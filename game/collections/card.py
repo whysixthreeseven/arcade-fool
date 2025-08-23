@@ -441,6 +441,7 @@ class Card:
             "card_type",
             "card_type_repr",
             "card_type_value",
+            "card_type_value_clean",
             "card_type_unicode"
             )
         
@@ -933,12 +934,23 @@ class Card:
         """
 
         # Acquiring card type value:
-        card_type_value: int = Card.CARD_TYPE_VALUE_INDEX[self.card_type]
+        card_type_value: int = self.card_type_value_clean
         if self.state_trump:
             card_type_value: int = card_type_value + Card.CARD_TRUMP_VALUE_BONUS
 
         # Returning:
         return card_type_value
+
+    
+    @cached_property
+    def card_type_value_clean(self) -> int:
+
+        # Acquiring card type value:
+        card_type_value: int = Card.CARD_TYPE_VALUE_INDEX[self.card_type]
+
+        # Returning:
+        return card_type_value
+
 
     
     @cached_property
@@ -1604,7 +1616,21 @@ class Card:
         self.__clear_cached_property_list(
             target_list = self.__cached_location_property_list
             )
-    
+
+
+    def reset_position(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Resetting position index:
+        self.__position_hand:    int | None = None
+        self.__position_added:   int | None = None
+        self.__position_table:   int | None = None
+        self.__position_stack:   int | None = None
+        self.__position_deck:    int | None = None
+        self.__position_discard: int | None = None
+
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
