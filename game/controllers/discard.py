@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 # Cache-related modules and scripts import:
-from game.collections.scripts import clear_cached_property
+from game.scripts import clear_cached_property
 from functools import cached_property
 from itertools import product
 
@@ -14,27 +14,27 @@ from game.variables import *
 from game.settings import *
 
 # Developer session values:
-from game.session import (
+from game.controllers.session import (
     DEV_ENABLE_ASSERTION,
     DEV_ENABLE_ECHO,
     )
 
 # Assertion functions import:
-from game.collections.scripts import (
+from game.scripts import (
     assert_value_is_default,
     assert_value_is_valid_type,
     assert_value_in_valid_range,
     )
 
 # Collections import:
-from game.collections.card import Card
+from game.controllers.card import CardObject
 
 
-class Discard:
+class DiscardController:
 
     def __init__(self):
         
-        self.__discard_container: list[Card]
+        self.__discard_container: list[CardObject]
 
     
     """
@@ -80,7 +80,7 @@ class Discard:
 
 
     @cached_property
-    def discard_container(self) -> list[Card]:
+    def discard_container(self) -> list[CardObject]:
         """
         TODO: Create a docstring.
         """
@@ -108,7 +108,7 @@ class Discard:
         """
 
         # Updating attribute:
-        self.__discard_container: list[Card] = []
+        self.__discard_container: list[CardObject] = []
 
         # Clearing cache:
         for cached_property in self.__cached_discard_property_list:
@@ -127,7 +127,7 @@ class Discard:
     """
 
 
-    def add_card(self, card_object: Card) -> None:
+    def add_card(self, card_object: CardObject) -> None:
         """
         TODO: Create a docstring.
         """

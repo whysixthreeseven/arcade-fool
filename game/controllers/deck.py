@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 # Cache-related modules and scripts import:
-from game.collections.scripts import clear_cached_property
+from game.scripts import clear_cached_property
 from functools import cached_property
 from itertools import product
 
@@ -14,20 +14,27 @@ from game.variables import *
 from game.settings import *
 
 # Developer session values:
-from game.session import (
+from game.controllers.session import (
     DEV_ENABLE_ASSERTION,
     DEV_ENABLE_ECHO,
     )
 
 # Assertion functions import:
-from game.collections.scripts import (
+from game.scripts import (
     assert_value_is_default,
     assert_value_is_valid_type,
     assert_value_in_valid_range,
     )
 
 # Collections import:
-from game.collections.card import Card
+from game.controllers.card import CardObject
+
+
+"""
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+DECK CONTROLLER BLOCK
+
+"""
 
 
 class DeckController:
@@ -39,7 +46,7 @@ class DeckController:
     def __init__(self):
         
         # Core attributes:
-        self.__deck_container: list[Card] = []
+        self.__deck_container: list[CardObject] = []
         self.__deck_trump_suit: str = VAR_CARD_SUIT_NOT_SET
 
     
@@ -64,7 +71,7 @@ class DeckController:
                 card_f = "cards" if self.deck_count > 1 else "card"
                 ),
             card_suit_trump = "{suit_unicode} trump".format(
-                suit_unicode = Card.CARD_SUIT_UNICODE_INDEX[self.deck_trump_suit],
+                suit_unicode = CardObject.CARD_SUIT_UNICODE_INDEX[self.deck_trump_suit],
                 )
             )
         
@@ -116,7 +123,7 @@ class DeckController:
 
 
     @cached_property
-    def deck_container(self) -> list[Card]:
+    def deck_container(self) -> list[CardObject]:
         """
         List container with all the card object items stored in it.
 
@@ -133,7 +140,7 @@ class DeckController:
 
     
     @cached_property
-    def deck_sealed(self) -> list[Card]:
+    def deck_sealed(self) -> list[CardObject]:
         """
         A list container with all 36 Card class type objects generated, set up and ready to use.
         This cached property is generated once and can be used multiple times without costing much
@@ -150,7 +157,7 @@ class DeckController:
         """
 
 
-        def create_card_object(init_suit: str, init_type: str, position_index: int) -> Card:
+        def create_card_object(init_suit: str, init_type: str, position_index: int) -> CardObject:
             """
             Generates a card object via Card class's staticmethod and sets a new position in deck.
             This function is used to quickly populate (generate) a list of Cards via generator and 
@@ -172,7 +179,7 @@ class DeckController:
             """
 
             # Creating card:
-            card_object: Card = Card.create_card_object(
+            card_object: CardObject = CardObject.create_card_object(
                 init_suit = init_suit,
                 init_type = init_type,
                 )
@@ -188,10 +195,10 @@ class DeckController:
 
 
         # Creating a deck container:
-        deck_sealed: list[Card] = list(
+        deck_sealed: list[CardObject] = list(
             create_card_object(init_suit, init_type, position_index) 
             for position_index, (init_suit, init_type) in enumerate(
-                product(Card.CARD_SUIT_LIST, Card.CARD_TYPE_LIST)
+                product(CardObject.CARD_SUIT_LIST, CardObject.CARD_TYPE_LIST)
                 )
             )
 
@@ -239,10 +246,10 @@ class DeckController:
         """
 
         # Getting a new deck and shuffling:
-        self.__deck_container: list[Card] = self.deck_sealed
+        self.__deck_container: list[CardObject] = self.deck_sealed
 
         # Selecting a new trump suit:
-        trump_suit: str = random.choice(Card.CARD_SUIT_LIST)
+        trump_suit: str = random.choice(CardObject.CARD_SUIT_LIST)
         self.set_deck_trump(
             set_value = trump_suit,
             clear_cache = False
@@ -286,7 +293,7 @@ class DeckController:
         """
 
         # Resetting deck container list:
-        self.__deck_container: list[Card] = []
+        self.__deck_container: list[CardObject] = []
 
         # Clearing cache:
         for cached_property in self.__cached_deck_property_list:
@@ -311,7 +318,7 @@ class DeckController:
             # Updating card objects:
             if self.deck_count > 0:
                 for card_object in self.__deck_container:
-                    if card_object.card_suit == set_value:
+                    if card_object.suit == set_value:
                         card_object.set_state_trump(
                             set_value = True
                             )
@@ -334,20 +341,25 @@ class DeckController:
     """
 
 
-    def draw_card(self) -> Card:
+    def draw_card(self) -> CardObject:
         """
         TODO: Create a docstring.
+        
+        :return CardObject: ...
         """
 
         # Checking if there are any cards left to draw:
         if self.deck_count >= 1:
 
             # Getting card object and removing it from the deck:
-            card_object: Card = self.deck_container[0]
+            card_object: CardObject = self.deck_container[0]
             self.__remove_card(
                 card_object = card_object,
                 clear_cache = False
                 )
+            
+            # Updating card object:
+            card_object.reset_position()        # <- Resets all positions to None
             
             # Clearing cache:
             for cached_property in self.__cached_deck_property_list:
@@ -355,9 +367,12 @@ class DeckController:
                     target_object = self,
                     target_attribute = cached_property
                     )
+            
+            # Returning:
+            return card_object
 
 
-    def __remove_card(self, card_object: Card, clear_cache: bool = False) -> None:
+    def __remove_card(self, card_object: CardObject, clear_cache: bool = False) -> None:
         """
         TODO: Create a docstring.
         """

@@ -15,13 +15,13 @@ def clear_cached_property(target_object: object, target_attribute: str) -> None:
         delattr(target_object, target_attribute)
 
 
-def timestamp(self) -> str:
+def timestamp() -> str:
     """
     TODO: Create a docstring
     """
 
     # Generating a formatted timestamp string:
-    time_now = datetime.now()
+    time_now: datetime = datetime.now()
     time_pattern: str = "%H:%M:%S"
     time_formatted: str = datetime.strftime(
         time_now,

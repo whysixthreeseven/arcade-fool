@@ -5,7 +5,7 @@ import os
 # Project settings:
 PROJECT_NAME: str = "Arcade Fool"
 PROJECT_DATE_STARTED: str = "2025.08.08"
-PROJECT_DATE_UPDATED: str = "2025.08.19"
+PROJECT_DATE_UPDATED: str = "2025.08.24"
 PROJECT_VERSION: str = "0.1c"
 
 # Directories settings:
@@ -62,8 +62,6 @@ CARD_COORDINATE_Y_HAND_OPPONENT: int = int(
     GAME_WINDOW_HEIGHT - 
     CARD_TEXTURE_HEIGHT_SCALED - CARD_TEXTURE_HEIGHT_SCALED / 4
     )
-CARD_COORDINATE_X_TABLE: int = int(GAME_WINDOW_WIDTH / 2)
-CARD_COORDINATE_Y_TABLE: int = int(GAME_WINDOW_HEIGHT / 2)
 
 # Card slide settings:
 CARD_SLIDE_DISTANCE_HOVER_HAND:  int   = int(CARD_TEXTURE_HEIGHT_SCALED / 3)
@@ -79,7 +77,13 @@ HAND_BOUNDARY_SIZE:      float = 0.65   # % occupied of all game window width
 HAND_OVERLAP_ITERATION:  float = 0.99   # % of decreased overlap margin per iteration
 HAND_OVERLAP_MARGIN_MAX: float = 0.85
 
-# Table settings:
+# Table coordinates settings:
+TABLE_COORDINATE_Y:       int = int
+TABLE_POSITION_MARGIN:    int = int(CARD_TEXTURE_WIDTH_SCALED * 0.35)
+TABLE_STACK_SHIFT_X:      int = +10
+TABLE_STACK_SHIFT_Y:      int = -5
+
+# Table position and stack index settings: 
 TABLE_POSITION_COUNT_MAX: int = 6
 TABLE_STACK_BOTTOM_INDEX: int = 0
 TABLE_STACK_TOP_INDEX:    int = 1

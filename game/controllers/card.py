@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 # Cache-related modules and scripts import:
-from game.collections.scripts import clear_cached_property
+from game.scripts import clear_cached_property
 from functools import cached_property
 
 # System-management library import:
@@ -20,13 +20,13 @@ from game.variables import *
 from game.settings import *
 
 # Developer session values:
-from game.session import (
+from game.controllers.session import (
     DEV_ENABLE_ASSERTION,
     DEV_ENABLE_ECHO,
     )
 
 # Assertion functions import:
-from game.collections.scripts import (
+from game.scripts import (
     assert_value_is_default,
     assert_value_is_valid_type,
     assert_value_in_valid_range,
@@ -40,7 +40,7 @@ CARD CLASS BLOCK
 """
 
 
-class Card:
+class CardObject:
     """
     ## About
 
@@ -140,8 +140,8 @@ class Card:
     def __init__(self) -> None:
 
         # Core attributes:
-        self.__card_suit: str = VAR_CARD_SUIT_NOT_SET
-        self.__card_type: str = VAR_CARD_TYPE_NOT_SET
+        self.__suit: str = VAR_CARD_SUIT_NOT_SET
+        self.__type: str = VAR_CARD_TYPE_NOT_SET
 
         # Position attributes:
         self.__position_added:   int | None = None
@@ -190,8 +190,8 @@ class Card:
         repr_string: str = "Card (not set)"
         if self.state_ready:
             repr_string: str = "{card_suit_unicode}{card_type_unicode} @{location_repr}".format(
-                card_suit_unicode = self.card_suit_unicode,
-                card_type_unicode = self.card_type_unicode,
+                card_suit_unicode = self.suit_unicode,
+                card_type_unicode = self.type_unicode,
                 location_repr = self.location_repr.lower()
                 )
         
@@ -199,7 +199,7 @@ class Card:
         return repr_string
 
 
-    def __gt__(self, card_object: Card) -> bool:
+    def __gt__(self, card_object: CardObject) -> bool:
         """
         Overwrites native __gt__ magic method. 
         
@@ -227,16 +227,16 @@ class Card:
         
         # Checking if two cards can be compared (trump or same suit values):
         eval_result: bool = False
-        if self.state_trump or self.card_suit == card_object.set_card_suit:
+        if self.state_trump or self.suit == card_object.set_suit:
 
             # Comparing:
-            eval_result: bool = self.card_type_value > card_object.card_type_value
+            eval_result: bool = self.type_value > card_object.type_value
 
         # Returning:
         return eval_result
 
 
-    def __lt__(self, card_object: Card) -> bool:
+    def __lt__(self, card_object: CardObject) -> bool:
         """
         Overwrites native __lt__ magic method. 
         
@@ -257,10 +257,10 @@ class Card:
         
         # Checking if two cards can be compared:
         eval_result: bool = False
-        if self.card_suit == card_object.set_card_suit:
+        if self.suit == card_object.set_suit:
 
             # Comparing:
-            eval_result: bool = self.card_type_value < card_object.card_type_value
+            eval_result: bool = self.type_value < card_object.type_value
 
         # Returning:
         return eval_result
@@ -279,7 +279,7 @@ class Card:
 
 
     @staticmethod
-    def create_card_object(init_suit: str, init_type: str) -> Card:
+    def create_card_object(init_suit: str, init_type: str) -> CardObject:
         """
         Creates and returns a card object with a set suit and type attributes, and loaded cover
         and front texture files based on the default texture pack. Made to be a static method to
@@ -293,13 +293,13 @@ class Card:
         """
 
         # Creating a card:
-        card_object: Card = Card()
+        card_object: CardObject = CardObject()
         
         # Setting core attributes:
-        card_object.set_card_suit(
+        card_object.set_suit(
             set_value = init_suit
             )
-        card_object.set_card_type(
+        card_object.set_type(
             set_value = init_type
             )
         
@@ -409,11 +409,11 @@ class Card:
 
         # Generating a list of cached properties:
         cached_property_list: tuple[str, ...] = (
-            "card_suit",
-            "card_suit_repr",
-            "card_suit_color",
-            "card_suit_color_repr",
-            "card_suit_unicode"
+            "suit",
+            "suit_repr",
+            "suit_color",
+            "suit_color_repr",
+            "suit_unicode"
             )
         
         # Returning:
@@ -438,11 +438,11 @@ class Card:
 
         # Generating a list of cached properties:
         cached_property_list: tuple[str, ...] = (
-            "card_type",
-            "card_type_repr",
-            "card_type_value",
-            "card_type_value_clean",
-            "card_type_unicode"
+            "type_default",
+            "type_repr",
+            "type_value",
+            "type_value_clean",
+            "type_unicode"
             )
         
         # Returning:
@@ -681,7 +681,7 @@ class Card:
 
     
     @cached_property
-    def card_suit(self) -> str:
+    def suit(self) -> str:
         """
         Card object's default suit value as is in variables.py script, e.g. "CARD_SUIT_HEARTS".
         
@@ -697,11 +697,11 @@ class Card:
         """
 
         # Returning:
-        return self.__card_suit
+        return self.__suit
     
 
     @cached_property
-    def card_suit_color(self) -> str:
+    def suit_color(self) -> str:
         """
         Card object's default suit value as is in variables.py script, e.g. "CARD_SUIT_COLOR_RED".
 
@@ -716,14 +716,14 @@ class Card:
         """
 
         # Acquiring suit color:
-        card_suit_color: str = Card.CARD_SUIT_COLOR_INDEX[self.card_suit]
+        card_suit_color: str = CardObject.CARD_SUIT_COLOR_INDEX[self.suit]
 
         # Returning:
         return card_suit_color
 
     
     @cached_property
-    def card_suit_repr(self) -> str:
+    def suit_repr(self) -> str:
         """
         Card object's formatted suit value, e.g. "Hearts".
 
@@ -739,7 +739,7 @@ class Card:
 
         # Formatting string:
         repr_string_formatted: str = self.__convert_to_repr(
-            attribute_string = self.card_suit,
+            attribute_string = self.suit,
             )
 
         # Returning:
@@ -747,7 +747,7 @@ class Card:
     
 
     @cached_property
-    def card_suit_color_repr(self) -> str:
+    def suit_color_repr(self) -> str:
         """
         Card object's formatted suit color value, e.g. "Red".
 
@@ -762,7 +762,7 @@ class Card:
 
         # Formatting string:
         repr_string_formatted: str = self.__convert_to_repr(
-            attribute_string = self.card_suit_color,
+            attribute_string = self.suit_color,
             )
 
         # Returning:
@@ -770,7 +770,7 @@ class Card:
 
     
     @cached_property
-    def card_suit_unicode(self) -> str:
+    def suit_unicode(self) -> str:
         """
         Card object's suit unicode value, e.g. ♡ for Hearts, or ♢ for Diamonds, or ♧ for Clubs, 
         or ♤ Spades. 
@@ -784,13 +784,13 @@ class Card:
         """
 
         # Acquiring suit unicode:
-        card_suit_unicode: str = Card.CARD_SUIT_UNICODE_INDEX[self.card_suit]
+        card_suit_unicode: str = CardObject.CARD_SUIT_UNICODE_INDEX[self.suit]
 
         # Returning:
         return card_suit_unicode
 
     
-    def set_card_suit(self, set_value: str) -> None:
+    def set_suit(self, set_value: str) -> None:
         """
         Sets a new card suit value to a card object, if current suit value is different. Must be 
         a default value as in variables.py script, e.g. "CARD_SUIT_HEARTS".
@@ -817,7 +817,7 @@ class Card:
                 )
             
             # Asserting value is default:
-            valid_list: tuple[str, ...] = Card.CARD_SUIT_LIST
+            valid_list: tuple[str, ...] = CardObject.CARD_SUIT_LIST
             assert_value_is_default(
                 check_value = set_value,
                 valid_list  = valid_list,
@@ -825,8 +825,8 @@ class Card:
                 )
 
         # Updating attribute:
-        if self.card_suit != set_value:
-            self.__card_suit: str = set_value
+        if self.suit != set_value:
+            self.__suit: str = set_value
 
             # Clearing cache (suit):
             self.__clear_cached_property_list(
@@ -873,7 +873,7 @@ class Card:
 
 
     @cached_property
-    def card_type(self) -> str:
+    def type_default(self) -> str:
         """
         Card object's default type value as is in variables.py script, e.g. "CARD_TYPE_JACK".
         
@@ -890,11 +890,11 @@ class Card:
         """
 
         # Returning:
-        return self.__card_type
+        return self.__type
     
 
     @cached_property
-    def card_type_repr(self) -> str:
+    def type_repr(self) -> str:
         """
         Card object's formatted type value, e.g. "Jack".
 
@@ -910,7 +910,7 @@ class Card:
 
         # Formatting string:
         repr_string_formatted: str = self.__convert_to_repr(
-            attribute_string = self.card_type,
+            attribute_string = self.type_default,
             )
 
         # Returning:
@@ -918,7 +918,7 @@ class Card:
 
     
     @cached_property
-    def card_type_value(self) -> int:
+    def type_value(self) -> int:
         """
         Card object's integer type value, e.g. 6 for a card of type "CARD_TYPE_SIX", or (if trump)
         107 for a card of type "CARD_TYPE_SEVEN" which state_trump is True (trump modifier applied).
@@ -934,19 +934,19 @@ class Card:
         """
 
         # Acquiring card type value:
-        card_type_value: int = self.card_type_value_clean
+        card_type_value: int = self.type_value_clean
         if self.state_trump:
-            card_type_value: int = card_type_value + Card.CARD_TRUMP_VALUE_BONUS
+            card_type_value: int = card_type_value + CardObject.CARD_TRUMP_VALUE_BONUS
 
         # Returning:
         return card_type_value
 
     
     @cached_property
-    def card_type_value_clean(self) -> int:
+    def type_value_clean(self) -> int:
 
         # Acquiring card type value:
-        card_type_value: int = Card.CARD_TYPE_VALUE_INDEX[self.card_type]
+        card_type_value: int = CardObject.CARD_TYPE_VALUE_INDEX[self.type_default]
 
         # Returning:
         return card_type_value
@@ -954,7 +954,7 @@ class Card:
 
     
     @cached_property
-    def card_type_unicode(self) -> str:
+    def type_unicode(self) -> str:
         """
         Card object's type unicode value, e.g. "6" for Six or "J" for Jack - the first letter of
         a named card type, or full numerical value (not calculated type value) for numerical card
@@ -977,20 +977,20 @@ class Card:
             )
         
         # If card type is Jack, or Queen, or King, or Ace, - take letter:
-        if self.card_type in card_type_named_list:
-            card_type_repr_char: str = self.card_type_repr[0]
+        if self.type_default in card_type_named_list:
+            card_type_repr_char: str = self.type_repr[0]
             card_type_unicode: str = card_type_repr_char.upper()
         
         # If card is 6, or 7, or 8, or 9, or 10, - take value:
         else:
-            card_type_value_char: str = str(self.card_type_value)
+            card_type_value_char: str = str(self.type_value_clean)
             card_type_unicode: str = card_type_value_char.upper()
 
         # Returning:
         return card_type_unicode
 
 
-    def set_card_type(self, set_value: str) -> None:
+    def set_type(self, set_value: str) -> None:
         """
         Sets a new card type value to a card object, if current type value is different. Must be 
         a default value as in variables.py script, e.g. "CARD_TYPE_LIST".
@@ -1017,7 +1017,7 @@ class Card:
                 )
             
             # Asserting value is default:
-            valid_list: tuple[str, ...] = Card.CARD_TYPE_LIST
+            valid_list: tuple[str, ...] = CardObject.CARD_TYPE_LIST
             assert_value_is_default(
                 check_value = set_value,
                 valid_list  = valid_list,
@@ -1025,8 +1025,8 @@ class Card:
                 )
 
         # Updating attribute:
-        if self.card_type != set_value:
-            self.__card_type: str = set_value
+        if self.type_default != set_value:
+            self.__type: str = set_value
 
             # Clearing cache (type):
             self.__clear_cached_property_list(
@@ -1368,7 +1368,7 @@ class Card:
                 self.__position_discard: int | None = None
 
                 # Updating cached property list:
-                cached_position_property_list: tuple[str, ...] = self.__cached_position_propaerty_list
+                cached_position_property_list: tuple[str, ...] = self.__cached_position_property_list
             
             # Clearing cache (position):
             self.__clear_cached_property_list(
@@ -1620,7 +1620,7 @@ class Card:
 
     def reset_position(self) -> None:
         """
-        TODO: Create a docstring.
+        Resets all position-related attributes to None.
         """
 
         # Resetting position index:
@@ -1763,8 +1763,8 @@ class Card:
 
         # Checking:
         state_ready: bool = bool(
-            self.card_suit != VAR_CARD_SUIT_NOT_SET and
-            self.card_type != VAR_CARD_TYPE_NOT_SET
+            self.suit != VAR_CARD_SUIT_NOT_SET and
+            self.type_default != VAR_CARD_TYPE_NOT_SET
             )
         
         # Returning:
@@ -2297,8 +2297,8 @@ class Card:
         
         # Generating filename:
         texture_filename: str = "{suit}_{type}.{extension}".format(
-            suit = self.card_suit_repr.lower(),
-            type = self.card_type_repr.lower(),
+            suit = self.suit_repr.lower(),
+            type = self.type_repr.lower(),
             extension = CARD_TEXTURE_EXTENSION
             )
         
@@ -2483,7 +2483,7 @@ class Card:
 
         # Checking if card is below or above the middle of the table:
         coordinate_y: int = CARD_COORDINATE_Y_HAND_PLAYER
-        if self.coordinate_y > CARD_COORDINATE_Y_TABLE:
+        if self.coordinate_y > TABLE_COORDINATE_Y:
             coordinate_y: int = CARD_COORDINATE_Y_HAND_OPPONENT
 
         # Returning:
@@ -2509,7 +2509,7 @@ class Card:
 
         # Checking if card is below or above the middle of the table:
         coordinate_y: int = self.coordinate_y_hand + CARD_SLIDE_DISTANCE_HOVER_HAND
-        if self.coordinate_y > CARD_COORDINATE_Y_TABLE:
+        if self.coordinate_y > TABLE_COORDINATE_Y:
             coordinate_y: int = int(self.coordinate_y_hand - CARD_SLIDE_DISTANCE_HOVER_HAND / 2)
 
         # Returning:
@@ -2678,26 +2678,34 @@ class Card:
         coordinate_x, coordinate_y = set_value
 
         # Updating:
-        self.set_coordinate_x(
-            set_value = coordinate_x,
-            ignore_assertion = True,
-            clear_cache = False,
-            )
-        self.set_coordinate_y(
-            set_value = coordinate_y,
-            ignore_assertion = True,
-            clear_cache = False,
-            )
+        coordinates_updated: bool = False
+        if coordinate_x != self.coordinate_x:
+            coordinates_updated: bool = True
+            self.set_coordinate_x(
+                set_value = coordinate_x,
+                ignore_assertion = True,
+                clear_cache = False,
+                )
+        if coordinate_y != self.coordinate_y:
+            coordinates_updated: bool = True
+            self.set_coordinate_y(
+                set_value = coordinate_y,
+                ignore_assertion = True,
+                clear_cache = False,
+                )
         
-        # Clearing cache (coordinates):
-        self.__clear_cached_property_list(
-            target_list = self.__cached_coordinates_property_list
-            )
-            
-        # Clearing cache (boundary):
-        self.__clear_cached_property_list(
-            target_list = self.__cached_boundary_property_list
-            )
+        # Clearing cache:
+        if coordinates_updated:
+
+            # Clearing cache (coordinates):
+            self.__clear_cached_property_list(
+                target_list = self.__cached_coordinates_property_list
+                )
+                
+            # Clearing cache (boundary):
+            self.__clear_cached_property_list(
+                target_list = self.__cached_boundary_property_list
+                )
             
     
     """
@@ -3222,7 +3230,7 @@ class Card:
                         slide_speed_modifier: float = CARD_SLIDE_SPEED_MOD_INCREASED
                         coordinates_end: tuple[int, int] = (
                             coordinate_x_end,
-                            CARD_COORDINATE_Y_TABLE
+                            TABLE_COORDINATE_Y
                             )
                 
                 # If card's current state is NOT hovered:
@@ -3232,7 +3240,7 @@ class Card:
                         slide_speed_modifier: float = CARD_SLIDE_SPEED_MOD_DEFAULT
                         coordinates_end: tuple[int, int] = (
                             coordinate_x_spot,
-                            CARD_COORDINATE_Y_TABLE
+                            TABLE_COORDINATE_Y
                             )
                         
             # Sliding to the correct position:
