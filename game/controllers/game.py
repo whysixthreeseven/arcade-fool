@@ -16,6 +16,13 @@ from game.controllers.session import (
     DEV_ENABLE_ECHO,
     )
 
+# Assertion functions import:
+from game.scripts import (
+    assert_value_is_default,
+    assert_value_is_valid_type,
+    assert_value_in_valid_range,
+    )
+
 
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -257,5 +264,298 @@ class GameController:
             )
     
     
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    SWEEP EVENTS METHODS BLOCK
 
+    """
+
+
+    def sweep_cards_to_discard(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Checking if there are any cards to sweep:
+        if self.__table.table_count > 0:
+
+            # Cycling through available cards in table:
+            for card_object in self.__table.table_container:
+
+                # Removing card from table container:
+                self.__table.remove_card(
+                    card_object = card_object,
+                    ignore_assertion = True
+                    )
+
+                # Resetting card's position:
+                card_object.reset_position()
+
+                # Adding card to discard pile:
+                self.__discard.add_card(
+                    card_object = card_object
+                    )
+            
+            # Updating discard:
+            ... # TODO: Implement
+
+    
+    def sweep_cards_to_hand(self, player_controller: PlayerController) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Assertion control:
+        if DEV_ENABLE_ASSERTION:
+
+            # Assertion controller is valid value:
+            valid_type: type = PlayerController
+            assert_eval: bool = assert_value_is_valid_type(
+                check_value = player_controller,
+                valid_type  = valid_type,
+                raise_error = True
+                )
+
+            # Asserting controller is expected:
+            valid_list: tuple = self.player_list
+            assert_eval: bool = assert_value_is_default(
+                check_value = player_controller,
+                valid_list  = valid_list,
+                raise_error = True
+                )
+
+        # Checking if there are any cards to sweep:
+        if self.__table.table_count > 0:
+
+            # Cycling through available cards in table:
+            for card_object in self.__table.table_container:
+
+                # Removing card from table container:
+                self.__table.remove_card(
+                    card_object = card_object,
+                    ignore_assertion = True
+                    )
+
+                # Resetting card's position:
+                card_object.reset_position()
+
+                # Adding card to player controller's container:
+                player_controller.add_card(
+                    card_object = card_object,
+                    update_container = False        # Call update later
+                    )
+            
+            # Updating player controller:
+            ... # TODO: Implement
+
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    CURSOR EVENTS METHODS BLOCK
+
+    """
+
+
+    @cached_property
+    def __player_one_boundary(self) -> tuple[range, range]:
+        """
+        TODO: Create a docstring.
+
+        Cached. Cannot be removed.
+        """
+
+        # Calculating shift values:
+        coordinate_x_shift: int = int(
+            GAME_WINDOW_WIDTH - 
+            GAME_WINDOW_WIDTH * HAND_BOUNDARY_SIZE
+            )
+        coordinate_y_shift: int = int(
+            CARD_TEXTURE_HEIGHT_SCALED * 0.10
+            )
         
+        # Creating horizontal boundary range:
+        coordiante_x_boundary: range = range(
+            0 + coordinate_x_shift,
+            GAME_WINDOW_WIDTH - coordinate_y_shift
+            )
+
+        # Creating vertical boundary range:
+        coordinate_y_top: int = int(
+            CARD_COORDINATE_Y_HAND_PLAYER + 
+            CARD_TEXTURE_HEIGHT_SCALED / 2 +
+            CARD_SLIDE_DISTANCE_HOVER_HAND
+            )
+        coordinate_y_bottom: int = int(
+            CARD_COORDINATE_Y_HAND_PLAYER -
+            CARD_TEXTURE_HEIGHT_SCALED / 2 - 
+            CARD_SLIDE_DISTANCE_HOVER_HAND
+            )
+        coordinate_y_boundary: range = range(
+            coordinate_y_bottom,
+            coordiante_y_top
+            )
+
+        # Packing:
+        player_one_boundary: tuple[range, range] = (
+            coordiante_x_boundary,
+            coordinate_y_boundary
+            )
+        
+        # Returning:
+        return player_one_boundary
+
+
+    @cached_property
+    def __player_two_boundary(self) -> tuple[range, range]:
+        """
+        TODO: Create a docstring.
+
+        Cached. Cannot be removed.
+        """
+
+        # Calculating shift values:
+        coordinate_x_shift: int = int(
+            GAME_WINDOW_WIDTH - 
+            GAME_WINDOW_WIDTH * HAND_BOUNDARY_SIZE
+            )
+        coordinate_y_shift: int = int(
+            CARD_TEXTURE_HEIGHT_SCALED * 0.10
+            )
+        
+        # Creating horizontal boundary range:
+        coordiante_x_boundary: range = range(
+            0 + coordinate_x_shift,
+            GAME_WINDOW_WIDTH - coordinate_y_shift
+            )
+
+        # Creating vertical boundary range:
+        coordinate_y_top: int = int(
+            CARD_COORDINATE_Y_HAND_OPPONENT +
+            CARD_TEXTURE_HEIGHT_SCALED / 2 +
+            CARD_SLIDE_DISTANCE_HOVER_HAND
+            )
+        coordinate_y_bottom: int = int(
+            CARD_COORDINATE_Y_HAND_OPPONENT -
+            CARD_TEXTURE_HEIGHT_SCALED / 2 -
+            CARD_SLIDE_DISTANCE_HOVER_HAND
+            )
+        coordinate_y_boundary: range = range(
+            coordinate_y_bottom,
+            coordinate_y_top,
+            )
+
+        # Packing:
+        player_two_boundary: tuple[range, range] = (
+            coordiante_x_boundary,
+            coordinate_y_boundary
+            )
+        
+        # Returning:
+        return player_two_boundary
+
+
+    def cursor_in_player_one_area(self, cursor_coordinates: tuple[int, int]) -> bool:
+        """
+        TODO: Create a docstring
+        """
+
+        # Assertion control:
+        if DEV_ENABLE_ASSERTION:
+
+            # Asserting container is valid type
+            valid_type: type = tuple
+            assert_value_is_valid_type(
+                check_value = set_value,
+                valid_type  = valid_type,
+                raise_error = True,
+                )
+
+            # Asserting container items are valid type:        
+            for coordinate_value in set_value:
+                valid_type: type = int
+                assert_value_is_valid_type(
+                    check_value = coordinate_value,
+                    valid_type  = valid_type,
+                    raise_error = True
+                    )
+
+        # Unpacking containers:
+        cursor_coordinate_x, cursor_coordinate_y = cursor_coordinates
+        coordinate_x_range, coordinate_y_range = self.__player_one_boundary
+
+        # Checking if cursor coordinates in boundary ranges:
+        assert_eval: bool = bool(
+            cursor_coordinate_x in coordinate_x_range and
+            cursor_coordinate_y in coordinate_y_range
+            )
+
+        # Returning:
+        return assert_eval
+    
+
+    def cursor_in_player_two_area(self, cursor_coordinates: tuple[int, int]) -> bool:
+        """
+        TODO: Create a docstring
+        """
+
+        # Assertion control:
+        if DEV_ENABLE_ASSERTION:
+
+            # Asserting container is valid type
+            valid_type: type = tuple
+            assert_value_is_valid_type(
+                check_value = set_value,
+                valid_type  = valid_type,
+                raise_error = True,
+                )
+
+            # Asserting container items are valid type:        
+            for coordinate_value in set_value:
+                valid_type: type = int
+                assert_value_is_valid_type(
+                    check_value = coordinate_value,
+                    valid_type  = valid_type,
+                    raise_error = True
+                    )
+
+        # Unpacking containers:
+        cursor_coordinate_x, cursor_coordinate_y = cursor_coordinates
+        coordinate_x_range, coordinate_y_range = self.__player_two_boundary
+
+        # Checking if cursor coordinates in boundary ranges:
+        assert_eval: bool = bool(
+            cursor_coordinate_x in coordinate_x_range and
+            cursor_coordinate_y in coordinate_y_range
+            )
+
+        # Returning:
+        return assert_eval
+    
+
+    def cursor_in_table_area(self, cursor_coordinates: tuple[int, int]) -> bool:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Assertion control:
+        if DEV_ENABLE_ASSERTION:
+
+            # Asserting container is valid type
+            valid_type: type = tuple
+            assert_value_is_valid_type(
+                check_value = set_value,
+                valid_type  = valid_type,
+                raise_error = True,
+                )
+
+            # Asserting container items are valid type:        
+            for coordinate_value in set_value:
+                valid_type: type = int
+                assert_value_is_valid_type(
+                    check_value = coordinate_value,
+                    valid_type  = valid_type,
+                    raise_error = True
+                    )
+        
+        # Unpacking containers:
+        cursor_coordinate_x, cursor_coordinate_y = cursor_coordinates
