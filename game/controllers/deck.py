@@ -254,6 +254,13 @@ class DeckController:
             set_value = trump_suit,
             clear_cache = False
             )
+        
+        # Updating trump cards:
+        for card_object in self.__deck_container:
+            if card_object.suit == trump_suit:
+                card_object.set_state_trump(
+                    set_value = True
+                    )
 
         # Clearing cache:
         for cached_property in self.__cached_deck_property_list:

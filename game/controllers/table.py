@@ -149,6 +149,8 @@ class TableController:
         cached_property_list: tuple[str, ...] = (
             "table_map",
             "table_container",
+            "table_container_bottom",
+            "table_container_top",
             "table_count",
             "table_empty_position",
             )
@@ -200,7 +202,49 @@ class TableController:
         # Returning:
         return card_list_converted
 
+
+    @cached_property
+    def table_container_bottom(self) -> tuple[CardObject, ...]:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Creating an empty tuple container (if no cards are available)
+        card_list: tuple[CardObject, ...] = tuple()
+
+        # Gathering only bottom stacked cards:
+        if self.table_count > 0 :
+            card_list: tuple[CardObject, ...] = tuple(
+                card_object for card_object
+                in self.table_container
+                if card_object.position_stack == TABLE_STACK_BOTTOM_INDEX
+                )
+        
+        # Returning:
+        return card_list
     
+
+    @cached_property
+    def table_container_top(self) -> tuple[CardObject, ...]:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Creating an empty tuple container (if no cards are available)
+        card_list: tuple[CardObject, ...] = tuple()
+
+        # Gathering only bottom stacked cards:
+        if self.table_count > 0 :
+            card_list: tuple[CardObject, ...] = tuple(
+                card_object for card_object
+                in self.table_container
+                if card_object.position_stack == TABLE_STACK_TOP_INDEX
+                )
+        
+        # Returning:
+        return card_list
+    
+
     @cached_property
     def table_count(self) -> int:
         """
@@ -225,14 +269,8 @@ class TableController:
         # Creating empty position index dictionary:
         table_position_index: dict[int, dict[int, tuple[int, int]]] = {}
 
-        # Calculating table width:
-        table_width: int = int(
-            CARD_TEXTURE_WIDTH_SCALED * TABLE_POSITION_COUNT_MAX + 
-            TABLE_POSITION_MARGIN * (TABLE_POSITION_COUNT_MAX - 1)
-            )
-        
         # Calculating start coordinates:
-        table_coordinate_x_start = int(GAME_WINDOW_WIDTH / 2 - table_width / 2)
+        table_coordinate_x_start = int(TABLE_COORDINATE_X - TABLE_WIDTH / 2)
         position_index_coordinate_x_start: int = int(
             table_coordinate_x_start + CARD_TEXTURE_WIDTH_SCALED / 2
             )

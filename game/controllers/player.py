@@ -32,14 +32,73 @@ from game.controllers.card import CardObject
 
 class PlayerController:
 
+
     def __init__(self) -> None:
 
+        # User information attributes:
+        self.__player_name: str = VAR_PLAYER_NAME_NOT_SET
+        self.__player_type: str = VAR_PLAYER_TYPE_NOT_SET
+
+        # COntainer:
         self.__hand_container: list[CardObject] = []
+        self.__hand_iter_count: int = 0
 
         # State attributes:
         self.__state_active:    bool = False
         self.__state_attacking: bool = False
         self.__state_defending: bool = False
+
+    
+    def __repr__(self):
+        """
+        TODO: Create a docstring.
+        """
+
+        # TODO: Implement.
+
+        # Returning:
+        return self.__player_name
+    
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    CLASS STATIC METHODS BLOCK
+    
+    Card's static methods that are available across the module and/or project, giving other scripts
+    and option to create card objects via a method with all required setters onboard. Made to be a 
+    static method to avoid circular import error via script.py file, and to avoid creating more 
+    setter methods and checks.
+
+    """
+
+
+    @staticmethod
+    def create_player_controller(init_name: str, init_type: str) -> PlayerController:
+        """
+        Creates and returns a card object with a set suit and type attributes, and loaded cover
+        and front texture files based on the default texture pack. Made to be a static method to
+        avoid circular import error via script.py file, and to avoid creating more setter methods 
+        and checks.
+
+        :param str init_suit: Suit string value, must be a default value, e.g. "CARD_SUIT_HEARTS".
+        :param str init_type: Type string value, must be a default value, e.g. "CARD_TYPE_SIX".
+
+        :return Card: Card class-type object.
+        """
+
+        # Creating a controller:
+        player_controller: PlayerController = PlayerController()
+        
+        # Setting core attributes:
+        player_controller.set_player_name(
+            set_value = init_name
+            )
+        player_controller.set_player_type(
+            set_value = init_type
+            )
+        
+        # Returning:
+        return player_controller
 
     
     """
@@ -96,6 +155,32 @@ class PlayerController:
 
 
     @cached_property
+    def __cached_info_property_list(self) -> tuple[str, ...]:
+        """
+        A tuple container with cached property (attribute) string values related to a certain 
+        block within the class object. Used to cycle through the property (attribute) names and 
+        use hasattr and delattr functions to remove these properties (attributes) from the object.
+        Thus, clearing cache. 
+        
+        Cached.
+
+        Most of the setter methods that should automatically clear related cached properties
+        would use a for-loop, e.g. for cached_property in this cached_property_list: clear_func().
+
+        :return tuple[str, ...]: A tuple container with cached property (attribute) string values.
+        """
+
+        # Generating a list of cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "player_name",
+            "player_type"
+            )
+        
+        # Returning:
+        return cached_property_list
+
+
+    @cached_property
     def __cached_hand_property_list(self) -> tuple[str, ...]:
         """
         A tuple container with cached property (attribute) string values related to a certain 
@@ -116,6 +201,7 @@ class PlayerController:
             "hand_container",
             "hand_playable",
             "hand_count",
+            "hand_playable_count",
             "hand_value",
             )
         
@@ -148,6 +234,104 @@ class PlayerController:
         
         # Returning:
         return cached_property_list
+    
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    PLAYER INFO METHODS AND PROPERTIES BLOCK
+
+    """
+
+
+    @cached_property
+    def player_name(self) -> str:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__player_name
+    
+
+    @cached_property
+    def player_type(self) -> str:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__player_type
+    
+
+    @cached_property
+    def player_computer(self) -> bool:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Checking player type:
+        player_computer: bool = False
+        if self.player_type == VAR_PLAYER_TYPE_COMPUTER:
+            player_computer: bool = True
+
+        # Returning:
+        return player_computer
+    
+
+    def set_player_name(self, set_value: str) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Assertion control:
+        if DEV_ENABLE_ASSERTION:
+
+            # Asserting sort method is valid type:
+            valid_type: bool = str
+            assert_value_is_valid_type(
+                check_value = set_value,
+                valid_type = valid_type,
+                raise_error = True
+                )
+            
+        # Updating attribute:
+        if self.player_name != set_value:
+            self.__player_name: str = set_value
+
+            # Clearing cache:
+            self.__clear_cached_property(
+                target_attribute = "player_name"
+                )
+            
+    
+    def set_player_type(self, set_value: str) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Assertion control:
+        if DEV_ENABLE_ASSERTION:
+
+            # Asserting sort method is valid type:
+            valid_type: bool = str
+            assert_value_is_valid_type(
+                check_value = set_value,
+                valid_type = valid_type,
+                raise_error = True
+                )
+            
+        # Updating attribute:
+        if self.player_type != set_value:
+            self.__player_type: str = set_value
+
+            # Clearing cache:
+            cached_property_list: tuple[str, ...] = (
+                "player_type",
+                "player_computer"
+                )
+            self.__clear_cached_property_list(
+                target_list = cached_property_list
+                )
 
 
     """
@@ -199,6 +383,19 @@ class PlayerController:
 
         # Returning:
         return hand_container_count
+    
+
+    @cached_property
+    def hand_playable_count(self) -> int:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Calculating:
+        hand_playable_count: int = len(self.hand_playable)
+
+        # Returning:
+        return hand_playable_count
 
     
     @cached_property
@@ -231,7 +428,7 @@ class PlayerController:
 
         # Calculating the current hand width:
         card_overlap_current: int = HAND_OVERLAP_MARGIN_MAX
-        hand_width_max: int = int(GAME_WINDOW_WIDTH * HAND_BOUNDARY_SIZE)
+        hand_width_max: int = int(GAME_WINDOW_WIDTH * HAND_BOUNDARY_MOD)
         hand_width_current: int = int(
             self.hand_count * 
             CARD_TEXTURE_WIDTH_SCALED * card_overlap_current
@@ -248,8 +445,15 @@ class PlayerController:
         # Calculating start position:
         card_coordinate_x_start: int = int(
             (GAME_WINDOW_WIDTH / 2 - hand_width_current / 2) + 
-            CARD_TEXTURE_WIDTH_SCALED / 2
+            CARD_TEXTURE_WIDTH_SCALED / 6       # Fine-tuned
             )
+        
+        # Selecting appropriate coordinate y per player:
+        coordinate_y_index: dict[str, int] = {
+            VAR_PLAYER_TYPE_PLAYER: CARD_COORDINATE_Y_HAND_PLAYER,
+            VAR_PLAYER_TYPE_COMPUTER: CARD_COORDINATE_Y_HAND_OPPONENT
+            }
+        coordinate_y: int = coordinate_y_index[self.player_type]
 
         # Updating position index dictionary:
         for position_index in hand_position_index:
@@ -257,14 +461,27 @@ class PlayerController:
                 card_coordinate_x_start + 
                 CARD_TEXTURE_WIDTH_SCALED * card_overlap_current * position_index
                 )
-            coordinate_y: int = CARD_COORDINATE_Y_HAND_PLAYER
             hand_position_index[position_index] = (coordinate_x, coordinate_y)
         
         # Returning:
         return hand_position_index
+    
+
+    def clear_hand(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Updating attribute:
+        self.__hand_container: list[CardObject] = []
+
+        # Clearing cache:
+        self.__clear_cached_property_list(
+            self.__cached_hand_property_list
+            )
 
 
-    def __update_hand_position(self) -> None:
+    def update_hand_position(self) -> None:
         """
         TODO: Create a docstring.
         """
@@ -280,17 +497,12 @@ class PlayerController:
             card_object.set_coordinates(
                 set_value = position_coordinates
                 )
+            card_object.set_coordinates_expected(
+                set_value = position_coordinates
+                )
 
 
-    def __update_hand_state(self) -> None:
-        """
-        TODO: Create a docstring.
-        """
-
-        ...
-
-
-    def update_hand(self, table_map: dict[int, dict[int, tuple[int, int]]]) -> None:
+    def update_hand_state(self, table_map: dict[int, dict[int, tuple[int, int]]]) -> None:
         """
         TODO: Create a docstring.
         """
@@ -335,7 +547,8 @@ class PlayerController:
 
     def sort_hand(self, 
                   sort_method: str,                 # Default sort method as in SESSION controller
-                  ascending_order: bool = True      # Value and card suit priority order
+                  ascending_order: bool = True,     # Value and card suit priority order
+                  update_position: bool = True      # Flag to update card objects' positions
                   ) -> None:
         """
         TODO: Create a docstring.
@@ -384,14 +597,15 @@ class PlayerController:
                     key = lambda card_object: int(          # Suit priority by index
                         CardObject.CARD_SUIT_LIST.index(
                             card_object.suit
-                            )
-                        ),
+                            ), 
+                        )
+                        - card_object.type_value_clean,
                     reverse = reverse_check,    # Top priority left (default)
                     )
 
             # Sorting by value (ignoring trump value):
             elif sort_method == VAR_SESSION_SORT_METHOD_VALUE_CLEAN:
-                reverse_check: bool = True if not ascending_order else False
+                reverse_check: bool = ascending_order
                 hand_sorted: list[CardObject] = sorted(
                     self.hand_container,
                     key = lambda card_object: card_object.type_value_clean,
@@ -400,7 +614,7 @@ class PlayerController:
 
             # Sorting by value (default):
             elif sort_method == VAR_SESSION_SORT_METHOD_VALUE:
-                reverse_check: bool = True if not ascending_order else False
+                reverse_check: bool = ascending_order
                 hand_sorted: list[CardObject] = sorted(
                     self.hand_container,
                     key = lambda card_object: card_object.type_value,
@@ -409,15 +623,27 @@ class PlayerController:
 
             # Sorting by time added to hand:
             elif sort_method == VAR_SESSION_SORT_METHOD_ADDED:
-                reverse_check: bool = True if ascending_order else False
+                reverse_check: bool = True if not ascending_order else False
                 hand_sorted: list[CardObject] = sorted(
                     self.hand_container,
                     key = lambda card_object: card_object.position_added,
                     reverse = reverse_check,        # First left (default)
                     )
+                
+            # Updating card objects' position index:
+            for position_index, card_object in enumerate(hand_sorted):
+                card_object: CardObject
+                card_object.set_position_hand(
+                    position_index = position_index,
+                    update_related = False
+                    )
             
             # Updating container:
             self.__hand_container: list[CardObject] = hand_sorted
+
+            # Updating card object's positions in hand:
+            if update_position:
+                self.update_hand_position()
 
             # Clearing cache:
             self.__clear_cached_property_list(
@@ -669,6 +895,13 @@ class PlayerController:
                 position_index = card_position,
                 update_related = True
                 )
+            
+            # Updating card added index:
+            card_object.set_position_added(
+                position_index = self.__hand_iter_count,
+                update_related = True
+                )
+            self.__hand_iter_count += 1
             
             # Adding card to the list:
             self.__hand_container.append(

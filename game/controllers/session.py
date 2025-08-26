@@ -27,6 +27,7 @@ SESSION CONTROLLER BLOCK
 # GLOBALLY AVAILABLE developer session flags:
 DEV_ENABLE_ASSERTION: bool = False
 DEV_ENABLE_ECHO: bool = True
+DEV_ENABLE_DEBUG_RENDER: bool = True
 
 
 class SessionController:
@@ -40,6 +41,9 @@ class SessionController:
         )
 
     def __init__(self):
+
+        # User settings:
+        self.__user_name: str = VAR_PLAYER_NAME_ONE_DEFAULT
         
         # Menu selections:
         self.__sort_method:  str = VAR_SESSION_SORT_METHOD_SUIT
@@ -216,7 +220,50 @@ class SessionController:
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    SORTH METHODS & PROPERTIES BLOCK
+    USER METHODS & PROPERTIES BLOCK
+
+    """
+
+
+    @cached_property
+    def user_name(self) -> str:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__user_name
+    
+
+    def set_user_name(self, set_value: str) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Assertion control:
+        if DEV_ENABLE_ASSERTION:
+
+            # Asserting value is valid type:
+            valid_type: type = str
+            assert_value_is_valid_type(
+                check_value = set_value,
+                valid_type  = valid_type,
+                raise_error = True,
+                )
+
+        # Updating attribute:
+        if self.user_name != set_value:
+            self.__user_name: str = set_value
+
+            # Clearing cache:
+            self.__clear_cached_property(
+                target_attribute = "user_name"
+                )
+    
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    SORT METHODS & PROPERTIES BLOCK
 
     """
 

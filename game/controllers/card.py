@@ -161,6 +161,11 @@ class CardObject:
         # Coordinates attributes:
         self.__coordinate_x: int = 0
         self.__coordinate_y: int = 0
+        self.__coordinate_x_expected: int = 0
+        self.__coordinate_y_expected: int = 0
+        
+        # Slide attributes:
+        self.__slide_speed: int = CARD_SLIDE_SPEED
 
         # Texture attributes:
         self.__texture_pack:               str | None = None
@@ -170,6 +175,7 @@ class CardObject:
         self.__texture_front_filename:     str | None = None
         self.__texture_front_filepath:     str | None = None
         self.__texture_front_object:   Texture | None = None
+
 
     
     def __repr__(self) -> str:
@@ -648,6 +654,7 @@ class CardObject:
             "render_width",
             "render_height",
             "render_texture",
+            "render_texture_filename",
             )
         
         # Returning:
@@ -1234,12 +1241,12 @@ class CardObject:
     def set_position_added(self, position_index: int, update_related: bool = True) -> None:
         """
         Sets a new position added to the card object. This method may reset other position-related 
-        attributes to None, if this stter changes the location of the card in game, e.g. setting a
+        attributes to None, if this setter changes the location of the card in game, e.g. setting a
         new position added will set position in deck to None, as it is no longer (or can no longer)
         be in deck container.
 
         Automatically clears location and position property related cached attributes if parameter 
-        update_related is True, otherwise clears only "position_added" attribute.
+        `update_related` is True, otherwise clears only ``position_added`` attribute.
 
         :param int position_index: Integer value of a new position added. Must be in range 0-35.
         :param bool update_related: Flag to update related position attributes, setting them to
@@ -1281,8 +1288,8 @@ class CardObject:
             self.__position_added: int = position_index
 
             # Cache list:
-            cached_position_property_list: tuple[str, ...] = tuple(
-                "position_added"
+            cached_position_property_list: tuple[str, ...] = (
+                "position_added",
                 )
 
             # Updating related positions:
@@ -1309,7 +1316,7 @@ class CardObject:
     def set_position_hand(self, position_index: int, update_related: bool = True) -> None:
         """
         Sets a new position in hand to the card object. This method may reset other position-related
-        attributes to None, if this stter changes the location of the card in game, e.g. setting a
+        attributes to None, if this setter changes the location of the card in game, e.g. setting a
         new position in hand will set position in deck to None, as it is no longer (or can no longer)
         be in deck container.
 
@@ -1356,8 +1363,8 @@ class CardObject:
             self.__position_hand: int = position_index
 
             # Cache list:
-            cached_position_property_list: tuple[str, ...] = tuple(
-                "position_hand"
+            cached_position_property_list: tuple[str, ...] = (
+                "position_hand",
                 )
 
             # Updating related positions:
@@ -1384,7 +1391,7 @@ class CardObject:
     def set_position_table(self, position_index: int, stack_index: int, update_related: bool = True) -> None:
         """
         Sets a new position on table to the card object. The method may reset other position-related
-        attributes to None, if this stter changes the location of the card in game, e.g. setting a
+        attributes to None, if this setter changes the location of the card in game, e.g. setting a
         new position in hand will set position in deck to None, as it is no longer (or can no longer)
         be in deck container.
 
@@ -1470,7 +1477,7 @@ class CardObject:
     def set_position_deck(self, position_index: int, update_related: bool = True) -> None:
         """
         Sets a new position in deck to the card object. The method may reset other position-related
-        attributes to None, if this stter changes the location of the card in game, e.g. setting a
+        attributes to None, if this setter changes the location of the card in game, e.g. setting a
         new position in hand will set position in deck to None, as it is no longer (or can no longer)
         be in deck container.
 
@@ -1545,7 +1552,7 @@ class CardObject:
     def set_position_discard(self, position_index: int, update_related: bool = True) -> None:
         """
         Sets a new position in discard pile to the card object. The method may reset other position
-        -related attributes to None, if this stter changes the location of the card in game, e.g. 
+        -related attributes to None, if this setter changes the location of the card in game, e.g. 
         setting a new position in hand will set position in deck to None, as it is no longer (or 
         can no longer) be in deck container.
 
@@ -2091,6 +2098,11 @@ class CardObject:
             self.__clear_cached_property_list(
                 target_list = self.__cached_render_property_list
                 )
+            
+            # Clearing cache (boundary):
+            self.__clear_cached_property(
+                target_attribute = "boundary_top"
+                )
                 
     
     def reset_state(self) -> None:
@@ -2510,11 +2522,11 @@ class CardObject:
         # Checking if card is below or above the middle of the table:
         coordinate_y: int = self.coordinate_y_hand + CARD_SLIDE_DISTANCE_HOVER_HAND
         if self.coordinate_y > TABLE_COORDINATE_Y:
-            coordinate_y: int = int(self.coordinate_y_hand - CARD_SLIDE_DISTANCE_HOVER_HAND / 2)
+            coordinate_y: int = int(self.coordinate_y_hand - CARD_SLIDE_DISTANCE_HOVER_HAND / 3)
 
         # Returning:
         return coordinate_y
-
+    
 
     @cached_property
     def coordinates(self) -> int:
@@ -2538,10 +2550,31 @@ class CardObject:
         return coordinates_container
     
 
+    @cached_property
+    def coordinate_x_expected(self) -> int:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__coordinate_x_expected
+    
+
+    @cached_property
+    def coordinate_y_expected(self) -> int:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__coordinate_y_expected
+    
+
     def set_coordinate_x(self, 
                          set_value: int, 
                          ignore_assertion: bool = False, 
-                         clear_cache: bool = True
+                         clear_cache: bool = True,
+                         update_boundaries: bool = False,
                          ) -> None:
         """
         Sets a new coordinate x value for card object.
@@ -2583,15 +2616,17 @@ class CardObject:
                     )
                 
                 # Clearing cache (boundary):
-                self.__clear_cached_property_list(
-                    target_list = self.__cached_boundary_property_list,
-                    )
+                if update_boundaries:
+                    self.__clear_cached_property_list(
+                        target_list = self.__cached_boundary_property_list,
+                        )
                 
 
     def set_coordinate_y(self, 
                          set_value: int, 
                          ignore_assertion: bool = False, 
-                         clear_cache: bool = True
+                         clear_cache: bool = True,
+                         update_boundaries: bool = False,
                          ) -> None:
         """
         Sets a new coordinate y value for card object.
@@ -2633,12 +2668,16 @@ class CardObject:
                     )
                 
                 # Clearing cache (boundary):
-                self.__clear_cached_property_list(
-                    target_list = self.__cached_boundary_property_list,
-                    )
+                if update_boundaries:
+                    self.__clear_cached_property_list(
+                        target_list = self.__cached_boundary_property_list,
+                        )
                 
     
-    def set_coordinates(self, set_value: tuple[int, int]) -> None:
+    def set_coordinates(self, 
+                        set_value: tuple[int, int],
+                        update_boundaries: bool = True
+                        ) -> None:
         """
         Sets new coordinates x and y for card object.
 
@@ -2703,8 +2742,133 @@ class CardObject:
                 )
                 
             # Clearing cache (boundary):
+            if update_boundaries:
+                self.__clear_cached_property_list(
+                    target_list = self.__cached_boundary_property_list
+                    )
+            
+    
+    def set_coordinate_x_expected(self, 
+                                  set_value: int, 
+                                  ignore_assertion: bool = False, 
+                                  clear_cache: bool = True
+                                  ) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Assertion control:
+        if DEV_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value is valid type:
+            valid_type: type = int
+            assert_value_is_valid_type(
+                check_value = set_value,
+                valid_type  = valid_type,
+                raise_error = True,
+                )
+
+        # Updating attribute:
+        if self.coordinate_x_expected != set_value:
+            self.__coordinate_x_expected: int = set_value
+
+            # Clearing cache:
+            if clear_cache:
+
+                # Clearing cache (coordinates):
+                self.__clear_cached_property(
+                    target_attribute = "coordinate_x_expected"
+                    )
+
+
+    def set_coordinate_y_expected(self, 
+                                  set_value: int, 
+                                  ignore_assertion: bool = False, 
+                                  clear_cache: bool = True
+                                  ) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Assertion control:
+        if DEV_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value is valid type:
+            valid_type: type = int
+            assert_value_is_valid_type(
+                check_value = set_value,
+                valid_type  = valid_type,
+                raise_error = True,
+                )
+
+        # Updating attribute:
+        if self.coordinate_y_expected != set_value:
+            self.__coordinate_y_expected: int = set_value
+
+            # Clearing cache:
+            if clear_cache:
+
+                # Clearing cache (coordinates):
+                self.__clear_cached_property(
+                    target_attribute = "coordinate_y_expected"
+                    )
+                
+    
+    def set_coordinates_expected(self, set_value: tuple[int, int]) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Assertion control:
+        if DEV_ENABLE_ASSERTION:
+
+            # Asserting value is valid type:
+            valid_type: type = tuple
+            assert_value_is_valid_type(
+                check_value = set_value,
+                valid_type  = valid_type,
+                raise_error = True,
+                )
+
+            # Asserting container items are valid type:        
+            for coordinate_value in set_value:
+                valid_type: type = int
+                assert_value_is_valid_type(
+                    check_value = coordinate_value,
+                    valid_type  = valid_type,
+                    raise_error = True
+                    )
+
+        # Unpacking container:
+        coordinate_x, coordinate_y = set_value
+
+        # Updating:
+        coordinates_updated: bool = False
+        if coordinate_x != self.coordinate_x_expected:
+            coordinates_updated: bool = True
+            self.set_coordinate_x_expected(
+                set_value = coordinate_x,
+                ignore_assertion = True,
+                clear_cache = False,
+                )
+        if coordinate_y != self.coordinate_y_expected:
+            coordinates_updated: bool = True
+            self.set_coordinate_y_expected(
+                set_value = coordinate_y,
+                ignore_assertion = True,
+                clear_cache = False,
+                )
+        
+        # Clearing cache:
+        if coordinates_updated:
+
+            # Clearing cache (coordinates expected):
+            cached_property_list: tuple[str, ...] = (
+                "coordinate_x_expected",
+                "coordinate_y_expected"
+                )
             self.__clear_cached_property_list(
-                target_list = self.__cached_boundary_property_list
+                target_list = cached_property_list
                 )
             
     
@@ -2814,7 +2978,9 @@ class CardObject:
         """
 
         # Calculating boundary coordinate:
-        boundary_coordinate_y: int = int(self.coordinate_y + CARD_TEXTURE_WIDTH_SCALED / 2)
+        boundary_coordinate_y: int = int(self.coordinate_y + CARD_TEXTURE_WIDTH_SCALED / 2 * 1.41)
+        if self.state_hovered:
+            boundary_coordinate_y: int = boundary_coordinate_y + CARD_SLIDE_DISTANCE_HOVER_HAND
 
         # Returning:
         return boundary_coordinate_y
@@ -2850,9 +3016,9 @@ class CardObject:
         """
         Texture object's vertical boundary range (from bottom-most to the top-most coordinates y).
 
-        Takes boundary_bottom and boundary_rop cached properties and puts them together in a range.
-        Used together with boundary_range_horizontal cached property to determine whether a cursor 
-        is within the texture object's boundaries (when hovering over or clicking).
+        Takes `boundary_bottom` and `boundary_rop` cached properties and puts them together in a 
+        range. Used together with boundary_range_horizontal cached property to determine whether a 
+        cursor is within the texture object's boundaries (when hovering over or clicking).
 
         Cached.
 
@@ -2881,8 +3047,8 @@ class CardObject:
     texture width and height (applied to arcade.Rect object first) and select a correct texture 
     object to render.
 
-    Main render() method uses arcade library's native method draw_texture_rect() to display the 
-    selected texture over an arcade.Rect object generated in __render_rect property in the set
+    Main `render()` method uses arcade library's native method `draw_texture_rect()` to display the
+    selected texture over an arcade.Rect object generated in `__render_rect` property in the set
     card object's coordinates x and y.
 
     """
@@ -2894,14 +3060,14 @@ class CardObject:
         Texture object's scale float value.
 
         Selected based on card object's selected state by choosing between its default value and 
-        selected value set in settings.py script.
+        selected value set in `settings.py` script.
 
         Used to apply a scale modifier when calculating texture width and height properties.
 
         Cached.
 
-        :return float: Texture object's scale float value. CARD_RENDER_SCALE_DEFAULT value by 
-            default if not selected, or CARD_RENDER_SCALE_SELECTED value otherwise.
+        :return float: Texture object's scale float value. `CARD_RENDER_SCALE_DEFAULT` value by 
+            default if not selected, or `CARD_RENDER_SCALE_SELECTED` value otherwise.
         """
 
         # Selecting a larger render scale value if card is selected:
@@ -2932,7 +3098,7 @@ class CardObject:
         Cached.
 
         :return int: Texture object's rotate angle integer value, 0 by default, random between 
-            CARD_RENDER_ANGLE_MIN and CARD_RENDER_ANGLE_MAX (settings.py script) which can be 
+            `CARD_RENDER_ANGLE_MIN` and `CARD_RENDER_ANGLE_MAX` (`settings.py` script) which can be 
             positive or negative.
         """
 
@@ -2958,8 +3124,8 @@ class CardObject:
         """
         Texture object's width integer value. 
         
-        Calculated using other cached property render_scale. Used to create an arcade.Rect object
-        to draw texture in with main render() method. 
+        Calculated using other cached property `render_scale`. Used to create an `arcade.Rect` 
+        object to draw texture in with main `render()` method. 
 
         Cached.
 
@@ -2978,8 +3144,8 @@ class CardObject:
         """
         Texture object's height integer value. 
         
-        Calculated using other cached property render_scale. Used to create an arcade.Rect object
-        to draw texture in with main render() method. 
+        Calculated using other cached property `render_scale`. Used to create an `arcade.Rect` 
+        object to draw texture in with main `render()` method. 
 
         Cached.
 
@@ -2996,7 +3162,7 @@ class CardObject:
     @cached_property
     def render_texture(self) -> arcade.Texture:
         """
-        Arcade library's Texture object selected to render..
+        Arcade library's Texture object selected to render.
 
         Used to select correct texture object: front of cover of the card, based on its revealed
         state. If card is revealed, this property will return the front texture, otherwise it will
@@ -3017,6 +3183,29 @@ class CardObject:
 
         # Returning:
         return render_texture
+    
+
+    @cached_property
+    def render_texture_filename(self) -> str:
+        """
+        Currently used texture's filename string value. Used for debug purposes.
+
+        Cached.
+
+        :return str: Currently used texture's filename string value, e.g. `"hearts_six.png"`
+        """
+
+        # Selecting front card texture filename if card is revealed:
+        if self.state_revealed:
+            render_texture_filename: Texture = self.__texture_front_filename
+        
+        # Selecting cover card texture filename if card is not revealed:
+        else:
+            render_texture_filename: Texture = self.__texture_cover_filename
+
+        # Returning:
+        return render_texture_filename
+
 
 
     @property
@@ -3049,8 +3238,8 @@ class CardObject:
         """
         Main render method. Draws card object's selected texture on screen.
 
-        Uses arcade library's draw_texture_rect() method to draw texture over this class private 
-        property __render_rect (returns arcade.Rect) that sets the coordinates and dimensions of 
+        Uses arcade library's `draw_texture_rect()` method to draw texture over this class private 
+        property `__render_rect` (returns `arcade.Rect`) that sets the coordinates and dimensions of 
         the texture.
         """
 
@@ -3068,24 +3257,33 @@ class CardObject:
     
     Slide methods provide interaction between player's mouse movement and the card objects active
     on the screen. Slide (as a generic method) simply shifts the card object's coordinates by a set
-    number of pixels based on CARD_SLIDE_SPEED value stored in settings.py depending on its current
+    number of pixels based on `CARD_SLIDE_SPEED` value stored in settings.py depending on its current
     position on the screen and its hover state (for card hovering animation).
 
     These methods on their own call on coordinates setter methods if they determine that their card 
     object's coordinates x and/or y do not match the destination (either given as a parameter or 
     set in cached properties and based on settings.py script variable, e.g. coordinate y of the 
-    center coordinate y poisition of player's hand position - CARD_COORDINATE_Y_HAND_PLAYER).
+    center coordinate y poisition of player's hand position - `CARD_COORDINATE_Y_HAND_PLAYER`).
 
     """
+
+
+    def set_slide_speed(self, set_value: int) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Updating attribute:
+        self.__slide_speed: int = set_value
 
 
     def __slide(self, coordinates_end: tuple[int, int], slide_speed_modifier: float) -> None:
         """
         Adjusts card object's coordinates x and y depending on any existing differences between
         card object's current coordinates and parameter coordinates_end. General purpose private 
-        method, called by specific slide methods, e.g. slide_stack() or slide_hand().
+        method, called by specific slide methods, e.g. `slide_stack()` or `slide_hand()`.
 
-        Calculates card object's next position one each step of applying CARD_SLIDE_SPEED value
+        Calculates card object's next position one each step of applying `CARD_SLIDE_SPEED` value
         to current coordinates and sets new coordinates via coordinates setter methods if they do
         not match yet. If coordinates "slided over", uses coordinates setter methods to set card 
         object's current coordinates directly to end coordinates.
@@ -3095,11 +3293,11 @@ class CardObject:
         :param tuple[int, int] coordinates_end: Tuple container with coordinates x and y integer
             values to navigate card object's movement.
         :param float slide_speed_modifier: Float value modifier that is used to multiply default
-            slide speed CARD_SLIDE_SPEED defined and stored in settings.py. 
+            slide speed `CARD_SLIDE_SPEED` defined and stored in settings.py. 
         """
 
         # Calculating speed:
-        slide_speed: int = int(CARD_SLIDE_SPEED * slide_speed_modifier)
+        slide_speed: int = int(self.__slide_speed * slide_speed_modifier)
 
         # Unpacking end coordinates:
         coordinate_x_end, coordinate_y_end = coordinates_end
@@ -3137,6 +3335,7 @@ class CardObject:
         # Updating coordinates:
         self.set_coordinates(
             set_value = coordinates_next,
+            update_boundaries = False
             )
         
 
@@ -3149,9 +3348,9 @@ class CardObject:
         to highlight it. If not hovered, but not at default hand coordinate y, will slide the card 
         back to its position. Slide speed depends on slide direction.
 
-        Relies on cached methods' calculated coordinate_y_hand and coordinate_y_hand_hover.
+        Relies on cached methods' calculated `coordinate_y_hand` and `coordinate_y_hand_hover`.
 
-        :raise AssertionError: (If enabled) Raises AssertionError if parameter value type is 
+        :raise AssertionError: (If enabled) Raises `AssertionError` if parameter value type is 
             invalid (expected integer).
         """
 
@@ -3197,10 +3396,10 @@ class CardObject:
         will slide the card back to its position. Slide speed depends on slide direction.
 
         :param int coordinate_x_spot: Coordinate x integer value of the card object's default 
-            position on table based on its position_table idnex value. Calculated by DeckController
+            position on table based on its position_table idnex value. Calculated by `DeckController`
             object and fed into the method.
 
-        :raise AssertionError: (If enabled) Raises AssertionError if parameter value type is 
+        :raise AssertionError: (If enabled) Raises `AssertionError` if parameter value type is 
             invalid (expected integer).
         """
 
