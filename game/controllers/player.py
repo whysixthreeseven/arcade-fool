@@ -591,15 +591,15 @@ class PlayerController:
 
             # Sorting by suit priority (Hearts > Diamonds > Clubs > Spades):
             if sort_method == VAR_SESSION_SORT_METHOD_SUIT:
-                reverse_check: bool = True if not ascending_order else False
+                reverse_check: bool = ascending_order
                 hand_sorted: list[CardObject] = sorted(
                     self.hand_container,
-                    key = lambda card_object: int(          # Suit priority by index
-                        CardObject.CARD_SUIT_LIST.index(
+                    key = lambda card_object: (             # Suit priority by index
+                        - CardObject.CARD_SUIT_LIST.index(
                             card_object.suit
                             ), 
-                        )
-                        - card_object.type_value_clean,
+                        card_object.type_value_clean
+                        ),
                     reverse = reverse_check,    # Top priority left (default)
                     )
 
