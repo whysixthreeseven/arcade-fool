@@ -16,7 +16,7 @@ import arcade
 from arcade import Texture, Rect
 
 # Settings and variables import list:
-from game.variables import *
+from game.collections import CARD_INFO
 from game.settings import *
 
 # Developer session values:
@@ -87,61 +87,61 @@ class CardObject:
 
     # Default (expected) card types list:
     CARD_TYPE_LIST: tuple[str, ...] = (
-        VAR_CARD_TYPE_SIX,                  # 6
-        VAR_CARD_TYPE_SEVEN,                # 7
-        VAR_CARD_TYPE_EIGHT,                # 8
-        VAR_CARD_TYPE_NINE,                 # 9
-        VAR_CARD_TYPE_TEN,                  # 10
-        VAR_CARD_TYPE_JACK,                 # J
-        VAR_CARD_TYPE_QUEEN,                # Q
-        VAR_CARD_TYPE_KING,                 # K
-        VAR_CARD_TYPE_ACE                   # A
+        CARD_INFO.TYPE_SIX,                  # 6
+        CARD_INFO.TYPE_SEVEN,                # 7
+        CARD_INFO.TYPE_EIGHT,                # 8
+        CARD_INFO.TYPE_NINE,                 # 9
+        CARD_INFO.TYPE_TEN,                  # 10
+        CARD_INFO.TYPE_JACK,                 # J
+        CARD_INFO.TYPE_QUEEN,                # Q
+        CARD_INFO.TYPE_KING,                 # K
+        CARD_INFO.TYPE_ACE                   # A
         )
 
     # Default card type value index:
     CARD_TYPE_VALUE_INDEX: dict[str, int] = {
-        VAR_CARD_TYPE_SIX:   6,
-        VAR_CARD_TYPE_SEVEN: 7,
-        VAR_CARD_TYPE_EIGHT: 8,
-        VAR_CARD_TYPE_NINE:  9,
-        VAR_CARD_TYPE_TEN:   10,
-        VAR_CARD_TYPE_JACK:  11,
-        VAR_CARD_TYPE_QUEEN: 12,
-        VAR_CARD_TYPE_KING:  13,
-        VAR_CARD_TYPE_ACE:   14
+        CARD_INFO.TYPE_SIX:   6,
+        CARD_INFO.TYPE_SEVEN: 7,
+        CARD_INFO.TYPE_EIGHT: 8,
+        CARD_INFO.TYPE_NINE:  9,
+        CARD_INFO.TYPE_TEN:   10,
+        CARD_INFO.TYPE_JACK:  11,
+        CARD_INFO.TYPE_QUEEN: 12,
+        CARD_INFO.TYPE_KING:  13,
+        CARD_INFO.TYPE_ACE:   14
         }
     CARD_TRUMP_VALUE_BONUS: int = 100
 
     # Card default (expected) suit list:
     CARD_SUIT_LIST: tuple[str, ...] = (
-        VAR_CARD_SUIT_HEARTS,               # ♡
-        VAR_CARD_SUIT_DIAMONDS,             # ♢
-        VAR_CARD_SUIT_CLUBS,                # ♧
-        VAR_CARD_SUIT_SPADES                # ♤
+        CARD_INFO.SUIT_HEARTS,               # ♡
+        CARD_INFO.SUIT_DIAMONDS,             # ♢
+        CARD_INFO.SUIT_CLUBS,                # ♧
+        CARD_INFO.SUIT_SPADES                # ♤
         )
     
     # Card suit color index:
     CARD_SUIT_COLOR_INDEX: dict[str, str] = {
-        VAR_CARD_SUIT_HEARTS:   VAR_CARD_SUIT_COLOR_RED,
-        VAR_CARD_SUIT_DIAMONDS: VAR_CARD_SUIT_COLOR_RED,
-        VAR_CARD_SUIT_CLUBS:    VAR_CARD_SUIT_COLOR_BLACK,
-        VAR_CARD_SUIT_SPADES:   VAR_CARD_SUIT_COLOR_BLACK
+        CARD_INFO.SUIT_HEARTS:   CARD_INFO.SUIT_COLOR_RED,
+        CARD_INFO.SUIT_DIAMONDS: CARD_INFO.SUIT_COLOR_RED,
+        CARD_INFO.SUIT_CLUBS:    CARD_INFO.SUIT_COLOR_BLACK,
+        CARD_INFO.SUIT_SPADES:   CARD_INFO.SUIT_COLOR_BLACK
         }
     
     # Card suit unicode index:
     CARD_SUIT_UNICODE_INDEX: dict[str, str] = {
-        VAR_CARD_SUIT_HEARTS:   "♡",
-        VAR_CARD_SUIT_DIAMONDS: "♢",
-        VAR_CARD_SUIT_CLUBS:    "♧",
-        VAR_CARD_SUIT_SPADES:   "♤"
+        CARD_INFO.SUIT_HEARTS:   "♡",
+        CARD_INFO.SUIT_DIAMONDS: "♢",
+        CARD_INFO.SUIT_CLUBS:    "♧",
+        CARD_INFO.SUIT_SPADES:   "♤"
         }
     
 
     def __init__(self) -> None:
 
         # Core attributes:
-        self.__suit: str = VAR_CARD_SUIT_NOT_SET
-        self.__type: str = VAR_CARD_TYPE_NOT_SET
+        self.__suit: str = CARD_INFO.SUIT_NOT_SET
+        self.__type: str = CARD_INFO.TYPE_NOT_SET
 
         # Position attributes:
         self.__position_added:   int | None = None
@@ -160,9 +160,8 @@ class CardObject:
 
         # Coordinates attributes:
         self.__coordinate_x: int = 0
+        self.__coordinate_x_stack: int = 0
         self.__coordinate_y: int = 0
-        self.__coordinate_x_expected: int = 0
-        self.__coordinate_y_expected: int = 0
         
         # Slide attributes:
         self.__slide_speed: int = CARD_SLIDE_SPEED
@@ -198,7 +197,8 @@ class CardObject:
             repr_string: str = "{card_suit_unicode}{card_type_unicode} @{location_repr}".format(
                 card_suit_unicode = self.suit_unicode,
                 card_type_unicode = self.type_unicode,
-                location_repr = self.location_repr.lower()
+                # location_repr = self.location_repr.lower()
+                location_repr = f"{self.location_repr}_{self.position_hand if self.position_hand is not None else "#"}"
                 )
         
         # Returning:
@@ -233,7 +233,7 @@ class CardObject:
         
         # Checking if two cards can be compared (trump or same suit values):
         eval_result: bool = False
-        if self.state_trump or self.suit == card_object.set_suit:
+        if self.state_trump or self.suit == card_object.suit:
 
             # Comparing:
             eval_result: bool = self.type_value > card_object.type_value
@@ -263,7 +263,7 @@ class CardObject:
         
         # Checking if two cards can be compared:
         eval_result: bool = False
-        if self.suit == card_object.set_suit:
+        if self.suit == card_object.suit:
 
             # Comparing:
             eval_result: bool = self.type_value < card_object.type_value
@@ -285,7 +285,7 @@ class CardObject:
 
 
     @staticmethod
-    def create_card_object(init_suit: str, init_type: str) -> CardObject:
+    def create_card_object(init_suit: CARD_INFO, init_type: CARD_INFO) -> CardObject:
         """
         Creates and returns a card object with a set suit and type attributes, and loaded cover
         and front texture files based on the default texture pack. Made to be a static method to
@@ -311,7 +311,7 @@ class CardObject:
         
         # Loading a default texture pack:
         card_object.set_texture_pack(
-            set_value = VAR_CARD_TEXTURE_PACK_DEFAULT
+            set_value = CARD_INFO.TEXTURE_PACK_DEFAULT
             )
 
         # Returning:
@@ -329,7 +329,7 @@ class CardObject:
     """
 
 
-    def __convert_to_repr(self, attribute_string: str) -> str:
+    def __convert_to_repr(self, attribute_string: CARD_INFO) -> str:
         """
         Converts a default (stored in variables.py script) variable string to its formatted repr 
         (or display/render-friendly) version by removing the variable tag and formatting the string.
@@ -342,7 +342,7 @@ class CardObject:
 
         # Splitting and formatting:
         char_split: str = "_"
-        repr_string_tagless:   str = attribute_string.split(char_split)[-1]
+        repr_string_tagless:   str = str(attribute_string).split(char_split)[-1]
         repr_string_formatted: str = repr_string_tagless.capitalize()
 
         # Returning:
@@ -591,6 +591,7 @@ class CardObject:
         # Generating a list of cached properties:
         cached_property_list: tuple[str, ...] = (
             "coordinate_x",
+            "coordinate_x_hover",
             "coordinate_y",
             "coordinate_y_hand",
             "coordinate_y_hand_hover",
@@ -797,7 +798,7 @@ class CardObject:
         return card_suit_unicode
 
     
-    def set_suit(self, set_value: str) -> None:
+    def set_suit(self, set_value: CARD_INFO) -> None:
         """
         Sets a new card suit value to a card object, if current suit value is different. Must be 
         a default value as in variables.py script, e.g. "CARD_SUIT_HEARTS".
@@ -812,11 +813,16 @@ class CardObject:
             stored in Card.CARD_SUIT_LIST).
         """
 
+        # Echo control:
+        if DEV_ENABLE_ECHO:
+            echo_message: str = f"Setting suit {set_value=} for {self=}."
+            print(echo_message)
+
         # Assertion control:
         if DEV_ENABLE_ASSERTION:
 
             # Asserting value is valid type:
-            valid_type: type = str
+            valid_type: type = CARD_INFO
             assert_value_is_valid_type(
                 check_value = set_value,
                 valid_type  = valid_type,
@@ -977,10 +983,10 @@ class CardObject:
 
         # Generating a named type list:
         card_type_named_list: tuple[str, ...] = (
-            VAR_CARD_TYPE_JACK,
-            VAR_CARD_TYPE_QUEEN,
-            VAR_CARD_TYPE_KING,
-            VAR_CARD_TYPE_ACE
+            CARD_INFO.TYPE_JACK,
+            CARD_INFO.TYPE_QUEEN,
+            CARD_INFO.TYPE_KING,
+            CARD_INFO.TYPE_ACE
             )
         
         # If card type is Jack, or Queen, or King, or Ace, - take letter:
@@ -997,7 +1003,7 @@ class CardObject:
         return card_type_unicode
 
 
-    def set_type(self, set_value: str) -> None:
+    def set_type(self, set_value: CARD_INFO) -> None:
         """
         Sets a new card type value to a card object, if current type value is different. Must be 
         a default value as in variables.py script, e.g. "CARD_TYPE_LIST".
@@ -1012,11 +1018,16 @@ class CardObject:
             stored in Card.CARD_TYPE_LIST).
         """
 
+        # Echo control:
+        if DEV_ENABLE_ECHO:
+            echo_message: str = f"Setting type {set_value=} for {self=}."
+            print(echo_message)
+
         # Assertion control:
         if DEV_ENABLE_ASSERTION:
 
             # Asserting value is valid type:
-            valid_type: type = str
+            valid_type: type = CARD_INFO
             assert_value_is_valid_type(
                 check_value = set_value,
                 valid_type  = valid_type,
@@ -1256,6 +1267,14 @@ class CardObject:
             invalid, or position index is out of range.
         """
 
+        # Echo control:
+        if DEV_ENABLE_ECHO:
+            echo_message: str = f"Setting position added {position_index=} for {self=}."
+            print(echo_message)
+            if update_related:
+                echo_message: str = f"  Updating related positions..."
+                print(echo_message)
+
         # Assertion control:
         if DEV_ENABLE_ASSERTION:
 
@@ -1330,6 +1349,14 @@ class CardObject:
         :raise AssertionError: (If enabled) Raises AssertionError if parameters value type are 
             invalid, or position index is out of range.
         """
+
+        # Echo control:
+        if DEV_ENABLE_ECHO:
+            echo_message: str = f"Setting position hand {position_index=} for {self=}."
+            print(echo_message)
+            if update_related:
+                echo_message: str = f"  Updating related positions..."
+                print(echo_message)
 
         # Assertion control:
         if DEV_ENABLE_ASSERTION:
@@ -1407,6 +1434,14 @@ class CardObject:
             invalid, or position index is out of range.
         """
 
+        # Echo control:
+        if DEV_ENABLE_ECHO:
+            echo_message: str = f"Setting position table {position_index=} & {stack_index=} for {self=}."
+            print(echo_message)
+            if update_related:
+                echo_message: str = f"  Updating related positions..."
+                print(echo_message)
+
         # Assertion control:
         if DEV_ENABLE_ASSERTION:
 
@@ -1442,6 +1477,9 @@ class CardObject:
                 valid_range = valid_range,
                 raise_error = True
                 )
+            
+        # Resetting state:
+        self.reset_state()
 
         # Updating attributes:
         self.__position_table: int = position_index
@@ -1472,6 +1510,11 @@ class CardObject:
         self.__clear_cached_property_list(
             target_list = self.__cached_location_property_list
             )
+        
+        # Clearing cache (render):
+        self.__clear_cached_property(
+            target_attribute = "render_scale"
+            )
             
     
     def set_position_deck(self, position_index: int, update_related: bool = True) -> None:
@@ -1491,6 +1534,14 @@ class CardObject:
         :raise AssertionError: (If enabled) Raises AssertionError if parameters value type are 
             invalid, or position index is out of range.
         """
+
+        # Echo control:
+        if DEV_ENABLE_ECHO:
+            echo_message: str = f"Setting position deck {position_index=} for {self=}."
+            print(echo_message)
+            if update_related:
+                echo_message: str = f"  Updating related positions..."
+                print(echo_message)
 
         # Assertion control:
         if DEV_ENABLE_ASSERTION:
@@ -1684,12 +1735,12 @@ class CardObject:
         """
 
         # Matching location variables and position attributes:
-        location_string: str = VAR_CARD_LOCATION_NOT_SET
+        location_string: str = CARD_INFO.LOCATION_NOT_SET
         location_index: dict[str, int | None] = {
-            VAR_CARD_LOCATION_HAND:    self.position_hand,
-            VAR_CARD_LOCATION_TABLE:   self.position_table,
-            VAR_CARD_LOCATION_DECK:    self.position_deck,
-            VAR_CARD_LOCATION_DISCARD: self.position_discard
+            CARD_INFO.LOCATION_HAND:    self.position_hand,
+            CARD_INFO.LOCATION_TABLE:   self.position_table,
+            CARD_INFO.LOCATION_DECK:    self.position_deck,
+            CARD_INFO.LOCATION_DISCARD: self.position_discard
             }
         
         # Selecting position:
@@ -1770,8 +1821,8 @@ class CardObject:
 
         # Checking:
         state_ready: bool = bool(
-            self.suit != VAR_CARD_SUIT_NOT_SET and
-            self.type_default != VAR_CARD_TYPE_NOT_SET
+            self.suit != CARD_INFO.SUIT_NOT_SET and
+            self.type_default != CARD_INFO.TYPE_NOT_SET
             )
         
         # Returning:
@@ -2095,9 +2146,10 @@ class CardObject:
                 )
 
             # Clearing cache (render):
-            self.__clear_cached_property_list(
-                target_list = self.__cached_render_property_list
-                )
+            if self.location == CARD_INFO.LOCATION_HAND:
+                self.__clear_cached_property_list(
+                    target_list = self.__cached_render_property_list
+                    )
             
             # Clearing cache (boundary):
             self.__clear_cached_property(
@@ -2126,7 +2178,6 @@ class CardObject:
         self.__clear_cached_property_list(
             target_list = self.__cached_state_property_list
             )
-
 
         # Clearing cache (render):
         self.__clear_cached_property_list(
@@ -2372,7 +2423,7 @@ class CardObject:
         self.__texture_cover_object: Texture = texture_object
 
 
-    def set_texture_pack(self, set_value: str) -> None:
+    def set_texture_pack(self, set_value: CARD_INFO) -> None:
         """
         Sets a new texture pack for the card object, and updates texture related attributes, such
         as front and cover texture filenames, filepaths and texture objects by generating filename
@@ -2390,7 +2441,7 @@ class CardObject:
         if DEV_ENABLE_ASSERTION:
 
             # Asserting value is valid type:
-            valid_type: type = str
+            valid_type: type = CARD_INFO
             assert_value_is_valid_type(
                 check_value = set_value,
                 valid_type  = valid_type,
@@ -2399,7 +2450,7 @@ class CardObject:
             
             # Asserting value is default:
             valid_list: tuple[str, ...] = (
-                VAR_CARD_TEXTURE_PACK_DEFAULT,      # <- Used by default on card creation
+                CARD_INFO.TEXTURE_PACK_DEFAULT,      # <- Used by default on card creation
                 )
             assert_value_is_default(
                 check_value = set_value,
@@ -2456,6 +2507,16 @@ class CardObject:
 
         # Returning:
         return self.__coordinate_x
+    
+
+    @cached_property
+    def coordinate_x_stack(self) -> int:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__coordinate_x_stack
     
 
     @cached_property
@@ -2548,26 +2609,6 @@ class CardObject:
 
         # Returning:
         return coordinates_container
-    
-
-    @cached_property
-    def coordinate_x_expected(self) -> int:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Returning:
-        return self.__coordinate_x_expected
-    
-
-    @cached_property
-    def coordinate_y_expected(self) -> int:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Returning:
-        return self.__coordinate_y_expected
     
 
     def set_coordinate_x(self, 
@@ -2672,11 +2713,44 @@ class CardObject:
                     self.__clear_cached_property_list(
                         target_list = self.__cached_boundary_property_list,
                         )
+                    
+    
+    def set_coordinate_x_stack(self, 
+                               set_value: int, 
+                               ignore_assertion: bool = False, 
+                               clear_cache: bool = True,
+                               ) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Assertion control:
+        if DEV_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value is valid type:
+            valid_type: type = int
+            assert_value_is_valid_type(
+                check_value = set_value,
+                valid_type  = valid_type,
+                raise_error = True,
+                )
+
+        # Updating attribute:
+        if self.coordinate_x_stack != set_value:
+            self.__coordinate_x_stack: int = set_value
+
+            # Clearing cache:
+            if clear_cache:
+
+                # Clearing cache (coordinates):
+                self.__clear_cached_property(
+                    target_attribute = "coordinate_x_stack"
+                    )
                 
     
     def set_coordinates(self, 
                         set_value: tuple[int, int],
-                        update_boundaries: bool = True
+                        update_boundary: bool = True
                         ) -> None:
         """
         Sets new coordinates x and y for card object.
@@ -2742,135 +2816,11 @@ class CardObject:
                 )
                 
             # Clearing cache (boundary):
-            if update_boundaries:
+            if update_boundary:
                 self.__clear_cached_property_list(
                     target_list = self.__cached_boundary_property_list
                     )
-            
-    
-    def set_coordinate_x_expected(self, 
-                                  set_value: int, 
-                                  ignore_assertion: bool = False, 
-                                  clear_cache: bool = True
-                                  ) -> None:
-        """
-        TODO: Create a docstring.
-        """
 
-        # Assertion control:
-        if DEV_ENABLE_ASSERTION and not ignore_assertion:
-
-            # Asserting value is valid type:
-            valid_type: type = int
-            assert_value_is_valid_type(
-                check_value = set_value,
-                valid_type  = valid_type,
-                raise_error = True,
-                )
-
-        # Updating attribute:
-        if self.coordinate_x_expected != set_value:
-            self.__coordinate_x_expected: int = set_value
-
-            # Clearing cache:
-            if clear_cache:
-
-                # Clearing cache (coordinates):
-                self.__clear_cached_property(
-                    target_attribute = "coordinate_x_expected"
-                    )
-
-
-    def set_coordinate_y_expected(self, 
-                                  set_value: int, 
-                                  ignore_assertion: bool = False, 
-                                  clear_cache: bool = True
-                                  ) -> None:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Assertion control:
-        if DEV_ENABLE_ASSERTION and not ignore_assertion:
-
-            # Asserting value is valid type:
-            valid_type: type = int
-            assert_value_is_valid_type(
-                check_value = set_value,
-                valid_type  = valid_type,
-                raise_error = True,
-                )
-
-        # Updating attribute:
-        if self.coordinate_y_expected != set_value:
-            self.__coordinate_y_expected: int = set_value
-
-            # Clearing cache:
-            if clear_cache:
-
-                # Clearing cache (coordinates):
-                self.__clear_cached_property(
-                    target_attribute = "coordinate_y_expected"
-                    )
-                
-    
-    def set_coordinates_expected(self, set_value: tuple[int, int]) -> None:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Assertion control:
-        if DEV_ENABLE_ASSERTION:
-
-            # Asserting value is valid type:
-            valid_type: type = tuple
-            assert_value_is_valid_type(
-                check_value = set_value,
-                valid_type  = valid_type,
-                raise_error = True,
-                )
-
-            # Asserting container items are valid type:        
-            for coordinate_value in set_value:
-                valid_type: type = int
-                assert_value_is_valid_type(
-                    check_value = coordinate_value,
-                    valid_type  = valid_type,
-                    raise_error = True
-                    )
-
-        # Unpacking container:
-        coordinate_x, coordinate_y = set_value
-
-        # Updating:
-        coordinates_updated: bool = False
-        if coordinate_x != self.coordinate_x_expected:
-            coordinates_updated: bool = True
-            self.set_coordinate_x_expected(
-                set_value = coordinate_x,
-                ignore_assertion = True,
-                clear_cache = False,
-                )
-        if coordinate_y != self.coordinate_y_expected:
-            coordinates_updated: bool = True
-            self.set_coordinate_y_expected(
-                set_value = coordinate_y,
-                ignore_assertion = True,
-                clear_cache = False,
-                )
-        
-        # Clearing cache:
-        if coordinates_updated:
-
-            # Clearing cache (coordinates expected):
-            cached_property_list: tuple[str, ...] = (
-                "coordinate_x_expected",
-                "coordinate_y_expected"
-                )
-            self.__clear_cached_property_list(
-                target_list = cached_property_list
-                )
-            
     
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2900,7 +2850,7 @@ class CardObject:
         Texture object's left-most coordinate x (boundary) integer value.
 
         Calculates and returns left-most coordinate x by subtracting half of texture width scaled
-        value (CARD_TEXTURE_WIDTH_SCALED variable stored in settings.py script), rounded down.
+        value (`CARD_TEXTURE_WIDTH_SCALED` variable stored in `settings.py` script), rounded down.
 
         Used to construct texture object's horizontal boundary range; to check the proximity of the
         user's cursor to the left-most coordinate x of the card when choosing a priority hover 
@@ -2924,7 +2874,7 @@ class CardObject:
         Texture object's right-most coordinate x (boundary) integer value.
 
         Calculates and returns right-most coordinate x by adding half of texture width scaled value 
-        (CARD_TEXTURE_WIDTH_SCALED variable stored in settings.py script), rounded down.
+        (`CARD_TEXTURE_WIDTH_SCALED` variable stored in `settings.py` script), rounded down.
 
         Used to construct texture object's horizontal boundary range.
 
@@ -2946,7 +2896,7 @@ class CardObject:
         Texture object's bottom-most coordinate y (boundary) integer value.
 
         Calculates and returns bottom-most coordinate y by subtractig half of texture height scaled
-        value (CARD_TEXTURE_HEIGHT_SCALED variable stored in settings.py script), rounded down.
+        value (`CARD_TEXTURE_HEIGHT_SCALED` variable stored in `settings.py` script), rounded down.
 
         Used to construct texture object's vertical boundary range.
 
@@ -2956,7 +2906,16 @@ class CardObject:
         """
 
         # Calculating boundary coordinate:
-        boundary_coordinate_y: int = int(self.coordinate_y - CARD_TEXTURE_HEIGHT_SCALED / 2)
+        if self.location == CARD_INFO.LOCATION_HAND:
+            boundary_coordinate_y: int = int(
+                self.coordinate_y_hand - 
+                CARD_TEXTURE_HEIGHT_SCALED / 2
+                )
+        else:
+            boundary_coordinate_y: int = int(
+                self.coordinate_y - 
+                CARD_TEXTURE_HEIGHT_SCALED / 2
+                )
 
         # Returning:
         return boundary_coordinate_y
@@ -2968,7 +2927,7 @@ class CardObject:
         Texture object's top-most coordinate y (boundary) integer value.
 
         Calculates and returns top-most coordinate y by adding half of texture height scaled 
-        value (CARD_TEXTURE_HEIGHT_SCALED variable stored in settings.py script), rounded down.
+        value (`CARD_TEXTURE_HEIGHT_SCALED` variable stored in `settings.py` script), rounded down.
 
         Used to construct texture object's vertical boundary range.
 
@@ -2977,10 +2936,22 @@ class CardObject:
         :return int: Texture object's top-most coordinate y (boundary) integer value.
         """
 
+        # Fine-tune:
+        __mod: float = 1.41
+
         # Calculating boundary coordinate:
-        boundary_coordinate_y: int = int(self.coordinate_y + CARD_TEXTURE_WIDTH_SCALED / 2 * 1.41)
-        if self.state_hovered:
-            boundary_coordinate_y: int = boundary_coordinate_y + CARD_SLIDE_DISTANCE_HOVER_HAND
+        if self.location == CARD_INFO.LOCATION_HAND:
+            boundary_coordinate_y: int = int(
+                self.coordinate_y_hand + 
+                CARD_TEXTURE_WIDTH_SCALED / 2 * __mod    # Fine-tuned value
+                )
+            if self.state_hovered:
+                boundary_coordinate_y: int = boundary_coordinate_y + CARD_SLIDE_DISTANCE_HOVER_HAND
+        else:
+            boundary_coordinate_y: int = int(
+                self.coordinate_y + 
+                CARD_TEXTURE_WIDTH_SCALED / 2 * __mod    # Fine-tuned value
+                )
 
         # Returning:
         return boundary_coordinate_y
@@ -2992,7 +2963,7 @@ class CardObject:
         Texture object's horizontal boundary range (from left-most to the right-most coordinates x).
 
         Takes boundary_left and boundary_right cached properties and puts them together in a range.
-        Used together with boundary_range_vertical cached property to determine whether a cursor is
+        Used together with `boundary_range_vertical` cached property to determine whether a cursor is
         within the texture object's boundaries (when hovering over or clicking).
 
         Cached.
@@ -3016,8 +2987,8 @@ class CardObject:
         """
         Texture object's vertical boundary range (from bottom-most to the top-most coordinates y).
 
-        Takes `boundary_bottom` and `boundary_rop` cached properties and puts them together in a 
-        range. Used together with boundary_range_horizontal cached property to determine whether a 
+        Takes `boundary_bottom` and `boundary_top` cached properties and puts them together in a 
+        range. Used together with `boundary_range_horizontal` cached property to determine whether a 
         cursor is within the texture object's boundaries (when hovering over or clicking).
 
         Cached.
@@ -3102,8 +3073,12 @@ class CardObject:
             positive or negative.
         """
 
-        # Generating a random render angle if card is selected:
-        if self.state_selected:
+        def random_angle() -> int:
+            """
+            TODO: Create a docstring.
+            """
+
+            # Generating:
             render_angle_axis: int = random.choice(CARD_RENDER_ANGLE_AXIS_LIST)
             render_angle_random: int = random.randint(
                 a = CARD_RENDER_ANGLE_MIN,
@@ -3111,9 +3086,20 @@ class CardObject:
                 )
             render_angle_selected: int = render_angle_random * render_angle_axis
 
+            # Returning:
+            return render_angle_selected
+        
         # Selecting a default render angle:
-        else:
-            render_angle_selected: int = CARD_RENDER_ANGLE_DEFAULT
+        render_angle_selected: int = CARD_RENDER_ANGLE_DEFAULT
+
+        # Generating a random render angle if card is selected:
+        if self.location == CARD_INFO.LOCATION_HAND:
+            if self.state_selected:
+                render_angle_selected: int = random_angle()
+        
+        elif self.location == CARD_INFO.LOCATION_TABLE:
+            if self.position_stack == TABLE_STACK_TOP_INDEX:
+                render_angle_selected: int = random_angle()
 
         # Returning:
         return render_angle_selected
@@ -3335,7 +3321,7 @@ class CardObject:
         # Updating coordinates:
         self.set_coordinates(
             set_value = coordinates_next,
-            update_boundaries = False
+            update_boundary = True
             )
         
 
@@ -3355,7 +3341,7 @@ class CardObject:
         """
 
         # Checking card's location:
-        if self.location == VAR_CARD_LOCATION_HAND:
+        if self.location == CARD_INFO.LOCATION_HAND:
             slide_required: bool = False
 
             # If card's current state is hovered:
@@ -3386,7 +3372,7 @@ class CardObject:
                     )
                 
     
-    def slide_stack(self, coordinate_x_spot: int) -> None:
+    def slide_stack(self) -> None:
         """
         Slides the card object horizontally if card is on the table as in on the top stack position,
         depending on its current coordinate x and state hovered.
@@ -3395,27 +3381,12 @@ class CardObject:
         right to reveal the card underneath it. If not hovered, but not at default stack coordinate,
         will slide the card back to its position. Slide speed depends on slide direction.
 
-        :param int coordinate_x_spot: Coordinate x integer value of the card object's default 
-            position on table based on its position_table idnex value. Calculated by `DeckController`
-            object and fed into the method.
-
         :raise AssertionError: (If enabled) Raises `AssertionError` if parameter value type is 
             invalid (expected integer).
         """
 
-        # Assertion control:
-        if DEV_ENABLE_ASSERTION:
-
-            # Asserting set value is valid type:
-            valid_type: type = int
-            assert_value_is_valid_type(
-                check_value = coordinate_x_spot,
-                valid_type = valid_type,
-                raise_error = True
-                )
-
         # Checking card's location:
-        if self.location == VAR_CARD_LOCATION_TABLE:
+        if self.location == CARD_INFO.LOCATION_TABLE:
             slide_required: bool = False
 
             # If card's stack index is top:
@@ -3423,23 +3394,23 @@ class CardObject:
 
                 # If card's current state is hovered:
                 if self.state_hovered:
-                    coordinate_x_end: int = coordinate_x_spot + CARD_SLIDE_DISTANCE_HOVER_STACK,
+                    coordinate_x_end: int = self.coordinate_x_stack + CARD_SLIDE_DISTANCE_HOVER_STACK
                     if self.coordinate_x != coordinate_x_end:
                         slide_required: bool = True
                         slide_speed_modifier: float = CARD_SLIDE_SPEED_MOD_INCREASED
                         coordinates_end: tuple[int, int] = (
                             coordinate_x_end,
-                            TABLE_COORDINATE_Y
+                            self.coordinate_y
                             )
                 
                 # If card's current state is NOT hovered:
                 else:
-                    if self.coordinate_x != coordinate_x_spot:
+                    if self.coordinate_x != self.coordinate_x_stack:
                         slide_required: bool = True
                         slide_speed_modifier: float = CARD_SLIDE_SPEED_MOD_DEFAULT
                         coordinates_end: tuple[int, int] = (
-                            coordinate_x_spot,
-                            TABLE_COORDINATE_Y
+                            self.coordinate_x_stack,
+                            self.coordinate_y
                             )
                         
             # Sliding to the correct position:
