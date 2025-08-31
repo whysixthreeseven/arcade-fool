@@ -9,7 +9,6 @@ from functools import cached_property
 import random
 
 # Settings and variables import list:
-from game.variables import *
 from game.settings import *
 
 # Developer session values:
@@ -302,13 +301,13 @@ class TableController:
     
 
     @cached_property
-    def table_empty_position(self) -> int:
+    def table_empty_position(self) -> int | None:
         """
         TODO: Create a docstring.
         """
         
         # Cycling through available positions on table:
-        table_empty_position: int = 0
+        table_empty_position: int | None = 0
         for position_index in self.table_map:
             card_object: CardObject | None = self.get_card_by_position(
                 position_index   = position_index,
@@ -320,6 +319,10 @@ class TableController:
             if card_object is None:
                 table_empty_position: int = position_index
                 break
+
+        # Returning None if no empty position found:
+        else:
+            table_empty_position: int | None = None
         
         # Returning:
         return table_empty_position
@@ -339,6 +342,40 @@ class TableController:
         self.__clear_cached_property_list(
             target_list = self.__cached_table_property_list,
             )
+        
+
+    def update_card_position(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+        
+        # Resetting coordinates for card objects:
+        for card_object in self.table_container_top:
+
+            # Acquiring index:
+            position_index: int = card_object.position_table
+            stack_index: int = card_object.position_stack
+
+            # Getting new coordinates:
+            table_position_index: dict[int, dict[int, tuple[int, int]]] = self.table_position_index
+            card_coordinates: tuple[int, int] = table_position_index[position_index][stack_index]
+            
+            # Unpacking coordinates:
+            card_object.set_coordinates(
+                set_value = card_coordinates,
+                update_boundary = True,
+                )
+            
+            # Resetting hover state:
+            card_object.set_state_hovered(
+                set_value = False
+                )
+            
+            # Clearing cache:
+            self.__clear_cached_property_list(
+                self.__cached_table_property_list
+                )
+
 
 
     """
@@ -415,11 +452,30 @@ class TableController:
                 update_related = True
                 )
             
-            # Updating card object's coordinates:
+            # Getting new coordinates:
             table_position_index: dict[int, dict[int, tuple[int, int]]] = self.table_position_index
             card_coordinates: tuple[int, int] = table_position_index[position_index][stack_index]
+            
+            # Unpacking coordinates:
+            card_coordinate_x, card_coordinate_y = card_coordinates
+            card_object.set_coordinate_x_stack(
+                set_value = card_coordinate_x,
+                ignore_assertion = False,
+                clear_cache = True,
+                )
             card_object.set_coordinates(
-                set_value = card_coordinates
+                set_value = card_coordinates,
+                update_boundary = True,
+                )
+            
+            # Revealing card:
+            card_object.set_state_revealed(
+                set_value = True,
+                )
+            
+            # Clearing cache:
+            self.__clear_cached_property_list(
+                self.__cached_table_property_list
                 )
             
     
@@ -451,6 +507,11 @@ class TableController:
 
             # Updating card positions:
             card_object.reset_position()
+
+            # Clearing cache:
+            self.__clear_cached_property_list(
+                self.__cached_table_property_list
+                )
 
     
     def get_card_by_position(self, 
@@ -496,12 +557,12 @@ class TableController:
                 )
             assert_value_is_default(
                 check_value = stack_index,
-                valid_range = valid_list,
+                valid_list  = valid_list,
                 raise_error = True
                 )
 
         # Acquiring object:
-        card_object: CardObject | None = self.table_position_index[position_index][stack_index]
+        card_object: CardObject | None = self.table_map[position_index][stack_index]
 
         # Returning:
         return card_object        

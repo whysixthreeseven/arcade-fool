@@ -2,9 +2,15 @@
 from game.scripts import clear_cached_property
 from functools import cached_property
 
+# Typing library import:
+from typing import Any
+
 # Arcade library import:
 import arcade
 from arcade import Rect, Text
+
+# Random library import:
+import random
 
 # Controllers import:
 from game.controllers.player import PlayerController
@@ -19,11 +25,21 @@ from game.controllers.ui import UIController
 from game.area import *
 
 # Settings and variables import list:
-from game.variables import *
+from game.collections import PLAYER_INFO
 from game.settings import *
+
+# Game status import list:
+from game.status import (
+    GameStatus,
+    Function_Set,
+    GAME_STATE, 
+    TURN_STATE,
+    ROUND_STATE,
+    )
 
 # Developer session values:
 from game.controllers.session import (
+    DEV_ENABLE_DEBUG_AREA_RENDER,
     DEV_ENABLE_ASSERTION,
     DEV_ENABLE_ECHO,
     )
@@ -47,16 +63,17 @@ class GameController:
 
     def __init__(self):
         
-        self.__game_status: str = ''
+        # Game status:
+        self.game_status:  GameStatus
 
         # Controllers:
-        self.__player_one: PlayerController | None = None
-        self.__player_two: PlayerController | None = None
-        self.__deck:         DeckController | None = None
-        self.__discard:   DiscardController | None = None
-        self.__session:   SessionController | None = None
-        self.__table:       TableController | None = None
-        self.__ui:             UIController | None = None
+        self.__player_one: PlayerController
+        self.__player_two: PlayerController
+        self.__deck:       DeckController
+        self.__discard:    DiscardController
+        self.__session:    SessionController
+        self.__table:      TableController
+        self.__ui:         UIController
 
         # Current selection:
         self.__card_hovered:     CardObject | None = None
@@ -181,7 +198,10 @@ class GameController:
             "player_one",
             "player_two",
             "player_list",
-            "player_active"
+            "player_active",
+            "player_inactive",
+            "player_attacking",
+            "player_defending"
             )
         
         # Returning:
@@ -230,6 +250,13 @@ class GameController:
         TODO: Create a docstring.
         """
 
+        # Game status initialized:
+        self.game_status:   GameStatus | None = GameStatus(
+            game_state  = GAME_STATE.NOT_STARTED,
+            turn_state  = TURN_STATE.NOT_STARTED,
+            round_state = ROUND_STATE.NOT_STARTED
+            )
+
         # Current selection reset:
         self.__card_hovered:  CardObject | None = None
         self.__card_selected: CardObject | None = None
@@ -246,14 +273,13 @@ class GameController:
         # Setting player controllers:
         self.__player_one: PlayerController = PlayerController.create_player_controller(
             init_name = self.__session.user_name,
-            init_type = VAR_PLAYER_TYPE_PLAYER
+            init_type = PLAYER_INFO.TYPE_PLAYER
             )
         self.__player_two: PlayerController = PlayerController.create_player_controller(
-            init_name = VAR_PLAYER_NAME_TWO_DEFAULT,
-            init_type = VAR_PLAYER_TYPE_COMPUTER
+            init_name = PLAYER_INFO.NAME_PLAYER_TWO,
+            init_type = PLAYER_INFO.TYPE_COMPUTER
             )
         
-    
     def game_prepare(self) -> None:
         """
         TODO: Create a docstring.
@@ -264,6 +290,9 @@ class GameController:
         self.__card_selected: CardObject | None = None
         self.__card_dragged:  CardObject | None = None
         self.__card_played:   CardObject | None = None
+
+        # Updating game status:
+        self.game_status.game_state = GAME_STATE.PREPARING
 
         # Preparing a new deck:
         self.__deck.clear_deck()
@@ -276,6 +305,34 @@ class GameController:
         # Preparing table:
         self.__table.clear_table()
 
+        # Updating player one states:
+        self.__player_one.set_state_active(
+            set_value        = True,
+            ignore_assertion = True
+            )
+        self.__player_one.set_state_attacking(      # <- Attacking (default)
+            set_value        = True,
+            ignore_assertion = True
+            )
+        self.__player_one.set_state_defending(
+            set_value        = False,
+            ignore_assertion = True
+            )
+        
+        # Updating player two states:
+        self.__player_two.set_state_active(
+            set_value = False,
+            ignore_assertion = True
+            )
+        self.__player_two.set_state_attacking(
+            set_value        = False,
+            ignore_assertion = True
+            )
+        self.__player_two.set_state_defending(      # <- Defending (default)
+            set_value        = True,
+            ignore_assertion = True
+            )
+
         # Dealing cards:
         for player_controller in self.player_list:
             player_controller.clear_hand()
@@ -283,17 +340,43 @@ class GameController:
                 player_controller = player_controller
                 )
         
-
-    
-
+        # Updating state:
+        for player_controller in self.player_list:
+            player_controller.update_hand_state(
+                table_map = self.__table.table_map
+                )
         
-    
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     RENDER METHODS AND PROPERTIES BLOCK
 
     """
+
+
+    def render(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Rendering indicators:
+        if self.player_active == self.player_one:
+            self.render_debug_player_one_indicator()
+        else:
+            self.render_debug_player_two_indicator()
+
+        # Rendering areas of the table if required:
+        if DEV_ENABLE_DEBUG_AREA_RENDER:
+            self.render_debug_player_one_area()
+            self.render_debug_player_two_area()
+            self.render_debug_table_area()
+
+        # Rendering game objects in order (layer):
+        self.render_table_cards()
+        for player_controller in reversed(self.player_list):
+            self.render_player_cards(
+                player_controller = player_controller
+                )
 
 
     def render_debug_player_one_area(self) -> None:
@@ -303,7 +386,7 @@ class GameController:
 
         # Rendering:
         arcade.draw_rect_filled(
-            rect = self.__area_rect_player_one,
+            rect = self.__area_rect_player_one_hand,
             color = arcade.color.GREEN,
             tilt_angle = 0
             )
@@ -316,7 +399,7 @@ class GameController:
 
         # Rendering:
         arcade.draw_rect_filled(
-            rect = self.__area_rect_player_two,
+            rect = self.__area_rect_player_two_hand,
             color = arcade.color.GREEN_YELLOW,
             tilt_angle = 0
             )
@@ -331,6 +414,32 @@ class GameController:
         arcade.draw_rect_filled(
             rect = self.__area_rect_table,
             color = arcade.color.RED,
+            tilt_angle = 0
+            )
+        
+    
+    def render_debug_player_one_indicator(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Rendering:
+        arcade.draw_rect_filled(
+            rect = self.__area_rect_player_one_indicator,
+            color = arcade.color.GREEN_YELLOW,
+            tilt_angle = 0
+            )
+        
+    
+    def render_debug_player_two_indicator(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Rendering:
+        arcade.draw_rect_filled(
+            rect = self.__area_rect_player_two_indicator,
+            color = arcade.color.GREEN_YELLOW,
             tilt_angle = 0
             )
 
@@ -453,6 +562,57 @@ class GameController:
             return self.player_one
         else:
             return self.player_two
+    
+
+    @cached_property
+    def player_inactive(self) -> PlayerController:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Asserting player controllers are not both active or inactive:
+        if DEV_ENABLE_ASSERTION:
+            self.__assert_player_active_state_is_valid()
+
+        # Returning active player controller:
+        if self.player_one.state_inactive:
+            return self.player_one
+        else:
+            return self.player_two
+
+
+    @cached_property
+    def player_attacking(self) -> PlayerController:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Asserting player controllers are not both active or inactive:
+        if DEV_ENABLE_ASSERTION:
+            self.__assert_player_focus_state_is_valid()
+
+        # Returning active player controller:
+        if self.player_one.state_attacking:
+            return self.player_one
+        else:
+            return self.player_two
+        
+    
+    @cached_property
+    def player_defending(self) -> PlayerController:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Asserting player controllers are not both active or inactive:
+        if DEV_ENABLE_ASSERTION:
+            self.__assert_player_focus_state_is_valid()
+
+        # Returning active player controller:
+        if self.player_one.state_defending:
+            return self.player_one
+        else:
+            return self.player_two
         
     
     def switch_players_state_active(self) -> None:
@@ -463,6 +623,9 @@ class GameController:
         # Switching active state per player:
         for player_controller in self.player_list:
             player_controller.switch_state_active()
+            player_controller.update_hand_state(
+                table_map = self.__table.table_map
+                )
 
         # Asserting player controllers are not both active or inactive:
         if DEV_ENABLE_ASSERTION:
@@ -779,7 +942,19 @@ class GameController:
         TODO: Create a docstring.
         """
 
-        ...
+        # Checking previous selection:
+        if self.card_selected != card_object:
+            self.__card_selected: CardObject | None = card_object
+
+            # Updating card object's attribute:
+            card_object.set_state_selected(
+                set_value = True,
+                )
+            
+            # Clearing cache:
+            self.__clear_cached_property(
+                target_attribute = "card_selected"
+                )
 
 
     def event_deselect_card(self) -> None:
@@ -787,20 +962,170 @@ class GameController:
         TODO: Create a dcostring.
         """
 
-        ...
+        # Updating card object's attribute:
+        if self.card_selected is not None:
+            self.__card_selected.set_state_selected(
+                set_value = False,
+                )
+            
+            # Updating attribute:
+            self.__card_selected: CardObject | None = None
+            
+            # Clearing cache:
+            self.__clear_cached_property(
+                target_attribute = "card_selected"
+                )
 
 
-    def event_play_card(self, card_object: CardObject) -> None:
+    def event_play_card(self, 
+                        player_controller: PlayerController, 
+                        card_object: CardObject
+                        ) -> None:
         """
         TODO: Create a docstring.
         """
 
-        ...
+        # Getting positions on attack state:
+        if player_controller.state_attacking:
+            position_index: int = self.__table.table_empty_position
+            stack_index: int = TABLE_STACK_BOTTOM_INDEX
+
+            # Assertion control:
+            if DEV_ENABLE_ASSERTION:
+
+                # Raising error if position index is returned as None:
+                if position_index is None:
+                    error_message: str = f"Empty index returned as None for {card_object=}."
+                    raise IndexError(error_message)
+                
+        # Getting positions on defence state:
+        else:
+            for table_index in self.__table.table_map:
+                card_stored: CardObject | None = self.__table.get_card_by_position(
+                    position_index = table_index,
+                    stack_index = TABLE_STACK_BOTTOM_INDEX
+                    )
+
+                # Stopping on correct position:
+                if card_stored is not None:
+                    card_covered: CardObject | None = self.__table.get_card_by_position(
+                        position_index = table_index,
+                        stack_index = TABLE_STACK_TOP_INDEX
+                        )
+                    if card_covered is None:
+                        position_index: int = table_index
+                        stack_index: int = TABLE_STACK_TOP_INDEX
+                        break
+
+            # Raising error on expending all positions with no result:
+            else:
+                error_message: str = f"Found no position to play {card_object=} on defence."
+                raise IndexError(error_message)
+
+        # Handling:
+        self.handle_play(
+            player_controller = player_controller,
+            card_object       = card_object,
+            position_index    = position_index,
+            stack_index       = stack_index
+            )
+        
+        # Updating hand:
+        player_controller.update_hand_state(
+            table_map = self.__table.table_map
+            )
+        
+    
+    def event_computer_turn(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Playing until turn finished:
+        turn_finished: bool = False
+        while not turn_finished:
+
+            # DEBUG:
+            self.__player_two.update_hand_state(
+                table_map = self.__table.table_map
+                )
+
+            # Checking if computer has cards to play:
+            if self.__player_two.hand_playable_count == 0:
+                turn_finished: bool = True
+            
+            # Else:
+            if self.__player_two.hand_playable_count > 0:
+
+                # TODO: Create strategy:
+                hand_sorted: list[CardObject] = sorted(
+                    self.__player_two.hand_playable,
+                    key = lambda card_object: card_object.type_value,
+                    reverse = False
+                    )
+                
+                # Choosing a card to attack with:
+                if self.player_two.state_attacking:
+                    card_selected: CardObject = hand_sorted[0]
+
+                # Choosing a card to defend with:
+                else:
+
+                    # Cycling through all cards avaialble on table:
+                    card_found: bool = False
+                    for position_index in self.__table.table_map:
+                        card_bottom: CardObject | None = self.__table.get_card_by_position(
+                            position_index = position_index,
+                            stack_index = TABLE_STACK_BOTTOM_INDEX,
+                            ignore_assertion = True
+                            )
+                        if card_bottom is not None:
+                            card_top: CardObject | None = self.__table.get_card_by_position(
+                                position_index = position_index,
+                                stack_index = TABLE_STACK_TOP_INDEX,
+                                ignore_assertion = True
+                                )
+                            if card_top is None:
+
+                                # Finding a card to defend with:
+                                for card_playable in hand_sorted:
+                                    if card_playable > card_bottom:
+                                        card_selected: CardObject = card_playable
+                                        break
+
+                                # Updating flag:
+                                card_found: bool = True
+                            
+                            # Breaking
+                            if card_found:
+                                break
+            
+                # Playing card
+                self.event_play_card(
+                    player_controller = self.__player_two,
+                    card_object = card_selected
+                    )
+                
+                # Analyzing turn:
+                self.event_analyze_turn_state()
+                
+                # Checking if needs to continue playing:
+                stack_bottom_count: int = len(self.__table.table_container_bottom)
+                stack_top_count: int = len(self.__table.table_container_top)
+                if stack_bottom_count == stack_top_count:
+                    turn_finished: bool = True
+            
+            # Switching player active state:
+            self.switch_players_state_active()
+
+            # Analyzing turn:
+            self.event_analyze_turn_state()
 
 
     def event_draw_card(self, 
                         player_controller: PlayerController, 
-                        state_continuous: bool = False
+                        state_continuous: bool = False,
+                        debug_update: bool = False
                         ) -> None:
         """
         TODO: Create a docstring.
@@ -818,13 +1143,8 @@ class GameController:
             card_object: CardObject = self.__deck.draw_card()
 
             # Tweaking cards for PLAYER:
-            if player_controller.player_type == VAR_PLAYER_TYPE_PLAYER:
+            if player_controller.player_type == PLAYER_INFO.TYPE_PLAYER:
                 card_object.set_state_revealed(
-                    set_value = True
-                    )
-                
-                # DEBUG:
-                card_object.set_state_playable(
                     set_value = True
                     )
             
@@ -833,7 +1153,11 @@ class GameController:
                 card_object.set_slide_speed(
                     set_value = CARD_SLIDE_SPEED_OPPONENT
                     )
-
+                
+                # DEBUG:
+                card_object.set_state_revealed(
+                    set_value = True
+                    )
 
             # Adding to player controller
             player_controller.add_card(
@@ -844,6 +1168,11 @@ class GameController:
             # Updating hand:
             if not state_continuous:
                 player_controller.update_hand_position()
+
+            if debug_update:
+                player_controller.update_hand_state(
+                    table_map = self.__table.table_map
+                    )
         
     
     def event_fill_hand(self, player_controller: PlayerController) -> None:
@@ -860,7 +1189,160 @@ class GameController:
         
         # Updating hand:
         player_controller.update_hand_position()
+
     
+    def event_analyze_turn_state(self) -> None:
+        """
+        TODO: Create a docstring
+        """
+
+        # Updating players' hands:
+        for player_controller in self.player_list:
+            player_controller.update_hand_state(
+                table_map = self.__table.table_map
+                )
+
+        # Preparing flags:
+        end_round: bool = False
+        sweep_cards: bool = False
+        switch_active: bool = False
+        switch_focus: bool = False
+
+        # If there are no cards on table, continue:
+        if self.__table.table_count == 0:
+            ...
+
+        # Cards on table, analyzing:
+        elif self.__table.table_count > 0:
+
+            # Checking table card count on stacks:
+            stack_bottom_card_count: int = len(self.__table.table_container_bottom)
+            stack_top_card_count: int = len(self.__table.table_container_top)
+
+            # Checking if table stack is full:
+            if stack_top_card_count == TABLE_POSITION_COUNT_MAX:
+                end_round: bool = True
+                switch_active: bool = True
+                switch_focus: bool = True
+
+            # Table stack is not full:
+            else:
+
+                # If all cards are "answered":
+                if stack_bottom_card_count == stack_top_card_count:
+
+                    # If attacking player can not play more cards, end turn:
+                    if self.player_active.state_attacking:
+                        if self.player_active.hand_playable_count == 0:
+                            end_round: bool = True
+                            switch_active: bool = True
+                            switch_focus: bool = True
+
+                    # Checking if defending player can continue:
+                    else:
+
+                        # Defender has no cards in hand:
+                        if self.player_defending.hand_count == 0:
+                            end_round: bool = True
+                            switch_focus: bool = True
+                        
+                        # Defender has cards in hand:
+                        else:
+                            switch_active: bool = True
+                
+                # If there are cards "unanswered":
+                elif stack_bottom_card_count > stack_top_card_count:
+
+                    # If active player is attacking, pass:
+                    if self.player_active.state_attacking:
+                        ...
+
+                    # If active player is defending:
+                    elif self.player_active.state_defending:
+
+                        # Raising error on no cards in hand:
+                        if self.player_active.hand_count == 0:
+                            error_message: str = f"{self.player_active} has no cards on defence."
+                            raise LookupError(error_message)
+                        
+                        # Assessing player's state, if there are cards available:
+                        else:
+
+                            # If there are playable cards in hand, continue:
+                            if self.player_active.hand_playable_count > 0:
+                                ...
+
+                            # If no playable cards in hand - sweep, end round:
+                            elif self.player_active.hand_playable_count == 0:
+                                end_round: bool = True
+                                sweep_cards: bool = True
+                                switch_active: bool = True
+
+        # Ending round by sweeping cards:
+        if end_round:
+
+            # Updating waiting input flag:
+            self.game_status.waiting_input = True
+            self.game_status.end_turn_func_set = Function_Set(
+                sweep_cards = sweep_cards,
+                sweep_player_controller = self.player_active if sweep_cards else None,
+                switch_active = switch_active,
+                switch_focus = switch_focus,
+                )
+                
+        # Switching active state:
+        else:
+            
+            # Removing end func set:
+            self.game_status.end_turn_func_set = None
+
+            # Switching active state:
+            if switch_active:
+                self.switch_players_state_active()
+
+            # Switching focus state:
+            if switch_focus:
+                self.switch_players_state_focus()
+
+            player_controller.update_hand_state(
+                table_map = self.__table.table_map
+                )
+
+        # Clearing cache:
+        self.__clear_cached_property_list(
+            target_list = self.__cached_player_controller_property_list
+            )
+        
+    
+    def event_end_turn(self, sweep_cards: bool, switch_active: bool, switch_focus: bool) -> None:
+
+        # Ending turn:
+        if sweep_cards:
+            self.sweep_cards_to_hand(
+                player_controller = self.player_active
+                )
+        else:
+            self.sweep_cards_to_discard()
+
+        # Filling cards:
+        for player_controller in self.player_list:
+            self.event_fill_hand(
+                player_controller = player_controller
+                )
+        
+        # Switching active state:
+        if switch_active:
+            self.switch_players_state_active()
+
+        # Switching focus state:
+        if switch_focus:
+            self.switch_players_state_focus()
+
+        # Updating hand:
+        player_controller.update_hand_state(
+            table_map = self.__table.table_map
+            )
+        
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -886,7 +1368,6 @@ class GameController:
         # Returning:
         return boundary_container
         
-
 
     @cached_property
     def __boundary_player_two_area(self) -> tuple[range, range]:
@@ -1098,7 +1579,7 @@ class GameController:
 
 
     @cached_property
-    def __area_rect_player_one(self) -> arcade.Rect:
+    def __area_rect_player_one_hand(self) -> arcade.Rect:
         """
         TODO: Create a docstring.
         """
@@ -1116,7 +1597,7 @@ class GameController:
     
 
     @cached_property
-    def __area_rect_player_two(self) -> arcade.Rect:
+    def __area_rect_player_two_hand(self) -> arcade.Rect:
         """
         TODO: Create a docstring.
         """
@@ -1152,6 +1633,42 @@ class GameController:
     
 
     @cached_property
+    def __area_rect_player_one_indicator(self) -> arcade.Rect:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Generating a Rect object:
+        render_rect: Rect = arcade.XYWH(
+            x      = AREA_INDICATOR_PLAYER_ONE.area_coordinate_x_center,
+            y      = AREA_INDICATOR_PLAYER_ONE.area_coordinate_y_center,
+            width  = AREA_INDICATOR_PLAYER_ONE.area_width,
+            height = AREA_INDICATOR_PLAYER_ONE.area_height
+            )
+        
+        # Returning:
+        return render_rect
+    
+
+    @cached_property
+    def __area_rect_player_two_indicator(self) -> arcade.Rect:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Generating a Rect object:
+        render_rect: Rect = arcade.XYWH(
+            x      = AREA_INDICATOR_PLAYER_TWO.area_coordinate_x_center,
+            y      = AREA_INDICATOR_PLAYER_TWO.area_coordinate_y_center,
+            width  = AREA_INDICATOR_PLAYER_TWO.area_width,
+            height = AREA_INDICATOR_PLAYER_TWO.area_height
+            )
+        
+        # Returning:
+        return render_rect
+    
+
+    @cached_property
     def area_current(self) -> Area:
         """
         TODO: Create a docstring.
@@ -1170,28 +1687,28 @@ class GameController:
         if self.area_current != set_value:
             area_previous: Area | None = self.__area_current
             self.__area_current: Area | None = set_value
-
-            # Clearing cache:
-            self.__clear_cached_property(
-                target_attribute = "area_current"
-                )
             
             # Checking if cards needs to be updated:
-            update_cards: bool = bool(
-                area_previous != self.__area_current and
-                area_previous in (AREA_PLAYER_ONE_HAND, AREA_PLAYER_TWO_HAND)
-                )
+            update_cards: bool = area_previous != set_value
             
             # Updating cards to avoid awkward slides:
             if update_cards:
 
-                # Handling slide in player one area:
-                if area_previous == AREA_PLAYER_ONE_HAND:
-                    self.__player_one.update_hand_position()
+                # Updating card objects' coordinates to match original placement:
+                for player_controller in self.player_list:
+                    player_controller.update_hand_position()
+                self.__table.update_card_position()
 
-                # Handling slide in player two area:
-                elif area_previous == AREA_PLAYER_TWO_HAND:
-                    self.__player_two.update_hand_position()
+                # De-hovering card:
+                self.set_card_hovered(
+                    card_object = None,
+                    update_state = True
+                    )
+            
+            # Clearing cache:
+            self.__clear_cached_property(
+                target_attribute = "area_current"
+                )
 
     
     def choose_area_current(self, cursor_coordinates: tuple[int, int]) -> Area | None:
@@ -1214,13 +1731,13 @@ class GameController:
                     set_value = area_object
                     )
                 break
-        
+
         # Setting no area:
         else:
             self.set_area_current(
                 set_value = None
                 )
-
+            
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1237,54 +1754,65 @@ class GameController:
         TODO: Create a docstring.
         """
 
+        # Converting to integers:
+        cursor_coordinate_x: int = int(cursor_coordinate_x)
+        cursor_coordinate_y: int = int(cursor_coordinate_y)
+
+        # Packing up:
+        cursor_coordinates: tuple[int, int] = (
+            cursor_coordinate_x,
+            cursor_coordinate_y
+            )
+
         # Checking if click can select cards:
         card_select_enabled: bool = bool(
             self.__player_one.state_active and              # Player is active
-            self.__player_one.hand_playable_count and       # Player has playable cards
+            self.__player_one.hand_playable_count > 0 and   # Player has playable cards
             self.assert_cursor_in_player_one_area(          # Click in player's hand area
                 cursor_coordinates = cursor_coordinates
                 )
             )
         if card_select_enabled:
 
-            # Converting to integers:
-            cursor_coordinate_x: int = int(cursor_coordinate_x)
-            cursor_coordinate_y: int = int(cursor_coordinate_y)
-
-            # Packing up:
-            cursor_coordinates: tuple[int, int] = (
-                cursor_coordinate_x,
-                cursor_coordinate_y
-                )
-
             # Checking if a card was clicked:
-            card_clicked: CardObject | None = None
+            card_clicked_priority: CardObject | None = None
+            card_clicked_list: list[CardObject] = []
             for card_object in self.__player_one.hand_playable:
                 card_clicked_conf: bool = self.assert_cursor_in_card_area(
                     cursor_coordinates = cursor_coordinates,
                     card_object = card_object
                     )
                 if card_clicked_conf:
-                    card_clicked: CardObject = card_object
-                    break
+                    card_clicked_list.append(
+                        card_object
+                        )
+
+                # Getting card hover priority object:
+                card_clicked_priority: CardObject = self.__cursor_priority(
+                    hover_coordinates = cursor_coordinates,
+                    hover_list = card_clicked_list,
+                    ignore_assertion = True
+                    )
             
             # If card object was clicked:
-            if card_clicked is not None:
-                
-                # Deselecting old card object, selecting clicked card object:
-                if self.card_selected is not None:
-                    self.event_deselect_card()
-                    if self.card_selected != card_clicked:
-                        self.event_select_card(
-                            card_object = card_clicked
+            if card_clicked_priority is not None:
+
+                # Playing (if enabled) or deselecting:
+                if self.card_selected == card_clicked_priority:
+                    if self.__session.enable_click_to_play:
+                        self.event_play_card(
+                            player_controller = self.player_active,
+                            card_object = card_clicked_priority
                             )
+                    else:
+                        self.event_deselect_card()
                 
-                # Selecting new card object:
+                # Selecting:
                 else:
                     self.event_select_card(
-                        card_object = card_clicked
+                        card_object = card_clicked_priority
                         )
-            
+                
             # If no card object was clicked:
             else:
                 self.event_deselect_card()
@@ -1323,7 +1851,7 @@ class GameController:
                         )
             
             # Getting card hover priority object:
-            card_hover_priority: CardObject = self.hover_priority(
+            card_hover_priority: CardObject = self.__cursor_priority(
                 hover_coordinates = cursor_coordinates,
                 hover_list = card_hover_list,
                 ignore_assertion = True
@@ -1334,6 +1862,9 @@ class GameController:
                 card_object = card_hover_priority,
                 update_state = True
                 )
+            if self.card_selected is not None:
+                if self.card_selected is not card_hover_priority:
+                    self.event_deselect_card()
             
     
     def __handle_card_hover_table(self, cursor_coordinates: tuple[int, int]) -> None:
@@ -1346,35 +1877,41 @@ class GameController:
         card_hover_enabled: bool = card_count > 0
         if card_hover_enabled:
 
-            # Getting list of card objects hovered over:
-            card_hover_list: list[CardObject] = []
+            # Locating hovered over card:
+            card_hovered_priority: CardObject | None = None
             for card_object in self.__table.table_container_top:
                 card_hovered: bool = self.assert_cursor_in_card_area(
                     cursor_coordinates = cursor_coordinates,
                     card_object = card_object
                     )
                 if card_hovered:
-                    card_hover_list.append(
-                        card_object
-                        )
-                    
-                    # Resetting card object's hover state:
-                    card_object.set_state_hovered(
-                        set_value = False
-                        )
-            
-            # Getting card hover priority object:
-            card_hover_priority: CardObject = self.hover_priority(
-                hover_coordinates = cursor_coordinates,
-                hover_list = card_hover_list,
-                ignore_assertion = True
-                )
+                    card_hovered_priority: CardObject = card_object
+                    break
 
-            # Updating card object hover state:
-            self.set_card_hovered(
-                card_object = card_hover_priority,
-                update_state = True
-                )
+                # Checking and hovering:
+                if card_hovered_priority is not None:
+                    if card_hovered_priority != self.card_hovered:
+                        self.set_card_hovered(
+                            card_object = None,
+                            update_state = True
+                            )
+
+                    # Updating card object hover state:
+                    self.set_card_hovered(
+                        card_object = card_hovered_priority,
+                        update_state = True
+                        )
+                
+                # No card was hovered:
+                else:
+
+                    # De-hovering previous card:
+                    if self.card_hovered is not None:
+                        self.set_card_hovered(
+                            card_object = None,
+                            update_state = True
+                            )
+
 
 
     def handle_mouse_motion(self,
@@ -1436,36 +1973,68 @@ class GameController:
         """
 
         # Checking if cursor is within any area:
-        if self.__area_current is not None:
+        if self.area_current is not None:
 
             # Handling slide in player one area:
-            if self.__area_current == AREA_PLAYER_ONE_HAND:
+            if self.area_current == AREA_PLAYER_ONE_HAND:
                 if self.player_one.hand_playable_count > 0:
                     for card_object in self.player_one.hand_playable:
                         card_object.slide_hand()
 
             # Handling slide in player two area:
-            elif self.__area_current == AREA_PLAYER_TWO_HAND:
+            elif self.area_current == AREA_PLAYER_TWO_HAND:
                 if self.player_two.hand_count > 0:
                     for card_object in self.player_two.hand_container:
                         card_object.slide_hand()
 
             # Handling slide in table area:
-            elif self.__area_current == AREA_TABLE:
+            elif self.area_current == AREA_TABLE:
                 container_count: int = len(self.__table.table_container_top)
                 if container_count > 0:
                     for card_object in self.__table.table_container_top:
                         card_object.slide_stack()
 
+    
+    def handle_play(self, 
+                    player_controller: PlayerController, 
+                    card_object: CardObject, 
+                    position_index: int, 
+                    stack_index: int
+                    ) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Removing card from player controller:
+        player_controller.remove_card(
+            card_object = card_object,
+            update_container = True,
+            )
+        
+        # Updating card object's positions:
+        card_object.set_position_table(
+            position_index = position_index,
+            stack_index = stack_index,
+            update_related = True,
+            )
+        
+        # Adding card to the table controller:
+        self.__table.add_card(
+            card_object = card_object,
+            position_index = position_index,
+            stack_index = stack_index,
+            ignore_assertion = DEV_ENABLE_ASSERTION
+            )
+
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    HOVER METHODS BLOCK
+    PRIORITY METHODS BLOCK
 
     """
 
 
-    def hover_priority(self, 
+    def __cursor_priority(self, 
                        hover_coordinates: tuple[int, int], 
                        hover_list: list[CardObject],
                        ignore_assertion: bool = False

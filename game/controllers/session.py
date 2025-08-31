@@ -6,7 +6,7 @@ from game.scripts import clear_cached_property
 from functools import cached_property
 
 # Settings and variables import list:
-from game.variables import *
+from game.collections import SORT_METHOD, PLAYER_INFO, CARD_INFO
 from game.settings import *
 
 # Assertion functions import:
@@ -25,35 +25,35 @@ SESSION CONTROLLER BLOCK
 
 
 # GLOBALLY AVAILABLE developer session flags:
-DEV_ENABLE_ASSERTION: bool = False
+DEV_ENABLE_ASSERTION: bool = True
 DEV_ENABLE_ECHO: bool = True
-DEV_ENABLE_DEBUG_RENDER: bool = True
+DEV_ENABLE_DEBUG_AREA_RENDER: bool = False
 
 
 class SessionController:
 
     # Sort method available list:
     SESSION_SORT_METHOD_LIST: tuple[str, ...] = (
-        VAR_SESSION_SORT_METHOD_SUIT,
-        VAR_SESSION_SORT_METHOD_VALUE,
-        VAR_SESSION_SORT_METHOD_VALUE_CLEAN,
-        VAR_SESSION_SORT_METHOD_ADDED
+        SORT_METHOD.BY_SUIT,
+        SORT_METHOD.BY_VALUE,
+        SORT_METHOD.BY_VALUE_C,
+        SORT_METHOD.BY_ADDED
         )
 
     def __init__(self):
 
         # User settings:
-        self.__user_name: str = VAR_PLAYER_NAME_ONE_DEFAULT
+        self.__user_name: str = PLAYER_INFO.NAME_PLAYER_ONE
         
         # Menu selections:
-        self.__sort_method:  str = VAR_SESSION_SORT_METHOD_SUIT
-        self.__texture_pack: str = VAR_CARD_TEXTURE_PACK_DEFAULT
+        self.__sort_method:  str = SORT_METHOD.BY_SUIT
+        self.__texture_pack: str = CARD_INFO.TEXTURE_PACK_DEFAULT
 
         # Game settings:
         self.__enable_hint:          bool = False
         self.__enable_reverse:       bool = False
         self.__enable_swap_trump:    bool = False
-        self.__enable_click_to_play: bool = False
+        self.__enable_click_to_play: bool = True
 
 
     """
@@ -65,26 +65,6 @@ class SessionController:
     scripts.py.
 
     """
-
-
-    def __convert_to_repr(self, attribute_string: str) -> str:
-        """
-        Converts a default (stored in variables.py script) variable string to its formatted repr 
-        (or display/render-friendly) version by removing the variable tag and formatting the string.
-        Example: "CARD_SUIT_HEARTS" -> "Hearts"
-
-        :param str attribute_string: Default variable string, e.g. "CARD_SUIT_HEARTS"
-
-        :return str: Tagless formatted attribute string value, e.g. "CARD_SUIT_HEARTS" -> "Hearts"
-        """
-
-        # Splitting and formatting:
-        char_split: str = "_"
-        repr_string_tagless:   str = attribute_string.split(char_split)[-1]
-        repr_string_formatted: str = repr_string_tagless.capitalize()
-
-        # Returning:
-        return repr_string_formatted
     
 
     def __clear_cached_property(self, target_attribute: str) -> None:
@@ -285,7 +265,7 @@ class SessionController:
         """
 
         # Returning:
-        return VAR_SESSION_SORT_METHOD_SUIT
+        return SORT_METHOD.BY_SUIT
     
 
     @cached_property
@@ -427,8 +407,8 @@ class SessionController:
             
             # Asserting value is default:
             valid_list: tuple[str, ...] = (
-                VAR_SESSION_ITEM_PREV,
-                VAR_SESSION_ITEM_NEXT
+                SORT_METHOD.ITEM_NEXT,
+                SORT_METHOD.ITEM_PREV
                 )
             assert_value_is_default(
                 check_value = switch_axis,
@@ -438,7 +418,7 @@ class SessionController:
 
         # Getting sort method:
         sort_method_selected: str = str(
-            self.sort_method_next if switch_axis == VAR_SESSION_ITEM_NEXT else
+            self.sort_method_next if switch_axis == SORT_METHOD.ITEM_NEXT else
             self.sort_method_previous
             )
         
@@ -474,7 +454,7 @@ class SessionController:
         """
 
         # Returning:
-        return VAR_CARD_TEXTURE_PACK_DEFAULT
+        return CARD_INFO.TEXTURE_PACK_DEFAULT
     
 
     @cached_property
@@ -485,7 +465,7 @@ class SessionController:
 
         # Generating list (temp):
         texture_pack_list: tuple[str, ...] = (
-            VAR_CARD_TEXTURE_PACK_DEFAULT,
+            CARD_INFO.TEXTURE_PACK_DEFAULT,
             )
         
         # Returning:
@@ -549,7 +529,7 @@ class SessionController:
         return texture_pack
     
 
-    def set_texture_pack(self, set_value: bool, ignore_assertion: bool = False) -> None:
+    def set_texture_pack(self, set_value: CARD_INFO, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
         """
@@ -614,8 +594,8 @@ class SessionController:
             
             # Asserting value is default:
             valid_list: tuple[str, ...] = (
-                VAR_SESSION_ITEM_PREV,
-                VAR_SESSION_ITEM_NEXT
+                SORT_METHOD.ITEM_NEXT,
+                SORT_METHOD.ITEM_PREV
                 )
             assert_value_is_default(
                 check_value = switch_axis,
@@ -625,7 +605,7 @@ class SessionController:
 
         # Getting sort method:
         texture_pack_selected: str = str(
-            self.texture_pack_next if switch_axis == VAR_SESSION_ITEM_NEXT else
+            self.texture_pack_next if switch_axis == SORT_METHOD.ITEM_NEXT else
             self.texture_pack_previous
             )
         

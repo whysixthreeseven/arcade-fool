@@ -10,7 +10,7 @@ from itertools import product
 import random
 
 # Settings and variables import list:
-from game.variables import *
+from game.collections import *
 from game.settings import *
 
 # Developer session values:

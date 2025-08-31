@@ -4,13 +4,12 @@ from __future__ import annotations
 # Cache-related modules and scripts import:
 from game.scripts import clear_cached_property
 from functools import cached_property
-from itertools import product
 
 # Random library import:
 import random
 
 # Settings and variables import list:
-from game.variables import *
+from game.collections import PLAYER_INFO, SORT_METHOD
 from game.settings import *
 
 # Developer session values:
@@ -21,9 +20,9 @@ from game.controllers.session import (
 
 # Assertion functions import:
 from game.scripts import (
+    convert_to_repr,
     assert_value_is_default,
     assert_value_is_valid_type,
-    assert_value_in_valid_range,
     )
 
 # Collections import:
@@ -36,8 +35,8 @@ class PlayerController:
     def __init__(self) -> None:
 
         # User information attributes:
-        self.__player_name: str = VAR_PLAYER_NAME_NOT_SET
-        self.__player_type: str = VAR_PLAYER_TYPE_NOT_SET
+        self.__player_name: str = PLAYER_INFO.NAME_PLAYER_ONE
+        self.__player_type: str = PLAYER_INFO.TYPE_NOT_SET
 
         # COntainer:
         self.__hand_container: list[CardObject] = []
@@ -55,9 +54,37 @@ class PlayerController:
         """
 
         # TODO: Implement.
+        repr_string: str = "{player_name} ({player_type}), {player_status} {player_hand}".format(
+            player_name = self.player_name_repr.title(),
+            player_type = self.player_type_repr.capitalize(),
+            player_status = "{state_active_char}/{state_focus_char}".format(
+                state_active_char = str(
+                    "A" if self.state_active else 
+                    "I" if not self.state_active else "#"),
+                state_focus_char = str(
+                    "A" if self.state_attacking and not self.state_defending else 
+                    "D" if self.state_defending and not self.state_attacking else "#")
+                ),
+            player_hand = self.hand_container
+            )
 
         # Returning:
-        return self.__player_name
+        return repr_string
+    
+
+    def __str__(self):
+        """
+        TODO: Create a docstring.
+        """
+
+        # TODO: Implement.
+        repr_string: str = "{player_name} ({player_type})".format(
+            player_name = self.player_name_repr.title(),
+            player_type = self.player_type_repr.capitalize()
+            )
+
+        # Returning:
+        return repr_string
     
 
     """
@@ -73,7 +100,7 @@ class PlayerController:
 
 
     @staticmethod
-    def create_player_controller(init_name: str, init_type: str) -> PlayerController:
+    def create_player_controller(init_name: str, init_type: PLAYER_INFO) -> PlayerController:
         """
         Creates and returns a card object with a set suit and type attributes, and loaded cover
         and front texture files based on the default texture pack. Made to be a static method to
@@ -173,7 +200,10 @@ class PlayerController:
         # Generating a list of cached properties:
         cached_property_list: tuple[str, ...] = (
             "player_name",
-            "player_type"
+            "player_name_repr",
+            "player_type",
+            "player_type_repr"
+            "state_focus_repr"
             )
         
         # Returning:
@@ -199,8 +229,8 @@ class PlayerController:
         # Generating a list of cached properties:
         cached_property_list: tuple[str, ...] = (
             "hand_container",
-            "hand_playable",
             "hand_count",
+            "hand_playable",
             "hand_playable_count",
             "hand_value",
             )
@@ -254,6 +284,19 @@ class PlayerController:
     
 
     @cached_property
+    def player_name_repr(self) -> str:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Formatting string:
+        player_name_repr: str = str(self.player_name).title()
+
+        # Returning:
+        return player_name_repr
+    
+
+    @cached_property
     def player_type(self) -> str:
         """
         TODO: Create a docstring.
@@ -264,6 +307,21 @@ class PlayerController:
     
 
     @cached_property
+    def player_type_repr(self) -> str:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Formatting string:
+        repr_string_formatted: str = convert_to_repr(
+            attribute_string = self.player_type,
+            )
+
+        # Returning:
+        return repr_string_formatted
+    
+
+    @cached_property
     def player_computer(self) -> bool:
         """
         TODO: Create a docstring.
@@ -271,14 +329,14 @@ class PlayerController:
 
         # Checking player type:
         player_computer: bool = False
-        if self.player_type == VAR_PLAYER_TYPE_COMPUTER:
+        if self.player_type == PLAYER_INFO.TYPE_COMPUTER:
             player_computer: bool = True
 
         # Returning:
         return player_computer
     
 
-    def set_player_name(self, set_value: str) -> None:
+    def set_player_name(self, set_value: PLAYER_INFO) -> None:
         """
         TODO: Create a docstring.
         """
@@ -287,7 +345,7 @@ class PlayerController:
         if DEV_ENABLE_ASSERTION:
 
             # Asserting sort method is valid type:
-            valid_type: bool = str
+            valid_type: bool = PLAYER_INFO
             assert_value_is_valid_type(
                 check_value = set_value,
                 valid_type = valid_type,
@@ -299,12 +357,12 @@ class PlayerController:
             self.__player_name: str = set_value
 
             # Clearing cache:
-            self.__clear_cached_property(
-                target_attribute = "player_name"
+            self.__clear_cached_property_list(
+                target_list = self.__cached_info_property_list
                 )
             
     
-    def set_player_type(self, set_value: str) -> None:
+    def set_player_type(self, set_value: PLAYER_INFO) -> None:
         """
         TODO: Create a docstring.
         """
@@ -313,7 +371,7 @@ class PlayerController:
         if DEV_ENABLE_ASSERTION:
 
             # Asserting sort method is valid type:
-            valid_type: bool = str
+            valid_type: bool = PLAYER_INFO
             assert_value_is_valid_type(
                 check_value = set_value,
                 valid_type = valid_type,
@@ -323,14 +381,10 @@ class PlayerController:
         # Updating attribute:
         if self.player_type != set_value:
             self.__player_type: str = set_value
-
+            
             # Clearing cache:
-            cached_property_list: tuple[str, ...] = (
-                "player_type",
-                "player_computer"
-                )
             self.__clear_cached_property_list(
-                target_list = cached_property_list
+                target_list = self.__cached_info_property_list
                 )
 
 
@@ -445,13 +499,13 @@ class PlayerController:
         # Calculating start position:
         card_coordinate_x_start: int = int(
             (GAME_WINDOW_WIDTH / 2 - hand_width_current / 2) + 
-            CARD_TEXTURE_WIDTH_SCALED / 6       # Fine-tuned
+            CARD_TEXTURE_WIDTH_SCALED / 2.40       # Fine-tuned
             )
         
         # Selecting appropriate coordinate y per player:
         coordinate_y_index: dict[str, int] = {
-            VAR_PLAYER_TYPE_PLAYER: CARD_COORDINATE_Y_HAND_PLAYER,
-            VAR_PLAYER_TYPE_COMPUTER: CARD_COORDINATE_Y_HAND_OPPONENT
+            PLAYER_INFO.TYPE_PLAYER: CARD_COORDINATE_Y_HAND_PLAYER,
+            PLAYER_INFO.TYPE_COMPUTER: CARD_COORDINATE_Y_HAND_OPPONENT
             }
         coordinate_y: int = coordinate_y_index[self.player_type]
 
@@ -481,7 +535,7 @@ class PlayerController:
             )
 
 
-    def update_hand_position(self) -> None:
+    def update_hand_position(self, shift_position: bool = False) -> None:
         """
         TODO: Create a docstring.
         """
@@ -497,12 +551,9 @@ class PlayerController:
             card_object.set_coordinates(
                 set_value = position_coordinates
                 )
-            card_object.set_coordinates_expected(
-                set_value = position_coordinates
-                )
 
 
-    def update_hand_state(self, table_map: dict[int, dict[int, tuple[int, int]]]) -> None:
+    def update_hand_state(self, table_map: dict[int, dict[int, tuple[int, int]]],) -> None:
         """
         TODO: Create a docstring.
         """
@@ -533,20 +584,49 @@ class PlayerController:
 
             # No cards on the table, all are playable:
             if card_list_available_count == 0:
-                for card_object in self.hand_container:
+                for card_object in self.__hand_container:
                     card_object.set_state_playable(
                         set_value = True
                         )
-            
+                    
             # Cards on table:
             else:
-                ... # TODO: Continue
+                card_type_list: list[str] = [
+                    card_object.type_default for card_object 
+                    in card_list_available
+                    ]
+                for card_object in self.hand_container:
+                    if card_object.type_default in card_type_list:
+                        card_object.set_state_playable(
+                            set_value = True
+                            )
 
+        # Updating based on defending state:
+        else:
 
+            # Scanning positions:
+            for position_index in table_map:
+                card_bottom: CardObject = table_map[position_index][TABLE_STACK_BOTTOM_INDEX]
+                card_top: CardObject = table_map[position_index][TABLE_STACK_TOP_INDEX]
+                if card_bottom is None:
+                    break
+
+                # Comparing value and setting playable state, if card's value is bigger:
+                if card_top is None:
+                    for card_object in self.hand_container:
+                        if card_object > card_bottom:
+                            card_object.set_state_playable(
+                                set_value = True
+                                )
+        
+        # Clearing cache:
+        self.__clear_cached_property_list(
+            target_list = self.__cached_hand_property_list
+            )
 
 
     def sort_hand(self, 
-                  sort_method: str,                 # Default sort method as in SESSION controller
+                  sort_method: SORT_METHOD,         # Default sort method as in SESSION controller
                   ascending_order: bool = True,     # Value and card suit priority order
                   update_position: bool = True      # Flag to update card objects' positions
                   ) -> None:
@@ -558,7 +638,7 @@ class PlayerController:
         if DEV_ENABLE_ASSERTION:
             
             # Asserting sort method is valid type:
-            valid_type: bool = str
+            valid_type: bool = SORT_METHOD
             assert_value_is_valid_type(
                 check_value = sort_method,
                 valid_type = valid_type,
@@ -567,10 +647,10 @@ class PlayerController:
             
             # Asserting sort method is a default variable:
             valid_list: tuple = (
-                VAR_SESSION_SORT_METHOD_ADDED,
-                VAR_SESSION_SORT_METHOD_VALUE,
-                VAR_SESSION_SORT_METHOD_VALUE_CLEAN,
-                VAR_SESSION_SORT_METHOD_SUIT
+                SORT_METHOD.BY_SUIT,
+                SORT_METHOD.BY_VALUE,
+                SORT_METHOD.BY_VALUE_C,
+                SORT_METHOD.BY_ADDED
                 )
             assert_value_is_default(
                 check_value = sort_method,
@@ -590,7 +670,7 @@ class PlayerController:
         if self.hand_count >= 2:
 
             # Sorting by suit priority (Hearts > Diamonds > Clubs > Spades):
-            if sort_method == VAR_SESSION_SORT_METHOD_SUIT:
+            if sort_method == SORT_METHOD.BY_SUIT:
                 reverse_check: bool = ascending_order
                 hand_sorted: list[CardObject] = sorted(
                     self.hand_container,
@@ -604,7 +684,7 @@ class PlayerController:
                     )
 
             # Sorting by value (ignoring trump value):
-            elif sort_method == VAR_SESSION_SORT_METHOD_VALUE_CLEAN:
+            elif sort_method == SORT_METHOD.BY_VALUE:
                 reverse_check: bool = ascending_order
                 hand_sorted: list[CardObject] = sorted(
                     self.hand_container,
@@ -613,7 +693,7 @@ class PlayerController:
                     )
 
             # Sorting by value (default):
-            elif sort_method == VAR_SESSION_SORT_METHOD_VALUE:
+            elif sort_method == SORT_METHOD.BY_VALUE_C:
                 reverse_check: bool = ascending_order
                 hand_sorted: list[CardObject] = sorted(
                     self.hand_container,
@@ -622,7 +702,7 @@ class PlayerController:
                     )
 
             # Sorting by time added to hand:
-            elif sort_method == VAR_SESSION_SORT_METHOD_ADDED:
+            elif sort_method == SORT_METHOD.BY_ADDED:
                 reverse_check: bool = True if not ascending_order else False
                 hand_sorted: list[CardObject] = sorted(
                     self.hand_container,
@@ -675,9 +755,9 @@ class PlayerController:
         """
 
         # Choosing correct repr string:
-        state_active_repr: str = VAR_PLAYER_STATE_ACTIVE
+        state_active_repr: str = PLAYER_INFO.STATE_ACTIVE
         if not self.state_active:
-            state_active_repr: str = VAR_PLAYER_STATE_INACTIVE
+            state_active_repr: str = PLAYER_INFO.STATE_INACTIVE
 
         # Returning:
         return state_active_repr
@@ -711,9 +791,9 @@ class PlayerController:
 
         # Choosing correct repr string:
         if self.state_attacking and not self.state_defending:
-            state_focus_repr: str = VAR_PLAYER_STATE_ATTACKING
+            state_focus_repr: str = PLAYER_INFO.STATE_ATTACKING
         elif not self.state_attacking and self.state_defending:
-            state_focus_repr: str = VAR_PLAYER_STATE_INACTIVE
+            state_focus_repr: str = PLAYER_INFO.STATE_DEFENDING
 
         # Raising error, if both focus states are active or inactive:
         else:
@@ -775,7 +855,7 @@ class PlayerController:
         """
 
         # Switching flag value:
-        switch_value: bool = True if not self.state_active else False
+        switch_value: bool = True if not self.__state_active else False
         self.set_state_active(
             set_value = switch_value,
             ignore_assertion = True,
@@ -814,7 +894,7 @@ class PlayerController:
         """
 
         # Switching flag value:
-        switch_value: bool = True if not self.state_attacking else False
+        switch_value: bool = True if not self.__state_attacking else False
         self.set_state_attacking(
             set_value = switch_value,
             ignore_assertion = True,
@@ -845,7 +925,6 @@ class PlayerController:
             self.__clear_cached_property(
                 target_attribute = "state_defending"
                 )
-            
     
     def switch_state_defending(self) -> None:
         """
@@ -853,8 +932,8 @@ class PlayerController:
         """
 
         # Switching flag value:
-        switch_value: bool = True if not self.state_defending else False
-        self.set_state_attacking(
+        switch_value: bool = True if not self.__state_defending else False
+        self.set_state_defending(
             set_value = switch_value,
             ignore_assertion = True,
             )
@@ -931,6 +1010,7 @@ class PlayerController:
         if card_object in self.hand_container:
 
             # Updating card position:
+            position_removed: int = card_object.position_hand
             card_object.reset_position()
 
             # Removing card from the list:
@@ -938,10 +1018,27 @@ class PlayerController:
                 card_object
                 )
             
+            # Updating positions:
+            position_start: int = position_removed + 1
+            position_end: int = len(self.__hand_container) + 1
+            position_update_range: range = range(
+                position_start,
+                position_end
+                )
+            for card_stored in self.__hand_container:
+                if card_stored.position_hand in position_update_range:
+                    position_index: int = card_stored.position_hand - 1
+                    card_stored.set_position_hand(
+                        position_index = position_index,
+                        update_related = False,
+                        )
+            
             # Clearing cache:
-            ...
+            self.__clear_cached_property_list(
+                self.__cached_hand_property_list
+                )
 
             # Updating hand container (if required):
             if update_container:
-                ... # TODO
+                self.update_hand_position()
 

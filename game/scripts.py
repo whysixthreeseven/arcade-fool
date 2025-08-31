@@ -15,6 +15,26 @@ def clear_cached_property(target_object: object, target_attribute: str) -> None:
         delattr(target_object, target_attribute)
 
 
+def convert_to_repr(attribute_string: str) -> str:
+    """
+    Converts a default (stored in variables.py script) variable string to its formatted repr 
+    (or display/render-friendly) version by removing the variable tag and formatting the string.
+    Example: "CARD_SUIT_HEARTS" -> "Hearts"
+
+    :param str attribute_string: Default variable string, e.g. "CARD_SUIT_HEARTS"
+
+    :return str: Tagless formatted attribute string value, e.g. "CARD_SUIT_HEARTS" -> "Hearts"
+    """
+
+    # Splitting and formatting:
+    char_split: str = "_"
+    repr_string_tagless:   str = str(attribute_string).split(char_split)[-1]
+    repr_string_formatted: str = repr_string_tagless.capitalize()
+
+    # Returning:
+    return repr_string_formatted
+
+
 def timestamp() -> str:
     """
     TODO: Create a docstring

@@ -6,7 +6,6 @@ from functools import cached_property
 from dataclasses import dataclass
 
 # Settings and variables import list:
-from game.variables import *
 from game.settings import *
 
 
@@ -78,31 +77,45 @@ AREA CONTAINERS BLOCK
 
 
 AREA_PLAYER_ONE_HAND: Area = Area(
-    area_name = "Player One Hand Area",
+    area_name = "Player One hand area",
     area_coordinate_x_center = CARD_COORDINATE_X_HAND_PLAYER,
     area_coordinate_y_center = CARD_COORDINATE_Y_HAND_PLAYER,
-    area_width = GAME_WINDOW_WIDTH,
-    area_height = int(
-        CARD_TEXTURE_HEIGHT_SCALED * 2.00   # Fine-tuned modifier
-        ),
+    area_width = AREA_PLAYER_ONE_HAND_WIDTH,
+    area_height = AREA_PLAYER_ONE_HAND_HEIGHT
     )
 
 
 AREA_PLAYER_TWO_HAND: Area = Area(
-    area_name = "Player Two Hand Area",
+    area_name = "Player Two hand area",
     area_coordinate_x_center = CARD_COORDINATE_X_HAND_OPPONENT,
     area_coordinate_y_center = CARD_COORDINATE_Y_HAND_OPPONENT,
-    area_width = GAME_WINDOW_WIDTH,
-    area_height = int(
-        CARD_TEXTURE_HEIGHT_SCALED * 2.00   # Fine-tuned modifier
-        ),
+    area_width = AREA_PLAYER_TWO_HAND_WIDTH,
+    area_height = AREA_PLAYER_TWO_HAND_HEIGHT
     )
 
 
 AREA_TABLE: Area = Area(
-    area_name = "Table Area",
+    area_name = "Table area",
     area_coordinate_x_center = TABLE_COORDINATE_X,
     area_coordinate_y_center = TABLE_COORDINATE_Y,
     area_width = GAME_WINDOW_WIDTH,
     area_height = TABLE_HEIGHT
+    )
+
+
+AREA_INDICATOR_PLAYER_ONE: Area = Area(
+    area_name = "Player One indicator area",
+    area_coordinate_x_center = TABLE_COORDINATE_X,
+    area_coordinate_y_center = AREA_PLAYER_ONE_INDICATOR_COORDINATE_Y,
+    area_width = AREA_PLAYER_ONE_INDICATOR_WIDTH,
+    area_height = AREA_PLYAER_ONE_INDICATOR_HEIGHT,
+    )
+
+
+AREA_INDICATOR_PLAYER_TWO: Area = Area(
+    area_name = "Player Two indicator area",
+    area_coordinate_x_center = TABLE_COORDINATE_X,
+    area_coordinate_y_center = AREA_PLAYER_TWO_INDICATOR_COORDINATE_Y,
+    area_width = AREA_PLAYER_TWO_INDICATOR_WIDTH,
+    area_height = AREA_PLAYER_TWO_INDICATOR_HEIGHT,
     )

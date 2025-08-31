@@ -6,25 +6,26 @@ import arcade
 from arcade import Texture, Rect
 
 # Settings and variables import list:
-from game.variables import *
+from game.collections import SORT_METHOD
 from game.settings import *
 
 # Developer session values:
 from game.controllers.session import (
-    DEV_ENABLE_DEBUG_RENDER,
+    DEV_ENABLE_DEBUG_AREA_RENDER,
     DEV_ENABLE_ASSERTION,
     DEV_ENABLE_ECHO,
     )
 
-# Controllers import:
-from game.controllers.session import SessionController
-from game.controllers.discard import DiscardController
-from game.controllers.player import PlayerController
-from game.controllers.table import TableController
-from game.controllers.deck import DeckController
+# Game status import list:
+from game.status import (
+    GameStatus,
+    GAME_STATE, 
+    TURN_STATE,
+    ROUND_STATE,
+    )
+
+# Game controller import::
 from game.controllers.game import GameController
-from game.controllers.card import CardObject
-from game.controllers.ui import UIController
 
 
 """
@@ -53,6 +54,9 @@ class Gameshell(arcade.Window):
         # Game controller:
         self.__game_controller: GameController = GameController()
         self.__setup_game_controller()
+
+        # Update rate counter:
+        self.__update_count: int = 0
 
 
     """
@@ -111,10 +115,15 @@ class Gameshell(arcade.Window):
             seconds.
         """
         
+        # Handling card slide (if required):
         self.__game_controller.handle_slide()
-        
 
-    
+        if self.__game_controller.player_active == self.__game_controller.player_two:
+            if self.__update_count > PLAY_DELAY_SECONDS:
+                self.__game_controller.event_computer_turn()
+                self.__update_count: int = 0
+            self.__update_count += delta_time
+            
 
     def on_draw(self):
         """
@@ -125,19 +134,7 @@ class Gameshell(arcade.Window):
         self.clear()
 
         # Debug rendering:
-        if DEV_ENABLE_DEBUG_RENDER:
-            self.__game_controller.render_debug_player_one_area()
-            self.__game_controller.render_debug_player_two_area()
-            self.__game_controller.render_debug_table_area()
-
-        # Rendering game objects in order (layer):
-        self.__game_controller.render_table_cards()
-        self.__game_controller.render_player_cards(
-            player_controller = self.__game_controller.player_one
-            )
-        self.__game_controller.render_player_cards(
-            player_controller = self.__game_controller.player_two
-            )
+        self.__game_controller.render()
 
     
     def on_mouse_press(self, 
@@ -183,32 +180,49 @@ class Gameshell(arcade.Window):
         """
 
         if key_pressed == arcade.key.R:
-            self.__game_controller.game_init()
-            self.__game_controller.game_prepare()
-            print(self.__game_controller.player_one.hand_container)
+            self.__game_controller: GameController = GameController()
+            self.__setup_game_controller()
         elif key_pressed == arcade.key.A:
             self.__game_controller.event_draw_card(
-                player_controller=self.__game_controller.player_one
+                player_controller=self.__game_controller.player_one, debug_update = True
                 )
         elif key_pressed == arcade.key.S:
             self.__game_controller.event_draw_card(
                 player_controller=self.__game_controller.player_two
                 )
+        elif key_pressed == arcade.key.SPACE:
+            print(self.__game_controller.game_status.waiting_input)
+            if self.__game_controller.game_status.waiting_input:
+                if self.__game_controller.game_status.end_turn_func_set is not None:
+                    func_set = self.__game_controller.game_status.end_turn_func_set 
+                    self.__game_controller.event_end_turn(
+                        sweep_cards = func_set.sweep_cards,
+                        switch_active = func_set.switch_active,
+                        switch_focus = func_set.switch_focus
+                        )
+                    self.game_status.end_turn_func_set = None
+                    self.__game_controller.game_status.waiting_input = False
+                else:
+                    self.__game_controller.switch_players_state_active()
+                    self.__game_controller.event_analyze_turn_state()
+            else:
+                self.__game_controller.switch_players_state_active()
+                self.__game_controller.event_analyze_turn_state()
 
         else:
+            if key_pressed in (arcade.key.Z, arcade.key.X, arcade.key.C, arcade.key.V):
+                sort_method: str = SORT_METHOD.BY_SUIT
 
-            sort_method: str = VAR_SESSION_SORT_METHOD_SUIT
+                if key_pressed == arcade.key.Z:
+                    sort_method = SORT_METHOD.BY_SUIT
+                elif key_pressed == arcade.key.X:
+                    sort_method = SORT_METHOD.BY_VALUE
+                elif key_pressed == arcade.key.C:
+                    sort_method = SORT_METHOD.BY_VALUE_C
+                elif key_pressed == arcade.key.V:
+                    sort_method = SORT_METHOD.BY_ADDED
 
-            if key_pressed == arcade.key.Z:
-                sort_method = VAR_SESSION_SORT_METHOD_SUIT
-            elif key_pressed == arcade.key.X:
-                sort_method = VAR_SESSION_SORT_METHOD_VALUE
-            elif key_pressed == arcade.key.C:
-                sort_method = VAR_SESSION_SORT_METHOD_VALUE_CLEAN
-            elif key_pressed == arcade.key.V:
-                sort_method = VAR_SESSION_SORT_METHOD_ADDED
-
-            self.__game_controller.player_one.sort_hand(
-                sort_method=sort_method,
-                update_position=True
-                )
+                self.__game_controller.player_one.sort_hand(
+                    sort_method=sort_method,
+                    update_position=True
+                    )

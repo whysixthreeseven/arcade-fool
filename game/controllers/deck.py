@@ -10,20 +10,13 @@ from itertools import product
 import random
 
 # Settings and variables import list:
-from game.variables import *
+from game.collections import CARD_INFO
 from game.settings import *
 
 # Developer session values:
 from game.controllers.session import (
     DEV_ENABLE_ASSERTION,
     DEV_ENABLE_ECHO,
-    )
-
-# Assertion functions import:
-from game.scripts import (
-    assert_value_is_default,
-    assert_value_is_valid_type,
-    assert_value_in_valid_range,
     )
 
 # Collections import:
@@ -47,7 +40,7 @@ class DeckController:
         
         # Core attributes:
         self.__deck_container: list[CardObject] = []
-        self.__deck_trump_suit: str = VAR_CARD_SUIT_NOT_SET
+        self.__deck_trump_suit: str = CARD_INFO.SUIT_NOT_SET
 
     
     def __repr__(self):
@@ -157,7 +150,10 @@ class DeckController:
         """
 
 
-        def create_card_object(init_suit: str, init_type: str, position_index: int) -> CardObject:
+        def create_card_object(init_suit: CARD_INFO, 
+                               init_type: CARD_INFO, 
+                               position_index: int
+                               ) -> CardObject:
             """
             Generates a card object via Card class's staticmethod and sets a new position in deck.
             This function is used to quickly populate (generate) a list of Cards via generator and 
@@ -250,6 +246,7 @@ class DeckController:
 
         # Selecting a new trump suit:
         trump_suit: str = random.choice(CardObject.CARD_SUIT_LIST)
+        print(trump_suit) # DEBUG
         self.set_deck_trump(
             set_value = trump_suit,
             clear_cache = False
@@ -310,7 +307,7 @@ class DeckController:
                 )
             
     
-    def set_deck_trump(self, set_value: str, clear_cache: bool = True) -> None:
+    def set_deck_trump(self, set_value: CARD_INFO, clear_cache: bool = True) -> None:
         """
         TODO: Create a docstring.
         """
