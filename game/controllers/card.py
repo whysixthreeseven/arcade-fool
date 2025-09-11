@@ -82,6 +82,11 @@ from game.settings import (
     # Stack position index:
     TABLE_STACK_TOP_INDEX,
 
+    # Card render angle (in deck) settings:
+    DECK_RENDER_ANGLE_SHOWCASE,
+    DECK_RENDER_ANGLE_ADD_MIN,
+    DECK_RENDER_ANGLE_ADD_MAX,
+
     )
 
 # Collections import:
@@ -187,6 +192,7 @@ class Card_Object:
         self.__state_revealed: bool = False
         self.__state_opponent: bool = False
         self.__state_playable: bool = False
+        self.__state_showcase: bool = False
         
         # Position attributes:
         self.__position_hand:    int | None = None
@@ -717,6 +723,16 @@ class Card_Object:
         return self.__state_playable
     
 
+    @cached_property
+    def state_showcase(self) -> bool:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__state_showcase
+    
+
     def set_state_selected(self, set_value: bool) -> None:
         """
         TODO: Create a docstring.
@@ -777,13 +793,24 @@ class Card_Object:
         if self.state_revealed != set_value:
             self.__state_revealed: bool = set_value
 
-            # Clearing cache (property):
+            # Clearing cache (render, texture):
+            cached_property_collection: tuple[tuple, ...] = (
+                self.__cached_render_property_list,
+                self.__cached_texture_property_list,
+                )
+            for cached_property_list in cached_property_collection:
+                clear_cached_property_list(
+                    target_object = self,
+                    target_attribute_list = cached_property_list
+                    )
+            
+            # Clearing cache (property)
             cached_property: str = "state_revealed"
             clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
-    
+            
 
     def set_state_opponent(self, set_value: bool) -> None:
         """
@@ -819,6 +846,24 @@ class Card_Object:
                 )
             
     
+    def set_state_showcase(self, set_value: bool) -> None:
+        """
+        TODO
+        """
+
+        # Updating attribute:
+        if self.state_showcase != set_value:
+            self.__state_showcase: bool = set_value
+
+            # Clearing cache (property):
+            cached_property: str = "state_showcase"
+            clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+        
+            
+    
     def reset_state(self) -> None:
         """
         TODO: Create a docstring.
@@ -831,6 +876,7 @@ class Card_Object:
         self.__state_revealed: bool = False
         self.__state_opponent: bool = False
         self.__state_playable: bool = False
+        self.__state_showcase: bool = False
 
         # Clearing cache (state):
         clear_cached_property_list(
@@ -932,7 +978,7 @@ class Card_Object:
                 target_object = self,
                 target_attribute_list = self.__cached_location_property_list,
                 )
-    
+            
 
     def set_position_added(self, position_index: int) -> None:
         """
@@ -1675,11 +1721,17 @@ class Card_Object:
         TODO: Create a docstring.
         """
 
-        # Choosing texture based on revealed state:
-        if self.state_revealed:
+        # Default (not revealed) texture:
+        texture_object: Texture = self.__texture_back_object
+
+        # Checking if front texture is forced:
+        force_front: bool = bool(
+            self.location == CARD_LOCATION_HAND and self.state_revealed or
+            self.location == CARD_LOCATION_DISCARD or
+            self.location == CARD_LOCATION_DECK and self.state_showcase
+            )
+        if force_front:
             texture_object: Texture = self.__texture_front_object
-        else:
-            texture_object: Texture = self.__texture_back_object
 
         # Returning:
         return texture_object
@@ -1704,33 +1756,61 @@ class Card_Object:
         return render_scale_selected
     
 
+    @property
+    def __render_angle_random(self) -> int:
+        """
+        TODO: Create a docstring.
+        """
+        
+        # Calculating a random angle:
+        render_angle_value: int = random.randrange(
+            start = CARD_RENDER_ANGLE_MIN,
+            stop = CARD_RENDER_ANGLE_MAX
+            )
+        render_angle_axis: int = random.choice(
+            seq = CARD_RENDER_ANGLE_AXIS_LIST
+            )
+        render_angle_random: int = render_angle_value * render_angle_axis    
+
+        # Returning:
+        return render_angle_random
+
     @cached_property
     def __render_angle_value(self) -> int:
         """
         TODO: Create a docstring.
         """
 
-        # Checking if render angle is required:
-        render_angle_required: bool = bool(
-            self.location == CARD_LOCATION_TABLE and self.position_index == TABLE_STACK_TOP_INDEX or
-            self.location == CARD_LOCATION_HAND and self.state_opponent and self.state_revealed or
-            self.location == CARD_LOCATION_HAND and self.state_selected
-            )
-
-        # Choosing correct angle:
+        # Choosing default angle:
         render_angle_selected: int = CARD_RENDER_ANGLE_DEFAULT
-        if render_angle_required:
 
-            # Calculating a random angle:
-            if not self.state_opponent:
-                render_angle_value: int = random.randrange(
-                    start = CARD_RENDER_ANGLE_MIN,
-                    stop = CARD_RENDER_ANGLE_MAX
-                    )
-                render_angle_axis: int = random.choice(
-                    seq = CARD_RENDER_ANGLE_AXIS_LIST
-                    )
-                render_angle_selected: int = render_angle_value * render_angle_axis
+        # Checking angle based on location (table) and stack position:
+        if self.location == CARD_LOCATION_TABLE:
+            if self.position_index == TABLE_STACK_TOP_INDEX:
+                render_angle_selected: int = self.__render_angle_random
+        
+        # Checking angle based on location (hand) and state:
+        elif self.location == CARD_LOCATION_HAND:
+            if self.state_opponent:
+                if self.state_revealed:
+                    render_angle_selected: int = 180    # TODO: Implement
+            else:
+                if self.state_selected:
+                    render_angle_selected: int = self.__render_angle_random
+        
+        # Checking angle based on location (deck) and state:
+        elif self.location == CARD_LOCATION_DECK:
+            if self.state_showcase:
+                render_angle_selected: int = DECK_RENDER_ANGLE_SHOWCASE
+                # render_angle_add: int = random.randint(
+                #     a = DECK_RENDER_ANGLE_ADD_MIN,
+                #     b = DECK_RENDER_ANGLE_ADD_MAX,
+                #     )
+                # render_angle_axis: int = random.choice(CARD_RENDER_ANGLE_AXIS_LIST)
+                # render_angle_selected: int = int(
+                #     DECK_RENDER_ANGLE_SHOWCASE + 
+                #     render_angle_add * render_angle_axis
+                #     )
 
             # Flipping card over for opponent's hand:
             else:

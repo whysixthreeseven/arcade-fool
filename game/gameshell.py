@@ -61,7 +61,7 @@ class Gameshell(arcade.Window):
 
         from game.controllers.deck import Deck_Controller
         self.dc = Deck_Controller()
-        self.dc.create_deck()
+        self.dc.create_deck(6)
         while self.hc.hand_count < 6:
             card = self.dc.draw_card()
             card.set_state_revealed(True)
@@ -85,6 +85,7 @@ class Gameshell(arcade.Window):
         self.clear()
         for zone in self.zones:
             zone.render()
+        self.dc.render()
         self.hc.render()
 
     
@@ -92,6 +93,18 @@ class Gameshell(arcade.Window):
         if symbol == arcade.key.A:
             if self.dc.deck_count > 0:
                 card = self.dc.draw_card()
-                card.set_state_revealed(True)
                 self.hc.add_card(card, True)
                 self.hc.update_hand_position(True)
+            
+        elif symbol == arcade.key.R:
+            from game.controllers.hand import Hand_Controller
+            self.hc = Hand_Controller()
+            self.hc.set_hand_owner(set_value = PLAYER_TYPE_PLAYER)
+
+            from game.controllers.deck import Deck_Controller
+            self.dc = Deck_Controller()
+            self.dc.create_deck(6)
+            while self.hc.hand_count < 6:
+                card = self.dc.draw_card()
+                self.hc.add_card(card, True)
+            self.hc.update_hand_position(True)

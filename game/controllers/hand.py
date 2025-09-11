@@ -408,7 +408,7 @@ class Hand_Controller:
         # Checking if card does not exist in hand container:
         if card_object not in self.hand_container:
 
-            # Resetting card object's position:
+            # Resetting card object's position and state:
             card_object.reset_position()
 
             # Updating card object's hand position:
@@ -416,6 +416,16 @@ class Hand_Controller:
             card_object.set_position_hand(
                 position_index = position_hand_index
                 )
+            
+            # Revealing the card:
+            card_object.set_state_revealed(
+                set_value = True,
+                )
+            
+            if card_object.state_showcase:
+                card_object.set_state_showcase(
+                    set_value = False,
+                    )
             
             # Updating card object's added position:
             self.adjust_hand_added(
