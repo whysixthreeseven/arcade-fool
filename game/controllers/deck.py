@@ -8,10 +8,6 @@ from itertools import product
 # Random library import:
 import random
 
-# Arcade library import:
-import arcade
-from arcade import Rect, Text, Texture
-
 # Variables, settings, and directories import:
 from game.settings import (
 
@@ -327,7 +323,7 @@ class Deck_Controller:
 
             # Checking if coordinate shift is required:            
             shift_required: bool = bool(
-                card_render_count > 1 and
+                card_render_count >= 1 and
                 card_render_count % DECK_RENDER_SHIFT_THRESHOLD == 0
                 )
             if shift_required:
@@ -438,8 +434,7 @@ class Deck_Controller:
                 clear_cache = False
                 )
             
-            
-        # Clearing cache:
+        # Clearing cache (deck):
         clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_deck_property_list
@@ -448,6 +443,36 @@ class Deck_Controller:
         # Returning:
         return card_object
     
+
+    def draw_card_highest_value(self) -> Card_Object | None:
+
+        # Acquiring highest value card:
+        card_object: Card_Object | None = None
+        if self.deck_count > 0:
+
+            # Sorting deck container and getting highest value card:
+            deck_sorted: list[Card_Object] = sorted(
+                self.deck_container,
+                key = lambda card_object: card_object.type_value,
+                reverse = True,
+                )
+            card_object: Card_Object = deck_sorted[0]
+
+            # Removing card from deck container:
+            self.remove_card(
+                card_object = card_object,
+                clear_cache = False
+                )
+            
+            # Clearing cache (deck):
+            clear_cached_property_list(
+                target_object = self,
+                target_attribute_list = self.__cached_deck_property_list
+                )
+
+        # Returning:
+        return card_object
+
 
     def remove_card(self, card_object: Card_Object, clear_cache: bool = True) -> None:
         """
@@ -460,7 +485,7 @@ class Deck_Controller:
                 card_object
                 )
 
-            # Deck render update:
+            # Deck render update (removing one card from the container):
             self.__deck_render.pop(0)
 
             # Clearing cache (deck):
@@ -483,17 +508,18 @@ class Deck_Controller:
         TODO: Create a docstring.
         """
 
-        # Cycling through cards:
+        # Cycling through cards in reversed order:
         card_render_count: int = 0
         for card_render in reversed(self.deck_render):
             card_render_count += 1
 
             # Checking if render is required:
             render_required: bool = bool(
-                card_render_count > 0 and
-                card_render_count == 1 or 
-                card_render_count % DECK_RENDER_SHIFT_THRESHOLD == 0 or 
-                card_render_count < DECK_RENDER_SHIFT_THRESHOLD
+                card_render_count > 0 and bool(
+                    card_render_count == 1 or 
+                    card_render_count % DECK_RENDER_SHIFT_THRESHOLD == 0 or 
+                    card_render_count < DECK_RENDER_SHIFT_THRESHOLD
+                    )
                 )
             
             # Rendering:
