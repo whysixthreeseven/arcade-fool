@@ -1,6 +1,6 @@
 # Annotations, typing etc. import:
 from __future__ import annotations
-from typing import Any
+from typing import Any, Optional
 
 # System management import:
 import os
@@ -94,8 +94,8 @@ from game.collections.texturepack import (
 
     # Texture packs:
     Texture_Pack, 
-    TEXTURE_PACK_FRONT_DEFAULT,
-    TEXTURE_PACK_BACK_DEFAULT,
+    TEXTURE_PACK_FRONT_LIGHT_DEFAULT,
+    TEXTURE_PACK_BACK_LIGHT_DEFAULT,
     )
 
 # Scripts import:
@@ -298,7 +298,11 @@ class Card_Object:
 
 
     @staticmethod
-    def create_card_object(init_type: str, init_suit: str) -> Card_Object:
+    def create_card_object(init_type: str, 
+                           init_suit: str, 
+                           texture_pack_front: Optional[Texture_Pack] = None,
+                           texture_pack_back: Optional[Texture_Pack] = None,
+                           ) -> Card_Object:
         """
         TODO: Create a docstring.
         """
@@ -314,12 +318,20 @@ class Card_Object:
             set_value = init_suit
             )
         
-        # Updating texture pack:
+        # Selecting texture packs:
+        texture_pack_front_selected: Texture_Pack = TEXTURE_PACK_FRONT_LIGHT_DEFAULT
+        if texture_pack_front is not None:
+            texture_pack_front_selected: Texture_Pack = texture_pack_front
+        texture_pack_back_selected: Texture_Pack = TEXTURE_PACK_BACK_LIGHT_DEFAULT
+        if texture_pack_back is not None:
+            texture_pack_back_selected: Texture_Pack = texture_pack_back
+
+        # Setting texture packs accordingly:
         card_object.set_texture_pack_front(
-            texture_pack = TEXTURE_PACK_FRONT_DEFAULT,
+            texture_pack = texture_pack_front_selected
             )
         card_object.set_texture_pack_back(
-            texture_pack = TEXTURE_PACK_BACK_DEFAULT
+            texture_pack = texture_pack_back_selected
             )
         
         # Returning:
@@ -433,12 +445,8 @@ class Card_Object:
 
         # Generating cached property list:
         cached_property_list: tuple[str, ...] = (
-            "__texture_pack_front",
-            "__texture_pack_back",
-            "__texture_front_object",
-            "__texture_back_object",
-            "__texture_width",
-            "__texture_height",
+            "texture_front_object",
+            "texture_back_object",
             )
         
         # Returning:
@@ -473,11 +481,11 @@ class Card_Object:
 
         # Generating cached property list:
         cached_property_list: tuple[str, ...] = (
-            "__render_texture_object",
-            "__render_scale_value",
-            "__render_angle_value",
-            "__render_width_value",
-            "__render_height_value",
+            "render_texture_object",
+            "render_scale_value",
+            "render_angle_value",
+            "render_width_value",
+            "render_height_value",
             )
         
         # Returning:
@@ -1170,8 +1178,8 @@ class Card_Object:
     """
 
 
-    @cached_property
-    def __texture_pack_front(self) -> Texture_Pack:
+    @property
+    def texture_pack_front(self) -> Texture_Pack:
         """
         TODO: Create a docstring.
         """
@@ -1180,8 +1188,8 @@ class Card_Object:
         return self.__texture_pack_front
     
 
-    @cached_property
-    def __texture_pack_back(self) -> Texture_Pack:
+    @property
+    def texture_pack_back(self) -> Texture_Pack:
         """
         TODO: Create a docstring.
         """
@@ -1190,34 +1198,8 @@ class Card_Object:
         return self.__texture_pack_back
     
 
-    @cached_property
-    def __texture_width(self) -> int:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Acquriing texture width:
-        texture_width: int = self.__texture_front_object.width
-
-        # Returning:
-        return texture_width
-    
-
-    @cached_property
-    def __texture_height(self) -> int:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Acquriing texture width:
-        texture_height: int = self.__texture_front_object.height
-
-        # Returning:
-        return texture_height
-
-
     @property
-    def __texture_front_filename(self) -> str:
+    def texture_front_filename(self) -> str:
         """
         TODO: Create a docstring.
         """
@@ -1236,7 +1218,7 @@ class Card_Object:
     
 
     @property
-    def __texture_front_filepath(self) -> str:
+    def texture_front_filepath(self) -> str:
         """
         TODO: Create a docstring.
         """
@@ -1254,7 +1236,7 @@ class Card_Object:
             )
         
         # Generating texture front filepath:
-        texture_front_filename: str = self.__texture_front_filename
+        texture_front_filename: str = self.texture_front_filename
         texture_front_filepath: str = os.path.join(
             dir_texture_pack_path,
             texture_front_filename,
@@ -1265,7 +1247,7 @@ class Card_Object:
     
 
     @cached_property
-    def __texture_front_object(self) -> Texture:
+    def texture_front_object(self) -> Texture:
         """
         TODO: Create a docstring.
         """
@@ -1275,14 +1257,14 @@ class Card_Object:
     
 
     @property
-    def __texture_back_filename(self) -> str:
+    def texture_back_filename(self) -> str:
         """
         TODO: Create a docstring.
         """
 
         # Generating filename:
         texture_back_filename: str = "{pack_style}.png".format(
-            pack_style = self.__texture_pack_back.pack_style.lower()
+            pack_style = self.texture_pack_back.pack_style.lower()
             )
 
         # Returning:
@@ -1290,7 +1272,7 @@ class Card_Object:
     
 
     @property
-    def __texture_back_filepath(self) -> str:
+    def texture_back_filepath(self) -> str:
         """
         TODO: Create a docstring.
         """
@@ -1303,7 +1285,7 @@ class Card_Object:
             )
         
         # Generating texture back filepath:
-        texture_back_filename: str = self.__texture_back_filename
+        texture_back_filename: str = self.texture_back_filename
         texture_back_filepath: str = os.path.join(
             dir_texture_pack_path,
             texture_back_filename,
@@ -1314,7 +1296,7 @@ class Card_Object:
     
 
     @cached_property
-    def __texture_back_object(self) -> Texture:
+    def texture_back_object(self) -> Texture:
         """
         TODO: Create a docstring.
         """
@@ -1323,70 +1305,83 @@ class Card_Object:
         return self.__texture_back_object
     
 
-    def __load_texture_front(self) -> None:
+    def set_texture_pack_front(self, texture_pack: Texture_Pack, clear_cache: bool = True) -> None:
         """
         TODO: Create a docstring.
         """
 
+        # Updating texture:
+        self.__texture_pack_front: Texture_Pack = texture_pack
+        
         # Loading texture object:
         texture_object: Texture = arcade.load_texture(
-            file_path = self.__texture_front_filepath
+            file_path = self.texture_front_filepath
             )
         
         # Updating attribute:
         self.__texture_front_object: Texture = texture_object
 
-
-    def __load_texture_back(self) -> None:
+        # Clearing cache (texture):
+        if clear_cache:
+            clear_cached_property_list(
+                target_object = self,
+                target_attribute_list = self.__cached_texture_property_list,
+                )
+            
+    
+    def set_texture_pack_back(self, texture_pack: Texture_Pack, clear_cache: bool = True) -> None:
         """
         TODO: Create a docstring.
         """
 
+        # Updating texture:
+        self.__texture_pack_back: Texture_Pack = texture_pack
+
         # Loading texture object:
         texture_object: Texture = arcade.load_texture(
-            file_path = self.__texture_back_filepath
+            file_path = self.texture_back_filepath
             )
         
         # Updating attribute:
         self.__texture_back_object: Texture = texture_object
 
-
-    def set_texture_pack_front(self, texture_pack: Texture_Pack) -> None:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Updating texture:
-        if self.__texture_pack_front != texture_pack:
-            self.__texture_pack_front: Texture_Pack = texture_pack
-
-            # Clearing cache (texture):
+        # Clearing cache (texture):
+        if clear_cache:
             clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = self.__cached_texture_property_list,
                 )
-            
-            # Updating texture objects:
-            self.__load_texture_front()
             
     
-    def set_texture_pack_back(self, texture_pack: Texture_Pack) -> None:
+    def update_texture(self, 
+                       texture_pack_front: Texture_Pack, 
+                       texture_pack_back: Texture_Pack
+                       ) -> None:
         """
         TODO: Create a docstring.
         """
 
-        # Updating texture:
-        if self.__texture_pack_back != texture_pack:
-            self.__texture_pack_back: Texture_Pack = texture_pack
-
-            # Clearing cache (texture):
-            clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = self.__cached_texture_property_list,
-                )
-            
-            # Updating texture objects:
-            self.__load_texture_back()
+        # Updating texture packs:
+        self.set_texture_pack_front(
+            texture_pack = texture_pack_front,
+            clear_cache = False,
+            )
+        self.set_texture_pack_back(
+            texture_pack = texture_pack_back,
+            clear_cache = False,
+            )
+        
+        # Clearing cache (texture):
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_texture_property_list,
+            )
+        
+        # Clearing cache (render):
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_render_property_list
+            )
 
 
     """
@@ -1716,29 +1711,29 @@ class Card_Object:
     
 
     @cached_property
-    def __render_texture_object(self) -> Texture:
+    def render_texture_object(self) -> Texture:
         """
         TODO: Create a docstring.
         """
 
         # Default (not revealed) texture:
-        texture_object: Texture = self.__texture_back_object
+        texture_object: Texture = self.texture_back_object
 
         # Checking if front texture is forced:
         force_front: bool = bool(
             self.location == CARD_LOCATION_HAND and self.state_revealed or
-            self.location == CARD_LOCATION_DISCARD or
-            self.location == CARD_LOCATION_DECK and self.state_showcase
+            self.location == CARD_LOCATION_DECK and self.state_showcase or
+            self.location == CARD_LOCATION_DISCARD
             )
         if force_front:
-            texture_object: Texture = self.__texture_front_object
+            texture_object: Texture = self.texture_front_object
 
         # Returning:
         return texture_object
     
 
     @cached_property
-    def __render_scale_value(self) -> float:
+    def render_scale_value(self) -> float:
         """
         TODO: Create a docstring.
         """
@@ -1757,7 +1752,7 @@ class Card_Object:
     
 
     @property
-    def __render_angle_random(self) -> int:
+    def render_angle_value_random(self) -> int:
         """
         TODO: Create a docstring.
         """
@@ -1776,7 +1771,7 @@ class Card_Object:
         return render_angle_random
 
     @cached_property
-    def __render_angle_value(self) -> int:
+    def render_angle_value(self) -> int:
         """
         TODO: Create a docstring.
         """
@@ -1787,7 +1782,7 @@ class Card_Object:
         # Checking angle based on location (table) and stack position:
         if self.location == CARD_LOCATION_TABLE:
             if self.position_index == TABLE_STACK_TOP_INDEX:
-                render_angle_selected: int = self.__render_angle_random
+                render_angle_selected: int = self.render_angle_value_random
         
         # Checking angle based on location (hand) and state:
         elif self.location == CARD_LOCATION_HAND:
@@ -1796,7 +1791,7 @@ class Card_Object:
                     render_angle_selected: int = 180    # TODO: Implement
             else:
                 if self.state_selected:
-                    render_angle_selected: int = self.__render_angle_random
+                    render_angle_selected: int = self.render_angle_value_random
         
         # Checking angle based on location (deck) and state:
         elif self.location == CARD_LOCATION_DECK:
@@ -1814,40 +1809,40 @@ class Card_Object:
 
             # Flipping card over for opponent's hand:
             else:
-                render_angle_selected: int = CARD_RENDER_ANGLE_OPPONENT
+                render_angle_selected: int = CARD_RENDER_ANGLE_DEFAULT
 
         # Returning:
         return render_angle_selected
 
 
     @cached_property
-    def __render_width_value(self) -> int:
+    def render_width_value(self) -> int:
         """
         TODO: Create a docstring.
         """
 
         # Calculating:
-        render_width_value: int = int(CARD_TEXTURE_WIDTH_SCALED * self.__render_scale_value)
+        render_width_value: int = int(CARD_TEXTURE_WIDTH_SCALED * self.render_scale_value)
     
         # Returning:
         return render_width_value
     
 
     @cached_property
-    def __render_height_value(self) -> int:
+    def render_height_value(self) -> int:
         """
         TODO: Create a docstring.
         """
 
         # Calculating:
-        render_height_value: int = int(CARD_TEXTURE_HEIGHT_SCALED * self.__render_scale_value)
+        render_height_value: int = int(CARD_TEXTURE_HEIGHT_SCALED * self.render_scale_value)
     
         # Returning:
         return render_height_value
 
 
     @property
-    def __render_rect_object(self) -> Rect:
+    def render_rect_object(self) -> Rect:
         """
         TODO: Create a docstring.
         """
@@ -1856,8 +1851,8 @@ class Card_Object:
         render_rect: Rect = arcade.XYWH(
             x      = self.coordinate_x_current,
             y      = self.coordinate_y_current,
-            width  = self.__render_width_value,
-            height = self.__render_height_value
+            width  = self.render_width_value,
+            height = self.render_height_value
             )
         
         # Returning:
@@ -1871,9 +1866,9 @@ class Card_Object:
 
         # Rendering:
         arcade.draw_texture_rect(
-            texture   = self.__render_texture_object,
-            rect      = self.__render_rect_object,
-            angle     = self.__render_angle_value,
+            texture   = self.render_texture_object,
+            rect      = self.render_rect_object,
+            angle     = self.render_angle_value,
             pixelated = True,
             )
         
