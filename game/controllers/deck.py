@@ -8,7 +8,7 @@ from itertools import product
 # Random library import:
 import random
 
-# Variables, settings, and directories import:
+# Related settings import:
 from game.settings import (
 
     # Deck render coordinates:
@@ -16,14 +16,23 @@ from game.settings import (
     DECK_RENDER_COORDINATE_Y,
     DECK_RENDER_COORDINATE_SHIFT_X,
     DECK_RENDER_COORDINATE_SHIFT_Y,
-    DECK_RENDER_SHIFT_THRESHOLD,
+    DECK_RENDER_SHIFT_THRESHOLD_DEFAULT,
 
     # Card texture settings:
     CARD_TEXTURE_HEIGHT_SCALED,
     )
 
+# Variables import:
+from game.variables import CARD_SUIT_TAG
+
+# Collections import:
+from game.collections.texturepack import Texture_Pack
+
 # Controllers import:
 from game.controllers.card import Card_Object
+
+# Session controller import:
+from game.session import Session_Controller
 
 # Scripts import:
 from game.scripts.convert import (
@@ -49,6 +58,7 @@ class Deck_Controller:
         self.__deck_container: list[Card_Object] = []
         self.__deck_render: list[Card_Object] = []
         self.__deck_trump: str = None
+        self.__deck_shift: int = DECK_RENDER_SHIFT_THRESHOLD_DEFAULT
 
     
     """
@@ -101,6 +111,7 @@ class Deck_Controller:
             "deck_count",
             "deck_value",
             "deck_trump",
+            "deck_trump_repr",
             "deck_render"
             )
         
@@ -133,7 +144,7 @@ class Deck_Controller:
         for card_suit, card_type in card_object_combination_list:
             card_object: Card_Object = Card_Object.create_card_object(
                 init_suit = card_suit,
-                init_type = card_type
+                init_type = card_type,
                 )
             
             # Updating card object's attributes:
@@ -214,16 +225,35 @@ class Deck_Controller:
 
         # Returning:
         return self.__deck_trump
-    
 
-    def create_deck(self, value_lowest: int = 2) -> None:
+
+    @cached_property
+    def deck_trump_repr(self) -> str:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Converting to repr format:
+        deck_trump_repr: str = convert_attribute_to_repr(
+            attribute_value = self.deck_trump,
+            attribute_tag = CARD_SUIT_TAG,
+            )
+        
+        # Returning:
+        return deck_trump_repr
+
+
+    def create_deck(self, deck_shift: int, deck_lowest_value: int) -> None:
         """
         TODO: Create a new deck
         """
 
+        # Updating deck shift:
+        self.__deck_shift: int = deck_shift
+
         # Creating new deck container:
         self.__prepare_deck_container(
-            value_lowest = value_lowest,
+            deck_lowest_value = deck_lowest_value,
             )
         
         # Creating new deck render:
@@ -233,7 +263,30 @@ class Deck_Controller:
             )
 
 
-    def __prepare_deck_container(self, value_lowest: int = 2) -> None:
+    def update_deck(self, 
+                    texture_pack_front: Texture_Pack, 
+                    texture_pack_back: Texture_Pack
+                    ) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Acquiring deck containers and cycling through each:
+        deck_collection_list: tuple[tuple[Card_Object, ...], ...] = (
+            self.deck_container,
+            self.deck_render
+            )
+        for deck_collection in deck_collection_list:
+
+            # Updating texture packs per card object:
+            for card_object in deck_collection:
+                card_object.update_texture(
+                    texture_pack_front = texture_pack_front,
+                    texture_pack_back = texture_pack_back,
+                    )
+
+
+    def __prepare_deck_container(self, deck_lowest_value: int) -> None:
         """
         TODO: Create a docstring.
         """
@@ -242,13 +295,12 @@ class Deck_Controller:
         deck_selected: list[Card_Object] = self.deck_sealed
 
         # Filtering deck, if required:
-        if value_lowest != 2:
-            deck_filtered: list[Card_Object] = [
-                card_object for card_object
-                in self.deck_sealed
-                if card_object.type_value_default >= value_lowest
-                ]
-            deck_selected: list[Card_Object] = deck_filtered
+        deck_filtered: list[Card_Object] = [
+            card_object for card_object
+            in self.deck_sealed
+            if card_object.type_value_default >= deck_lowest_value
+            ]
+        deck_selected: list[Card_Object] = deck_filtered
 
         # Shuffling deck and updating attribute:
         random.shuffle(deck_selected)
@@ -268,7 +320,7 @@ class Deck_Controller:
                     card_object.set_state_trump(
                         set_value = True
                         )
-
+        
         # Clearing cache (deck):
         clear_cached_property_list(
             target_object = self,
@@ -297,6 +349,8 @@ class Deck_Controller:
             card_render: Card_Object = Card_Object.create_card_object(
                 init_suit = suit_choice,
                 init_type = type_choice,
+                texture_pack_front = card_trump.texture_pack_front,
+                texture_pack_back = card_trump.texture_pack_back,
                 )
             
             # Updating card object's attributes:
@@ -321,10 +375,10 @@ class Deck_Controller:
         for card_render in reversed(deck_render):
             card_render_count += 1
 
-            # Checking if coordinate shift is required:            
+            # Checking if coordinate shift is required:      
             shift_required: bool = bool(
                 card_render_count >= 1 and
-                card_render_count % DECK_RENDER_SHIFT_THRESHOLD == 0
+                card_render_count % self.__deck_shift == 0
                 )
             if shift_required:
                 coordinate_x_shift += DECK_RENDER_COORDINATE_SHIFT_X
@@ -516,12 +570,13 @@ class Deck_Controller:
             # Checking if render is required:
             render_required: bool = bool(
                 card_render_count > 0 and bool(
-                    card_render_count == 1 or 
-                    card_render_count % DECK_RENDER_SHIFT_THRESHOLD == 0 or 
-                    card_render_count < DECK_RENDER_SHIFT_THRESHOLD
+                    card_render_count % self.__deck_shift == 0 or 
+                    card_render_count < self.__deck_shift or
+                    card_render_count == 1
                     )
                 )
             
             # Rendering:
             if render_required:
                 card_render.render()
+
