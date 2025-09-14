@@ -23,3 +23,19 @@ def convert_attribute_to_repr(attribute_value: str, attribute_tag: str) -> str:
 
     # Returning:
     return attribute_formatted
+
+
+def convert_value_to_integer(convert_value: float) -> int:
+    """
+    TODO: Create a docstring.
+    """
+
+    # Attempting to convert:
+    try:
+        position_index_f: int = int(convert_value)
+    except:
+        error_message: str = f"Unable to convert {convert_value=} to integer."
+        raise ValueError(error_message)
+    
+    # Returning:
+    return position_index_f
