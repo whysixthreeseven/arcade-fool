@@ -5,4 +5,4 @@ from game.gameshell import Gameshell
 
 
 gameshell = Gameshell()
-arcade.run() 
+arcade.run()

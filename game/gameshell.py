@@ -13,14 +13,13 @@ from game.settings import (
     GAME_WINDOW_UPDATE_RATE,
     GAME_WINDOW_ANTIALIASING,
     GAME_WINDOW_TITLE,
+
+    # Deck size:
+    DECK_LOWEST_VALUE_DEFAULT,
     )
 
 # Gameshell-related settings import:
-from game.variables import (
-
-    # Player type:
-    PLAYER_TYPE_PLAYER
-    )
+from game.variables import *
 
 # Zones import:
 from game.collections.zone import (
@@ -35,6 +34,16 @@ from game.collections.zone import (
     ZONE_PLAYER_TWO,
     ZONE_TABLE,
     )
+
+# Controllers import:
+from game.session import Session_Controller
+
+
+"""
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+GAMESHELL CLASS OBJECT BLOCK
+
+"""
 
 
 class Gameshell(arcade.Window):
@@ -53,6 +62,7 @@ class Gameshell(arcade.Window):
             )
         
         # Controller attributes:
+        self.__session_controller: Session_Controller = Session_Controller()
         self.__game_controller = None
 
         from game.controllers.hand import Hand_Controller
@@ -61,7 +71,10 @@ class Gameshell(arcade.Window):
 
         from game.controllers.deck import Deck_Controller
         self.dc = Deck_Controller()
-        self.dc.create_deck(6)
+        self.dc.create_deck(
+            deck_lowest_value = self.__session_controller.deck_lowest_value,
+            deck_shift = self.__session_controller.deck_shift_threshold,
+            )
         while self.hc.hand_count < 6:
             card = self.dc.draw_card()
             card.set_state_revealed(True)
@@ -103,8 +116,66 @@ class Gameshell(arcade.Window):
 
             from game.controllers.deck import Deck_Controller
             self.dc = Deck_Controller()
-            self.dc.create_deck(6)
+            self.dc.create_deck(
+                deck_lowest_value = self.__session_controller.deck_lowest_value,
+                deck_shift = self.__session_controller.deck_shift_threshold,
+                )
             while self.hc.hand_count < 6:
                 card = self.dc.draw_card()
                 self.hc.add_card(card, True)
             self.hc.update_hand_position(True)
+
+        elif symbol == arcade.key.T:
+            self.__session_controller.texture_pack_front.switch_pack_next()
+
+            self.dc.update_deck(
+                texture_pack_front = self.__session_controller.texture_pack_front,
+                texture_pack_back = self.__session_controller.texture_pack_back,
+                )
+            
+            for card_object in self.hc.hand_container:
+                card_object.update_texture(
+                    texture_pack_front = self.__session_controller.texture_pack_front,
+                    texture_pack_back = self.__session_controller.texture_pack_back,
+                    )
+                
+        elif symbol == arcade.key.Y:
+            self.__session_controller.texture_pack_back.switch_pack_next()
+            self.dc.update_deck(
+                texture_pack_front = self.__session_controller.texture_pack_front,
+                texture_pack_back = self.__session_controller.texture_pack_back,
+                )
+            
+            for card_object in self.hc.hand_container:
+                card_object.update_texture(
+                    texture_pack_front = self.__session_controller.texture_pack_front,
+                    texture_pack_back = self.__session_controller.texture_pack_back,
+                    )
+                
+        elif symbol == arcade.key.U:
+            self.__session_controller.texture_pack_front.set_pack_default(TEXTURE_PACK_MODE_LIGHT)
+            self.__session_controller.texture_pack_back.set_pack_default(TEXTURE_PACK_MODE_LIGHT)
+            self.dc.update_deck(
+                texture_pack_front = self.__session_controller.texture_pack_front,
+                texture_pack_back = self.__session_controller.texture_pack_back,
+                )
+            
+            for card_object in self.hc.hand_container:
+                card_object.update_texture(
+                    texture_pack_front = self.__session_controller.texture_pack_front,
+                    texture_pack_back = self.__session_controller.texture_pack_back,
+                    )
+                
+        elif symbol == arcade.key.I:
+            self.__session_controller.texture_pack_front.set_pack_default(TEXTURE_PACK_MODE_DARK)
+            self.__session_controller.texture_pack_back.set_pack_default(TEXTURE_PACK_MODE_DARK)
+            self.dc.update_deck(
+                texture_pack_front = self.__session_controller.texture_pack_front,
+                texture_pack_back = self.__session_controller.texture_pack_back,
+                )
+            
+            for card_object in self.hc.hand_container:
+                card_object.update_texture(
+                    texture_pack_front = self.__session_controller.texture_pack_front,
+                    texture_pack_back = self.__session_controller.texture_pack_back,
+                    )

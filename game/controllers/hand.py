@@ -1,9 +1,9 @@
 # Annotations, typing etc. import:
 from __future__ import annotations
+from typing import Any
 
 # Cache-related import:
 from functools import cached_property
-from itertools import product
 
 # Random library import:
 import random
@@ -49,11 +49,6 @@ from game.settings import (
     SLIDE_DISTANCE_AXIS_PLAYER,
     SLIDE_DISTANCE_AXIS_COMPUTER,
 
-    # Table-related settings:
-    TABLE_STACK_BOTTOM_INDEX,
-    TABLE_STACK_TOP_INDEX,
-    TABLE_COORDINATE_SHIFT_X,
-    TABLE_COORDINATE_SHIFT_Y,
     )
 
 # Controllers import:
@@ -554,8 +549,6 @@ class Hand_Controller:
                 )
             
             
-                
-    
     def update_hand_state(self, 
                           player_focus_state: str,      # <- Default var (attacking or defending)
                           table_map: dict[int, dict[int, Card_Object | None]]
@@ -653,6 +646,20 @@ class Hand_Controller:
                 )
 
 
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    SORT METHODS BLOCK
+    
+    """
+
+
+    def sort_hand(self, sort_method: str) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+    
+    
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     COORDINATES METHODS AND PROPERTIES BLOCK
