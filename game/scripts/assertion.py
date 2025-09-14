@@ -79,3 +79,23 @@ def assert_value_is_positive(check_value: int | float,
 
     # Returning (if reached):
     return assert_eval
+
+
+def assert_container_is_valid_size(check_container: tuple[Any, ...] | list[Any],
+                                   check_size: int,
+                                   raise_error: bool = True
+                                   ) -> None:
+    """
+    TODO: Create a docstring.
+    """
+
+    # Asserting value is positive:
+    assert_eval: bool = len(check_container) == check_size
+    assert_error: str = f"Container {check_container=} is invalid size ({check_size=}), duh."
+
+    # Raising error (if enabled):
+    if raise_error:
+        assert assert_eval, assert_error
+
+    # Returning (if reached):
+    return assert_eval
