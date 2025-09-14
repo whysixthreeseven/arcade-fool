@@ -79,14 +79,33 @@ from game.settings import (
     CARD_TEXTURE_WIDTH_SCALED,
     CARD_TEXTURE_HEIGHT_SCALED,
 
-    # Stack position index:
+    # Table positions and stack index:
     TABLE_STACK_TOP_INDEX,
+    TABLE_STACK_BOTTOM_INDEX,
+    TABLE_STACK_RANGE,
+    TABLE_POSITION_MIN,
+    TABLE_POSITION_MAX,
+    TABLE_POSITION_RANGE,
 
     # Card render angle (in deck) settings:
     DECK_RENDER_ANGLE_SHOWCASE,
     DECK_RENDER_ANGLE_ADD_MIN,
     DECK_RENDER_ANGLE_ADD_MAX,
 
+    # Deck settings:
+    DECK_SIZE_MAX,
+
+    )
+
+# Session-related import:
+from game.session import (
+
+    # Controller:
+    Session_Controller,
+
+    # Global session variables:
+    SESSION_ENABLE_ASSERTION,
+    SESSION_ENABLE_ECHO,
     )
 
 # Collections import:
@@ -100,11 +119,19 @@ from game.collections.texturepack import (
 
 # Scripts import:
 from game.scripts.convert import (
-    convert_attribute_to_repr
+    convert_attribute_to_repr,
+    convert_value_to_integer,
     )
 from game.scripts.cache import (
     clear_cached_property, 
     clear_cached_property_list
+    )
+from game.scripts.assertion import (
+    assert_value_is_default,
+    assert_value_is_positive,
+    assert_value_is_valid_type,
+    assert_value_in_valid_range,
+    assert_container_is_valid_size,
     )
 
 
@@ -554,10 +581,34 @@ class Card_Object:
         return suit_color_repr
 
 
-    def set_suit(self, set_value: str) -> None:
+    def set_suit(self, set_value: str, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
+
+        :param str set_value: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
         """
+
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (str, )
+            assert_value_is_valid_type(
+                check_value = set_value,
+                check_type = default_type_list,
+                raise_error = True
+                )
+            
+            # Asserting value is default:
+            default_value_list: tuple[Any, ...] = Card_Object.CARD_SUIT_LIST
+            assert_value_is_default(
+                check_value = set_value,
+                check_list  = default_value_list,
+                raise_error = True,
+                )
 
         # Updating attribute:
         if self.suit != set_value:
@@ -632,10 +683,34 @@ class Card_Object:
         return type_value
 
 
-    def set_type(self, set_value: str) -> None:
+    def set_type(self, set_value: str, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
+
+        :param str set_value: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
         """
+
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (str, )
+            assert_value_is_valid_type(
+                check_value = set_value,
+                check_type = default_type_list,
+                raise_error = True
+                )
+            
+            # Asserting value is default:
+            default_value_list: tuple[Any, ...] = Card_Object.CARD_TYPE_LIST
+            assert_value_is_default(
+                check_value = set_value,
+                check_list  = default_value_list,
+                raise_error = True,
+                )
 
         # Updating attribute:
         if self.type_f != set_value:
@@ -741,10 +816,26 @@ class Card_Object:
         return self.__state_showcase
     
 
-    def set_state_selected(self, set_value: bool) -> None:
+    def set_state_selected(self, set_value: bool, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
+
+        :param bool set_value: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError:
         """
+
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (bool, )
+            assert_value_is_valid_type(
+                check_value = set_value,
+                check_type = default_type_list,
+                raise_error = True
+                )
 
         # Updating attribute:
         if self.state_selected != set_value:
@@ -758,10 +849,26 @@ class Card_Object:
                 )
     
 
-    def set_state_hovered(self, set_value: bool) -> None:
+    def set_state_hovered(self, set_value: bool, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
+
+        :param bool set_value: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError:
         """
+
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (bool, )
+            assert_value_is_valid_type(
+                check_value = set_value,
+                check_type = default_type_list,
+                raise_error = True
+                )
 
         # Updating attribute:
         if self.state_hovered != set_value:
@@ -775,10 +882,26 @@ class Card_Object:
                 )
     
 
-    def set_state_trump(self, set_value: bool) -> None:
+    def set_state_trump(self, set_value: bool, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
+
+        :param bool set_value: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError:
         """
+
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (bool, )
+            assert_value_is_valid_type(
+                check_value = set_value,
+                check_type = default_type_list,
+                raise_error = True
+                )
 
         # Updating attribute:
         if self.state_trump != set_value:
@@ -792,10 +915,26 @@ class Card_Object:
                 )
     
 
-    def set_state_revealed(self, set_value: bool) -> None:
+    def set_state_revealed(self, set_value: bool, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
+
+        :param bool set_value: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError:
         """
+
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (bool, )
+            assert_value_is_valid_type(
+                check_value = set_value,
+                check_type = default_type_list,
+                raise_error = True
+                )
 
         # Updating attribute:
         if self.state_revealed != set_value:
@@ -820,10 +959,26 @@ class Card_Object:
                 )
             
 
-    def set_state_opponent(self, set_value: bool) -> None:
+    def set_state_opponent(self, set_value: bool, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
+
+        :param bool set_value: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError:
         """
+
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (bool, )
+            assert_value_is_valid_type(
+                check_value = set_value,
+                check_type = default_type_list,
+                raise_error = True
+                )
 
         # Updating attribute:
         if self.state_opponent != set_value:
@@ -837,10 +992,26 @@ class Card_Object:
                 )
     
 
-    def set_state_playable(self, set_value: bool) -> None:
+    def set_state_playable(self, set_value: bool, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
+
+        :param bool set_value: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError:
         """
+
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (bool, )
+            assert_value_is_valid_type(
+                check_value = set_value,
+                check_type = default_type_list,
+                raise_error = True
+                )
 
         # Updating attribute:
         if self.state_playable != set_value:
@@ -854,10 +1025,26 @@ class Card_Object:
                 )
             
     
-    def set_state_showcase(self, set_value: bool) -> None:
+    def set_state_showcase(self, set_value: bool, ignore_assertion: bool = False) -> None:
         """
-        TODO
+        TODO: Create a docstring.
+
+        :param bool set_value: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError:
         """
+
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (bool, )
+            assert_value_is_valid_type(
+                check_value = set_value,
+                check_type = default_type_list,
+                raise_error = True
+                )
 
         # Updating attribute:
         if self.state_showcase != set_value:
@@ -870,7 +1057,6 @@ class Card_Object:
                 target_attribute = cached_property
                 )
         
-            
     
     def reset_state(self) -> None:
         """
@@ -960,14 +1146,47 @@ class Card_Object:
         return self.__position_index
     
 
-    def set_position_hand(self, position_index: int) -> None:
+    def set_position_hand(self, position_index: int, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
+
+        :param int | float position_index: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        :raise ValueError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (int, float)
+            assert_value_is_valid_type(
+                check_value     = position_index,
+                check_type = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value in valid range:
+            default_range: range = range(0, DECK_SIZE_MAX)
+            assert_value_in_valid_range(
+                check_value = position_index,
+                check_range = default_range,
+                raise_error = True
+                )
+        
+        # Attempting to convert:
+        convert_required: bool = isinstance(position_index, float)
+        position_index_f: float | int = position_index
+        if convert_required:
+            position_index_f: int = convert_value_to_integer(
+                convert_value = position_index
+                )
+
         # Updating attribute:
-        if self.position_hand != position_index:
-            self.__position_hand: int = position_index
+        if self.position_hand != position_index_f:
+            self.__position_hand: int = position_index_f
 
             # Updating related attributes:
             self.__position_deck:    int | None = None
@@ -988,14 +1207,47 @@ class Card_Object:
                 )
             
 
-    def set_position_added(self, position_index: int) -> None:
+    def set_position_added(self, position_index: int, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
+
+        :param int | float position_index: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        :raise ValueError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (int, float)
+            assert_value_is_valid_type(
+                check_value     = position_index,
+                check_type = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value in valid range:
+            default_range: range = range(0, DECK_SIZE_MAX)
+            assert_value_in_valid_range(
+                check_value = position_index,
+                check_range = default_range,
+                raise_error = True
+                )
+        
+        # Attempting to convert:
+        convert_required: bool = isinstance(position_index, float)
+        position_index_f: float | int = position_index
+        if convert_required:
+            position_index_f: int = convert_value_to_integer(
+                convert_value = position_index
+                )
+
         # Updating attribute:
-        if self.position_added != position_index:
-            self.__position_added: int = position_index
+        if self.position_added != position_index_f:
+            self.__position_added: int = position_index_f
 
             # Updating related attributes:
             self.__position_deck:    int | None = None
@@ -1016,14 +1268,45 @@ class Card_Object:
                 )
     
 
-    def set_position_deck(self, position_index: int) -> None:
+    def set_position_deck(self, position_index: int, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
+
+        :param int | float position_index: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        :raise ValueError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (int, float)
+            assert_value_is_valid_type(
+                check_value     = position_index,
+                check_type = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value is positive:
+            assert_value_is_positive(
+                check_value = position_index,
+                raise_error = True,
+                )
+
+        # Attempting to convert:
+        convert_required: bool = isinstance(position_index, float)
+        position_index_f: float | int = position_index
+        if convert_required:
+            position_index_f: int = convert_value_to_integer(
+                convert_value = position_index
+                )
+
         # Updating attribute:
-        if self.position_deck != position_index:
-            self.__position_deck: int = position_index
+        if self.position_deck != position_index_f:
+            self.__position_deck: int = position_index_f
 
             # Updating related attributes:
             self.__position_hand:    int | None = None
@@ -1045,14 +1328,47 @@ class Card_Object:
                 )
     
 
-    def set_position_discard(self, position_index: int) -> None:
+    def set_position_discard(self, position_index: int, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
+
+        :param int | float position_index: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        :raise ValueError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (int, float)
+            assert_value_is_valid_type(
+                check_value     = position_index,
+                check_type = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value in valid range:
+            default_range: range = range(0, DECK_SIZE_MAX)
+            assert_value_in_valid_range(
+                check_value = position_index,
+                check_range = default_range,
+                raise_error = True
+                )
+        
+        # Attempting to convert:
+        convert_required: bool = isinstance(position_index, float)
+        position_index_f: float | int = position_index
+        if convert_required:
+            position_index_f: int = convert_value_to_integer(
+                convert_value = position_index
+                )
+
         # Updating attribute:
-        if self.position_discard != position_index:
-            self.__position_discard: int = position_index
+        if self.position_discard != position_index_f:
+            self.__position_discard: int = position_index_f
 
             # Updating related attributes:
             self.__position_hand:    int | None = None
@@ -1074,15 +1390,78 @@ class Card_Object:
                 )
         
 
-    def set_position_table(self, position_index: int, stack_index: int) -> None:
+    def set_position_table(self, 
+                           position_index: int,                 # <- 0 (left) to 5 (right)
+                           stack_index: int,                    # <- 0 (bottom) to 1 (top)
+                           ignore_assertion: bool = False       # <- True if debugging
+                           ) -> None:
         """
         TODO: Create a docstring.
+
+        :param int | float position_index: ...
+        :param int | float stack_index: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        :raise ValueError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid (position):
+            default_type_list: tuple[type, ...] = (int, float)
+            assert_value_is_valid_type(
+                check_value     = position_index,
+                check_type = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value in valid range (position):
+            default_range: range = TABLE_POSITION_RANGE
+            assert_value_in_valid_range(
+                check_value = position_index,
+                check_range = default_range,
+                raise_error = True
+                )
+            
+            # Asserting value type is valid (stack):
+            default_type_list: tuple[type, ...] = (int, float)
+            assert_value_is_valid_type(
+                check_value     = stack_index,
+                check_type = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value in valid range (stack):
+            default_range: range = TABLE_STACK_RANGE
+            assert_value_in_valid_range(
+                check_value = stack_index,
+                check_range = default_range,
+                raise_error = True
+                )
+        
+        # Attempting to convert (position index):
+        convert_required: bool = isinstance(position_index, float)
+        position_index_f: float | int = position_index
+        if convert_required:
+            position_index_f: int = convert_value_to_integer(
+                convert_value = position_index
+                )
+        
+        # Attempting to convert (stack index):
+        convert_required: bool = isinstance(stack_index, float)
+        stack_index_f: float | int = stack_index
+        if convert_required:
+            stack_index_f: int = convert_value_to_integer(
+                convert_value = stack_index
+                )
+        
+
         # Updating attributes:
-        if self.position_table != position_index and self.position_index != stack_index:
-            self.__position_table: int = position_index
-            self.__position_index: int = stack_index
+        if self.position_table != position_index_f and self.position_index != stack_index_f:
+            self.__position_table: int = position_index_f
+            self.__position_index: int = stack_index_f
 
             # Updating related attributes:
             self.__position_hand:    int | None = None
@@ -1308,7 +1687,31 @@ class Card_Object:
     def set_texture_pack_front(self, texture_pack: Texture_Pack, clear_cache: bool = True) -> None:
         """
         TODO: Create a docstring.
+
+        :param Texture_Pack texture_pack: ...
+        :param bool clear_cache: ...
+
+        :raise AssertionError: ...
         """
+
+        # Assertion control:
+        if SESSION_ENABLE_ASSERTION:
+
+            # Asserting value is valid type (texture pack):
+            default_type: object = Texture_Pack
+            assert_value_is_valid_type(
+                check_value = texture_pack,
+                check_type  = default_type,
+                raise_error = True,
+                )
+            
+            # Asserting value is valid type (flag):
+            default_type: type = bool
+            assert_value_is_valid_type(
+                check_value = clear_cache,
+                check_type  = default_type,
+                raise_error = True,
+                )
 
         # Updating texture:
         self.__texture_pack_front: Texture_Pack = texture_pack
@@ -1332,7 +1735,31 @@ class Card_Object:
     def set_texture_pack_back(self, texture_pack: Texture_Pack, clear_cache: bool = True) -> None:
         """
         TODO: Create a docstring.
+
+        :param Texture_Pack texture_pack: ...
+        :param bool clear_cache: ...
+
+        :raise AssertionError: ...
         """
+
+        # Assertion control:
+        if SESSION_ENABLE_ASSERTION:
+
+            # Asserting value is valid type (texture pack):
+            default_type: object = Texture_Pack
+            assert_value_is_valid_type(
+                check_value = texture_pack,
+                check_type  = default_type,
+                raise_error = True,
+                )
+            
+            # Asserting value is valid type (flag):
+            default_type: type = bool
+            assert_value_is_valid_type(
+                check_value = clear_cache,
+                check_type  = default_type,
+                raise_error = True,
+                )
 
         # Updating texture:
         self.__texture_pack_back: Texture_Pack = texture_pack
@@ -1355,10 +1782,13 @@ class Card_Object:
     
     def update_texture(self, 
                        texture_pack_front: Texture_Pack, 
-                       texture_pack_back: Texture_Pack
+                       texture_pack_back: Texture_Pack,
                        ) -> None:
         """
         TODO: Create a docstring.
+
+        :param Texture_Pack texture_pack_front:
+        :param Texture_Pack texture_pack_back:
         """
 
         # Updating texture packs:
@@ -1458,11 +1888,43 @@ class Card_Object:
                                  ) -> None:
         """
         TODO: Create a docstring.
+
+        :param int | float set_value: ...
+        :param bool clear_cache: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        :raise ValueError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (int, float)
+            assert_value_is_valid_type(
+                check_value     = set_value,
+                check_type      = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value is positive:
+            assert_value_is_positive(
+                check_value = set_value,
+                raise_error = True,
+                )
+        
+        # Attempting to convert:
+        convert_required: bool = isinstance(set_value, float)
+        set_value_f: float | int = set_value
+        if convert_required:
+            set_value_f: int = convert_value_to_integer(
+                convert_value = set_value
+                )
+
         # Updating attribute:
-        if self.coordinate_x_current != set_value:
-            self.__coordinate_x_current: int = set_value
+        if self.coordinate_x_current != set_value_f:
+            self.__coordinate_x_current: int = set_value_f
 
             # Clearing cache:
             if clear_cache:
@@ -1480,11 +1942,43 @@ class Card_Object:
                                  ) -> None:
         """
         TODO: Create a docstring.
+
+        :param int | float set_value: ...
+        :param bool clear_cache: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        :raise ValueError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (int, float)
+            assert_value_is_valid_type(
+                check_value     = set_value,
+                check_type      = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value is positive:
+            assert_value_is_positive(
+                check_value = set_value,
+                raise_error = True,
+                )
+        
+        # Attempting to convert:
+        convert_required: bool = isinstance(set_value, float)
+        set_value_f: float | int = set_value
+        if convert_required:
+            set_value_f: int = convert_value_to_integer(
+                convert_value = set_value
+                )
+
         # Updating attribute:
-        if self.coordinate_y_current != set_value:
-            self.__coordinate_y_current: int = set_value
+        if self.coordinate_y_current != set_value_f:
+            self.__coordinate_y_current: int = set_value_f
 
             # Clearing cache:
             if clear_cache:
@@ -1502,11 +1996,43 @@ class Card_Object:
                                  ) -> None:
         """
         TODO: Create a docstring.
+
+        :param int | float set_value: ...
+        :param bool clear_cache: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        :raise ValueError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (int, float)
+            assert_value_is_valid_type(
+                check_value     = set_value,
+                check_type      = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value is positive:
+            assert_value_is_positive(
+                check_value = set_value,
+                raise_error = True,
+                )
+        
+        # Attempting to convert:
+        convert_required: bool = isinstance(set_value, float)
+        set_value_f: float | int = set_value
+        if convert_required:
+            set_value_f: int = convert_value_to_integer(
+                convert_value = set_value
+                )
+
         # Updating attribute:
-        if self.coordinate_x_default != set_value:
-            self.__coordinate_x_default: int = set_value
+        if self.coordinate_x_default != set_value_f:
+            self.__coordinate_x_default: int = set_value_f
 
             # Clearing cache:
             if clear_cache:
@@ -1524,11 +2050,43 @@ class Card_Object:
                                  ) -> None:
         """
         TODO: Create a docstring.
+
+        :param int | float set_value: ...
+        :param bool clear_cache: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        :raise ValueError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (int, float)
+            assert_value_is_valid_type(
+                check_value     = set_value,
+                check_type      = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value is positive:
+            assert_value_is_positive(
+                check_value = set_value,
+                raise_error = True,
+                )
+        
+        # Attempting to convert:
+        convert_required: bool = isinstance(set_value, float)
+        set_value_f: float | int = set_value
+        if convert_required:
+            set_value_f: int = convert_value_to_integer(
+                convert_value = set_value
+                )
+
         # Updating attribute:
-        if self.coordinate_y_default != set_value:
-            self.__coordinate_y_default: int = set_value
+        if self.coordinate_y_default != set_value_f:
+            self.__coordinate_y_default: int = set_value_f
 
             # Clearing cache:
             if clear_cache:
@@ -1546,11 +2104,43 @@ class Card_Object:
                                ) -> None:
         """
         TODO: Create a docstring.
+
+        :param int | float set_value: ...
+        :param bool clear_cache: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        :raise ValueError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (int, float)
+            assert_value_is_valid_type(
+                check_value     = set_value,
+                check_type      = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value is positive:
+            assert_value_is_positive(
+                check_value = set_value,
+                raise_error = True,
+                )
+        
+        # Attempting to convert:
+        convert_required: bool = isinstance(set_value, float)
+        set_value_f: float | int = set_value
+        if convert_required:
+            set_value_f: int = convert_value_to_integer(
+                convert_value = set_value
+                )
+
         # Updating attribute:
-        if self.coordinate_x_slide != set_value:
-            self.__coordinate_x_slide: int = set_value
+        if self.coordinate_x_slide != set_value_f:
+            self.__coordinate_x_slide: int = set_value_f
 
             # Clearing cache:
             if clear_cache:
@@ -1568,11 +2158,43 @@ class Card_Object:
                                ) -> None:
         """
         TODO: Create a docstring.
+
+        :param int | float set_value: ...
+        :param bool clear_cache: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        :raise ValueError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (int, float)
+            assert_value_is_valid_type(
+                check_value     = set_value,
+                check_type      = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value is positive:
+            assert_value_is_positive(
+                check_value = set_value,
+                raise_error = True,
+                )
+        
+        # Attempting to convert:
+        convert_required: bool = isinstance(set_value, float)
+        set_value_f: float | int = set_value
+        if convert_required:
+            set_value_f: int = convert_value_to_integer(
+                convert_value = set_value
+                )
+
         # Updating attribute:
-        if self.coordinate_y_slide != set_value:
-            self.__coordinate_y_slide: int = set_value
+        if self.coordinate_y_slide != set_value_f:
+            self.__coordinate_y_slide: int = set_value_f
 
             # Clearing cache:
             if clear_cache:
@@ -1584,15 +2206,39 @@ class Card_Object:
                 
     
     def set_coordinates_current(self, 
-                                set_value: tuple[int, int], 
+                                set_container: tuple[int, int], 
                                 ignore_assertion: bool = False
                                 ) -> None:
         """
         TODO: Create a docstring.
+
+        :param tuple[int, int] set_container: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (tuple[int, int], list[int, int])
+            assert_value_is_valid_type(
+                check_value     = set_container,
+                check_type      = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value (container) is valid size:
+            default_size: int = 2
+            assert_container_is_valid_size(
+                check_container = set_container,
+                check_size      = default_size,
+                raise_error     = True
+                )
+
         # Unpacking:
-        set_coordinate_x, set_coordinate_y = set_value
+        set_coordinate_x, set_coordinate_y = set_container
         
         # Updating attributes:
         attribute_updated: bool = False
@@ -1624,15 +2270,39 @@ class Card_Object:
 
     
     def set_coordinates_default(self, 
-                                set_value: tuple[int, int], 
+                                set_container: tuple[int, int], 
                                 ignore_assertion: bool = False
                                 ) -> None:
         """
         TODO: Create a docstring.
+
+        :param tuple[int, int] set_container: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (tuple[int, int], list[int, int])
+            assert_value_is_valid_type(
+                check_value     = set_container,
+                check_type      = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value (container) is valid size:
+            default_size: int = 2
+            assert_container_is_valid_size(
+                check_container = set_container,
+                check_size      = default_size,
+                raise_error     = True
+                )
+
         # Unpacking:
-        set_coordinate_x, set_coordinate_y = set_value
+        set_coordinate_x, set_coordinate_y = set_container
         
         # Updating attributes:
         attribute_updated: bool = False
@@ -1664,15 +2334,39 @@ class Card_Object:
 
 
     def set_coordinates_slide(self, 
-                              set_value: tuple[int, int], 
+                              set_container: tuple[int, int], 
                               ignore_assertion: bool = False
                               ) -> None:
         """
         TODO: Create a docstring.
+
+        :param tuple[int, int] set_value: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
         """
 
+        # Assertion control (if enabled):
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+
+            # Asserting value type is valid:
+            default_type_list: tuple[type, ...] = (tuple[int, int], list[int, int])
+            assert_value_is_valid_type(
+                check_value     = set_container,
+                check_type      = default_type_list,
+                raise_error     = True
+                )
+            
+            # Asserting value (container) is valid size:
+            default_size: int = 2
+            assert_container_is_valid_size(
+                check_container = set_container,
+                check_size      = default_size,
+                raise_error     = True
+                )
+
         # Unpacking:
-        set_coordinate_x, set_coordinate_y = set_value
+        set_coordinate_x, set_coordinate_y = set_container
         
         # Updating attributes:
         attribute_updated: bool = False
