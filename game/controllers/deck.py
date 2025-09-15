@@ -47,6 +47,7 @@ from game.scripts.cache import (
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 DECK OBJECT CLASS BLOCK
+
 """
 
 
@@ -54,9 +55,11 @@ class Deck_Controller:
 
     def __init__(self) -> None:
         
-        # Core attributes:
+        # Deck lists:
         self.__deck_container: list[Card_Object] = []
-        self.__deck_render: list[Card_Object] = []
+        self.__deck_render:    list[Card_Object] = []
+
+        # Additional attributes:
         self.__deck_trump: str = None
         self.__deck_shift: int = DECK_RENDER_SHIFT_THRESHOLD_DEFAULT
 
@@ -131,6 +134,8 @@ class Deck_Controller:
         TODO: Create a docstring.
 
         Cached. Cannot be cleared.
+
+        :return list[Card_Object]: ...
         """
         
         # Creating card combinations list:
@@ -172,6 +177,8 @@ class Deck_Controller:
     def deck_render(self) -> list[Card_Object]:
         """
         TODO: Create a docstring.
+
+        :return list[Card_Object]: ...
         """
 
         # Returning:
@@ -182,6 +189,8 @@ class Deck_Controller:
     def deck_container(self) -> list[Card_Object]:
         """
         TODO: Create a docstring.
+
+        :return list[Card_Object]: ...
         """
 
         # Returning:
@@ -192,6 +201,8 @@ class Deck_Controller:
     def deck_count(self) -> int:
         """
         TODO: Create a docstring.
+
+        :return int: ...
         """
 
         # Calculating:
@@ -205,6 +216,8 @@ class Deck_Controller:
     def deck_value(self) -> int:
         """
         TODO: Create a docstring.
+
+        :return int: ...
         """
 
         # Calculating deck value:
@@ -221,6 +234,8 @@ class Deck_Controller:
     def deck_trump(self) -> str:
         """
         TODO: Create a docstring.
+
+        :return str: ...
         """
 
         # Returning:
@@ -231,6 +246,8 @@ class Deck_Controller:
     def deck_trump_repr(self) -> str:
         """
         TODO: Create a docstring.
+
+        :return str: ...
         """
 
         # Converting to repr format:
@@ -243,9 +260,19 @@ class Deck_Controller:
         return deck_trump_repr
 
 
-    def create_deck(self, deck_shift: int, deck_lowest_value: int) -> None:
+    def create_deck(self, 
+                    deck_shift: int, 
+                    deck_lowest_value: int, 
+                    ignore_assertion: bool = False
+                    ) -> None:
         """
-        TODO: Create a new deck
+        TODO: Create a new deck.
+
+        :param int deck_shift: ...
+        :param int deck_lowest_value: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
         """
 
         # Updating deck shift:
@@ -265,10 +292,17 @@ class Deck_Controller:
 
     def update_deck(self, 
                     texture_pack_front: Texture_Pack, 
-                    texture_pack_back: Texture_Pack
+                    texture_pack_back: Texture_Pack,
+                    ignore_assertion: bool = False,
                     ) -> None:
         """
         TODO: Create a docstring.
+
+        :param Texture_pack texture_pack_front: ...
+        :param Texture_pack texture_pack_back: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
         """
 
         # Acquiring deck containers and cycling through each:
@@ -289,6 +323,10 @@ class Deck_Controller:
     def __prepare_deck_container(self, deck_lowest_value: int) -> None:
         """
         TODO: Create a docstring.
+
+        :param int deck_lowest_value: ...
+
+        :raise AssertionError: ...
         """
 
         # Selecting deck:
@@ -331,6 +369,8 @@ class Deck_Controller:
     def __prepare_deck_render(self, card_trump: Card_Object) -> None:
         """
         TODO: Create a docstring.
+
+        :param Card_Object card_trump: ...
         """
 
         # Preparing coordinate shift values:
@@ -394,11 +434,11 @@ class Deck_Controller:
 
             # Updating coordinates:
             card_render.set_coordinates_default(
-                set_value = card_coordinates,
+                set_container = card_coordinates,
                 ignore_assertion = True,
                 )
             card_render.set_coordinates_current(
-                set_value = card_coordinates,
+                set_container = card_coordinates,
                 ignore_assertion = True
                 )
 
@@ -417,11 +457,11 @@ class Deck_Controller:
         
         # Updating showcase trump card's coordinates:
         card_render_trump.set_coordinates_default(
-            set_value = card_coordinates,
+            set_container = card_coordinates,
             ignore_assertion = True,
             )
         card_render_trump.set_coordinates_current(
-            set_value = card_coordinates,
+            set_container = card_coordinates,
             ignore_assertion = True
             )
         
@@ -464,6 +504,8 @@ class Deck_Controller:
     def next_card(self) -> Card_Object | None:
         """
         TODO: Create a docstring.
+
+        :return Card_Object: ...
         """
 
         # Getting the next (top) card from the deck:
@@ -478,6 +520,8 @@ class Deck_Controller:
     def draw_card(self) -> Card_Object | None:
         """
         TODO: Create a docstring.
+
+        :return Card_Object: ...
         """
 
         # If card exists, removing it from the container:
@@ -499,6 +543,12 @@ class Deck_Controller:
     
 
     def draw_card_highest_value(self) -> Card_Object | None:
+        """
+        TODO: Create a docstring.
+
+        :return Card_Object: ...
+        :return None: ...
+        """
 
         # Acquiring highest value card:
         card_object: Card_Object | None = None
@@ -531,6 +581,11 @@ class Deck_Controller:
     def remove_card(self, card_object: Card_Object, clear_cache: bool = True) -> None:
         """
         TODO: Create a docstring.
+
+        :param Card_object card_object: ...
+        :param bool clear_cache: ...
+
+        :raise AssertionError: ...
         """
 
         # Removing card from the deck container:
