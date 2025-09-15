@@ -2340,7 +2340,7 @@ class Card_Object:
         """
         TODO: Create a docstring.
 
-        :param tuple[int, int] set_value: ...
+        :param tuple[int, int] set_container: ...
         :param bool ignore_assertion: ...
 
         :raise AssertionError: ...
@@ -2350,7 +2350,7 @@ class Card_Object:
         if SESSION_ENABLE_ASSERTION and not ignore_assertion:
 
             # Asserting value type is valid:
-            default_type_list: tuple[type, ...] = (tuple[int, int], list[int, int])
+            default_type_list: tuple[type, ...] = (tuple, )
             assert_value_is_valid_type(
                 check_value     = set_container,
                 check_type      = default_type_list,
@@ -2482,7 +2482,7 @@ class Card_Object:
         elif self.location == CARD_LOCATION_HAND:
             if self.state_opponent:
                 if self.state_revealed:
-                    render_angle_selected: int = 180    # TODO: Implement
+                    render_angle_selected: int = CARD_RENDER_ANGLE_OPPONENT
             else:
                 if self.state_selected:
                     render_angle_selected: int = self.render_angle_value_random
@@ -2491,6 +2491,9 @@ class Card_Object:
         elif self.location == CARD_LOCATION_DECK:
             if self.state_showcase:
                 render_angle_selected: int = DECK_RENDER_ANGLE_SHOWCASE
+
+                # TODO: Consider to implement
+                
                 # render_angle_add: int = random.randint(
                 #     a = DECK_RENDER_ANGLE_ADD_MIN,
                 #     b = DECK_RENDER_ANGLE_ADD_MAX,
