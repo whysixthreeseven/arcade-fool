@@ -5,13 +5,6 @@ from typing import Any
 # Cache-related import:
 from functools import cached_property
 
-# Random library import:
-import random
-
-# Arcade library import:
-import arcade
-from arcade import Rect, Text, Texture
-
 # Controller-related variables import:
 from game.variables import (
 
@@ -386,6 +379,27 @@ class Hand_Controller:
                 target_object = self,
                 target_attribute = cached_property
                 )
+    
+
+    def reset_hand(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Creating a new empty container:
+        hand_container: list[Card_Object] = []
+        hand_added: int = 0
+
+        # Updating attributes:
+        self.__hand_container: list[Card_Object] = hand_container
+        self.__hand_added: int = hand_added
+
+        # Clearing cache:
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_hand_property_list
+            )
+
 
 
     """
@@ -407,7 +421,7 @@ class Hand_Controller:
             card_object.reset_position()
 
             # Updating card object's hand position:
-            position_hand_index: int = self.hand_count
+            position_hand_index: int = len(self.__hand_container)   # <- Using init container
             card_object.set_position_hand(
                 position_index = position_hand_index
                 )
@@ -521,12 +535,12 @@ class Hand_Controller:
 
             # Updating default coordinates:
             card_object.set_coordinates_default(
-                set_value = hand_coordinates,
+                set_container = hand_coordinates,
                 ignore_assertion = True
                 )
             if reset_coordinates:
                 card_object.set_coordinates_current(
-                    set_value = hand_coordinates,
+                    set_container = hand_coordinates,
                     ignore_assertion = True,
                     )
             
@@ -544,7 +558,7 @@ class Hand_Controller:
                 slide_coordinate_y
                 )
             card_object.set_coordinates_slide(
-                set_value = slide_coordinates,
+                set_container = slide_coordinates,
                 ignore_assertion = False,
                 )
             

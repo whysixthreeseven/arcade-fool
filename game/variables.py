@@ -99,6 +99,9 @@ PLAYER_TYPE_COMPUTER: str = f"{PLAYER_TYPE_TAG}_COMPUTER"
 # Player name variables:
 PLAYER_ONE_NAME_DEFAULT: str = "Player"
 PLAYER_TWO_NAME_DEFAULT: str = "Computer"
+PLAYER_NAME_GENDER_NOT_SET: str = "Neutral"
+PLAYER_NAME_GENDER_MALE: str = "Male"
+PLAYER_NAME_GENDER_FEMALE: str = "Female"
 
 # Player state variables:
 PLAYER_STATE_FOCUS_TAG: str = "PLAYER_STATE_FOCUS"

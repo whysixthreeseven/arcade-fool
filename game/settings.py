@@ -11,8 +11,8 @@ PROJECT SETTINGS BLOCK
 
 PROJECT_NAME: str = "Arcade Fool"
 PROJECT_DATE_STARTED: str = "2025.08.22"
-PROJECT_DATE_UPDATED: str = "2025.09.13"
-PROJECT_VERSION: str = "0.2t"
+PROJECT_DATE_UPDATED: str = "2025.09.15"
+PROJECT_VERSION: str = "0.31P"
 
 
 """
@@ -157,8 +157,8 @@ DECK_RENDER_COORDINATE_Y: int = int(
     )
 DECK_RENDER_COORDINATE_SHIFT_X: int = +2
 DECK_RENDER_COORDINATE_SHIFT_Y: int = -1
-DECK_RENDER_SHIFT_THRESHOLD_DEFAULT: int = 2
-DECK_RENDER_SHIFT_THRESHOLD_EXTENDED: int = 3
+DECK_RENDER_SHIFT_THRESHOLD_DEFAULT: int = 2    # <- Number of cards per render/shift in coords
+DECK_RENDER_SHIFT_THRESHOLD_EXTENDED: int = 3   # <- Extended number to reduce visual stack size
 
 # Render angle settings:
 DECK_RENDER_ANGLE_SHOWCASE: int = 270
@@ -166,9 +166,9 @@ DECK_RENDER_ANGLE_ADD_MIN: int = 3
 DECK_RENDER_ANGLE_ADD_MAX: int = 7
 
 # Deck size settings:
-DECK_LOWEST_VALUE_DEFAULT: int = 6
-DECK_LOWEST_VALUE_EXTENDED: int = 2
-DECK_SIZE_MAX: int = 52
+DECK_LOWEST_VALUE_DEFAULT: int = 6              # <- Default lowest size, perfect for 1v1 games
+DECK_LOWEST_VALUE_EXTENDED: int = 2             # <- Extended size for longer games, or 3+ players
+DECK_SIZE_MAX: int = 52                         # <- Max size, if lowest value is 2
 
 
 """

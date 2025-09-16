@@ -70,7 +70,7 @@ def assert_value_is_positive(check_value: int | float,
     """
 
     # Asserting value is positive:
-    assert_eval: bool = check_value > 0
+    assert_eval: bool = check_value >= 0
     assert_error: str = f"Value {check_value=} is negative, duh."
 
     # Raising error (if enabled):

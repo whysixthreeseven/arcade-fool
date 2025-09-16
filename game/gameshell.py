@@ -37,6 +37,8 @@ from game.collections.zone import (
 
 # Controllers import:
 from game.session import Session_Controller
+from game.controllers.game import Game_Controller
+from game.controllers.deck import Deck_Controller
 
 
 """
@@ -63,23 +65,12 @@ class Gameshell(arcade.Window):
         
         # Controller attributes:
         self.__session_controller: Session_Controller = Session_Controller()
-        self.__game_controller = None
+        self.__game_controller: Game_Controller = Game_Controller()
 
-        from game.controllers.hand import Hand_Controller
-        self.hc = Hand_Controller()
-        self.hc.set_hand_owner(set_value = PLAYER_TYPE_PLAYER)
 
-        from game.controllers.deck import Deck_Controller
-        self.dc = Deck_Controller()
-        self.dc.create_deck(
-            deck_lowest_value = self.__session_controller.deck_lowest_value,
-            deck_shift = self.__session_controller.deck_shift_threshold,
-            )
-        while self.hc.hand_count < 6:
-            card = self.dc.draw_card()
-            card.set_state_revealed(True)
-            self.hc.add_card(card)
-        self.hc.update_hand_position(True)
+        self.__game_controller.create_session()
+        self.__game_controller.create_game_default()
+
 
         self.zones: tuple[Zone_XYWH, ...] = (
             ZONE_GAME_AREA_PLAY,
@@ -98,84 +89,84 @@ class Gameshell(arcade.Window):
         self.clear()
         for zone in self.zones:
             zone.render()
-        self.dc.render()
-        self.hc.render()
+        self.__game_controller.deck.render()
+        self.__game_controller.player_one.hand.render()
+        self.__game_controller.player_two.hand.render()
 
     
     def on_key_press(self, symbol, modifiers):
         if symbol == arcade.key.A:
-            if self.dc.deck_count > 0:
-                card = self.dc.draw_card()
-                self.hc.add_card(card, True)
-                self.hc.update_hand_position(True)
+            if self.__game_controller.deck.deck_count > 0:
+                card = self.__game_controller.deck.draw_card()
+                self.__game_controller.player_one.hand.add_card(card, True)
+                self.__game_controller.player_one.hand.update_hand_position(True)
+        elif symbol == arcade.key.S:
+            if self.__game_controller.deck.deck_count > 0:
+                card = self.__game_controller.deck.draw_card()
+                self.__game_controller.player_two.hand.add_card(card, True)
+                self.__game_controller.player_two.hand.update_hand_position(True)
             
         elif symbol == arcade.key.R:
-            from game.controllers.hand import Hand_Controller
-            self.hc = Hand_Controller()
-            self.hc.set_hand_owner(set_value = PLAYER_TYPE_PLAYER)
-
-            from game.controllers.deck import Deck_Controller
-            self.dc = Deck_Controller()
-            self.dc.create_deck(
-                deck_lowest_value = self.__session_controller.deck_lowest_value,
-                deck_shift = self.__session_controller.deck_shift_threshold,
+            self.__game_controller.reset_session(
+                preserve_name = True
                 )
-            while self.hc.hand_count < 6:
-                card = self.dc.draw_card()
-                self.hc.add_card(card, True)
-            self.hc.update_hand_position(True)
+            self.__game_controller.create_game_default()
 
         elif symbol == arcade.key.T:
             self.__session_controller.texture_pack_front.switch_pack_next()
 
-            self.dc.update_deck(
+            self.__game_controller.deck.update_deck(
                 texture_pack_front = self.__session_controller.texture_pack_front,
                 texture_pack_back = self.__session_controller.texture_pack_back,
                 )
             
-            for card_object in self.hc.hand_container:
-                card_object.update_texture(
-                    texture_pack_front = self.__session_controller.texture_pack_front,
-                    texture_pack_back = self.__session_controller.texture_pack_back,
-                    )
+            for pc in (self.__game_controller.player_one, self.__game_controller.player_two):
+                for card_object in pc.hand.hand_container:
+                    card_object.update_texture(
+                        texture_pack_front = self.__session_controller.texture_pack_front,
+                        texture_pack_back = self.__session_controller.texture_pack_back,
+                        )
                 
         elif symbol == arcade.key.Y:
             self.__session_controller.texture_pack_back.switch_pack_next()
-            self.dc.update_deck(
+            self.__game_controller.deck.update_deck(
                 texture_pack_front = self.__session_controller.texture_pack_front,
                 texture_pack_back = self.__session_controller.texture_pack_back,
                 )
             
-            for card_object in self.hc.hand_container:
-                card_object.update_texture(
-                    texture_pack_front = self.__session_controller.texture_pack_front,
-                    texture_pack_back = self.__session_controller.texture_pack_back,
-                    )
+            for pc in (self.__game_controller.player_one, self.__game_controller.player_two):
+                for card_object in pc.hand.hand_container:
+                    card_object.update_texture(
+                        texture_pack_front = self.__session_controller.texture_pack_front,
+                        texture_pack_back = self.__session_controller.texture_pack_back,
+                        )
                 
         elif symbol == arcade.key.U:
             self.__session_controller.texture_pack_front.set_pack_default(TEXTURE_PACK_MODE_LIGHT)
             self.__session_controller.texture_pack_back.set_pack_default(TEXTURE_PACK_MODE_LIGHT)
-            self.dc.update_deck(
+            self.__game_controller.deck.update_deck(
                 texture_pack_front = self.__session_controller.texture_pack_front,
                 texture_pack_back = self.__session_controller.texture_pack_back,
                 )
             
-            for card_object in self.hc.hand_container:
-                card_object.update_texture(
-                    texture_pack_front = self.__session_controller.texture_pack_front,
-                    texture_pack_back = self.__session_controller.texture_pack_back,
-                    )
+            for pc in (self.__game_controller.player_one, self.__game_controller.player_two):
+                for card_object in pc.hand.hand_container:
+                    card_object.update_texture(
+                        texture_pack_front = self.__session_controller.texture_pack_front,
+                        texture_pack_back = self.__session_controller.texture_pack_back,
+                        )
                 
         elif symbol == arcade.key.I:
             self.__session_controller.texture_pack_front.set_pack_default(TEXTURE_PACK_MODE_DARK)
             self.__session_controller.texture_pack_back.set_pack_default(TEXTURE_PACK_MODE_DARK)
-            self.dc.update_deck(
+            self.__game_controller.deck.update_deck(
                 texture_pack_front = self.__session_controller.texture_pack_front,
                 texture_pack_back = self.__session_controller.texture_pack_back,
                 )
             
-            for card_object in self.hc.hand_container:
-                card_object.update_texture(
-                    texture_pack_front = self.__session_controller.texture_pack_front,
-                    texture_pack_back = self.__session_controller.texture_pack_back,
-                    )
+            for pc in (self.__game_controller.player_one, self.__game_controller.player_two):
+                for card_object in pc.hand.hand_container:
+                    card_object.update_texture(
+                        texture_pack_front = self.__session_controller.texture_pack_front,
+                        texture_pack_back = self.__session_controller.texture_pack_back,
+                        )
