@@ -95,6 +95,15 @@ class Gameshell(arcade.Window):
 
     
     def on_key_press(self, symbol, modifiers):
+        
+
+        """
+        
+        TEST / DEBUG MODE!
+        
+        """
+
+        # ADD CARD TO SELF/OPPONENT:
         if symbol == arcade.key.A:
             if self.__game_controller.deck.deck_count > 0:
                 card = self.__game_controller.deck.draw_card()
@@ -105,68 +114,26 @@ class Gameshell(arcade.Window):
                 card = self.__game_controller.deck.draw_card()
                 self.__game_controller.player_two.hand.add_card(card, True)
                 self.__game_controller.player_two.hand.update_hand_position(True)
-            
+
+
+        # RESTART GAME:
         elif symbol == arcade.key.R:
-            self.__game_controller.reset_session(
-                preserve_name = True
-                )
             self.__game_controller.create_game_default()
 
+
+        # NEXT FRONT/BACK TEXTURE PACK:
         elif symbol == arcade.key.T:
             self.__session_controller.texture_pack_front.switch_pack_next()
-
-            self.__game_controller.deck.update_deck(
-                texture_pack_front = self.__session_controller.texture_pack_front,
-                texture_pack_back = self.__session_controller.texture_pack_back,
-                )
-            
-            for pc in (self.__game_controller.player_one, self.__game_controller.player_two):
-                for card_object in pc.hand.hand_container:
-                    card_object.update_texture(
-                        texture_pack_front = self.__session_controller.texture_pack_front,
-                        texture_pack_back = self.__session_controller.texture_pack_back,
-                        )
-                
+            self.__game_controller.update_texture_pack()
         elif symbol == arcade.key.Y:
             self.__session_controller.texture_pack_back.switch_pack_next()
-            self.__game_controller.deck.update_deck(
-                texture_pack_front = self.__session_controller.texture_pack_front,
-                texture_pack_back = self.__session_controller.texture_pack_back,
-                )
-            
-            for pc in (self.__game_controller.player_one, self.__game_controller.player_two):
-                for card_object in pc.hand.hand_container:
-                    card_object.update_texture(
-                        texture_pack_front = self.__session_controller.texture_pack_front,
-                        texture_pack_back = self.__session_controller.texture_pack_back,
-                        )
-                
+            self.__game_controller.update_texture_pack()
+
+
+        # DEFAULT LIGHT/DARK TEXTURE PACK
         elif symbol == arcade.key.U:
-            self.__session_controller.texture_pack_front.set_pack_default(TEXTURE_PACK_MODE_LIGHT)
-            self.__session_controller.texture_pack_back.set_pack_default(TEXTURE_PACK_MODE_LIGHT)
-            self.__game_controller.deck.update_deck(
-                texture_pack_front = self.__session_controller.texture_pack_front,
-                texture_pack_back = self.__session_controller.texture_pack_back,
-                )
-            
-            for pc in (self.__game_controller.player_one, self.__game_controller.player_two):
-                for card_object in pc.hand.hand_container:
-                    card_object.update_texture(
-                        texture_pack_front = self.__session_controller.texture_pack_front,
-                        texture_pack_back = self.__session_controller.texture_pack_back,
-                        )
-                
+            self.__game_controller.set_texture_pack_default(TEXTURE_PACK_MODE_LIGHT)
+            self.__game_controller.update_texture_pack()
         elif symbol == arcade.key.I:
-            self.__session_controller.texture_pack_front.set_pack_default(TEXTURE_PACK_MODE_DARK)
-            self.__session_controller.texture_pack_back.set_pack_default(TEXTURE_PACK_MODE_DARK)
-            self.__game_controller.deck.update_deck(
-                texture_pack_front = self.__session_controller.texture_pack_front,
-                texture_pack_back = self.__session_controller.texture_pack_back,
-                )
-            
-            for pc in (self.__game_controller.player_one, self.__game_controller.player_two):
-                for card_object in pc.hand.hand_container:
-                    card_object.update_texture(
-                        texture_pack_front = self.__session_controller.texture_pack_front,
-                        texture_pack_back = self.__session_controller.texture_pack_back,
-                        )
+            self.__game_controller.set_texture_pack_default(TEXTURE_PACK_MODE_DARK)
+            self.__game_controller.update_texture_pack()

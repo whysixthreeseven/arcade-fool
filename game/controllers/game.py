@@ -1,3 +1,6 @@
+# Typing library import:
+from typing import Any, Optional
+
 # Random library:
 import random
 
@@ -24,6 +27,9 @@ from game.settings import (
     # Deck size values:
     DECK_LOWEST_VALUE_DEFAULT,
     DECK_LOWEST_VALUE_EXTENDED,
+
+    # Hand size default:
+    HAND_CARD_COUNT_DEFAULT,
     )
 
 # Session variables import:
@@ -80,11 +86,31 @@ class Game_Controller:
         cached_property_list: tuple[str, ...] = (
             "player_one",
             "player_two",
+            "player_list",
             "player_active",
             "player_inactive",
             "player_attacking",
             "player_defending",
-            "player_list",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+
+    @cached_property
+    def __cached_controller_property_list(self) -> tuple[str, ...]:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Generating cached property list:
+        cached_property_list: tuple[str, ...] = (
+            "player_one",
+            "player_two",
+            "session",
+            "deck",
+            "discard",
+            "table"
             )
         
         # Returning:
@@ -163,6 +189,26 @@ class Game_Controller:
     """
 
 
+    @property
+    def game_ready(self) -> bool:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Asserting all controllers are set:
+        game_ready: bool = bool(
+            self.__player_one_controller is not None and
+            self.__player_two_controller is not None and
+            self.__table_controller      is not None and
+            self.__deck_controller       is not None and
+            self.__discard_controller    is not None and
+            self.__session_controller    is not None
+            )
+        
+        # Returning:
+        return game_ready
+
+
     def __create_game(self, deck_shift: str, deck_lowest_value: int) -> None:
         """
         TODO: Create a docstring.
@@ -172,62 +218,53 @@ class Game_Controller:
         if self.session is None:
             self.create_session()
 
-        # Creating a new deck:
+        # Creating various controllers:
         self.__create_deck(
             deck_shift = deck_shift,
-            deck_lowest_value = deck_lowest_value
+            deck_lowest_value = deck_lowest_value,
             )
+        self.__create_table()
+        self.__create_discard()
+
+        # Checking if player controllers exist:
+        preserve_player_controllers: bool = bool(
+            self.__player_one_controller is not None and
+            self.__player_two_controller is not None
+            ) 
         
-        # Preparing player controller:
-        player_one_name: str = self.__session_controller.player_one_name
-        player_two_name: str = self.__session_controller.player_two_name
-        player_one_controller = Player_Controller.create_player_controller(
-            init_type = PLAYER_TYPE_PLAYER,
-            init_name = player_one_name,
-            )
-        player_two_controller = Player_Controller.create_player_controller(
-            init_type = PLAYER_TYPE_COMPUTER,
-            init_name = player_two_name,
-            )
-
-        # Drawing cards to determine active and focus states:
-        player_controller_list: tuple[Player_Controller, ...] = (
-            player_one_controller,
-            player_two_controller
-            )
-        for player_controller in player_controller_list:
-            card_draw_list: list[Card_Object] = []
-            card_draw_count: int = 0
-            while card_draw_count < 6:
-                card_draw: Card_Object = self.deck.draw_card()
-                card_draw_list.append(
-                    card_draw
-                    )
-                card_draw_count += 1
-
-            # Adding cards in bulk to avoid excessive cache clearing:
-            player_controller.hand.add_card_list(
-                card_list = card_draw_list
-                )
-            
-            # Updating hand container:
-            player_controller.hand.update_hand_position(
-                reset_coordinates = True,
-                )
-
-
-
-
+        # Resetting or creating player controllers based on check:
+        if preserve_player_controllers:
+            for player_controller in self.player_list:
+                player_controller.reset_hand()
+        else:
+            self.__create_player_controllers()
         
-        # Updating controller attributes:
-        self.__player_one_controller: Player_Controller  = player_one_controller
-        self.__player_two_controller: Player_Controller  = player_two_controller
+        # Filling player controllers' hands and selecting priority:
+        for player_controller in self.player_list:
+            self.__fill_player_hand_init(
+                player_controller = player_controller
+                )
+        self.__update_player_priority()
 
         # Clearing cache (player):
         clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_player_property_list
             )
+        
+        # Clearing cache (controllers):
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_controller_property_list
+            )
+        
+        # Updating textures (from previous game):
+        update_texture_pack: bool = bool(
+            self.session.texture_pack_front != self.session.texture_pack_front_default and
+            self.session.texture_pack_back != self.session.texture_pack_back_default
+            )
+        if update_texture_pack:
+            self.update_texture_pack()
 
 
     def create_game_custom(self) -> None:
@@ -284,6 +321,17 @@ class Game_Controller:
         for player_controller in self.player_list:
             player_controller.reset_hand()
 
+        # Clearing cache (player):
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_player_property_list
+            )
+        
+        # Clearing cache (controllers):
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_controller_property_list
+            )
 
 
     """
@@ -325,7 +373,7 @@ class Game_Controller:
         # Updating card objects' texture packs within deck:
         texture_pack_front = self.__session_controller.texture_pack_front
         texture_pack_back = self.__session_controller.texture_pack_back
-        deck_controller.update_deck(
+        deck_controller.update_render_texture(
             texture_pack_front = texture_pack_front,
             texture_pack_back = texture_pack_back,
             ignore_assertion = True,
@@ -402,7 +450,16 @@ class Game_Controller:
         TODO: Create a docstring.
         """
 
+        # Updating attribute:
+        self.__discard_controller.reset_discard()
 
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "discard"
+            clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
 
     
     """
@@ -413,15 +470,50 @@ class Game_Controller:
 
 
     @cached_property
-    def table_controller(self) -> Table_Controller:
+    def table(self) -> Table_Controller:
         """
         TODO: Create a docstring.
         """
         
         # Returning:
         return self.__table_controller
+    
 
+    def __create_table(self, clear_cache: bool = True) -> None:
+        """
+        TODO: Create a docstring.
+        """
 
+        # Creating discard controller:
+        table_controller: Table_Controller = Table_Controller()
+        
+        # Updating attribute:
+        self.__table_controller: Table_Controller = table_controller
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "table"
+            clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+
+    
+    def __reset_table(self, clear_cache: bool = True) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Updating attribute:
+        self.__table_controller.reset_table()
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "table"
+            clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
     
     
     """
@@ -661,6 +753,62 @@ class Game_Controller:
             )
         
     
+    def __create_player_controllers(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Selecting player names if session controller exists:
+        player_one_name: str = PLAYER_ONE_NAME_DEFAULT
+        player_two_name: str = PLAYER_TWO_NAME_DEFAULT
+        if self.session is not None:
+            player_one_name: str = self.__session_controller.player_one_name
+            player_two_name: str = self.__session_controller.player_two_name
+
+        # Preparing player controller:
+        player_one_controller = Player_Controller.create_player_controller(
+            init_type = PLAYER_TYPE_PLAYER,
+            init_name = player_one_name,
+            )
+        player_two_controller = Player_Controller.create_player_controller(
+            init_type = PLAYER_TYPE_COMPUTER,
+            init_name = player_two_name,
+            )
+            
+        # Updating controller attributes:
+        self.__player_one_controller: Player_Controller  = player_one_controller
+        self.__player_two_controller: Player_Controller  = player_two_controller
+
+        # Clearing cache (player):
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_player_property_list
+            )
+        
+    
+    def __fill_player_hand_init(self, player_controller: Player_Controller) -> None:
+    
+        # Drawing cards:
+        card_draw_list: list[Card_Object] = []
+        card_draw_count: int = 0
+        while card_draw_count < HAND_CARD_COUNT_DEFAULT:
+            card_draw: Card_Object = self.deck.draw_card()
+            card_draw_list.append(
+                card_draw
+                )
+            card_draw_count += 1
+
+        # Adding cards in bulk to avoid excessive cache clearing:
+        player_controller.hand.add_card_list(
+            card_list = card_draw_list
+            )
+        
+        # Updating hand container:
+        player_controller.hand.update_hand_position(
+            reset_coordinates = True,
+            )
+        
+    
     def __update_player_priority(self) -> None:
         """
         TODO: Create a docstring.
@@ -721,3 +869,125 @@ class Game_Controller:
         player_second.set_state_defending(
             set_value = True,
             )
+    
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    TEXTURE UPDATE METHODS BLOCK
+
+    """
+
+    
+    @property
+    def __card_container_list(self) -> tuple[list[Card_Object]] | None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Collecting containers:
+        card_container_list: tuple | None = None
+        if self.game_ready:
+            card_container_list: tuple[list[Card_Object]] = (
+                self.player_one.hand.hand_container,
+                self.player_two.hand.hand_container,
+                self.deck.deck_container,
+                self.discard.discard_container,
+                self.table.table_container,
+                )
+        
+        # Returning:
+        return card_container_list
+
+
+    def update_texture_pack(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Acquiring texture packs selected:
+        texture_pack_front: Texture_Pack = self.session.texture_pack_front
+        texture_pack_back: Texture_Pack = self.session.texture_pack_back
+            
+        # Updating card objects in all containers:
+        for card_container in self.__card_container_list:
+            for card_object in card_container:
+                card_object.update_texture(
+                    texture_pack_front = texture_pack_front,
+                    texture_pack_back = texture_pack_back,
+                    )
+                
+            # Manually updating render (fake) container:
+            if card_container == self.deck.deck_container:
+                self.deck.update_render_texture(
+                    texture_pack_front = texture_pack_front,
+                    texture_pack_back = texture_pack_back,
+                    ignore_assertion = True
+                    )
+    
+
+    def set_texture_pack_front(self, 
+                               texture_pack: Texture_Pack, 
+                               force_update: bool = False
+                               ) -> None:
+        """
+        
+        """
+
+        # Setting pack:
+        self.session.texture_pack_front.set_pack(
+            pack_type = texture_pack.pack_type,
+            pack_container = texture_pack.pack_container,
+            clear_cache = True,
+            )
+        
+        # Force updating, if required:
+        if force_update:
+            self.update_texture_pack()
+
+
+    def set_texture_pack_back(self, 
+                              texture_pack: Texture_Pack, 
+                              force_update: bool = False
+                              ) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Setting pack:
+        self.session.texture_pack_back.set_pack(
+            pack_type = texture_pack.pack_type,
+            pack_container = texture_pack.pack_container,
+            clear_cache = True,
+            )
+        
+        # Force updating, if required:
+        if force_update:
+            self.update_texture_pack()
+    
+
+    def set_texture_pack_default(self, 
+                                 pack_mode: Optional[str] = None, 
+                                 force_update: bool = False
+                                 ) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Texture pack default:
+        pack_mode_selected: str = TEXTURE_PACK_MODE_LIGHT
+        if pack_mode is not None:
+            pack_mode_selected: str = pack_mode
+
+        # Setting pack:
+        self.session.texture_pack_front.set_pack_default(
+            pack_mode = pack_mode_selected,
+            )
+        self.session.texture_pack_back.set_pack_default(
+            pack_mode = pack_mode_selected,
+            )
+        
+        # Force updating, if required:
+        if force_update:
+            self.update_texture_pack()
+    
+

@@ -46,7 +46,7 @@ from game.scripts.cache import (
 
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-DECK OBJECT CLASS BLOCK
+DECK CLASS OBJECT BLOCK
 
 """
 
@@ -124,7 +124,8 @@ class Deck_Controller:
     
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    DECK OBJECT CLASS BLOCK
+    DECK CONTAINER METHODS AND PROPERTIES BLOCK
+
     """
 
 
@@ -290,11 +291,11 @@ class Deck_Controller:
             )
 
 
-    def update_deck(self, 
-                    texture_pack_front: Texture_Pack, 
-                    texture_pack_back: Texture_Pack,
-                    ignore_assertion: bool = False,
-                    ) -> None:
+    def update_render_texture(self, 
+                              texture_pack_front: Texture_Pack, 
+                              texture_pack_back: Texture_Pack,
+                              ignore_assertion: bool = False,
+                              ) -> None:
         """
         TODO: Create a docstring.
 
@@ -304,20 +305,13 @@ class Deck_Controller:
 
         :raise AssertionError: ...
         """
-
-        # Acquiring deck containers and cycling through each:
-        deck_collection_list: tuple[tuple[Card_Object, ...], ...] = (
-            self.deck_container,
-            self.deck_render
-            )
-        for deck_collection in deck_collection_list:
-
-            # Updating texture packs per card object:
-            for card_object in deck_collection:
-                card_object.update_texture(
-                    texture_pack_front = texture_pack_front,
-                    texture_pack_back = texture_pack_back,
-                    )
+    
+        # Updating texture packs per card object:
+        for card_object in self.deck_render:
+            card_object.update_texture(
+                texture_pack_front = texture_pack_front,
+                texture_pack_back = texture_pack_back,
+                )
 
 
     def __prepare_deck_container(self, deck_lowest_value: int) -> None:
