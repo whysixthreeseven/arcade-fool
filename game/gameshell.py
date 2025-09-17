@@ -168,22 +168,25 @@ class Gameshell(arcade.Window):
         """
         TODO: Create a docstring.
         """
-        
-        # Checking if key pressed was a debug command:
-        if key_pressed in self.game.keyboard.debug_key_list:
 
-            # Warning debug mode was not enabled:
-            if not SESSION_ENABLE_DEBUG:
-                warning_message: str = "Unable to execute command. Enable debug mode in session."
-                print(warning_message)
+        # Asserting key is registered and recognized:
+        if key_pressed in self.game.keyboard.key_list:
 
-            # Executing debug command:
+            # Checking if key pressed was a debug command:
+            if key_pressed in self.game.keyboard.debug_key_list:
+
+                # Warning debug mode was not enabled:
+                if not SESSION_ENABLE_DEBUG:
+                    warning_message: str = "Unable to execute command. Enable debug mode in session."
+                    print(warning_message)
+
+                # Executing debug command:
+                else:
+                    self.game.handle_debug_key_pressed(
+                        key_pressed = key_pressed
+                        )
+            
+            # Otherwise, handling key pressed:
             else:
-                self.game.handle_debug_key_pressed(
-                    key_pressed = key_pressed
-                    )
-        
-        # Otherwise, handling key pressed:
-        else:
-            ...
+                ...
                 

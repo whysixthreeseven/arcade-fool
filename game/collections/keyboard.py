@@ -48,6 +48,30 @@ class Keyboard_Mapping:
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    ALL KEY LISTS PROPERTIES BLOCK
+    
+    """
+
+
+    @cached_property
+    def key_list(self) -> tuple[int, ...]:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Acquiring all recognized keys:
+        key_list: tuple[int, ...] = tuple(
+            key_stored for key_stored
+            in self.__dict__.values()
+            if key_stored is not None
+            )
+        
+        # Returning:
+        return key_list
+
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     DEBUG KEY LISTS PROPERTIES BLOCK
     
     """
