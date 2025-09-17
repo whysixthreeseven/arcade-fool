@@ -269,27 +269,36 @@ class Texture_Pack:
     """
     
 
-    def set_pack(self, pack_type: str, pack_container: tuple, clear_cache: bool = True) -> None:
+    def set_pack(self, 
+                 pack_container: tuple, 
+                 pack_type: Optional[str] = None, 
+                 clear_cache: bool = True
+                 ) -> None:
         """
         TODO: Create a doctring.
         """
 
+        # Getting pack type:
+        pack_type_selected: str | None = pack_type
+        if pack_type_selected is None:
+            pack_type_selected: str = self.pack_type
+
         # Unpacking texture pack front:
-        if pack_type == TEXTURE_PACK_TYPE_FRONT:
+        if pack_type_selected == TEXTURE_PACK_TYPE_FRONT:
             pack_style, pack_color, pack_index = pack_container
             self.pack_style: str = pack_style
             self.pack_color: str = pack_color
             self.pack_index: str = pack_index
 
         # Unpacking texture pack back:
-        elif pack_type == TEXTURE_PACK_TYPE_BACK:
+        elif pack_type_selected == TEXTURE_PACK_TYPE_BACK:
             pack_color, pack_style = pack_container
             self.pack_style: str = pack_style
             self.pack_color: str = pack_color
 
         # Raising error, if pack type is not recognized:
         else:
-            error_message: str = f"Texture pack type {pack_type=} is not recognized."
+            error_message: str = f"Texture pack type {pack_type_selected=} is not recognized."
             raise ValueError(error_message)
         
         # Clearing cache (property):

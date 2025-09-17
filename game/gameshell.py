@@ -1,3 +1,9 @@
+# Typing import:
+from typing import Any
+
+# Cache tools:
+from functools import cached_property
+
 # Arcade library import:
 import arcade
 from arcade import Rect, Text, Texture
@@ -35,10 +41,24 @@ from game.collections.zone import (
     ZONE_TABLE,
     )
 
+# Collections import:
+from game.collections.keyboard import Keyboard_Mapping
+
 # Controllers import:
-from game.session import Session_Controller
 from game.controllers.game import Game_Controller
-from game.controllers.deck import Deck_Controller
+from game.controllers.player import Player_Controller
+
+# Session variables import:
+from game.session import SESSION_ENABLE_DEBUG
+
+# Scripts import:
+from game.scripts.convert import (
+    convert_attribute_to_repr
+    )
+from game.scripts.cache import (
+    clear_cached_property, 
+    clear_cached_property_list
+    )
 
 
 """
@@ -63,22 +83,72 @@ class Gameshell(arcade.Window):
             antialiasing = GAME_WINDOW_ANTIALIASING
             )
         
-        # Controller attributes:
-        self.__session_controller: Session_Controller = Session_Controller()
-        self.__game_controller: Game_Controller = Game_Controller()
+        # Game controller:
+        self.__game_controller: Game_Controller = None
+        self.__initialize_game_controller()
 
 
-        self.__game_controller.create_session()
-        self.__game_controller.create_game_default()
-
-
-        self.zones: tuple[Zone_XYWH, ...] = (
+        self.__zones: tuple[Zone_XYWH, ...] = (
             ZONE_GAME_AREA_PLAY,
             ZONE_GAME_AREA_SIDE,
             ZONE_PLAYER_ONE,
             ZONE_PLAYER_TWO,
             ZONE_TABLE,
             )
+        
+    
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    CACHE METHODS AND PROPERTIES BLOCK
+    
+    """
+
+
+    ...
+
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    GAME METHODS AND PROPERTIES BLOCK
+    
+    """
+
+
+    @cached_property
+    def game(self) -> Game_Controller:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__game_controller
+    
+
+    def __initialize_game_controller(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Creating game controller:
+        self.__game_controller: Game_Controller = Game_Controller()
+
+        # Creating session and starting a default game:
+        self.__game_controller.create_session()
+        self.__game_controller.create_game_default()
+
+        # Clearing cache:
+        cached_property: str = "game"
+        clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+        
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    NATIVE METHODS BLOCK
+    
+    """
 
     
     def on_update(self, delta_time):
@@ -87,53 +157,33 @@ class Gameshell(arcade.Window):
 
     def on_draw(self):
         self.clear()
-        for zone in self.zones:
+        for zone in self.__zones:
             zone.render()
-        self.__game_controller.deck.render()
-        self.__game_controller.player_one.hand.render()
-        self.__game_controller.player_two.hand.render()
+        self.game.deck.render()
+        self.game.player_one.hand.render()
+        self.game.player_two.hand.render()
 
     
-    def on_key_press(self, symbol, modifiers):
-        
-
+    def on_key_press(self, key_pressed: Any, key_modifiers):
+        """
+        TODO: Create a docstring.
         """
         
-        TEST / DEBUG MODE!
+        # Checking if key pressed was a debug command:
+        if key_pressed in self.game.keyboard.debug_key_list:
+
+            # Warning debug mode was not enabled:
+            if not SESSION_ENABLE_DEBUG:
+                warning_message: str = "Unable to execute command. Enable debug mode in session."
+                print(warning_message)
+
+            # Executing debug command:
+            else:
+                self.game.handle_debug_key_pressed(
+                    key_pressed = key_pressed
+                    )
         
-        """
-
-        # ADD CARD TO SELF/OPPONENT:
-        if symbol == arcade.key.A:
-            if self.__game_controller.deck.deck_count > 0:
-                card = self.__game_controller.deck.draw_card()
-                self.__game_controller.player_one.hand.add_card(card, True)
-                self.__game_controller.player_one.hand.update_hand_position(True)
-        elif symbol == arcade.key.S:
-            if self.__game_controller.deck.deck_count > 0:
-                card = self.__game_controller.deck.draw_card()
-                self.__game_controller.player_two.hand.add_card(card, True)
-                self.__game_controller.player_two.hand.update_hand_position(True)
-
-
-        # RESTART GAME:
-        elif symbol == arcade.key.R:
-            self.__game_controller.create_game_default()
-
-
-        # NEXT FRONT/BACK TEXTURE PACK:
-        elif symbol == arcade.key.T:
-            self.__session_controller.texture_pack_front.switch_pack_next()
-            self.__game_controller.update_texture_pack()
-        elif symbol == arcade.key.Y:
-            self.__session_controller.texture_pack_back.switch_pack_next()
-            self.__game_controller.update_texture_pack()
-
-
-        # DEFAULT LIGHT/DARK TEXTURE PACK
-        elif symbol == arcade.key.U:
-            self.__game_controller.set_texture_pack_default(TEXTURE_PACK_MODE_LIGHT)
-            self.__game_controller.update_texture_pack()
-        elif symbol == arcade.key.I:
-            self.__game_controller.set_texture_pack_default(TEXTURE_PACK_MODE_DARK)
-            self.__game_controller.update_texture_pack()
+        # Otherwise, handling key pressed:
+        else:
+            ...
+                

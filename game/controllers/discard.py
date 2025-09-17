@@ -3,30 +3,11 @@ from __future__ import annotations
 
 # Cache-related import:
 from functools import cached_property
-from itertools import product
 
-# Random library import:
-import random
-
-# Related settings import:
-from game.settings import (
-
-    # Deck render coordinates:
-    DECK_RENDER_COORDINATE_X,
-    DECK_RENDER_COORDINATE_Y,
-    DECK_RENDER_COORDINATE_SHIFT_X,
-    DECK_RENDER_COORDINATE_SHIFT_Y,
-    DECK_RENDER_SHIFT_THRESHOLD_DEFAULT,
-
-    # Card texture settings:
-    CARD_TEXTURE_HEIGHT_SCALED,
-    )
-
-# Variables import:
-from game.variables import CARD_SUIT_TAG
-
-# Collections import:
-from game.collections.texturepack import Texture_Pack
+# # Related settings import:
+# from game.settings import (
+#     ...
+#     )
 
 # Controllers import:
 from game.controllers.card import Card_Object

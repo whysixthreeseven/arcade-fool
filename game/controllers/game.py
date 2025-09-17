@@ -14,6 +14,10 @@ from game.controllers.discard import Discard_Controller
 from game.controllers.table import Table_Controller
 from game.controllers.player import Player_Controller
 
+# Collections import:
+from game.collections.keyboard import Keyboard_Mapping
+from game.collections.texturepack import Texture_Pack
+
 # Variables import:
 from game.variables import *
 
@@ -43,9 +47,6 @@ from game.session import (
     SESSION_ENABLE_ECHO,
     )
 
-# Collections import:
-from game.collections.texturepack import Texture_Pack
-
 # Scripts import:
 from game.scripts.convert import (
     convert_attribute_to_repr
@@ -67,6 +68,9 @@ class Game_Controller:
         self.__deck_controller:       Deck_Controller    = None
         self.__discard_controller:    Discard_Controller = None
         self.__session_controller:    Session_Controller = None
+
+        # Keyboard mapping controller:
+        self.__keyboard_mapping:      Keyboard_Mapping = Keyboard_Mapping()
 
 
     """
@@ -869,6 +873,23 @@ class Game_Controller:
         player_second.set_state_defending(
             set_value = True,
             )
+        
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    KEYBOARD MAPPING PROPERTIES BLOCK
+
+    """
+
+    
+    @cached_property
+    def keyboard(self) -> Keyboard_Mapping:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__keyboard_mapping
     
 
     """
@@ -991,3 +1012,90 @@ class Game_Controller:
             self.update_texture_pack()
     
 
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    DEBUG HANDLERS BLOCK
+    
+    """
+
+
+    def handle_debug_key_pressed(self, key_pressed: Any) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Updating texture pack on call:
+        if key_pressed in self.keyboard.debug_texture_key_list:
+
+            # Switching texture packs:
+            if key_pressed == self.keyboard.KEY_DEBUG_SWITCH_TEXTURE_PACK_FRONT:
+                self.session.switch_texture_pack_front_next()
+            elif key_pressed == self.keyboard.KEY_DEBUG_SWITCH_TEXTURE_PACK_BACK:
+                self.session.switch_texture_pack_back_next()
+
+            # Setting default texture packs:
+            elif key_pressed == self.keyboard.KEY_DEBUG_SET_TEXTURE_PACK_DEFAULT_LIGHT:
+                self.session.set_texture_pack_default(
+                    texture_pack_mode = TEXTURE_PACK_MODE_LIGHT
+                    )
+            elif key_pressed == self.keyboard.KEY_DEBUG_SET_TEXTURE_PACK_DEFAULT_DARK:
+                self.session.set_texture_pack_default(
+                    texture_pack_mode = TEXTURE_PACK_MODE_DARK
+                    )
+
+            # Updating texture pack:
+            self.update_texture_pack()
+
+        # Sorting player's hand on call:
+        elif key_pressed in self.keyboard.debug_sort_key_list:
+
+            # Selecting sort method:
+            if key_pressed == self.keyboard.KEY_DEBUG_SORT_HAND_BY_VALUE:
+                ...     # <- TODO: Implement
+            elif key_pressed == self.keyboard.KEY_DEBUG_SORT_HAND_BY_VALUE_DEFAULT:
+                ...     # <- TODO: Implement
+            elif key_pressed == self.keyboard.KEY_DEBUG_SORT_HAND_BY_TIME_ADDED:
+                ...     # <- TODO: Implement
+            elif key_pressed == self.keyboard.KEY_DEBUG_SORT_HAND_BY_SUIT:
+                ...     # <- TODO: Implement
+
+            # Raising error on unrecognized or not implemented command call:
+            else:
+                error_message: str = f"Command call [{key_pressed=}] not implemented."
+                raise NotImplemented(error_message)
+            
+            # Sorting:
+            ...             # <- TODO: Implement
+
+        # Adding card to player or opponent:
+        elif key_pressed in self.keyboard.debug_draw_key_list:
+
+            # Ensuring there are cards to draw:
+            if self.deck.deck_count > 0:
+
+                # Selecting player controller to draw cards for:
+                player_controller: Player_Controller | None = None
+                if key_pressed == self.keyboard.KEY_DEBUG_DRAW_CARD_PLAYER:
+                    player_controller: Player_Controller = self.player_one
+                elif key_pressed == self.keyboard.KEY_DEBUG_DRAW_CARD_OPPONENT:
+                    player_controller: Player_Controller = self.player_two
+
+                # Raising error on unrecognized or not implemented command call:
+                else:
+                    error_message: str = f"Command call [{key_pressed=}] not implemented."
+                    raise NotImplemented(error_message)
+
+                # Drawing card for selected controller:
+                card_object = self.deck.draw_card()
+                player_controller.hand.add_card(
+                    card_object = card_object,
+                    clear_cache = True
+                    )
+                player_controller.hand.update_hand_position(
+                    reset_coordinates = True        # <- DEBUG, remove when slide is finished
+                    )
+
+        # RESTART GAME:
+        elif key_pressed == self.keyboard.KEY_DEBUG_RESTART_GAME:
+            self.create_game_default()
+    

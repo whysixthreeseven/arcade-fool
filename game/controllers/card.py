@@ -99,11 +99,6 @@ from game.settings import (
 
 # Session-related import:
 from game.session import (
-
-    # Controller:
-    Session_Controller,
-
-    # Global session variables:
     SESSION_ENABLE_ASSERTION,
     SESSION_ENABLE_ECHO,
     )

@@ -37,11 +37,6 @@ from game.variables import (
 
 # Session-related import:
 from game.session import (
-
-    # Controller:
-    Session_Controller,
-
-    # Global session variables:
     SESSION_ENABLE_ASSERTION,
     SESSION_ENABLE_ECHO,
     )
@@ -49,7 +44,6 @@ from game.session import (
 # Scripts import:
 from game.scripts.convert import (
     convert_attribute_to_repr,
-    convert_value_to_integer,
     )
 from game.scripts.cache import (
     clear_cached_property, 
@@ -57,10 +51,7 @@ from game.scripts.cache import (
     )
 from game.scripts.assertion import (
     assert_value_is_default,
-    assert_value_is_positive,
     assert_value_is_valid_type,
-    assert_value_in_valid_range,
-    assert_container_is_valid_size,
     )
 
 
