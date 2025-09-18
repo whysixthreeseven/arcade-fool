@@ -8,6 +8,7 @@ import random
 from functools import cached_property
 
 # Controllers import:
+from game.session import Session_Controller
 from game.controllers.card import Card_Object
 from game.controllers.deck import Deck_Controller
 from game.controllers.discard import Discard_Controller
@@ -19,16 +20,31 @@ from game.collections.keyboard import Keyboard_Mapping
 from game.collections.texturepack import Texture_Pack
 
 # Variables import:
-from game.variables import *
+from game.variables import (
+
+    # Player-related variables:
+    PLAYER_ONE_NAME_DEFAULT,
+    PLAYER_TWO_NAME_DEFAULT,
+    PLAYER_TYPE_PLAYER,
+    PLAYER_TYPE_COMPUTER,
+
+    # Texture-related variables:
+    TEXTURE_PACK_MODE_LIGHT,
+    TEXTURE_PACK_MODE_DARK,
+
+    # Hand-related methods:
+    HAND_SORT_METHOD_BY_VALUE,
+    HAND_SORT_METHOD_BY_VALUE_DEFAULT,
+    HAND_SORT_METHOD_BY_TIME_ADDED,
+    HAND_SORT_METHOD_BY_SUIT,
+    )
 
 # Settings import:
 from game.settings import (
     
-    # Deck render/shift threshold:
+    # Deck-related settings:
     DECK_RENDER_SHIFT_THRESHOLD_DEFAULT,
     DECK_RENDER_SHIFT_THRESHOLD_EXTENDED,
-
-    # Deck size values:
     DECK_LOWEST_VALUE_DEFAULT,
     DECK_LOWEST_VALUE_EXTENDED,
 
@@ -36,13 +52,8 @@ from game.settings import (
     HAND_CARD_COUNT_DEFAULT,
     )
 
-# Session variables import:
+# Session global variables import:
 from game.session import (
-
-    # Session controller object:
-    Session_Controller,
-
-    # Global session variables:
     SESSION_ENABLE_ASSERTION,
     SESSION_ENABLE_ECHO,
     )
@@ -55,6 +66,13 @@ from game.scripts.cache import (
     clear_cached_property, 
     clear_cached_property_list
     )
+
+
+"""
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+GAME CONTROLLER CLASS OBJECT BLOCK
+
+"""
 
 
 class Game_Controller:
@@ -70,7 +88,7 @@ class Game_Controller:
         self.__session_controller:    Session_Controller = None
 
         # Keyboard mapping controller:
-        self.__keyboard_mapping:      Keyboard_Mapping = Keyboard_Mapping()
+        self.__keyboard_mapping:      Keyboard_Mapping   = Keyboard_Mapping()
 
 
     """
@@ -84,6 +102,8 @@ class Game_Controller:
     def __cached_player_property_list(self) -> tuple[str, ...]:
         """
         TODO: Create a docstring.
+
+        :return tuple[str, ...]: ...
         """
 
         # Generating cached property list:
@@ -105,6 +125,8 @@ class Game_Controller:
     def __cached_controller_property_list(self) -> tuple[str, ...]:
         """
         TODO: Create a docstring.
+
+        :return tuple[str, ...]: ...
         """
 
         # Generating cached property list:
@@ -132,6 +154,8 @@ class Game_Controller:
     def session(self) -> Session_Controller:
         """
         TODO: Create a docstring.
+
+        :return Session_Controller: ...
         """
 
         # Returning:
@@ -157,6 +181,8 @@ class Game_Controller:
     def reset_session(self, preserve_name: bool = True) -> None:
         """
         TODO: Create a docstring.
+
+        :param bool preserve_name: ...
         """
 
         # Setting default player names:
@@ -197,25 +223,31 @@ class Game_Controller:
     def game_ready(self) -> bool:
         """
         TODO: Create a docstring.
+
+        :return bool: ...
         """
 
         # Asserting all controllers are set:
-        game_ready: bool = bool(
-            self.__player_one_controller is not None and
-            self.__player_two_controller is not None and
-            self.__table_controller      is not None and
-            self.__deck_controller       is not None and
-            self.__discard_controller    is not None and
-            self.__session_controller    is not None
+        controllers_list: tuple[Any, ...] = (
+            self.__player_one_controller,
+            self.__player_two_controller,
+            self.__table_controller,
+            self.__deck_controller,
+            self.__discard_controller,
+            self.__session_controller,  
             )
+        game_ready: bool = all(controllers_list)
         
         # Returning:
         return game_ready
 
 
-    def __create_game(self, deck_shift: str, deck_lowest_value: int) -> None:
+    def __create_game(self, deck_shift: int, deck_lowest_value: int) -> None:
         """
         TODO: Create a docstring.
+
+        :param int deck_shift: ...
+        :param int deck_lowest_value: ...
         """
 
         # Checking if session exists:
@@ -243,11 +275,19 @@ class Game_Controller:
         else:
             self.__create_player_controllers()
         
-        # Filling player controllers' hands and selecting priority:
+        # Filling hands for players:
         for player_controller in self.player_list:
-            self.__fill_player_hand_init(
+            self.event_fill_hand(
                 player_controller = player_controller
                 )
+            
+            # Updating hand positions and sorting:
+            player_controller.hand.sort_hand(
+                sort_method = self.session.sort_method_default,
+                reset_coordinates = True
+                )
+            
+        # Getting player priority (who plays first):
         self.__update_player_priority()
 
         # Clearing cache (player):
@@ -349,6 +389,8 @@ class Game_Controller:
     def deck(self) -> Deck_Controller:
         """
         TODO: Create a docstring.
+
+        :return Deck_Controller: ...
         """
 
         # Returning:
@@ -362,6 +404,10 @@ class Game_Controller:
                       ) -> None:
         """
         TODO: Create a docstring.
+
+        :param int deck_shift: ...
+        :param int deck_lowest_value: ...
+        :param bool clear_cache: ...
         """
 
         # Creating deck controller object:
@@ -398,6 +444,8 @@ class Game_Controller:
     def __reset_deck(self, clear_cache: bool = True) -> None:
         """
         TODO: Create a docstring.
+
+        :param bool clear_cache: ...
         """
 
         # Acquiring session variables:
@@ -790,27 +838,27 @@ class Game_Controller:
             )
         
     
-    def __fill_player_hand_init(self, player_controller: Player_Controller) -> None:
+    # def __fill_player_hand_init(self, player_controller: Player_Controller) -> None:
     
-        # Drawing cards:
-        card_draw_list: list[Card_Object] = []
-        card_draw_count: int = 0
-        while card_draw_count < HAND_CARD_COUNT_DEFAULT:
-            card_draw: Card_Object = self.deck.draw_card()
-            card_draw_list.append(
-                card_draw
-                )
-            card_draw_count += 1
+    #     # Drawing cards:
+    #     card_draw_list: list[Card_Object] = []
+    #     card_draw_count: int = 0
+    #     while card_draw_count < HAND_CARD_COUNT_DEFAULT:
+    #         card_draw: Card_Object = self.deck.draw_card()
+    #         card_draw_list.append(
+    #             card_draw
+    #             )
+    #         card_draw_count += 1
 
-        # Adding cards in bulk to avoid excessive cache clearing:
-        player_controller.hand.add_card_list(
-            card_list = card_draw_list
-            )
+    #     # Adding cards in bulk to avoid excessive cache clearing:
+    #     player_controller.hand.add_card_list(
+    #         card_list = card_draw_list
+    #         )
         
-        # Updating hand container:
-        player_controller.hand.update_hand_position(
-            reset_coordinates = True,
-            )
+    #     # Updating hand container:
+    #     player_controller.hand.update_hand_position(
+    #         reset_coordinates = True,
+    #         )
         
     
     def __update_player_priority(self) -> None:
@@ -892,6 +940,24 @@ class Game_Controller:
         return self.__keyboard_mapping
     
 
+    @cached_property
+    def keyboard_sort_index(self) -> dict[int, str]:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Generating:
+        sort_key_index: dict[int, str] = {
+            self.keyboard.KEY_DEBUG_SORT_HAND_BY_VALUE:         HAND_SORT_METHOD_BY_VALUE,
+            self.keyboard.KEY_DEBUG_SORT_HAND_BY_VALUE_DEFAULT: HAND_SORT_METHOD_BY_VALUE_DEFAULT,
+            self.keyboard.KEY_DEBUG_SORT_HAND_BY_TIME_ADDED:    HAND_SORT_METHOD_BY_TIME_ADDED,
+            self.keyboard.KEY_DEBUG_SORT_HAND_BY_SUIT:          HAND_SORT_METHOD_BY_SUIT,
+            }
+        
+        # Returning:
+        return sort_key_index
+    
+
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     TEXTURE UPDATE METHODS BLOCK
@@ -944,72 +1010,74 @@ class Game_Controller:
                     texture_pack_back = texture_pack_back,
                     ignore_assertion = True
                     )
+                
     
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    SORTING METHODS AND PROPERTIES BLOCK
+    
+    """
 
-    def set_texture_pack_front(self, 
-                               texture_pack: Texture_Pack, 
-                               force_update: bool = False
-                               ) -> None:
+
+    def set_sort_method(self, sort_method: str) -> None:
         """
-        
+        TODO: Create a docstring.
+
+        :param str sort_method: ...
         """
 
-        # Setting pack:
-        self.session.texture_pack_front.set_pack(
-            pack_type = texture_pack.pack_type,
-            pack_container = texture_pack.pack_container,
-            clear_cache = True,
-            )
-        
-        # Force updating, if required:
-        if force_update:
-            self.update_texture_pack()
+        # Updating session attribute
+        self.session.sort_method = sort_method
 
 
-    def set_texture_pack_back(self, 
-                              texture_pack: Texture_Pack, 
-                              force_update: bool = False
-                              ) -> None:
+    def set_sort_method_default(self) -> None:
+        """
+        TODO: Create a docstring.
+
+        :param str sort_method: ...
+        """
+
+        # Getting default sort method:
+        sort_method: str = self.session.sort_method_default
+
+        # Updating session attribute
+        self.session.sort_method = sort_method
+
+
+    def handle_sort(self, 
+                    player_controller: Player_Controller, 
+                    reset_coordinates: bool = False
+                    ) -> None:
         """
         TODO: Create a docstring.
         """
 
-        # Setting pack:
-        self.session.texture_pack_back.set_pack(
-            pack_type = texture_pack.pack_type,
-            pack_container = texture_pack.pack_container,
-            clear_cache = True,
+        # Getting current sort method:
+        sort_method: str = self.session.sort_method
+
+        # Sorting hand:
+        player_controller.hand.sort_hand(
+            sort_method = sort_method,
+            reset_coordinates = reset_coordinates,
             )
         
-        # Force updating, if required:
-        if force_update:
-            self.update_texture_pack()
     
-
-    def set_texture_pack_default(self, 
-                                 pack_mode: Optional[str] = None, 
-                                 force_update: bool = False
-                                 ) -> None:
+    def event_sort_hand_default(self, 
+                          player_controller: Player_Controller, 
+                          reset_coordinates: bool = False
+                          ) -> None:
         """
         TODO: Create a docstring.
         """
 
-        # Texture pack default:
-        pack_mode_selected: str = TEXTURE_PACK_MODE_LIGHT
-        if pack_mode is not None:
-            pack_mode_selected: str = pack_mode
+        # Getting current sort method:
+        sort_method: str = self.session.sort_method_default
 
-        # Setting pack:
-        self.session.texture_pack_front.set_pack_default(
-            pack_mode = pack_mode_selected,
+        # Sorting hand:
+        player_controller.hand.sort_hand(
+            sort_method = sort_method,
+            reset_coordinates = reset_coordinates,
             )
-        self.session.texture_pack_back.set_pack_default(
-            pack_mode = pack_mode_selected,
-            )
-        
-        # Force updating, if required:
-        if force_update:
-            self.update_texture_pack()
     
 
     """
@@ -1049,15 +1117,9 @@ class Game_Controller:
         # Sorting player's hand on call:
         elif key_pressed in self.keyboard.debug_sort_key_list:
 
-            # Selecting sort method:
-            if key_pressed == self.keyboard.KEY_DEBUG_SORT_HAND_BY_VALUE:
-                ...     # <- TODO: Implement
-            elif key_pressed == self.keyboard.KEY_DEBUG_SORT_HAND_BY_VALUE_DEFAULT:
-                ...     # <- TODO: Implement
-            elif key_pressed == self.keyboard.KEY_DEBUG_SORT_HAND_BY_TIME_ADDED:
-                ...     # <- TODO: Implement
-            elif key_pressed == self.keyboard.KEY_DEBUG_SORT_HAND_BY_SUIT:
-                ...     # <- TODO: Implement
+            # Getting sort method from cached key index:
+            if key_pressed in self.keyboard_sort_index:
+                sort_method_selected: str = self.keyboard_sort_index[key_pressed]
 
             # Raising error on unrecognized or not implemented command call:
             else:
@@ -1065,7 +1127,10 @@ class Game_Controller:
                 raise NotImplemented(error_message)
             
             # Sorting:
-            ...             # <- TODO: Implement
+            self.player_one.hand.sort_hand(
+                sort_method = sort_method_selected,
+                reset_coordinates = True,
+                )
 
         # Adding card to player or opponent:
         elif key_pressed in self.keyboard.debug_draw_key_list:
@@ -1086,16 +1151,68 @@ class Game_Controller:
                     raise NotImplemented(error_message)
 
                 # Drawing card for selected controller:
-                card_object = self.deck.draw_card()
-                player_controller.hand.add_card(
-                    card_object = card_object,
-                    clear_cache = True
+                self.event_draw_card(
+                    player_controller = player_controller
                     )
-                player_controller.hand.update_hand_position(
-                    reset_coordinates = True        # <- DEBUG, remove when slide is finished
-                    )
+                
+                # Automatically sorting, if enabled:
+                if self.session.enable_autosort:
+                    self.event_sort_hand_default(
+                        player_controller = player_controller,
+                        reset_coordinates = True    # <- DEBUG, remove when slide is finished
+                        )
+                # Updating hand position without sorting:
+                else:
+                    player_controller.hand.update_hand_position(
+                        reset_coordinates = True        
+                        )
 
         # RESTART GAME:
         elif key_pressed == self.keyboard.KEY_DEBUG_RESTART_GAME:
             self.create_game_default()
+
+    
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    EVENT METHODS BLOCK
+
+    """
+
+
+    def event_draw_card(self, player_controller: Player_Controller) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Drawing, if deck has cards to draw:
+        if self.deck.deck_count > 0:
+            card_object: Card_Object = self.deck.draw_card()
+
+            # Adding card to player controller:
+            player_controller.hand.add_card(
+                card_object = card_object,
+                clear_cache = True
+                )
+            
+    
+    def event_fill_hand(self, player_controller: Player_Controller) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Adding card to the hand container:
+        while player_controller.hand.hand_count < HAND_CARD_COUNT_DEFAULT:
+
+            # Exiting, if no more cards available:
+            if self.deck.deck_count == 0:
+                break
+
+            # Drawing cards:
+            else:
+                self.event_draw_card(
+                    player_controller = player_controller,
+                    )
+
+
+
     

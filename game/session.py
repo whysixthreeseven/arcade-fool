@@ -20,6 +20,9 @@ from game.variables import (
     TEXTURE_PACK_TYPE_BACK,
     TEXTURE_PACK_MODE_LIGHT,
     TEXTURE_PACK_MODE_DARK,
+
+    # Sort-related variables:
+    HAND_SORT_METHOD_BY_VALUE_DEFAULT
     )
 
 # Settings import:
@@ -33,10 +36,17 @@ from game.settings import (
     )
 
 
+"""
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+SESSION GLOBAL VARIABLES BLOCK
+
+"""
+
+
 # Global (debug) session variables:
 SESSION_ENABLE_ASSERTION: bool = True
-SESSION_ENABLE_ECHO: bool = True
-SESSION_ENABLE_DEBUG: bool = True
+SESSION_ENABLE_ECHO:      bool = True
+SESSION_ENABLE_DEBUG:     bool = True
 
 
 """
@@ -64,6 +74,16 @@ class Session_Controller:
     deck_lowest_value_default: int = DECK_LOWEST_VALUE_DEFAULT
     deck_lowest_value:         int = DECK_LOWEST_VALUE_DEFAULT
 
+    # Sort methods:
+    sort_method_default: str = HAND_SORT_METHOD_BY_VALUE_DEFAULT
+    sort_method:         str = HAND_SORT_METHOD_BY_VALUE_DEFAULT
+
+    # Enable flags:
+    enable_autosort:            bool = True
+    enable_hint_hand_value:     bool = True
+    enable_hint_discard_value:  bool = True
+    enable_hint_slide_playable: bool = False
+
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -89,7 +109,7 @@ class Session_Controller:
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    TEXTURE PACK METHODS AND PROPERTIES BLOCK
+    TEXTURE PACK METHODS BLOCK
     
     """
     
@@ -193,3 +213,18 @@ class Session_Controller:
         # Switching texture pack:
         self.texture_pack_back.switch_pack_previous()
 
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    SORTING METHODS BLOCK
+    
+    """
+
+
+    def set_sort_method(self, sort_method: str) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Updating attribute:
+        self.sort_method = sort_method

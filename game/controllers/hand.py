@@ -13,11 +13,14 @@ from game.variables import (
     PLAYER_TYPE_NOT_SET,
     PLAYER_TYPE_PLAYER,
     PLAYER_TYPE_COMPUTER,
-
-    # Player state variables:
     PLAYER_STATE_FOCUS_ATTACKING,
     PLAYER_STATE_FOCUS_DEFENDING,
 
+    # Hand-related methods:
+    HAND_SORT_METHOD_BY_VALUE,
+    HAND_SORT_METHOD_BY_VALUE_DEFAULT,
+    HAND_SORT_METHOD_BY_TIME_ADDED,
+    HAND_SORT_METHOD_BY_SUIT,
     )
 
 # Controller-related settings import:
@@ -666,13 +669,82 @@ class Hand_Controller:
     
     """
 
-
-    def sort_hand(self, sort_method: str) -> None:
+    def sort_hand(self, sort_method: str, reset_coordinates: bool = False) -> None:
         """
         TODO: Create a docstring.
         """
 
-    
+        # Preparing suit list to reference:
+        suit_list: tuple[str, ...] = Card_Object.CARD_SUIT_LIST
+
+        # Sorting hand by card's value:
+        if sort_method == HAND_SORT_METHOD_BY_VALUE:
+            hand_sorted: list[Card_Object] = sorted(
+                self.hand_container,
+                key = lambda card_object: (
+                        card_object.type_value,
+                        -suit_list.index(card_object.suit),
+                        ),
+                reverse = True,        # <- Strongest left, weakest right;
+                )
+        
+        # Sorting hand by card's default value (ignore trump): 
+        elif sort_method == HAND_SORT_METHOD_BY_VALUE_DEFAULT:
+            hand_sorted: list[Card_Object] = sorted(
+                self.hand_container,
+                key = lambda card_object: (
+                        card_object.type_value_default,
+                        -suit_list.index(card_object.suit),
+                        ),
+                reverse = True,        # <- Strongest left, weakest right;
+                )
+
+        # Sorting hand by time it was added to container:
+        elif sort_method == HAND_SORT_METHOD_BY_TIME_ADDED:
+            hand_sorted: list[Card_Object] = sorted(
+                self.hand_container,
+                key = lambda card_object: card_object.position_added,
+                reverse = False,         # <- 0 left, 52 right (old left, newest right);
+                )
+
+        # Sorting hand by suit index:
+        elif sort_method == HAND_SORT_METHOD_BY_SUIT:
+            hand_sorted: list[Card_Object] = sorted(
+                self.hand_container,
+                key = lambda card_object: (
+                    suit_list.index(card_object.suit),
+                    -card_object.type_value_default
+                    ),
+                reverse = False         # <- Hearts 0 > Diamonds 1 > Clubs 2 > Spades 3;
+                )
+
+        # Raising error if sort method is not recognized:
+        else:
+            error_message: str = f"Sort method provided {sort_method=} is not recognized."
+            raise ValueError(error_message)
+        
+        # Updating card objects' based on their new position within the sorted container:
+        for position_index, card_object in enumerate(hand_sorted):
+            card_object.set_position_hand(
+                position_index = position_index,
+                ignore_assertion = True
+                )
+        
+        # Forcing new coordinates:
+        self.update_hand_position(
+            reset_coordinates = reset_coordinates
+            )
+        
+        # Forcing new attribute:
+        self.__hand_container: list[Card_Object] = hand_sorted
+
+        # Clearing cache:
+        cached_property: str = "hand_container"
+        clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+
     
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

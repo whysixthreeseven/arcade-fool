@@ -19,8 +19,8 @@ KEYBOARD MAPPING CLASS OBJECT BLOCK
 class Keyboard_Mapping:
 
     # DEBUG Game logic key mapping:
-    KEY_DEBUG_DRAW_CARD_PLAYER:   int = arcade.key.A
-    KEY_DEBUG_DRAW_CARD_OPPONENT: int = arcade.key.S
+    KEY_DEBUG_DRAW_CARD_PLAYER:   int = arcade.key.NUM_1
+    KEY_DEBUG_DRAW_CARD_OPPONENT: int = arcade.key.NUM_2
     KEY_DEBUG_RESTART_GAME:       int = arcade.key.R
 
     # DEBUG Texture pack key mapping:

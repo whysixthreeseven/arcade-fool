@@ -133,6 +133,7 @@ from game.scripts.assertion import (
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 CARD OBJECT CLASS BLOCK
+
 """
 
 
@@ -809,6 +810,28 @@ class Card_Object:
 
         # Returning:
         return self.__state_showcase
+    
+
+    @cached_property
+    def state_moving(self) -> bool:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Comparing current coordinates with the expected/default coordinates:
+        state_moving: bool = bool(
+            self.coordinate_x_current not in (
+                self.coordinate_x_default,
+                self.coordinate_x_slide
+                ) or
+            self.coordinate_y_current not in (
+                self.coordinate_y_default,
+                self.coordinate_y_slide
+                )
+            )
+        
+        # Returning:
+        return state_moving
     
 
     def set_state_selected(self, set_value: bool, ignore_assertion: bool = False) -> None:
