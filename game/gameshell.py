@@ -151,15 +151,33 @@ class Gameshell(arcade.Window):
     """
 
     
-    def on_update(self, delta_time):
+    def on_update(self, delta_time: float) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Nothing to do, yet.
         pass
 
 
     def on_draw(self):
+        """
+        TODO: Create a docstring.
+        """
+
+        # Clearing previous frame:
         self.clear()
+
+        # Debugging, rendering game zones:
         for zone in self.__zones:
             zone.render()
+
+        # Rendering containers:
         self.game.deck.render()
+        # self.game.discard.render()        # <- TODO: Implement
+        # self.game.table.render()
+
+        # Rendering player controller's hand containers:
         self.game.player_one.hand.render()
         self.game.player_two.hand.render()
 
@@ -173,7 +191,7 @@ class Gameshell(arcade.Window):
         if key_pressed in self.game.keyboard.key_list:
 
             # Checking if key pressed was a debug command:
-            if key_pressed in self.game.keyboard.debug_key_list:
+            if key_pressed in self.game.keyboard.key_debug_list:
 
                 # Warning debug mode was not enabled:
                 if not SESSION_ENABLE_DEBUG:
@@ -188,5 +206,9 @@ class Gameshell(arcade.Window):
             
             # Otherwise, handling key pressed:
             else:
-                ...
+                
+                # Executing command:
+                self.game.handle_key_pressed(
+                    key_pressed = key_pressed
+                    )
                 

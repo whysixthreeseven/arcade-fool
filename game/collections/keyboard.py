@@ -48,6 +48,32 @@ class Keyboard_Mapping:
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    CACHE METHODS AND PROPERTIES BLOCK
+    
+    """
+
+
+    @cached_property
+    def __cached_key_list_property_list(self) -> tuple[str, ...]:
+        """
+        TODO: Create a docstring.
+
+        :return tuple[str, ...]: ...
+        """
+
+        # Generating cached property list:
+        cached_property_list: tuple[str, ...] = (
+            "key_list",
+            "key_user_list",
+            "key_debug_list",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     ALL KEY LISTS PROPERTIES BLOCK
     
     """
@@ -61,37 +87,72 @@ class Keyboard_Mapping:
 
         # Acquiring all recognized keys:
         key_list: tuple[int, ...] = tuple(
-            key_stored for key_stored
-            in self.__dict__.values()
+            key_stored for key_stored in self.__dict__.values()
             if key_stored is not None
             )
         
         # Returning:
         return key_list
-
-
-    """
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    DEBUG KEY LISTS PROPERTIES BLOCK
     
-    """
+    
+    @cached_property
+    def key_user_list(self) -> tuple[int, ...]:
+        """
+        TODO: Create a docstring.
+        """
 
+        # Acquiring all recognized keys:
+        key_list: tuple[int, ...] = tuple(
+            key_stored for attribute_name, key_stored in self.__dict__.items()
+            if key_stored in self.key_list and "DEBUG" not in attribute_name
+            )
+        
+        # Returning:
+        return key_list
+    
 
     @cached_property
-    def debug_key_list(self) -> tuple[int, ...]:
+    def key_debug_list(self) -> tuple[int, ...]:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Acquiring all recognized keys:
+        key_list: tuple[int, ...] = tuple(
+            key_stored for attribute_name, key_stored in self.__dict__.items()
+            if key_stored in self.key_list and "DEBUG" in attribute_name
+            )
+        
+        # Returning:
+        return key_list
+    
+
+    @cached_property
+    def key_debug_texture_list(self) -> tuple[int, ...]:
         """
         TODO: Create a docstring.
         """
 
         # Collecting key list:
         key_list: tuple[int, ...] = (
-            self.KEY_DEBUG_DRAW_CARD_PLAYER,
-            self.KEY_DEBUG_DRAW_CARD_OPPONENT,
-            self.KEY_DEBUG_RESTART_GAME,
             self.KEY_DEBUG_SWITCH_TEXTURE_PACK_FRONT,
             self.KEY_DEBUG_SWITCH_TEXTURE_PACK_BACK,
             self.KEY_DEBUG_SET_TEXTURE_PACK_DEFAULT_LIGHT,
             self.KEY_DEBUG_SET_TEXTURE_PACK_DEFAULT_DARK,
+            )
+        
+        # Returning:
+        return key_list
+
+
+    @cached_property
+    def key_debug_sort_list(self) -> tuple[int, ...]:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Collecting key list:
+        key_list: tuple[int, ...] = (
             self.KEY_DEBUG_SORT_HAND_BY_VALUE,
             self.KEY_DEBUG_SORT_HAND_BY_VALUE_DEFAULT,
             self.KEY_DEBUG_SORT_HAND_BY_TIME_ADDED,
@@ -103,43 +164,7 @@ class Keyboard_Mapping:
     
 
     @cached_property
-    def debug_texture_key_list(self) -> tuple[int, ...]:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Collecting key list:
-        key_list: tuple[int, ...] = (
-            self.KEY_DEBUG_SWITCH_TEXTURE_PACK_FRONT,
-            self.KEY_DEBUG_SWITCH_TEXTURE_PACK_BACK,
-            self.KEY_DEBUG_SET_TEXTURE_PACK_DEFAULT_LIGHT,
-            self.KEY_DEBUG_SET_TEXTURE_PACK_DEFAULT_DARK,
-            )
-        
-        # Returning:
-        return key_list
-    
-
-    @cached_property
-    def debug_sort_key_list(self) -> tuple[int, ...]:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Collecting key list:
-        key_list: tuple[int, ...] = (
-            self.KEY_DEBUG_SORT_HAND_BY_VALUE,
-            self.KEY_DEBUG_SORT_HAND_BY_VALUE_DEFAULT,
-            self.KEY_DEBUG_SORT_HAND_BY_TIME_ADDED,
-            self.KEY_DEBUG_SORT_HAND_BY_SUIT,
-            )
-        
-        # Returning:
-        return key_list
-    
-
-    @cached_property
-    def debug_draw_key_list(self) -> tuple[int, ...]:
+    def key_debug_draw_list(self) -> tuple[int, ...]:
         """
         TODO: Create a docstring.
         """

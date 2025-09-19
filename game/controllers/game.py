@@ -18,6 +18,18 @@ from game.controllers.player import Player_Controller
 # Collections import:
 from game.collections.keyboard import Keyboard_Mapping
 from game.collections.texturepack import Texture_Pack
+from game.collections.zone import (
+
+    # Zone class object:
+    Zone_XYWH,
+
+    # Debugging zones:
+    ZONE_GAME_AREA_PLAY,
+    ZONE_GAME_AREA_SIDE,
+    ZONE_PLAYER_ONE,
+    ZONE_PLAYER_TWO,
+    ZONE_TABLE,
+    )
 
 # Variables import:
 from game.variables import (
@@ -1093,7 +1105,7 @@ class Game_Controller:
         """
 
         # Updating texture pack on call:
-        if key_pressed in self.keyboard.debug_texture_key_list:
+        if key_pressed in self.keyboard.key_debug_texture_list:
 
             # Switching texture packs:
             if key_pressed == self.keyboard.KEY_DEBUG_SWITCH_TEXTURE_PACK_FRONT:
@@ -1115,7 +1127,7 @@ class Game_Controller:
             self.update_texture_pack()
 
         # Sorting player's hand on call:
-        elif key_pressed in self.keyboard.debug_sort_key_list:
+        elif key_pressed in self.keyboard.key_debug_sort_list:
 
             # Getting sort method from cached key index:
             if key_pressed in self.keyboard_sort_index:
@@ -1133,7 +1145,7 @@ class Game_Controller:
                 )
 
         # Adding card to player or opponent:
-        elif key_pressed in self.keyboard.debug_draw_key_list:
+        elif key_pressed in self.keyboard.key_debug_draw_list:
 
             # Ensuring there are cards to draw:
             if self.deck.deck_count > 0:
@@ -1171,12 +1183,202 @@ class Game_Controller:
         elif key_pressed == self.keyboard.KEY_DEBUG_RESTART_GAME:
             self.create_game_default()
 
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    GAME HANDLERS BLOCK
+    
+    """
+
+
+    def handle_key_pressed(self, key_pressed: int, ignore_assertion: bool = False) -> None:
+        """
+        TODO: Create a docstring.
+
+        :param int key_pressed: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        """
+
+        # Assertion control:
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+            ...
+
+        # Nothing to do, yet.
+        if key_pressed in self.keyboard.key_user_list:
+            ...
+
+
+    def handle_mouse_click(self, click_coordinates: tuple[int, int]) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Nothing to do, yet.
+        pass
+
+
+    def handle_mouse_release(self, click_coordinates: tuple[int, int]) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Nothing to do, yet.
+        pass
+
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    FIND ZONE METHODS AND PROPERTIES BLOCK
+
+    """
+
+
+    @cached_property
+    def __zone_selection_list(self) -> tuple[Zone_XYWH, ...]:
+        """
+        TODO: Create a docstring.
+
+        Cannot be cleared.
+
+        :return tuple[Zone_XYWH, ...]: ...
+        """
+
+        # Creating a container:
+        zone_list: tuple[Zone_XYWH, ...] = (
+            ZONE_PLAYER_ONE,
+            ZONE_PLAYER_TWO,
+            ZONE_TABLE
+            )
+        
+        # Returning:
+        return zone_list
+    
+
+    @cached_property
+    def __zone_area_list(self)-> tuple[Zone_XYWH, ...]:
+        """
+        TODO: Create a docstring.
+
+        Cannot be cleared.
+
+        :return tuple[Zone_XYWH, ...]: ...
+        """
+
+        # Creating a container:
+        zone_list: tuple[Zone_XYWH, ...] = (
+            ZONE_GAME_AREA_PLAY,
+            ZONE_GAME_AREA_SIDE
+            )
+        
+        # Returning:
+        return zone_list
+    
+
+    def __find_zone_by_coordinates(self, 
+                                   check_coordinates: tuple[int, int], 
+                                   zone_container: tuple[Zone_XYWH, ...],
+                                   ignore_assertion: bool = False,
+                                   ) -> Zone_XYWH | None:
+        """
+        TODO: Create a docstring.
+
+        :param tuple[int, int] check_coordinates: ...
+        :param tuple[Zone_XYWH, ...] zone_container: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        """
+
+        # Assertion control:
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+            ...
+
+        # Unpacking:
+        check_coordinate_x, check_coordinate_y = check_coordinates
+
+        # Finding the correct zone:
+        zone_object_found: Zone_XYWH | None = None
+        for zone_object in zone_container:
+
+            # Checking if coordinates are within zone object's boundaries:
+            zone_accessed: bool = bool(
+                check_coordinate_x in zone_object.coordinate_x_boundary and
+                check_coordinate_y in zone_object.coordinate_y_boundary
+                )
+            
+            # Updating variables and breaking:
+            if zone_accessed:
+                zone_object_found: Zone_XYWH = zone_object
+                break
+        
+        # Returning:
+        return zone_object_found
+    
+
+    def find_zone_selection_by_coordinates(self, 
+                                           check_coordinates: tuple[int, int],
+                                           ignore_assertion: bool = False,
+                                           ) -> Zone_XYWH | None:
+        """
+        TODO: Create a docstring.
+
+        :param tuple[int, int] check_coordinates: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        """
+
+        # Finding zone object:
+        zone_object_found: Zone_XYWH | None = self.__find_zone_by_coordinates(
+            check_coordinates = check_coordinates,
+            zone_container = self.__zone_selection_list,
+            ignore_assertion = ignore_assertion,
+            )
+        
+        # Returning:
+        return zone_object_found
+
+
+    def find_zone_area_by_coordinates(self, 
+                                      check_coordinates: tuple[int, int],
+                                      ignore_assertion: bool = False,
+                                      ) -> Zone_XYWH | None:
+        """
+        TODO: Create a docstring.
+
+        :param tuple[int, int] check_coordinates: ...
+        :param bool ignore_assertion: ...
+
+        :raise AssertionError: ...
+        """
+
+        # Finding zone object:
+        zone_object_found: Zone_XYWH | None = self.__find_zone_by_coordinates(
+            check_coordinates = check_coordinates,
+            zone_container = self.__zone_area_list,
+            ignore_assertion = ignore_assertion,
+            )
+        
+        # Returning:
+        return zone_object_found
+
     
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     EVENT METHODS BLOCK
 
     """
+
+
+    def event_click_card(self, card_object: Card_Object) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Nothing to do, yet.
+        pass
 
 
     def event_draw_card(self, player_controller: Player_Controller) -> None:
