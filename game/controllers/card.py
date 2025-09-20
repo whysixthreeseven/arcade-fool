@@ -2594,11 +2594,11 @@ class Card_Object:
     """
 
 
-    def __coordinate_next(self, 
-                          slide_speed: int, 
-                          current_coordinate: int, 
-                          target_coordinate: int
-                          ) -> int:
+    def __calculate_coordinate_next(self, 
+                                    slide_speed: int, 
+                                    current_coordinate: int, 
+                                    target_coordinate: int
+                                    ) -> int:
         """
         TODO: Create a docstring.
 
@@ -2658,7 +2658,7 @@ class Card_Object:
                 slide_speed: int = int(CARD_SLIDE_SPEED_DEFAULT * slide_speed_modifier)
 
                 # Getting next coordinate:
-                coordinate_next: int = self.__coordinate_next(
+                coordinate_next: int = self.__calculate_coordinate_next(
                     slide_speed = slide_speed,
                     target_coordinate = target_coordinate,
                     )
