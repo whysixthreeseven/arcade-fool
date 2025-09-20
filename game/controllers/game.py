@@ -1075,9 +1075,9 @@ class Game_Controller:
         
     
     def event_sort_hand_default(self, 
-                          player_controller: Player_Controller, 
-                          reset_coordinates: bool = False
-                          ) -> None:
+                                player_controller: Player_Controller, 
+                                reset_coordinates: bool = False
+                                ) -> None:
         """
         TODO: Create a docstring.
         """
@@ -1132,6 +1132,8 @@ class Game_Controller:
             # Getting sort method from cached key index:
             if key_pressed in self.keyboard_sort_index:
                 sort_method_selected: str = self.keyboard_sort_index[key_pressed]
+                sort_player_controller: Player_Controller = self.player_one
+                
 
             # Raising error on unrecognized or not implemented command call:
             else:
@@ -1139,7 +1141,8 @@ class Game_Controller:
                 raise NotImplemented(error_message)
             
             # Sorting:
-            self.player_one.hand.sort_hand(
+            self.handle_sort(
+                player_controller = 
                 sort_method = sort_method_selected,
                 reset_coordinates = True,
                 )
