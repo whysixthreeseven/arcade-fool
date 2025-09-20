@@ -3,7 +3,11 @@ from dataclasses import dataclass
 
 # Collections import:
 from game.collections.texturepack import (
+
+    # Texture pack controller:
     Texture_Pack, 
+
+    # Default texture pack:
     TEXTURE_PACK_FRONT_LIGHT_DEFAULT,
     TEXTURE_PACK_BACK_LIGHT_DEFAULT,
     )

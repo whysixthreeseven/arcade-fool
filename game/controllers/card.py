@@ -64,20 +64,21 @@ from game.directory import (
     DIR_TEXTURES_CARD_BACK_PATH,
     )
 
-# Card-related settings import:
+# Related settings import:
 from game.settings import (
 
-    # Card render settings:
+    # Card-related settings:
     CARD_RENDER_SCALE_DEFAULT_MOD,
     CARD_RENDER_ANGLE_DEFAULT,
     CARD_RENDER_ANGLE_OPPONENT,
     CARD_RENDER_ANGLE_MIN,
     CARD_RENDER_ANGLE_MAX,
     CARD_RENDER_ANGLE_AXIS_LIST,
-
-    # Card texture settings:
     CARD_TEXTURE_WIDTH_SCALED,
     CARD_TEXTURE_HEIGHT_SCALED,
+    CARD_SLIDE_SPEED_DEFAULT,
+    CARD_SLIDE_SPEED_MODIFIER_DEFAULT,
+    CARD_SLIDE_SPEED_MODIFIER_DOUBLE,
 
     # Table positions and stack index:
     TABLE_STACK_TOP_INDEX,
@@ -87,12 +88,10 @@ from game.settings import (
     TABLE_POSITION_MAX,
     TABLE_POSITION_RANGE,
 
-    # Card render angle (in deck) settings:
+    # Deck-related settings:
     DECK_RENDER_ANGLE_SHOWCASE,
     DECK_RENDER_ANGLE_ADD_MIN,
     DECK_RENDER_ANGLE_ADD_MAX,
-
-    # Deck settings:
     DECK_SIZE_MAX,
 
     )
@@ -2587,4 +2586,147 @@ class Card_Object:
             pixelated = True,
             )
         
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    SLIDE METHODS AND PROPERTIES BLOCK
     
+    """
+
+
+    def __coordinate_next(self, 
+                          slide_speed: int, 
+                          current_coordinate: int, 
+                          target_coordinate: int
+                          ) -> int:
+        """
+        TODO: Create a docstring.
+
+        :param int slide_speed: ...
+        :param int current_coordinate: ...
+        :param int target_coordinate: ...
+        """
+
+        # Finding coordinate x slide axis:
+        slide_axis: int = + 1
+        if current_coordinate < target_coordinate:
+            slide_axis: int = - 1
+
+        # Calculating coordinate:
+        coordinate_next: int = int(current_coordinate + slide_speed * slide_axis)
+        coordinate_forced: bool = bool(
+            (coordinate_next > target_coordinate and slide_axis == + 1) or
+            (coordinate_next < target_coordinate and slide_axis == - 1)
+            )
+        
+        # Forcing next coordinate to be target if it overlaps:
+        if coordinate_forced:
+            coordinate_next: int = target_coordinate
+
+        # Returning:
+        return coordinate_next
+
+
+    def __slide_to_coordinates(self, 
+                               target_coordinates: tuple[int, int], 
+                               speed_modifier: Optional[float] = None,
+                               force_instant: bool = False
+                               ) -> None:
+        """
+        TODO: Create a docstring.
+
+        :param tuple[int, int] target_coordinates: ...
+        :param Optional[float] speed_modifier: ...
+        :param bool force_instant: ...
+        """
+
+        # Looping over target coordinates:
+        set_coordinates: list[int] = []
+        for target_coordinate in target_coordinates:
+
+            # Forcing next coordinate to be target coordinate:
+            if force_instant:
+                coordinate_next: int = target_coordinate
+
+            # Calculating next coordinate x to slide to
+            else:
+
+                # Selecting speed modifier and calculating speed:
+                slide_speed_modifier: float = CARD_SLIDE_SPEED_DEFAULT
+                if speed_modifier is not None:
+                    slide_speed_modifier: float = speed_modifier
+                slide_speed: int = int(CARD_SLIDE_SPEED_DEFAULT * slide_speed_modifier)
+
+                # Getting next coordinate:
+                coordinate_next: int = self.__coordinate_next(
+                    slide_speed = slide_speed,
+                    target_coordinate = target_coordinate,
+                    )
+                
+                # Adding coordinate to the list:
+                set_coordinates.append(
+                    coordinate_next
+                    )
+        
+        # Converting and updating coordinates:
+        set_coordinates_conv: tuple[int, ...] = tuple(set_coordinates)
+        self.set_coordinates_current(
+            set_container = set_coordinates_conv,
+            ignore_assertion = True,
+            )
+
+
+    def __slide_to_default(self, speed_modifier: Optional[float], force_instant: bool = False) -> None:
+        """
+        TODO: Create a docstring.
+
+        :param Optional[float] speed_modifier: ...
+        :param bool force_instant: ...
+        """
+
+        # Preparing coordinates container:
+        coordinates_default: tuple[int, int] = (
+            self.coordinate_x_default,
+            self.coordinate_y_default
+            )
+        
+        # Calling slide method:
+        self.__slide_to_coordinates(
+            target_coordinates = coordinates_default,
+            speed_modifier = speed_modifier,
+            force_instant = force_instant,
+            )
+        
+    
+    def __slide_to_expected(self, speed_modifier: Optional[float], force_instant: bool = False) -> None:
+        """
+        TODO: Create a docstring.
+
+        :param Optional[float] speed_modifier: ...
+        :param bool force_instant: ...
+        """
+
+        # Preparing coordinates container:
+        coordinates_expected: tuple[int, int] = (
+            self.coordinate_x_slide,
+            self.coordinate_y_slide
+            )
+        
+        # Calling slide method:
+        self.__slide_to_coordinates(
+            target_coordinates = coordinates_expected,
+            speed_modifier = speed_modifier,
+            force_instant = force_instant,
+            )
+        
+    
+    def slide(self, force_instant: bool = False) -> None:
+        """
+        TODO: Create a docstring.
+
+        :param bool force_instant: ...
+        """
+
+        # Nothing here, yet.
+        pass
+
