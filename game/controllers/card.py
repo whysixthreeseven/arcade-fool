@@ -1674,7 +1674,7 @@ class Card_Object:
         """
 
         # Connecting texture pack folder with textures folder:
-        dir_texture_pack_color_name: str = self.__texture_pack_back.pack_color
+        dir_texture_pack_color_name: str = self.__texture_pack_back.pack_color.lower()
         dir_texture_pack_path: str = os.path.join(
             DIR_TEXTURES_CARD_BACK_PATH,
             dir_texture_pack_color_name
