@@ -1137,11 +1137,13 @@ class Game_Controller:
             else:
                 error_message: str = f"Command call [{key_pressed=}] not implemented."
                 raise NotImplemented(error_message)
+
+            # Updating sort method:
+            self.session.sort_method: str = sort_method_selected
             
             # Sorting:
             self.handle_sort(
                 player_controller = self.player_one,
-                sort_method = sort_method_selected,
                 reset_coordinates = True,
                 )
 
