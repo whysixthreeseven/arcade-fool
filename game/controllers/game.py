@@ -1132,8 +1132,6 @@ class Game_Controller:
             # Getting sort method from cached key index:
             if key_pressed in self.keyboard_sort_index:
                 sort_method_selected: str = self.keyboard_sort_index[key_pressed]
-                sort_player_controller: Player_Controller = self.player_one
-                
 
             # Raising error on unrecognized or not implemented command call:
             else:
@@ -1142,7 +1140,7 @@ class Game_Controller:
             
             # Sorting:
             self.handle_sort(
-                player_controller = 
+                player_controller = self.player_one,
                 sort_method = sort_method_selected,
                 reset_coordinates = True,
                 )
