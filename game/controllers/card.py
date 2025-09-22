@@ -514,6 +514,60 @@ class Card_Object:
         return cached_property_list
     
 
+    @cached_property
+    def __cached_boundary_property_list(self) -> tuple[str, ...]:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Generating cached property list:
+        cached_property_list: tuple[str, ...] = (
+            "boundary_x_left",
+            "boundary_x_right",
+            "boundary_x_range",
+            "boundary_y_bottom",
+            "boundary_y_top",
+            "boundary_y_range"
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+
+    @cached_property
+    def __cached_boundary_x_property_list(self) -> tuple[str, ...]:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Generating cached property list:
+        cached_property_list: tuple[str, ...] = (
+            "boundary_x_left",
+            "boundary_x_right",
+            "boundary_x_range",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+
+    @cached_property
+    def __cached_boundary_y_property_list(self) -> tuple[str, ...]:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Generating cached property list:
+        cached_property_list: tuple[str, ...] = (
+            "boundary_y_bottom",
+            "boundary_y_top",
+            "boundary_y_range"
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     CARD SUIT METHODS AND PROPERTIES BLOCK
@@ -540,7 +594,7 @@ class Card_Object:
         # Formatting:
         suit_repr: str = convert_attribute_to_repr(
             attribute_value = self.suit,
-            attribute_tag = CARD_SUIT_TAG 
+            attribute_tag   = CARD_SUIT_TAG 
             )
 
         # Returning:
@@ -569,7 +623,7 @@ class Card_Object:
         # Formatting:
         suit_color_repr: str = convert_attribute_to_repr(
             attribute_value = self.suit_color,
-            attribute_tag = CARD_SUIT_COLOR_TAG
+            attribute_tag   = CARD_SUIT_COLOR_TAG
             )
         
         # Returning:
@@ -593,7 +647,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (str, )
             assert_value_is_valid_type(
                 check_value = set_value,
-                check_type = default_type_list,
+                check_type  = default_type_list,
                 raise_error = True
                 )
             
@@ -611,7 +665,7 @@ class Card_Object:
 
             # Clearing cache (suit):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_suit_property_list
                 )
 
@@ -642,7 +696,7 @@ class Card_Object:
         # Formatting:
         type_repr: str = convert_attribute_to_repr(
             attribute_value = self.type_f,
-            attribute_tag = CARD_TYPE_TAG 
+            attribute_tag   = CARD_TYPE_TAG 
             )
 
 
@@ -695,7 +749,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (str, )
             assert_value_is_valid_type(
                 check_value = set_value,
-                check_type = default_type_list,
+                check_type  = default_type_list,
                 raise_error = True
                 )
             
@@ -713,7 +767,7 @@ class Card_Object:
 
             # Clearing cache (type):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_type_property_list
                 )
 
@@ -733,7 +787,7 @@ class Card_Object:
 
         # Checking attributes values:
         state_ready: bool = (
-            self.type_f != CARD_TYPE_NOT_SET,
+            self.type_f != CARD_TYPE_NOT_SET and
             self.suit != CARD_SUIT_NOT_SET
             )
         
@@ -850,7 +904,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (bool, )
             assert_value_is_valid_type(
                 check_value = set_value,
-                check_type = default_type_list,
+                check_type  = default_type_list,
                 raise_error = True
                 )
 
@@ -861,7 +915,7 @@ class Card_Object:
             # Clearing cache (property):
             cached_property: str = "state_selected"
             clear_cached_property(
-                target_object = self,
+                target_object    = self,
                 target_attribute = cached_property
                 )
     
@@ -883,7 +937,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (bool, )
             assert_value_is_valid_type(
                 check_value = set_value,
-                check_type = default_type_list,
+                check_type  = default_type_list,
                 raise_error = True
                 )
 
@@ -894,7 +948,7 @@ class Card_Object:
             # Clearing cache (property):
             cached_property: str = "state_hovered"
             clear_cached_property(
-                target_object = self,
+                target_object    = self,
                 target_attribute = cached_property
                 )
     
@@ -916,7 +970,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (bool, )
             assert_value_is_valid_type(
                 check_value = set_value,
-                check_type = default_type_list,
+                check_type  = default_type_list,
                 raise_error = True
                 )
 
@@ -927,7 +981,7 @@ class Card_Object:
             # Clearing cache (property):
             cached_property: str = "state_trump"
             clear_cached_property(
-                target_object = self,
+                target_object    = self,
                 target_attribute = cached_property
                 )
     
@@ -949,7 +1003,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (bool, )
             assert_value_is_valid_type(
                 check_value = set_value,
-                check_type = default_type_list,
+                check_type  = default_type_list,
                 raise_error = True
                 )
 
@@ -964,14 +1018,14 @@ class Card_Object:
                 )
             for cached_property_list in cached_property_collection:
                 clear_cached_property_list(
-                    target_object = self,
+                    target_object         = self,
                     target_attribute_list = cached_property_list
                     )
             
             # Clearing cache (property)
             cached_property: str = "state_revealed"
             clear_cached_property(
-                target_object = self,
+                target_object    = self,
                 target_attribute = cached_property
                 )
             
@@ -993,7 +1047,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (bool, )
             assert_value_is_valid_type(
                 check_value = set_value,
-                check_type = default_type_list,
+                check_type  = default_type_list,
                 raise_error = True
                 )
 
@@ -1004,7 +1058,7 @@ class Card_Object:
             # Clearing cache (property):
             cached_property: str = "state_opponent"
             clear_cached_property(
-                target_object = self,
+                target_object    = self,
                 target_attribute = cached_property
                 )
     
@@ -1026,7 +1080,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (bool, )
             assert_value_is_valid_type(
                 check_value = set_value,
-                check_type = default_type_list,
+                check_type  = default_type_list,
                 raise_error = True
                 )
 
@@ -1037,7 +1091,7 @@ class Card_Object:
             # Clearing cache (property):
             cached_property: str = "state_playable"
             clear_cached_property(
-                target_object = self,
+                target_object    = self,
                 target_attribute = cached_property
                 )
             
@@ -1059,7 +1113,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (bool, )
             assert_value_is_valid_type(
                 check_value = set_value,
-                check_type = default_type_list,
+                check_type  = default_type_list,
                 raise_error = True
                 )
 
@@ -1070,7 +1124,7 @@ class Card_Object:
             # Clearing cache (property):
             cached_property: str = "state_showcase"
             clear_cached_property(
-                target_object = self,
+                target_object    = self,
                 target_attribute = cached_property
                 )
         
@@ -1091,7 +1145,7 @@ class Card_Object:
 
         # Clearing cache (state):
         clear_cached_property_list(
-            target_object = self,
+            target_object         = self,
             target_attribute_list = self.__cached_state_property_list,
             )
 
@@ -1181,7 +1235,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (int, float)
             assert_value_is_valid_type(
                 check_value     = position_index,
-                check_type = default_type_list,
+                check_type      = default_type_list,
                 raise_error     = True
                 )
             
@@ -1213,13 +1267,13 @@ class Card_Object:
 
             # Clearing cache (position):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_position_property_list,
                 )
             
             # Clearing cache (location):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_location_property_list,
                 )
             
@@ -1242,7 +1296,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (int, float)
             assert_value_is_valid_type(
                 check_value     = position_index,
-                check_type = default_type_list,
+                check_type      = default_type_list,
                 raise_error     = True
                 )
             
@@ -1274,13 +1328,13 @@ class Card_Object:
 
             # Clearing cache (position):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_position_property_list,
                 )
             
             # Clearing cache (location):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_location_property_list,
                 )
     
@@ -1303,7 +1357,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (int, float)
             assert_value_is_valid_type(
                 check_value     = position_index,
-                check_type = default_type_list,
+                check_type      = default_type_list,
                 raise_error     = True
                 )
             
@@ -1334,13 +1388,13 @@ class Card_Object:
 
             # Clearing cache (position):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_position_property_list,
                 )
             
             # Clearing cache (location):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_location_property_list,
                 )
     
@@ -1363,7 +1417,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (int, float)
             assert_value_is_valid_type(
                 check_value     = position_index,
-                check_type = default_type_list,
+                check_type      = default_type_list,
                 raise_error     = True
                 )
             
@@ -1396,13 +1450,13 @@ class Card_Object:
 
             # Clearing cache (position):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_position_property_list,
                 )
             
             # Clearing cache (location):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_location_property_list,
                 )
         
@@ -1430,7 +1484,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (int, float)
             assert_value_is_valid_type(
                 check_value     = position_index,
-                check_type = default_type_list,
+                check_type      = default_type_list,
                 raise_error     = True
                 )
             
@@ -1446,7 +1500,7 @@ class Card_Object:
             default_type_list: tuple[type, ...] = (int, float)
             assert_value_is_valid_type(
                 check_value     = stack_index,
-                check_type = default_type_list,
+                check_type      = default_type_list,
                 raise_error     = True
                 )
             
@@ -1488,13 +1542,13 @@ class Card_Object:
 
             # Clearing cache (position):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_position_property_list,
                 )
             
             # Clearing cache (location):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_location_property_list,
                 )
 
@@ -1514,7 +1568,7 @@ class Card_Object:
 
         # Clearing cache:
         clear_cached_property_list(
-            target_object = self,
+            target_object         = self,
             target_attribute_list = self.__cached_position_property_list,
             )
 
@@ -1560,7 +1614,7 @@ class Card_Object:
         # Formatting:
         location_repr: str = convert_attribute_to_repr(
             attribute_value = self.location,
-            attribute_tag = CARD_LOCATION_TAG
+            attribute_tag   = CARD_LOCATION_TAG
             )
 
         # Returning:
@@ -1744,7 +1798,7 @@ class Card_Object:
         # Clearing cache (texture):
         if clear_cache:
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_texture_property_list,
                 )
             
@@ -1792,7 +1846,7 @@ class Card_Object:
         # Clearing cache (texture):
         if clear_cache:
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_texture_property_list,
                 )
             
@@ -1811,22 +1865,22 @@ class Card_Object:
         # Updating texture packs:
         self.set_texture_pack_front(
             texture_pack = texture_pack_front,
-            clear_cache = False,
+            clear_cache  = False,
             )
         self.set_texture_pack_back(
             texture_pack = texture_pack_back,
-            clear_cache = False,
+            clear_cache  = False,
             )
         
         # Clearing cache (texture):
         clear_cached_property_list(
-            target_object = self,
+            target_object         = self,
             target_attribute_list = self.__cached_texture_property_list,
             )
         
         # Clearing cache (render):
         clear_cached_property_list(
-            target_object = self,
+            target_object         = self,
             target_attribute_list = self.__cached_render_property_list
             )
 
@@ -1945,11 +1999,20 @@ class Card_Object:
 
             # Clearing cache:
             if clear_cache:
+
+                # Clearing cache (property)
                 cached_property: str = "coordinate_x_current"
                 clear_cached_property(
-                    target_object = self,
+                    target_object    = self,
                     target_attribute = cached_property
                     )
+                
+                # Clearing cache (boundary x):
+                clear_cached_property_list(
+                    target_object         = self,
+                    target_attribute_list = self.__cached_boundary_x_property_list
+                    )
+                
     
 
     def set_coordinate_y_current(self, 
@@ -1999,10 +2062,18 @@ class Card_Object:
 
             # Clearing cache:
             if clear_cache:
-                cached_property: str = "coordinate_y_current"
+
+                # Clearing cache (property)
+                cached_property: str = "coordinate_x_current"
                 clear_cached_property(
-                    target_object = self,
+                    target_object    = self,
                     target_attribute = cached_property
+                    )
+                
+                # Clearing cache (boundary y):
+                clear_cached_property_list(
+                    target_object         = self,
+                    target_attribute_list = self.__cached_boundary_y_property_list
                     )
     
 
@@ -2053,9 +2124,11 @@ class Card_Object:
 
             # Clearing cache:
             if clear_cache:
+                
+                # Clearing cache (property)
                 cached_property: str = "coordinate_x_default"
                 clear_cached_property(
-                    target_object = self,
+                    target_object    = self,
                     target_attribute = cached_property
                     )
     
@@ -2107,9 +2180,18 @@ class Card_Object:
 
             # Clearing cache:
             if clear_cache:
+                
+                # Clearing cache (coordinate property)
                 cached_property: str = "coordinate_y_default"
                 clear_cached_property(
-                    target_object = self,
+                    target_object    = self,
+                    target_attribute = cached_property
+                    )
+                
+                # Clearing cache (boundary property)
+                cached_property: str = "boundary_y_bottom"
+                clear_cached_property(
+                    target_object    = self,
                     target_attribute = cached_property
                     )
     
@@ -2163,7 +2245,7 @@ class Card_Object:
             if clear_cache:
                 cached_property: str = "coordinate_x_slide"
                 clear_cached_property(
-                    target_object = self,
+                    target_object    = self,
                     target_attribute = cached_property
                     )
     
@@ -2217,7 +2299,7 @@ class Card_Object:
             if clear_cache:
                 cached_property: str = "coordinate_y_slide"
                 clear_cached_property(
-                    target_object = self,
+                    target_object    = self,
                     target_attribute = cached_property
                     )
                 
@@ -2262,15 +2344,15 @@ class Card_Object:
         if self.coordinate_x_current != set_coordinate_x:
             attribute_updated: bool = True
             self.set_coordinate_x_current(
-                set_value = set_coordinate_x,
-                clear_cache = False,
+                set_value        = set_coordinate_x,
+                clear_cache      = False,
                 ignore_assertion = ignore_assertion
                 )
         if self.coordinate_y_current != set_coordinate_y:
             attribute_updated: bool = True
             self.set_coordinate_y_current(
-                set_value = set_coordinate_y,
-                clear_cache = False,
+                set_value        = set_coordinate_y,
+                clear_cache      = False,
                 ignore_assertion = ignore_assertion
                 )
         
@@ -2281,7 +2363,7 @@ class Card_Object:
                 "coordinate_y_current",
                 )
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = cached_property_list
                 )
 
@@ -2326,15 +2408,15 @@ class Card_Object:
         if self.coordinate_x_default != set_coordinate_x:
             attribute_updated: bool = True
             self.set_coordinate_x_default(
-                set_value = set_coordinate_x,
-                clear_cache = False,
+                set_value        = set_coordinate_x,
+                clear_cache      = False,
                 ignore_assertion = ignore_assertion
                 )
         if self.coordinate_y_default != set_coordinate_y:
             attribute_updated: bool = True
             self.set_coordinate_x_default(
-                set_value = set_coordinate_y,
-                clear_cache = False,
+                set_value        = set_coordinate_y,
+                clear_cache      = False,
                 ignore_assertion = ignore_assertion
                 )
         
@@ -2345,7 +2427,7 @@ class Card_Object:
                 "coordinate_y_default",
                 )
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = cached_property_list
                 )
 
@@ -2390,15 +2472,15 @@ class Card_Object:
         if self.coordinate_x_slide != set_coordinate_x:
             attribute_updated: bool = True
             self.set_coordinate_x_slide(
-                set_value = set_coordinate_x,
-                clear_cache = False,
+                set_value        = set_coordinate_x,
+                clear_cache      = False,
                 ignore_assertion = ignore_assertion
                 )
         if self.coordinate_y_slide != set_coordinate_y:
             attribute_updated: bool = True
             self.set_coordinate_x_slide(
-                set_value = set_coordinate_y,
-                clear_cache = False,
+                set_value        = set_coordinate_y,
+                clear_cache      = False,
                 ignore_assertion = ignore_assertion
                 )
         
@@ -2409,10 +2491,118 @@ class Card_Object:
                 "coordinate_y_slide",
                 )
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = cached_property_list
                 )
+            
 
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    BOUNDARY METHODS AND PROPERTIES BLOCK
+    
+    """
+
+
+    @cached_property
+    def boundary_x_left(self) -> int:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Calculating boundary coordinate:
+        boundary_coordinate: int = int(
+            self.coordinate_x_current -
+            self.render_width_value / 2
+            )
+        
+        # Returning:
+        return boundary_coordinate
+    
+
+    @cached_property
+    def boundary_x_right(self) -> int:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Calculating boundary coordinate:
+        boundary_coordinate: int = int(
+            self.coordinate_x_current +
+            self.render_width_value / 2
+            )
+        
+        # Returning:
+        return boundary_coordinate
+    
+
+    @cached_property
+    def boundary_y_bottom(self) -> int:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Getting center y coordinate based on location and state:
+        coordinate_y_center: int = self.coordinate_y_current
+        if self.location == CARD_LOCATION_HAND and self.state_hovered:
+            coordinate_y_center: int = self.coordinate_y_default
+
+        # Calculating boundary coordinate:
+        boundary_coordinate: int = int(
+            coordinate_y_center - 
+            self.render_height_value / 2
+            )
+        
+        # Returning:
+        return boundary_coordinate
+    
+
+    @cached_property
+    def boundary_y_top(self) -> int:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Calculating boundary coordinate:
+        boundary_coordinate: int = int(
+            self.coordinate_y_current - 
+            self.render_height_value / 2
+            )
+        
+        # Returning:
+        return boundary_coordinate
+    
+
+    @cached_property
+    def boundary_x_range(self) -> range:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Generating range:
+        boundary_range: range = range(
+            self.boundary_x_left,
+            self.boundary_x_right
+            )
+        
+        # Returning:
+        return boundary_range
+    
+
+    @cached_property
+    def boundary_y_range(self) -> range:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Generating range:
+        boundary_range: range = range(
+            self.boundary_y_bottom,
+            self.boundary_y_top
+            )
+        
+        # Returning:
+        return boundary_range
+        
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2471,7 +2661,7 @@ class Card_Object:
         # Calculating a random angle:
         render_angle_value: int = random.randrange(
             start = CARD_RENDER_ANGLE_MIN,
-            stop = CARD_RENDER_ANGLE_MAX
+            stop  = CARD_RENDER_ANGLE_MAX
             )
         render_angle_axis: int = random.choice(
             seq = CARD_RENDER_ANGLE_AXIS_LIST
@@ -2659,7 +2849,7 @@ class Card_Object:
 
                 # Getting next coordinate:
                 coordinate_next: int = self.__calculate_coordinate_next(
-                    slide_speed = slide_speed,
+                    slide_speed       = slide_speed,
                     target_coordinate = target_coordinate,
                     )
                 
@@ -2671,7 +2861,7 @@ class Card_Object:
         # Converting and updating coordinates:
         set_coordinates_conv: tuple[int, ...] = tuple(set_coordinates)
         self.set_coordinates_current(
-            set_container = set_coordinates_conv,
+            set_container    = set_coordinates_conv,
             ignore_assertion = True,
             )
 
@@ -2693,8 +2883,8 @@ class Card_Object:
         # Calling slide method:
         self.__slide_to_coordinates(
             target_coordinates = coordinates_default,
-            speed_modifier = speed_modifier,
-            force_instant = force_instant,
+            speed_modifier     = speed_modifier,
+            force_instant      = force_instant,
             )
         
     
@@ -2715,8 +2905,8 @@ class Card_Object:
         # Calling slide method:
         self.__slide_to_coordinates(
             target_coordinates = coordinates_expected,
-            speed_modifier = speed_modifier,
-            force_instant = force_instant,
+            speed_modifier     = speed_modifier,
+            force_instant      = force_instant,
             )
         
     
@@ -2731,11 +2921,11 @@ class Card_Object:
         if self.state_hovered:
             self.__slide_to_expected(
                 speed_modifier = CARD_SLIDE_SPEED_MODIFIER_DOUBLE,
-                force_instant = force_instant
+                force_instant  = force_instant
                 )
         else:
             self.__slide_to_default(
                 speed_modifier = CARD_SLIDE_SPEED_MODIFIER_DEFAULT,
-                force_instant = False,
+                force_instant  = False,
                 )
 
