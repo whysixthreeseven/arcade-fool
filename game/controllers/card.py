@@ -32,6 +32,13 @@ from game.variables import (
     CARD_SUIT_COLOR_RED,
     CARD_SUIT_COLOR_BLACK,
 
+    # Suit ASCII variables:
+    CARD_SUIT_NOT_SET_ASCII,
+    CARD_SUIT_HEARTS_ASCII,
+    CARD_SUIT_DIAMONDS_ASCII,
+    CARD_SUIT_CLUBS_ASCII,
+    CARD_SUIT_SPADES_ASCII,
+
     # Type variables:
     CARD_TYPE_TAG,
     CARD_TYPE_NOT_SET,
@@ -155,6 +162,15 @@ class Card_Object:
         CARD_SUIT_SPADES:   CARD_SUIT_COLOR_BLACK,
         }
     
+    # Card suit ASCII index:
+    CARD_SUIT_ASCII_INDEX: dict[str, str] = {
+        CARD_SUIT_NOT_SET:  CARD_SUIT_NOT_SET_ASCII,
+        CARD_SUIT_HEARTS:   CARD_SUIT_HEARTS_ASCII,
+        CARD_SUIT_DIAMONDS: CARD_SUIT_DIAMONDS_ASCII,
+        CARD_SUIT_CLUBS:    CARD_SUIT_CLUBS_ASCII,
+        CARD_SUIT_SPADES:   CARD_SUIT_SPADES_ASCII,
+        }
+    
     # Card type list:
     CARD_TYPE_LIST: tuple[str, ...] = (
         CARD_TYPE_TWO,
@@ -252,7 +268,7 @@ class Card_Object:
         """
 
         # Generating new string value:
-        echo_string: str = ""
+        echo_string: str = f"{self.suit_ascii}{self.type_ascii}"
 
         # Returning:
         return echo_string
@@ -264,7 +280,7 @@ class Card_Object:
         """
 
         # Generating new string value:
-        echo_string: str = ""
+        echo_string: str = f"{self.suit_ascii}{self.type_ascii}"
 
         # Returning:
         return echo_string
@@ -379,6 +395,7 @@ class Card_Object:
             "suit_repr",
             "suit_color",
             "suit_color_repr",
+            "suit_ascii",
             )
         
         # Returning:
@@ -396,7 +413,8 @@ class Card_Object:
             "type_f",
             "type_repr",
             "type_value_default",
-            "type_value"
+            "type_value",
+            "type_ascii",
             )
         
         # Returning:
@@ -628,6 +646,19 @@ class Card_Object:
         
         # Returning:
         return suit_color_repr
+    
+
+    @cached_property
+    def suit_ascii(self) -> str:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Aquiring ASCII symbol:
+        suit_ascii: str = Card_Object.CARD_SUIT_ASCII_INDEX[self.suit]
+
+        # Returning:
+        return suit_ascii
 
 
     def set_suit(self, set_value: str, ignore_assertion: bool = False) -> None:
@@ -699,7 +730,6 @@ class Card_Object:
             attribute_tag   = CARD_TYPE_TAG 
             )
 
-
         # Returning:
         return type_repr
     
@@ -730,6 +760,22 @@ class Card_Object:
 
         # Returning:
         return type_value
+    
+
+    @cached_property
+    def type_ascii(self) -> str:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Selecting first character based on numerical or literal type:
+        if self.type_value_default <= 10:
+            type_ascii: str = str(self.type_value_default)
+        else:
+            type_ascii: str = self.type_repr[0]
+
+        # Returning:
+        return type_ascii
 
 
     def set_type(self, set_value: str, ignore_assertion: bool = False) -> None:
@@ -2562,9 +2608,14 @@ class Card_Object:
         TODO: Create a docstring.
         """
 
+        # Getting center y coordinate based on location and state:
+        coordinate_y_center: int = self.coordinate_y_current
+        if self.location == CARD_LOCATION_HAND and self.state_hovered:
+            coordinate_y_center: int = self.coordinate_y_slide
+
         # Calculating boundary coordinate:
         boundary_coordinate: int = int(
-            self.coordinate_y_current - 
+            coordinate_y_center +
             self.render_height_value / 2
             )
         
@@ -2602,7 +2653,19 @@ class Card_Object:
         
         # Returning:
         return boundary_range
-        
+    
+
+    def reset_boundary(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Clearing cache (boundary):
+        clear_cached_property_list(
+            target_object         = self,
+            target_attribute_list = self.__cached_boundary_property_list
+            )
+    
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

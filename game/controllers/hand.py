@@ -565,6 +565,9 @@ class Hand_Controller:
                 ignore_assertion = False,
                 )
             
+            # Resetting boundaries:
+            card_object.reset_boundary()
+            
             
     def update_hand_state(self, 
                           player_focus_state: str,      # <- Default var (attacking or defending)

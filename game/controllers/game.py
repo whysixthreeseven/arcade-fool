@@ -102,6 +102,10 @@ class Game_Controller:
         # Keyboard mapping controller:
         self.__keyboard_mapping:      Keyboard_Mapping   = Keyboard_Mapping()
 
+        # Related card objects:
+        self.__card_selected: Card_Object | None = None
+        self.__card_hovered: Card_Object | None = None
+
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -937,6 +941,33 @@ class Game_Controller:
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    CARD SELECTION PROPERTIES BLOCK
+
+    """
+
+
+    @cached_property
+    def card_selected(self) -> Card_Object | None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__card_selected
+    
+
+    @cached_property
+    def card_hovered(self) -> Card_Object | None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__card_hovered
+        
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     KEYBOARD MAPPING PROPERTIES BLOCK
 
     """
@@ -1056,40 +1087,215 @@ class Game_Controller:
         self.session.sort_method = sort_method
 
 
-    def handle_sort(self, 
-                    player_controller: Player_Controller, 
-                    reset_coordinates: bool = False
-                    ) -> None:
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    TASK METHODS AND PROPERTIES BLOCK
+    
+    """
+
+
+    def __task_sort_hand(self, 
+                         player_controller: Player_Controller, 
+                         sort_method: Optional[str] = None,
+                         reset_coordinates: bool = False
+                         ) -> None:
         """
         TODO: Create a docstring.
         """
 
-        # Getting current sort method:
-        sort_method: str = self.session.sort_method
-
+        # Selecting sort method:
+        sort_method_selected: str = self.session.sort_method
+        if sort_method is not None:
+            sort_method_selected: str = sort_method
+        
         # Sorting hand:
         player_controller.hand.sort_hand(
-            sort_method = sort_method,
+            sort_method = sort_method_selected,
             reset_coordinates = reset_coordinates,
+            )
+
+
+    def task_sort_hand(self, 
+                       player_controller: Player_Controller, 
+                       reset_coordinates: bool = False
+                       ) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Calling sort method:
+        self.__task_sort_hand(
+            player_controller = player_controller,
+            sort_method = None,
+            reset_coordinates = reset_coordinates
             )
         
     
-    def event_sort_hand_default(self, 
-                                player_controller: Player_Controller, 
-                                reset_coordinates: bool = False
-                                ) -> None:
+    def task_sort_hand_default(self, 
+                               player_controller: Player_Controller, 
+                               reset_coordinates: bool = False
+                               ) -> None:
         """
         TODO: Create a docstring.
         """
 
-        # Getting current sort method:
+        # Getting default sort method:
         sort_method: str = self.session.sort_method_default
 
-        # Sorting hand:
-        player_controller.hand.sort_hand(
+        # Calling sort method:
+        self.__task_sort_hand(
+            player_controller = player_controller,
             sort_method = sort_method,
-            reset_coordinates = reset_coordinates,
+            reset_coordinates = reset_coordinates
             )
+        
+
+    def __task_get_card_priority(self, 
+                                 check_coordinates: tuple[int, int],
+                                 card_list: list[Card_Object],
+                                 ignore_assertion: bool = False,
+                                 ) -> Card_Object | None:
+        """
+        TODO: Create a docstring.
+
+        :param tuple[int, int] check_coordinates: ...
+        :param list[Card_Object] card_list: ...
+        :param bool ignore_assertion: ...
+
+        :return Card_Object: ...
+        :return None: ...
+        """
+
+        # Assertion control:
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+            ...
+
+
+        # Calculating list size:
+        card_list_size: int = len(card_list)
+
+        # Setting card object to None:
+        if card_list_size == 0:
+            card_priority: Card_Object | None = None
+
+        # Selecting the only card in the list:
+        elif card_list_size == 1:
+            card_priority: Card_Object = card_list[0]
+
+        # Sorting cards:
+        elif card_list_size > 1:
+
+            # Unpacking:
+            check_coordinate_x, check_coordinate_y = check_coordinates
+
+            # Sorting card list:
+            card_list_sorted: list[Card_Object] = sorted(
+                card_list,
+                key = lambda card_object: abs(
+                    check_coordinate_x % card_object.boundary_x_left
+                    ),
+                reverse = False
+                )
+            
+            # Acquiring first objectL
+            card_priority: Card_Object = card_list_sorted[0]
+
+        # Returning:
+        return card_priority
+        
+
+    def task_select_card(self, card_object: Card_Object) -> None:
+        """
+        TODO: Create a docstring.
+
+        :param Card_Object card_object: ...
+        """
+
+        # Updating controller's attribute holder:
+        self.__card_selected: Card_Object | None = card_object
+
+        # Updating card object's related attributes:
+        self.__card_selected.set_state_selected(
+            set_value        = True,
+            ignore_assertion = True,
+            )
+        
+        # Clearing cache (property):
+        cached_property: str = "card_selected"
+        clear_cached_property(
+            target_object    = self,
+            target_attribute = cached_property
+            )
+        
+    
+    def task_deselect_card(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Updating card object's related attributes:
+        if self.card_selected is not None:
+            self.__card_selected.set_state_selected(
+                set_value        = False,
+                ignore_assertion = True,
+                )
+            
+            # Updating controller's attribute holder:
+            self.__card_selected: Card_Object | None = None
+            
+            # Clearing cache (property):
+            cached_property: str = "card_selected"
+            clear_cached_property(
+                target_object    = self,
+                target_attribute = cached_property
+                )
+
+
+    def task_hover_card(self, card_object: Card_Object) -> None:
+        """
+        TODO: Create a docstring.
+
+        :param Card_Object card_object: ...
+        """
+
+        # Updating controller's attribute holder:
+        self.__card_hovered: Card_Object | None = card_object
+
+        # Updating card object's related attributes:
+        self.__card_hovered.set_state_hovered(
+            set_value        = True,
+            ignore_assertion = True,
+            )
+        
+        # Clearing cache (property):
+        cached_property: str = "card_hovered"
+        clear_cached_property(
+            target_object    = self,
+            target_attribute = cached_property
+            )
+        
+    
+    def task_dehover_card(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Updating card object's related attributes:
+        if self.card_hovered is not None:
+            self.__card_hovered.set_state_hovered(
+                set_value        = False,
+                ignore_assertion = True,
+                )
+        
+            # Updating controller's attribute holder:
+            self.__card_hovered: Card_Object | None = None
+            
+            # Clearing cache (property):
+            cached_property: str = "card_hovered"
+            clear_cached_property(
+                target_object    = self,
+                target_attribute = cached_property
+                )
     
 
     """
@@ -1139,10 +1345,10 @@ class Game_Controller:
                 raise NotImplemented(error_message)
 
             # Updating sort method:
-            self.session.sort_method: str = sort_method_selected
+            self.session.sort_method = sort_method_selected
             
             # Sorting:
-            self.handle_sort(
+            self.task_sort_hand(
                 player_controller = self.player_one,
                 reset_coordinates = True,
                 )
@@ -1172,7 +1378,7 @@ class Game_Controller:
                 
                 # Automatically sorting, if enabled:
                 if self.session.enable_autosort:
-                    self.event_sort_hand_default(
+                    self.task_sort_hand_default(
                         player_controller = player_controller,
                         reset_coordinates = True    # <- DEBUG, remove when slide is finished
                         )
@@ -1229,6 +1435,83 @@ class Game_Controller:
 
         # Nothing to do, yet.
         pass
+    
+
+    def handle_mouse_motion(self, motion_coordinates: tuple[int, int]) -> None:
+        """
+        TODO: Create a docstring.
+        
+        :param tuple[int, int] motion_coordinates: ...
+        """
+
+        # Unpacking coordinates:
+        motion_coordinate_x, motion_coordinate_y = motion_coordinates
+
+        # Finding zone area:
+        zone_area_motion: Zone_XYWH = self.__find_zone_by_coordinates(
+            check_coordinates = motion_coordinates,
+            zone_container    = self.__zone_area_list,
+            ignore_assertion  = False
+            )
+        
+        # Finding zone selection if cursor in game area:
+        if zone_area_motion == ZONE_GAME_AREA_PLAY:
+            zone_selection_motion: Zone_XYWH = self.__find_zone_by_coordinates(
+                check_coordinates = motion_coordinates,
+                zone_container    = self.__zone_selection_list,
+                ignore_assertion  = False,
+                )
+            
+            # Handling motion in player one zone:
+            if zone_selection_motion == ZONE_PLAYER_ONE:
+                
+                # Checking if cursor is hovering over a card:
+                card_hovered_list: list[Card_Object] = []
+                for card_object in self.player_one.hand.hand_container:
+                    card_hovered: bool = bool(
+                        motion_coordinate_x in card_object.boundary_x_range and
+                        motion_coordinate_y in card_object.boundary_y_range
+                        )
+                    if card_hovered:
+                        card_hovered_list.append(
+                            card_object
+                            )
+                
+                # Checking list size:
+                card_hovered_list_size: int = len(card_hovered_list)
+
+                # Dehovering, if empty list:
+                if card_hovered_list_size == 0:
+                    if self.card_hovered is not None:
+                        self.task_dehover_card()
+
+                # Finding hover priority:
+                else:
+
+                    # Finding priority card:
+                    card_priority: Card_Object = self.__task_get_card_priority(
+                        check_coordinates = motion_coordinates,
+                        card_list         = card_hovered_list,
+                        ignore_assertion  = False,
+                        )
+
+                    # Handling hover and dehover logic:
+                    if self.card_hovered is not card_priority:
+                        if card_hovered is not None:
+                            self.task_dehover_card()
+                        self.task_hover_card(
+                            card_object = card_priority
+                            )
+                # Debug:
+                print(self.card_hovered)
+
+            # Handling motion in player two zone:
+            elif zone_selection_motion == ZONE_PLAYER_TWO:
+                ...
+
+            # Handling motion in table zone:
+            elif zone_selection_motion == ZONE_TABLE:
+                ...
 
 
     """

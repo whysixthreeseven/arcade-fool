@@ -212,3 +212,29 @@ class Gameshell(arcade.Window):
                     key_pressed = key_pressed
                     )
                 
+
+    def on_mouse_motion(self, 
+                        motion_coordinate_x: Any, 
+                        motion_coordinate_y: Any, 
+                        motion_coordinate_dx: Any, 
+                        motion_coordinate_dy: Any
+                        ) -> None:
+        """
+        TODO: Create a docstring.
+
+        :param int | float motion_coordinate_x: ...
+        :param int | float motion_coordinate_y: ...
+        :param int | float motion_coordinate_dx: ...
+        :param int | float motion_coordinate_dy: ...
+        """
+
+        # Packing up:
+        motion_coordinates: tuple[int, int] = (
+            motion_coordinate_x,
+            motion_coordinate_y
+            )
+
+        # Handling mouse motion:
+        self.game.handle_mouse_motion(
+            motion_coordinates = motion_coordinates
+            )
