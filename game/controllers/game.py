@@ -104,7 +104,11 @@ class Game_Controller:
 
         # Related card objects:
         self.__card_selected: Card_Object | None = None
-        self.__card_hovered: Card_Object | None = None
+        self.__card_hovered:  Card_Object | None = None
+
+        # Zone current:
+        self.__zone_current_area:      Zone_XYWH | None = None
+        self.__zone_current_selection: Zone_XYWH | None = None
 
 
     """
@@ -189,7 +193,7 @@ class Game_Controller:
         # Clearing cache:
         cached_property: str = "session"
         clear_cached_property(
-            target_object = self,
+            target_object    = self,
             target_attribute = cached_property
             )
     
@@ -223,7 +227,7 @@ class Game_Controller:
         # Clearing cache:
         cached_property: str = "session"
         clear_cached_property(
-            target_object = self,
+            target_object    = self,
             target_attribute = cached_property
             )
     
@@ -291,6 +295,105 @@ class Game_Controller:
         else:
             self.__create_player_controllers()
 
+        # Filling hands (initial):
+        self.__fill_hands_initial()        
+            
+        # Getting player priority (who plays first):
+        self.__update_player_priority()
+
+        # Clearing cache (player):
+        clear_cached_property_list(
+            target_object         = self,
+            target_attribute_list = self.__cached_player_property_list
+            )
+        
+        # Clearing cache (controllers):
+        clear_cached_property_list(
+            target_object         = self,
+            target_attribute_list = self.__cached_controller_property_list
+            )
+        
+        # Updating textures (from previous game):
+        update_texture_pack: bool = bool(
+            self.session.texture_pack_front != self.session.texture_pack_front_default and
+            self.session.texture_pack_back != self.session.texture_pack_back_default
+            )
+        if update_texture_pack:
+            self.update_texture_pack()
+
+
+    def create_game_custom(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Getting custom session values:
+        deck_shift_custom: int = self.session.deck_shift_threshold
+        deck_lowest_value: int = self.session.deck_lowest_value
+
+        # Calling create method:
+        self.__create_game(
+            deck_shift        = deck_shift_custom,
+            deck_lowest_value = deck_lowest_value,
+            )
+
+
+    def create_game_default(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Calling create method:
+        self.__create_game(
+            deck_shift        = DECK_RENDER_SHIFT_THRESHOLD_DEFAULT,
+            deck_lowest_value = DECK_LOWEST_VALUE_DEFAULT,
+            )
+        
+
+    def create_game_extended(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Calling create method:
+        self.__create_game(
+            deck_shift        = DECK_RENDER_SHIFT_THRESHOLD_EXTENDED,
+            deck_lowest_value = DECK_LOWEST_VALUE_EXTENDED,
+            )
+        
+    
+    def reset_game(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Resetting controllers:
+        self.__reset_deck()
+        self.__reset_discard()
+        self.__reset_table()
+
+        # Resetting hand controllers in players:
+        for player_controller in self.player_list:
+            player_controller.reset_hand()
+
+        # Clearing cache (player):
+        clear_cached_property_list(
+            target_object         = self,
+            target_attribute_list = self.__cached_player_property_list
+            )
+        
+        # Clearing cache (controllers):
+        clear_cached_property_list(
+            target_object         = self,
+            target_attribute_list = self.__cached_controller_property_list
+            )
+        
+
+    def __fill_hands_initial(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+    
         # Fill check (no five or six cards per player of the same suit):
         check_completed: bool = False
         while not check_completed:
@@ -339,100 +442,14 @@ class Game_Controller:
                     )
                 
         # Updating hand positions and sorting:
-        for player_controller in self.player_list:
-            player_controller.hand.sort_hand(
-                sort_method = self.session.sort_method_default,
-                reset_coordinates = True
-                )
-            
-        # Getting player priority (who plays first):
-        self.__update_player_priority()
-
-        # Clearing cache (player):
-        clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_player_property_list
+        self.task_sort_hand_default(
+            player_controller = self.player_one,
+            reset_coordinates = True
             )
-        
-        # Clearing cache (controllers):
-        clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_controller_property_list
-            )
-        
-        # Updating textures (from previous game):
-        update_texture_pack: bool = bool(
-            self.session.texture_pack_front != self.session.texture_pack_front_default and
-            self.session.texture_pack_back != self.session.texture_pack_back_default
-            )
-        if update_texture_pack:
-            self.update_texture_pack()
-
-
-    def create_game_custom(self) -> None:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Getting custom session values:
-        deck_shift_custom: int = self.session.deck_shift_threshold
-        deck_lowest_value: int = self.session.deck_lowest_value
-
-        # Calling create method:
-        self.__create_game(
-            deck_shift = deck_shift_custom,
-            deck_lowest_value = deck_lowest_value,
-            )
-
-
-    def create_game_default(self) -> None:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Calling create method:
-        self.__create_game(
-            deck_shift = DECK_RENDER_SHIFT_THRESHOLD_DEFAULT,
-            deck_lowest_value = DECK_LOWEST_VALUE_DEFAULT,
-            )
-        
-
-    def create_game_extended(self) -> None:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Calling create method:
-        self.__create_game(
-            deck_shift = DECK_RENDER_SHIFT_THRESHOLD_EXTENDED,
-            deck_lowest_value = DECK_LOWEST_VALUE_EXTENDED,
-            )
-        
-    
-    def reset_game(self) -> None:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Resetting controllers:
-        self.__reset_deck()
-        self.__reset_discard()
-        self.__reset_table()
-
-        # Resetting hand controllers in players:
-        for player_controller in self.player_list:
-            player_controller.reset_hand()
-
-        # Clearing cache (player):
-        clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_player_property_list
-            )
-        
-        # Clearing cache (controllers):
-        clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_controller_property_list
+        self.__task_sort_hand(
+            player_controller = self.player_two,
+            sort_method       = HAND_SORT_METHOD_BY_TIME_ADDED,
+            reset_coordinates = True
             )
 
 
@@ -473,9 +490,9 @@ class Game_Controller:
 
         # Calling core methods:
         deck_controller.create_deck(
-            deck_shift = deck_shift,
+            deck_shift        = deck_shift,
             deck_lowest_value = deck_lowest_value,
-            ignore_assertion = True
+            ignore_assertion  = True
             )
         
         # Updating card objects' texture packs within deck:
@@ -483,8 +500,8 @@ class Game_Controller:
         texture_pack_back = self.__session_controller.texture_pack_back
         deck_controller.update_render_texture(
             texture_pack_front = texture_pack_front,
-            texture_pack_back = texture_pack_back,
-            ignore_assertion = True,
+            texture_pack_back  = texture_pack_back,
+            ignore_assertion   = True,
             )
         
         # Updating attribute:
@@ -494,7 +511,7 @@ class Game_Controller:
         if clear_cache:
             cached_property: str = "deck"
             clear_cached_property(
-                target_object = self,
+                target_object    = self,
                 target_attribute = cached_property
                 )
         
@@ -512,9 +529,9 @@ class Game_Controller:
 
         # Calling methods:
         self.__create_deck(
-            deck_shift = deck_shift,
+            deck_shift        = deck_shift,
             deck_lowest_value = deck_lowest_value,
-            clear_cache = clear_cache
+            clear_cache       = clear_cache
             )
         
 
@@ -550,7 +567,7 @@ class Game_Controller:
         if clear_cache:
             cached_property: str = "discard"
             clear_cached_property(
-                target_object = self,
+                target_object    = self,
                 target_attribute = cached_property
                 )
 
@@ -567,7 +584,7 @@ class Game_Controller:
         if clear_cache:
             cached_property: str = "discard"
             clear_cached_property(
-                target_object = self,
+                target_object    = self,
                 target_attribute = cached_property
                 )
 
@@ -604,7 +621,7 @@ class Game_Controller:
         if clear_cache:
             cached_property: str = "table"
             clear_cached_property(
-                target_object = self,
+                target_object    = self,
                 target_attribute = cached_property
                 )
 
@@ -621,7 +638,7 @@ class Game_Controller:
         if clear_cache:
             cached_property: str = "table"
             clear_cached_property(
-                target_object = self,
+                target_object    = self,
                 target_attribute = cached_property
                 )
     
@@ -755,16 +772,16 @@ class Game_Controller:
             # Setting default states to avoid conflicts:
             if set_default_state:
                 self.__player_one_controller.set_state_active(
-                    set_value        = True,
-                    update_related   = True,    # <- Switches related to False
+                    set_value      = True,
+                    update_related = True,    # <- Switches related to False
                     )
                 self.__player_one_controller.set_state_attacking(
-                    update_related   = True,    # <- Switches related to False
+                    update_related = True,    # <- Switches related to False
                     )
 
             # Clearing cache (player):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_player_property_list
                 )
     
@@ -792,7 +809,7 @@ class Game_Controller:
 
             # Clearing cache (player):
             clear_cached_property_list(
-                target_object = self,
+                target_object         = self,
                 target_attribute_list = self.__cached_player_property_list
                 )
             
@@ -823,7 +840,7 @@ class Game_Controller:
             "player_inactive",
             )
         clear_cached_property_list(
-            target_object = self,
+            target_object         = self,
             target_attribute_list = cached_property_list
             )
 
@@ -858,7 +875,7 @@ class Game_Controller:
             "player_defending",
             )
         clear_cached_property_list(
-            target_object = self,
+            target_object         = self,
             target_attribute_list = cached_property_list
             )
         
@@ -886,38 +903,15 @@ class Game_Controller:
             )
             
         # Updating controller attributes:
-        self.__player_one_controller: Player_Controller  = player_one_controller
-        self.__player_two_controller: Player_Controller  = player_two_controller
+        self.__player_one_controller: Player_Controller = player_one_controller
+        self.__player_two_controller: Player_Controller = player_two_controller
 
         # Clearing cache (player):
         clear_cached_property_list(
-            target_object = self,
+            target_object         = self,
             target_attribute_list = self.__cached_player_property_list
             )
-        
-    
-    # def __fill_player_hand_init(self, player_controller: Player_Controller) -> None:
-    
-    #     # Drawing cards:
-    #     card_draw_list: list[Card_Object] = []
-    #     card_draw_count: int = 0
-    #     while card_draw_count < HAND_CARD_COUNT_DEFAULT:
-    #         card_draw: Card_Object = self.deck.draw_card()
-    #         card_draw_list.append(
-    #             card_draw
-    #             )
-    #         card_draw_count += 1
 
-    #     # Adding cards in bulk to avoid excessive cache clearing:
-    #     player_controller.hand.add_card_list(
-    #         card_list = card_draw_list
-    #         )
-        
-    #     # Updating hand container:
-    #     player_controller.hand.update_hand_position(
-    #         reset_coordinates = True,
-    #         )
-        
     
     def __update_player_priority(self) -> None:
         """
@@ -1085,15 +1079,15 @@ class Game_Controller:
             for card_object in card_container:
                 card_object.update_texture(
                     texture_pack_front = texture_pack_front,
-                    texture_pack_back = texture_pack_back,
+                    texture_pack_back  = texture_pack_back,
                     )
                 
             # Manually updating render (fake) container:
             if card_container == self.deck.deck_container:
                 self.deck.update_render_texture(
                     texture_pack_front = texture_pack_front,
-                    texture_pack_back = texture_pack_back,
-                    ignore_assertion = True
+                    texture_pack_back  = texture_pack_back,
+                    ignore_assertion   = True
                     )
                 
     
@@ -1152,7 +1146,7 @@ class Game_Controller:
         
         # Sorting hand:
         player_controller.hand.sort_hand(
-            sort_method = sort_method_selected,
+            sort_method       = sort_method_selected,
             reset_coordinates = reset_coordinates,
             )
 
@@ -1168,7 +1162,7 @@ class Game_Controller:
         # Calling sort method:
         self.__task_sort_hand(
             player_controller = player_controller,
-            sort_method = None,
+            sort_method       = None,
             reset_coordinates = reset_coordinates
             )
         
@@ -1187,7 +1181,7 @@ class Game_Controller:
         # Calling sort method:
         self.__task_sort_hand(
             player_controller = player_controller,
-            sort_method = sort_method,
+            sort_method       = sort_method,
             reset_coordinates = reset_coordinates
             )
         
@@ -1392,7 +1386,7 @@ class Game_Controller:
             # Sorting:
             self.task_sort_hand(
                 player_controller = self.player_one,
-                reset_coordinates = True,
+                reset_coordinates = False,
                 )
 
         # Adding card to player or opponent:
@@ -1420,15 +1414,16 @@ class Game_Controller:
                 
                 # Automatically sorting, if enabled:
                 if self.session.enable_autosort:
-                    self.task_sort_hand_default(
-                        player_controller = player_controller,
-                        reset_coordinates = True    # <- DEBUG, remove when slide is finished
-                        )
+                    if player_controller == self.player_one:
+                        self.task_sort_hand_default(
+                            player_controller = player_controller,
+                            reset_coordinates = False
+                            )
+                
                 # Updating hand position without sorting:
-                else:
-                    player_controller.hand.update_hand_position(
-                        reset_coordinates = True        
-                        )
+                player_controller.hand.update_hand_position(
+                    reset_coordinates = False   # Debug        
+                    )
 
         # RESTART GAME:
         elif key_pressed == self.keyboard.KEY_DEBUG_RESTART_GAME:
@@ -1458,7 +1453,13 @@ class Game_Controller:
 
         # Nothing to do, yet.
         if key_pressed in self.keyboard.key_user_list:
-            ...
+            
+            # Sort command:
+            if key_pressed == self.keyboard.KEY_SORT:
+                self.task_sort_hand(
+                    player_controller = self.player_one,
+                    reset_coordinates = False,
+                    )
 
 
     def handle_mouse_click(self, click_coordinates: tuple[int, int]) -> None:
@@ -1504,12 +1505,23 @@ class Game_Controller:
                 ignore_assertion  = False,
                 )
             
+            # Updating zone:
+            self.update_zone_current(
+                zone_area      = zone_area_motion,
+                zone_selection = zone_selection_motion
+                )
+            
             # Handling motion in player one zone:
-            if zone_selection_motion == ZONE_PLAYER_ONE:
+            if zone_selection_motion in (ZONE_PLAYER_ONE, ZONE_PLAYER_TWO):
+
+                # Selecting player controller:
+                player_controller: Player_Controller = self.player_one
+                if zone_selection_motion == ZONE_PLAYER_TWO:
+                    player_controller: Player_Controller = self.player_two
                 
                 # Checking if cursor is hovering over a card:
                 card_hovered_list: list[Card_Object] = []
-                for card_object in self.player_one.hand.hand_container:
+                for card_object in player_controller.hand.hand_container:
                     card_hovered: bool = bool(
                         motion_coordinate_x in card_object.boundary_x_range and
                         motion_coordinate_y in card_object.boundary_y_range
@@ -1545,20 +1557,41 @@ class Game_Controller:
                             card_object = card_priority
                             )
 
-            # Handling motion in player two zone:
-            elif zone_selection_motion == ZONE_PLAYER_TWO:
-                ...
-
             # Handling motion in table zone:
             elif zone_selection_motion == ZONE_TABLE:
                 ...
 
+
+        # Handling mouse motion in side area:
+        elif zone_area_motion == ZONE_GAME_AREA_SIDE:
+            ...
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     FIND ZONE METHODS AND PROPERTIES BLOCK
 
     """
+
+
+    @cached_property
+    def zone_current_area(self) -> Zone_XYWH:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__zone_current_area
+    
+
+    @cached_property
+    def zone_current_section(self) -> Zone_XYWH:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__zone_current_selection
+
 
 
     @cached_property
@@ -1659,8 +1692,8 @@ class Game_Controller:
         # Finding zone object:
         zone_object_found: Zone_XYWH | None = self.__find_zone_by_coordinates(
             check_coordinates = check_coordinates,
-            zone_container = self.__zone_selection_list,
-            ignore_assertion = ignore_assertion,
+            zone_container    = self.__zone_selection_list,
+            ignore_assertion  = ignore_assertion,
             )
         
         # Returning:
@@ -1683,12 +1716,36 @@ class Game_Controller:
         # Finding zone object:
         zone_object_found: Zone_XYWH | None = self.__find_zone_by_coordinates(
             check_coordinates = check_coordinates,
-            zone_container = self.__zone_area_list,
-            ignore_assertion = ignore_assertion,
+            zone_container    = self.__zone_area_list,
+            ignore_assertion  = ignore_assertion,
             )
         
         # Returning:
         return zone_object_found
+    
+
+    def update_zone_current(self, zone_area: Zone_XYWH, zone_selection: Zone_XYWH) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Updating zone area:
+        if self.zone_current_area != zone_area:
+            self.__zone_current_area: Zone_XYWH = zone_area
+            cached_property: str = "zone_current_area"
+            clear_cached_property(
+                target_object    = self,
+                target_attribute = cached_property
+                )
+        
+        # Updating zone selection:
+        if self.zone_current_section != zone_selection:
+            self.__zone_current_selection: Zone_XYWH = zone_selection
+            cached_property: str = "zone_current_selection"
+            clear_cached_property(
+                target_object    = self,
+                target_attribute = cached_property
+                )
 
     
     """

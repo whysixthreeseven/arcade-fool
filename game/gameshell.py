@@ -157,7 +157,11 @@ class Gameshell(arcade.Window):
         """
 
         # Nothing to do, yet.
-        pass
+        for player_controller in self.game.player_list:
+            for card_object in player_controller.hand.hand_container:
+                card_object.slide(
+                    force_instant = False,
+                    )
 
 
     def on_draw(self):

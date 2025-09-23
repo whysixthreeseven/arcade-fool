@@ -19,8 +19,8 @@ KEYBOARD MAPPING CLASS OBJECT BLOCK
 class Keyboard_Mapping:
 
     # DEBUG Game logic key mapping:
-    KEY_DEBUG_DRAW_CARD_PLAYER:   int = arcade.key.NUM_1
-    KEY_DEBUG_DRAW_CARD_OPPONENT: int = arcade.key.NUM_2
+    KEY_DEBUG_DRAW_CARD_PLAYER:   int = arcade.key.KEY_1
+    KEY_DEBUG_DRAW_CARD_OPPONENT: int = arcade.key.KEY_2
     KEY_DEBUG_RESTART_GAME:       int = arcade.key.R
 
     # DEBUG Texture pack key mapping:
@@ -38,6 +38,7 @@ class Keyboard_Mapping:
     # Action key mapping:
     KEY_BACK:        int = arcade.key.ESCAPE    # <- Escape to menu, back to previous menu, exit game
     KEY_CONFIRM:     int = arcade.key.SPACE     # <- Confirm play, confirm prompt, selection
+    KEY_SORT:        int = arcade.key.S
 
     # Selection key mapping:
     KEY_ARROW_LEFT:  int = arcade.key.LEFT

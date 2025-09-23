@@ -83,7 +83,7 @@ class Session_Controller:
     sort_method:         str = HAND_SORT_METHOD_BY_VALUE_DEFAULT
 
     # Enable flags:
-    enable_autosort:            bool = True
+    enable_autosort:            bool = False
     enable_hint_hand_value:     bool = True
     enable_hint_discard_value:  bool = True
     enable_hint_slide_playable: bool = False

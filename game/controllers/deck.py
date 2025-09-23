@@ -352,6 +352,16 @@ class Deck_Controller:
                     card_object.set_state_trump(
                         set_value = True
                         )
+                    
+                # Setting card coordinates current:
+                coordinates_current: tuple[int, int] = (
+                    DECK_RENDER_COORDINATE_X,
+                    DECK_RENDER_COORDINATE_Y
+                    )
+                card_object.set_coordinates_current(
+                    set_container = coordinates_current,
+                    ignore_assertion = True
+                    )
         
         # Clearing cache (deck):
         clear_cached_property_list(
