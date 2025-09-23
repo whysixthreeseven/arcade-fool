@@ -86,6 +86,7 @@ from game.settings import (
     CARD_SLIDE_SPEED_DEFAULT,
     CARD_SLIDE_SPEED_THROTTLE,
     CARD_SLIDE_SPEED_MODIFIER_DEFAULT,
+    CARD_SLIDE_SPEED_MODIFIER_SLOW,
     CARD_SLIDE_SPEED_MODIFIER_FAST,
 
     # Table positions and stack index:
@@ -3087,22 +3088,25 @@ class Card_Object:
         :param bool force_instant: ...
         """
 
-        # Sliding card to it's new position:
+        # First slide logic:
         if not self.state_arrived:
             self.__slide_to_default(
                 speed_modifier = CARD_SLIDE_SPEED_MODIFIER_FAST,
                 force_instant = force_instant,
                 )
-
-        # Sliding card in place:
-        if self.state_hovered:
-            self.__slide_to_expected(
-                speed_modifier = CARD_SLIDE_SPEED_MODIFIER_DEFAULT,
-                force_instant = force_instant
-                )
+        
+        # Default logic:
         else:
-            self.__slide_to_default(
-                speed_modifier = CARD_SLIDE_SPEED_MODIFIER_DEFAULT,
-                force_instant = force_instant,
-                )
+
+            # Sliding card in place:
+            if self.state_hovered:
+                self.__slide_to_expected(
+                    speed_modifier = CARD_SLIDE_SPEED_MODIFIER_DEFAULT,
+                    force_instant = force_instant
+                    )
+            else:
+                self.__slide_to_default(
+                    speed_modifier = CARD_SLIDE_SPEED_MODIFIER_SLOW,
+                    force_instant = force_instant,
+                    )
 
