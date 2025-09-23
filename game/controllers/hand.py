@@ -429,11 +429,7 @@ class Hand_Controller:
                 position_index = position_hand_index
                 )
             
-            # Revealing the card:
-            card_object.set_state_revealed(
-                set_value = True,
-                )
-            
+            # Removing showcase, if applicable:
             if card_object.state_showcase:
                 card_object.set_state_showcase(
                     set_value = False,

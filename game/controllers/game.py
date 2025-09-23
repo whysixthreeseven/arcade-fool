@@ -290,14 +290,56 @@ class Game_Controller:
                 player_controller.reset_hand()
         else:
             self.__create_player_controllers()
+
+        # Fill check (no five or six cards per player of the same suit):
+        check_completed: bool = False
+        while not check_completed:
         
-        # Filling hands for players:
-        for player_controller in self.player_list:
-            self.event_fill_hand(
-                player_controller = player_controller
-                )
+            # Filling hands for players:
+            for player_controller in self.player_list:
+
+                # Resetting flags:
+                filled_correctly: bool = False
+                check_completed: bool = False
+
+                # Filling player controller's hand:
+                self.event_fill_hand(
+                    player_controller = player_controller
+                    )
             
-            # Updating hand positions and sorting:
+                # Checking filled hand:
+                card_suit_index: dict[str, int] = {
+                    card_suit: 0 for card_suit 
+                    in Card_Object.CARD_SUIT_LIST
+                    }
+                for card_object in player_controller.hand.hand_container:
+                    card_suit_index[card_object.suit] += 1
+                    if card_suit_index[card_object.suit] >= 5:
+                        filled_correctly: bool = False
+                        break
+
+                # Setting filled correctly flag:
+                else:
+                    filled_correctly: bool = True
+
+                if not filled_correctly:
+                    break
+
+            # Completing fill logic:
+            if filled_correctly:
+                check_completed: bool = True
+                break
+
+            # Resetting hands and deck, and starting fill again within the loop:
+            else:
+                for player_controller in self.player_list:
+                    player_controller.reset_hand()
+                self.__reset_deck(
+                    clear_cache = True
+                    )
+                
+        # Updating hand positions and sorting:
+        for player_controller in self.player_list:
             player_controller.hand.sort_hand(
                 sort_method = self.session.sort_method_default,
                 reset_coordinates = True
@@ -1502,8 +1544,6 @@ class Game_Controller:
                         self.task_hover_card(
                             card_object = card_priority
                             )
-                # Debug:
-                print(self.card_hovered)
 
             # Handling motion in player two zone:
             elif zone_selection_motion == ZONE_PLAYER_TWO:
@@ -1675,6 +1715,12 @@ class Game_Controller:
         # Drawing, if deck has cards to draw:
         if self.deck.deck_count > 0:
             card_object: Card_Object = self.deck.draw_card()
+
+            # Revealing the card:
+            if player_controller.player_type == PLAYER_TYPE_PLAYER:
+                card_object.set_state_revealed(
+                    set_value = True,
+                    )
 
             # Adding card to player controller:
             player_controller.hand.add_card(
