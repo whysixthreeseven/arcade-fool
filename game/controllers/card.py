@@ -2638,12 +2638,20 @@ class Card_Object:
         TODO: Create a docstring.
         """
 
-        # Calculating boundary coordinate:
-        boundary_coordinate: int = int(
-            self.coordinate_x_current -
-            self.render_width_value / 2
-            )
-        
+        # Calculating boundary coordinate (showcase):
+        if self.state_showcase:
+            boundary_coordinate: int = int(
+                self.coordinate_x_current -
+                self.render_height_value / 2
+                )
+
+        # Calculating boundary coordinate (default):
+        else:
+            boundary_coordinate: int = int(
+                self.coordinate_x_current -
+                self.render_width_value / 2
+                )
+            
         # Returning:
         return boundary_coordinate
     
@@ -2654,11 +2662,19 @@ class Card_Object:
         TODO: Create a docstring.
         """
 
-        # Calculating boundary coordinate:
-        boundary_coordinate: int = int(
-            self.coordinate_x_current +
-            self.render_width_value / 2
-            )
+        # Calculating boundary coordinate (showcase):
+        if self.state_showcase:
+            boundary_coordinate: int = int(
+                self.coordinate_x_current +
+                self.render_height_value / 2
+                )
+
+        # Calculating boundary coordinate (default):
+        else:
+            boundary_coordinate: int = int(
+                self.coordinate_x_current +
+                self.render_width_value / 2
+                )
         
         # Returning:
         return boundary_coordinate
@@ -2670,23 +2686,33 @@ class Card_Object:
         TODO: Create a docstring.
         """
 
-        # Generating player's boundary:
-        if self.coordinate_y_default < ZONE_TABLE_COORDINATE_Y:
-            coordinate_y_center: int = self.coordinate_y_current
-            if self.location == CARD_LOCATION_HAND and self.state_hovered:
-                coordinate_y_center: int = self.coordinate_y_default
+        # Calculating boundary coordinate (showcase):
+        if self.state_showcase:
+            boundary_coordinate: int = int(
+                self.coordinate_y_current - 
+                self.render_width_value / 2
+                )
 
-        # Generating opponent's boundary:
+        # Calculating boundary coordinate (default):
         else:
-            coordinate_y_center: int = self.coordinate_y_current
-            if self.location == CARD_LOCATION_HAND and self.state_hovered:
-                coordinate_y_center: int = self.coordinate_y_slide
 
-        # Calculating boundary coordinate:
-        boundary_coordinate: int = int(
-            coordinate_y_center - 
-            self.render_height_value / 2
-            )
+            # Generating player's boundary:
+            if self.coordinate_y_default < ZONE_TABLE_COORDINATE_Y:
+                coordinate_y_center: int = self.coordinate_y_current
+                if self.location == CARD_LOCATION_HAND and self.state_hovered:
+                    coordinate_y_center: int = self.coordinate_y_default
+
+            # Generating opponent's boundary:
+            else:
+                coordinate_y_center: int = self.coordinate_y_current
+                if self.location == CARD_LOCATION_HAND and self.state_hovered:
+                    coordinate_y_center: int = self.coordinate_y_slide
+
+            # Calculating boundary coordinate:
+            boundary_coordinate: int = int(
+                coordinate_y_center - 
+                self.render_height_value / 2
+                )
         
         # Returning:
         return boundary_coordinate
@@ -2698,23 +2724,33 @@ class Card_Object:
         TODO: Create a docstring.
         """
 
-        # Generating player's boundary:
-        if self.coordinate_y_default < ZONE_TABLE_COORDINATE_Y:
-            coordinate_y_center: int = self.coordinate_y_current
-            if self.location == CARD_LOCATION_HAND and self.state_hovered:
-                coordinate_y_center: int = self.coordinate_y_slide
-        
-        # Generating opponent's boundary:
-        else:
-            coordinate_y_center: int = self.coordinate_y_current
-            if self.location == CARD_LOCATION_HAND and self.state_hovered:
-                coordinate_y_center: int = self.coordinate_y_default
+        # Calculating boundary coordinate (showcase):
+        if self.state_showcase:
+            boundary_coordinate: int = int(
+                self.coordinate_y_current +
+                self.render_width_value / 2
+                )
 
-        # Calculating boundary coordinate:
-        boundary_coordinate: int = int(
-            coordinate_y_center +
-            self.render_height_value / 2
-            )
+        # Calculating boundary coordinate (default):
+        else:
+
+            # Generating player's boundary:
+            if self.coordinate_y_default < ZONE_TABLE_COORDINATE_Y:
+                coordinate_y_center: int = self.coordinate_y_current
+                if self.location == CARD_LOCATION_HAND and self.state_hovered:
+                    coordinate_y_center: int = self.coordinate_y_slide
+            
+            # Generating opponent's boundary:
+            else:
+                coordinate_y_center: int = self.coordinate_y_current
+                if self.location == CARD_LOCATION_HAND and self.state_hovered:
+                    coordinate_y_center: int = self.coordinate_y_default
+
+            # Calculating boundary coordinate:
+            boundary_coordinate: int = int(
+                coordinate_y_center +
+                self.render_height_value / 2
+                )
         
         # Returning:
         return boundary_coordinate
@@ -2859,20 +2895,6 @@ class Card_Object:
         elif self.location == CARD_LOCATION_DECK:
             if self.state_showcase:
                 render_angle_selected: int = DECK_RENDER_ANGLE_SHOWCASE
-
-                # TODO: Consider to implement
-                
-                # render_angle_add: int = random.randint(
-                #     a = DECK_RENDER_ANGLE_ADD_MIN,
-                #     b = DECK_RENDER_ANGLE_ADD_MAX,
-                #     )
-                # render_angle_axis: int = random.choice(CARD_RENDER_ANGLE_AXIS_LIST)
-                # render_angle_selected: int = int(
-                #     DECK_RENDER_ANGLE_SHOWCASE + 
-                #     render_angle_add * render_angle_axis
-                #     )
-
-            # Flipping card over for opponent's hand:
             else:
                 render_angle_selected: int = CARD_RENDER_ANGLE_DEFAULT
 

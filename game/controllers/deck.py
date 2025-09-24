@@ -20,6 +20,7 @@ from game.settings import (
 
     # Card texture settings:
     CARD_TEXTURE_HEIGHT_SCALED,
+    CARD_TEXTURE_WIDTH_SCALED
     )
 
 # Variables import:
@@ -61,6 +62,7 @@ class Deck_Controller:
 
         # Additional attributes:
         self.__deck_trump: str = None
+        self.__deck_showcase_card: Card_Object | None = None
         self.__deck_shift: int = DECK_RENDER_SHIFT_THRESHOLD_DEFAULT
 
     
@@ -259,6 +261,16 @@ class Deck_Controller:
         
         # Returning:
         return deck_trump_repr
+    
+
+    @cached_property
+    def deck_showcase_card(self) -> Card_Object | None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Returning:
+        return self.__deck_showcase_card
 
 
     def create_deck(self, 
@@ -452,10 +464,14 @@ class Deck_Controller:
             init_type = card_trump.type_f
             )
         # Calculating coordinates:
-        card_coordinate_x: int = int(DECK_RENDER_COORDINATE_X - CARD_TEXTURE_HEIGHT_SCALED / 3)
+        card_coordinate_x: int = int(DECK_RENDER_COORDINATE_X - CARD_TEXTURE_HEIGHT_SCALED / 4)
         card_coordinate_y: int = DECK_RENDER_COORDINATE_Y
         card_coordinates: tuple[int, int] = (
             card_coordinate_x,
+            card_coordinate_y
+            )
+        card_coordinates_slide: tuple[int, int] = (
+            card_coordinate_x - CARD_TEXTURE_HEIGHT_SCALED / 5,
             card_coordinate_y
             )
         
@@ -467,6 +483,10 @@ class Deck_Controller:
         card_render_trump.set_coordinates_current(
             set_container = card_coordinates,
             ignore_assertion = True
+            )
+        card_render_trump.set_coordinates_slide(
+            set_container = card_coordinates_slide,
+            ignore_assertion = True,
             )
         
         # Updating showcase trump card's attributes:
@@ -488,9 +508,17 @@ class Deck_Controller:
         
         # Updating attribute:
         self.__deck_render: list[Card_Object] = deck_render
+        self.__deck_showcase_card: Card_Object | None = card_render_trump
         
-        # Clearing cache:
+        # Clearing cache (render deck):
         cached_property: str = "deck_render"
+        clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+        # Clearing cache (showcase card):
+        cached_property: str = "deck_showcase_card"
         clear_cached_property(
             target_object = self,
             target_attribute = cached_property
@@ -541,6 +569,38 @@ class Deck_Controller:
             target_object = self,
             target_attribute_list = self.__cached_deck_property_list
             )
+        
+        # Resetting last card's (showcase card) position:
+        if self.deck_count == 1 and self.deck_showcase_card is not None:
+
+            # Generating default coordinates:
+            card_coordinate_x: int = int(DECK_RENDER_COORDINATE_X - CARD_TEXTURE_WIDTH_SCALED / 5)
+            card_coordinate_y: int = DECK_RENDER_COORDINATE_Y
+            coordinates_default: tuple[int, int] = (
+                card_coordinate_x,
+                card_coordinate_y,
+                )
+            
+            # Updating showcase trump card's coordinates:
+            self.deck_showcase_card.set_coordinates_default(
+                set_container = coordinates_default,
+                ignore_assertion = True,
+                )
+            self.deck_showcase_card.set_coordinates_current(
+                set_container = coordinates_default,
+                ignore_assertion = True
+                )
+        
+        # Checking if there are any cards remaining:
+        if self.deck_count == 0:
+            self.__deck_showcase_card: Card_Object | None = None
+
+            # Clearing cache (property):
+            cached_property: str = "deck_showcase_card"
+            clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
         
         # Returning:
         return card_object
@@ -607,7 +667,7 @@ class Deck_Controller:
                     target_object = self,
                     target_attribute_list = self.__cached_deck_property_list
                     )
-
+                
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

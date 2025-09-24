@@ -34,11 +34,11 @@ from game.collections.zone import (
     Zone_XYWH,
 
     # Debugging zones:
-    ZONE_GAME_AREA_PLAY,
-    ZONE_GAME_AREA_SIDE,
     ZONE_PLAYER_ONE,
     ZONE_PLAYER_TWO,
     ZONE_TABLE,
+    ZONE_DECK,
+    ZONE_DISCARD,
     )
 
 # Collections import:
@@ -89,11 +89,11 @@ class Gameshell(arcade.Window):
 
 
         self.__zones: tuple[Zone_XYWH, ...] = (
-            ZONE_GAME_AREA_PLAY,
-            ZONE_GAME_AREA_SIDE,
             ZONE_PLAYER_ONE,
             ZONE_PLAYER_TWO,
             ZONE_TABLE,
+            ZONE_DECK,
+            ZONE_DISCARD,
             )
         
     
@@ -162,6 +162,10 @@ class Gameshell(arcade.Window):
                 card_object.slide(
                     force_instant = False,
                     )
+        if self.game.deck.deck_showcase_card is not None:
+            self.game.deck.deck_showcase_card.slide(
+                force_instant = False,
+                )
 
 
     def on_draw(self):

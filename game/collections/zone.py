@@ -267,3 +267,24 @@ ZONE_INDICATOR_PLAYER_TWO: Zone_XYWH = Zone_XYWH(
     height       = ZONE_INDICATOR_PLAYER_TWO_HEIGHT,
     color        = ZONE_INDICATOR_PLAYER_TWO_COLOR,
     )
+
+
+ZONE_DECK: Zone_XYWH = Zone_XYWH(
+    name         = "Deck zone",
+    coordinate_x = ZONE_DECK_COORDINATE_X,
+    coordinate_y = ZONE_DECK_COORDINATE_Y,
+    width        = ZONE_DECK_WIDTH,
+    height       = ZONE_DECK_HEIGHT,
+    color        = ZONE_DECK_BG_COLOR
+    )
+
+
+ZONE_DISCARD: Zone_XYWH = Zone_XYWH(
+    name         = "Discard zone",
+    coordinate_x = ZONE_DISCARD_COORDINATE_X,
+    coordinate_y = ZONE_DISCARD_COORDINATE_Y,
+    width        = ZONE_DISCARD_WIDTH,
+    height       = ZONE_DISCARD_HEIGHT,
+    color        = ZONE_DISCARD_BG_COLOR
+    )
+
