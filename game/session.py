@@ -84,6 +84,7 @@ class Session_Controller:
 
     # Enable flags:
     enable_autosort:            bool = False
+    enable_force_slide:         bool = False
     enable_hint_hand_value:     bool = True
     enable_hint_discard_value:  bool = True
     enable_hint_slide_playable: bool = False

@@ -110,7 +110,7 @@ class Game_Controller:
 
         # Zone current:
         self.__zone_current_area:      Zone_XYWH | None = None
-        self.__zone_current_selection: Zone_XYWH | None = None
+        self.__zone_current_section: Zone_XYWH | None = None
 
 
     """
@@ -1439,6 +1439,31 @@ class Game_Controller:
     """
 
 
+    def handle_slide(self) -> None:
+        """
+        TODO: Create a docstring.
+
+        :param bool force_instant: ...
+        """
+
+        # Checking if slide is forced:
+        force_instant: bool = self.session.enable_force_slide
+
+        # Handling slide in players' hand containers:
+        for player_controller in self.player_list:
+            for card_object in player_controller.hand.hand_container:
+                card_object.slide(
+                    force_instant = force_instant
+                    )
+                
+        # Handling slide in deck (showcase card):
+        card_showcase: Card_Object | None = self.deck.deck_showcase_card
+        if card_showcase is not None:
+            card_showcase.slide(
+                force_instant = force_instant
+                )
+
+
     def handle_key_pressed(self, key_pressed: int, ignore_assertion: bool = False) -> None:
         """
         TODO: Create a docstring.
@@ -1510,7 +1535,7 @@ class Game_Controller:
             # Updating zone:
             self.update_zone_current(
                 zone_area = zone_area_motion,
-                zone_selection = zone_selection_motion
+                zone_section = zone_selection_motion
                 )
             
             # Handling motion in player one zone:
@@ -1575,7 +1600,7 @@ class Game_Controller:
             # Updating zone:
             self.update_zone_current(
                 zone_area = zone_area_motion,
-                zone_selection = zone_selection_motion
+                zone_section = zone_selection_motion
                 )
             
             # Handling motion in deck zone:
@@ -1615,7 +1640,7 @@ class Game_Controller:
 
 
     @cached_property
-    def zone_current_area(self) -> Zone_XYWH:
+    def zone_current_area(self) -> Zone_XYWH | None:
         """
         TODO: Create a docstring.
         """
@@ -1625,14 +1650,13 @@ class Game_Controller:
     
 
     @cached_property
-    def zone_current_section(self) -> Zone_XYWH:
+    def zone_current_section(self) -> Zone_XYWH | None:
         """
         TODO: Create a docstring.
         """
 
         # Returning:
-        return self.__zone_current_selection
-
+        return self.__zone_current_section
 
 
     @cached_property
@@ -1767,7 +1791,7 @@ class Game_Controller:
         return zone_object_found
     
 
-    def update_zone_current(self, zone_area: Zone_XYWH, zone_selection: Zone_XYWH) -> None:
+    def update_zone_current(self, zone_area: Zone_XYWH, zone_section: Zone_XYWH) -> None:
         """
         TODO: Create a docstring.
         """
@@ -1782,9 +1806,9 @@ class Game_Controller:
                 )
         
         # Updating zone selection:
-        if self.zone_current_section != zone_selection:
-            self.__zone_current_selection: Zone_XYWH = zone_selection
-            cached_property: str = "zone_current_selection"
+        if self.zone_current_section != zone_section:
+            self.__zone_current_section: Zone_XYWH = zone_section
+            cached_property: str = "zone_current_section"
             clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property

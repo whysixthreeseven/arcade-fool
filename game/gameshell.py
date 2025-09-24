@@ -157,15 +157,7 @@ class Gameshell(arcade.Window):
         """
 
         # Nothing to do, yet.
-        for player_controller in self.game.player_list:
-            for card_object in player_controller.hand.hand_container:
-                card_object.slide(
-                    force_instant = False,
-                    )
-        if self.game.deck.deck_showcase_card is not None:
-            self.game.deck.deck_showcase_card.slide(
-                force_instant = False,
-                )
+        self.game.handle_slide()
 
 
     def on_draw(self):
