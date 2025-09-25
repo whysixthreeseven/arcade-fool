@@ -13,4 +13,4 @@ To use debug commands, `game.session.SESSION_ENABLE_DEBUG` global session variab
 ## Game window
 Game window right now is not resizable and windowed. It is not planned to implement viewpoint and scaling. 
 Preview, running default game (36 cards), with zones rendering enabled.
-<img width="1202" height="632" alt="image" src="https://github.com/user-attachments/assets/c6f42e7c-a81a-4f26-8f7b-98f8e5b8502f" />
+![all slide (1)](https://github.com/user-attachments/assets/9c8c7a2e-ed37-4a3d-b57a-5f79d2899a57)
