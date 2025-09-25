@@ -979,6 +979,13 @@ class Card_Object:
                 target_object = self,
                 target_attribute = cached_property
                 )
+            
+            # Clearing cache (render):
+            cached_property: str = "render_angle_value"
+            clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
     
 
     def set_state_hovered(self, set_value: bool, ignore_assertion: bool = False) -> None:

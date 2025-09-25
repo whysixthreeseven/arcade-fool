@@ -109,7 +109,7 @@ class Game_Controller:
         self.__card_hovered:  Card_Object | None = None
 
         # Zone current:
-        self.__zone_current_area:      Zone_XYWH | None = None
+        self.__zone_current_area:    Zone_XYWH | None = None
         self.__zone_current_section: Zone_XYWH | None = None
 
 
@@ -1494,8 +1494,34 @@ class Game_Controller:
         TODO: Create a docstring.
         """
 
-        # Nothing to do, yet.
-        pass
+        # Selection handling:
+        if self.zone_current_section == ZONE_PLAYER_ONE:
+
+            if self.card_hovered is not None:
+
+                # Unpacking coordinates and checking if hovered card was clicked:
+                click_coordinate_x, click_coordinate_y = click_coordinates
+                card_clicked: bool = bool(
+                    click_coordinate_x in self.card_hovered.boundary_x_range and
+                    click_coordinate_y in self.card_hovered.boundary_y_range
+                    )
+                if card_clicked:
+
+                    # Selecting card (first click):
+                    if self.card_selected != self.card_hovered:
+                        self.task_deselect_card()
+                        self.task_select_card(
+                            card_object = self.card_hovered
+                            )
+                    
+                    # Playing card (second click):
+                    else:
+                        self.task_deselect_card()       # <- Not implemented, yet. Deselecting!
+
+                # Card was not clicked:
+                else:
+                    if self.card_selected is not None:
+                        self.task_deselect_card()
 
 
     def handle_mouse_release(self, click_coordinates: tuple[int, int]) -> None:
@@ -1553,6 +1579,8 @@ class Game_Controller:
                         motion_coordinate_x in card_object.boundary_x_range and
                         motion_coordinate_y in card_object.boundary_y_range
                         )
+
+                    # Adding card hovered to preliminary check list:
                     if card_hovered:
                         card_hovered_list.append(
                             card_object
@@ -1565,6 +1593,8 @@ class Game_Controller:
                 if card_hovered_list_size == 0:
                     if self.card_hovered is not None:
                         self.task_dehover_card()
+                    if self.card_selected is not None:
+                        self.task_deselect_card()
 
                 # Finding hover priority:
                 else:
@@ -1580,6 +1610,7 @@ class Game_Controller:
                     if self.card_hovered is not card_priority:
                         if card_hovered is not None:
                             self.task_dehover_card()
+                            self.task_deselect_card()
                         self.task_hover_card(
                             card_object = card_priority
                             )
