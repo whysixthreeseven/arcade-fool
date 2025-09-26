@@ -1064,7 +1064,7 @@ class Game_Controller:
 
     
     @property
-    def __card_container_list(self) -> tuple[list[Card_Object]] | None:
+    def __card_container_list(self) -> tuple[list[Card_Object], ...] | None:
         """
         TODO: Create a docstring.
         """
@@ -1072,7 +1072,7 @@ class Game_Controller:
         # Collecting containers:
         card_container_list: tuple | None = None
         if self.game_ready:
-            card_container_list: tuple[list[Card_Object]] = (
+            card_container_list: tuple[list[Card_Object], ...] = (
                 self.player_one.hand.hand_container,
                 self.player_two.hand.hand_container,
                 self.deck.deck_container,
@@ -1095,11 +1095,6 @@ class Game_Controller:
             
         # Updating card objects in all containers:
         for card_container in self.__card_container_list:
-            for card_object in card_container:
-                card_object.update_texture(
-                    texture_pack_front = texture_pack_front,
-                    texture_pack_back = texture_pack_back,
-                    )
                 
             # Manually updating render (fake) container:
             if card_container == self.deck.deck_container:
@@ -1108,6 +1103,14 @@ class Game_Controller:
                     texture_pack_back = texture_pack_back,
                     ignore_assertion = True
                     )
+                
+            # Updating other containers:
+            else:
+                for card_object in card_container:
+                    card_object.update_texture(
+                        texture_pack_front = texture_pack_front,
+                        texture_pack_back = texture_pack_back,
+                        )
                 
     
     """

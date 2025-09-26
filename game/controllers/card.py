@@ -2826,7 +2826,8 @@ class Card_Object:
         force_front: bool = bool(
             self.location == CARD_LOCATION_HAND and self.state_revealed or
             self.location == CARD_LOCATION_DECK and self.state_showcase or
-            self.location == CARD_LOCATION_DISCARD
+            self.location == CARD_LOCATION_DISCARD or
+            self.location == CARD_LOCATION_TABLE
             )
         if force_front:
             texture_object: Texture = self.texture_front_object
