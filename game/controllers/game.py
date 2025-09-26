@@ -41,6 +41,8 @@ from game.variables import (
     PLAYER_TWO_NAME_DEFAULT,
     PLAYER_TYPE_PLAYER,
     PLAYER_TYPE_COMPUTER,
+    PLAYER_STATE_FOCUS_ATTACKING,
+    PLAYER_STATE_FOCUS_DEFENDING,
 
     # Texture-related variables:
     TEXTURE_PACK_MODE_LIGHT,
@@ -64,6 +66,10 @@ from game.settings import (
 
     # Hand size default:
     HAND_CARD_COUNT_DEFAULT,
+
+    # Table settings:
+    TABLE_STACK_BOTTOM_INDEX,
+    TABLE_STACK_TOP_INDEX,
     )
 
 # Session global variables import:
@@ -302,6 +308,10 @@ class Game_Controller:
             
         # Getting player priority (who plays first):
         self.__update_player_priority()
+        self.player_active.hand.update_hand_state(
+            player_focus_state = PLAYER_STATE_FOCUS_ATTACKING,
+            table_map = self.table.table_map
+            )
 
         # Clearing cache (player):
         clear_cached_property_list(
@@ -408,7 +418,7 @@ class Game_Controller:
                 check_completed: bool = False
 
                 # Filling player controller's hand:
-                self.event_fill_hand(
+                self.task_fill_hand(
                     player_controller = player_controller
                     )
             
@@ -613,8 +623,9 @@ class Game_Controller:
         TODO: Create a docstring.
         """
 
-        # Creating discard controller:
+        # Creating table controller:
         table_controller: Table_Controller = Table_Controller()
+        table_controller.create_table()
         
         # Updating attribute:
         self.__table_controller: Table_Controller = table_controller
@@ -976,6 +987,12 @@ class Game_Controller:
             set_value = True,
             )
         
+        # Clearing cache (player):
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_player_property_list
+            )
+        
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1334,7 +1351,113 @@ class Game_Controller:
                 target_object = self,
                 target_attribute = cached_property
                 )
+            
     
+    def task_play_card(self, 
+                        card_object: Card_Object, 
+                        player_controller: Player_Controller,
+                        position_index: int,
+                        stack_index: int
+                        ) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Removing card from player controller:
+        player_controller.hand.remove_card(
+            card_object = card_object
+            )
+
+        # Attacking with the card:
+        if self.player_active.state_attacking:
+
+            # DEBUG:
+            self.table.add_card(
+                card_object = card_object,
+                position_index = position_index,
+                stack_index = stack_index,
+                reset_coordinates = self.session.enable_force_slide,
+                ignore_assertion = SESSION_ENABLE_ASSERTION
+                )
+            
+        # Updating player controller's hand:
+        player_controller.hand.update_hand_position()
+        player_controller.hand.update_hand_state(
+            player_focus_state = player_controller.state_focus,
+            table_map = self.table.table_map
+            )
+            
+
+
+    def task_draw_card(self, player_controller: Player_Controller) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Drawing, if deck has cards to draw:
+        if self.deck.deck_count > 0:
+            card_object: Card_Object = self.deck.draw_card()
+
+            # Revealing the card:
+            if player_controller.player_type == PLAYER_TYPE_PLAYER:
+                card_object.set_state_revealed(
+                    set_value = True,
+                    )
+
+            # Adding card to player controller:
+            player_controller.hand.add_card(
+                card_object = card_object,
+                clear_cache = True
+                )
+            
+    
+    def task_fill_hand(self, player_controller: Player_Controller) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Adding card to the hand container:
+        while player_controller.hand.hand_count < HAND_CARD_COUNT_DEFAULT:
+
+            # Exiting, if no more cards available:
+            if self.deck.deck_count == 0:
+                break
+
+            # Drawing cards:
+            else:
+                self.task_draw_card(
+                    player_controller = player_controller,
+                    )
+    
+
+    def task_update_hand(self, 
+                          player_controller: Player_Controller, 
+                          update_position: bool = True,
+                          update_state: bool = True,
+                          table_map: Optional[dict] = None,
+                          ) -> None:
+        """
+        TODO: Create a docstring.
+
+        :param Player_Controller player_controller: ...
+        :param bool update_position: ...
+        :param bool update_state: ...
+        :param dict table_map: ...
+        """
+
+        # Updating hand positions based on count of cards:
+        if update_position:
+            player_controller.hand.update_hand_position(
+                reset_coordinates = self.session.enable_force_slide
+                )
+            
+        # Updating hand state (playable) based on table map:
+        if update_state and table_map is not None:
+            player_controller.hand.update_hand_state(
+                player_focus_state = player_controller.state_focus,
+                table_map = table_map
+                )
+            
 
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1410,7 +1533,7 @@ class Game_Controller:
                     raise NotImplemented(error_message)
 
                 # Drawing card for selected controller:
-                self.event_draw_card(
+                self.task_draw_card(
                     player_controller = player_controller
                     )
                 
@@ -1421,10 +1544,13 @@ class Game_Controller:
                             player_controller = player_controller,
                             reset_coordinates = False
                             )
-                
+
                 # Updating hand position without sorting:
-                player_controller.hand.update_hand_position(
-                    reset_coordinates = False   # Debug        
+                self.task_update_hand(
+                    player_controller = player_controller,
+                    update_position = True,
+                    update_state = True,
+                    table_map = self.table.table_map
                     )
 
         # RESTART GAME:
@@ -1460,6 +1586,12 @@ class Game_Controller:
         card_showcase: Card_Object | None = self.deck.deck_showcase_card
         if card_showcase is not None:
             card_showcase.slide(
+                force_instant = force_instant
+                )
+        
+        # Handling slide in table:
+        for card_object in self.table.table_container:
+            card_object.slide(
                 force_instant = force_instant
                 )
 
@@ -1517,6 +1649,12 @@ class Game_Controller:
                     # Playing card (second click):
                     else:
                         self.task_deselect_card()       # <- Not implemented, yet. Deselecting!
+                        self.task_play_card(
+                            card_object = self.card_hovered, 
+                            player_controller = self.player_one,
+                            position_index = self.table.find_empty_position(), 
+                            stack_index = 0
+                            )
 
                 # Card was not clicked:
                 else:
@@ -1571,49 +1709,52 @@ class Game_Controller:
                 player_controller: Player_Controller = self.player_one
                 if zone_selection_motion == ZONE_PLAYER_TWO:
                     player_controller: Player_Controller = self.player_two
-                
-                # Checking if cursor is hovering over a card:
-                card_hovered_list: list[Card_Object] = []
-                for card_object in player_controller.hand.hand_container:
-                    card_hovered: bool = bool(
-                        motion_coordinate_x in card_object.boundary_x_range and
-                        motion_coordinate_y in card_object.boundary_y_range
-                        )
 
-                    # Adding card hovered to preliminary check list:
-                    if card_hovered:
-                        card_hovered_list.append(
-                            card_object
+                # Asserting there are playable cards:
+                if player_controller.hand.hand_playable_count > 0:
+                
+                    # Checking if cursor is hovering over a card:
+                    card_hovered_list: list[Card_Object] = []
+                    for card_object in player_controller.hand.hand_playable:
+                        card_hovered: bool = bool(
+                            motion_coordinate_x in card_object.boundary_x_range and
+                            motion_coordinate_y in card_object.boundary_y_range
                             )
-                
-                # Checking list size:
-                card_hovered_list_size: int = len(card_hovered_list)
 
-                # Dehovering, if empty list:
-                if card_hovered_list_size == 0:
-                    if self.card_hovered is not None:
-                        self.task_dehover_card()
-                    if self.card_selected is not None:
-                        self.task_deselect_card()
+                        # Adding card hovered to preliminary check list:
+                        if card_hovered:
+                            card_hovered_list.append(
+                                card_object
+                                )
+                    
+                    # Checking list size:
+                    card_hovered_list_size: int = len(card_hovered_list)
 
-                # Finding hover priority:
-                else:
-
-                    # Finding priority card:
-                    card_priority: Card_Object = self.__task_get_card_priority(
-                        check_coordinates = motion_coordinates,
-                        card_list = card_hovered_list,
-                        ignore_assertion = False,
-                        )
-
-                    # Handling hover and dehover logic:
-                    if self.card_hovered is not card_priority:
-                        if card_hovered is not None:
+                    # Dehovering, if empty list:
+                    if card_hovered_list_size == 0:
+                        if self.card_hovered is not None:
                             self.task_dehover_card()
+                        if self.card_selected is not None:
                             self.task_deselect_card()
-                        self.task_hover_card(
-                            card_object = card_priority
+
+                    # Finding hover priority:
+                    else:
+
+                        # Finding priority card:
+                        card_priority: Card_Object = self.__task_get_card_priority(
+                            check_coordinates = motion_coordinates,
+                            card_list = card_hovered_list,
+                            ignore_assertion = False,
                             )
+
+                        # Handling hover and dehover logic:
+                        if self.card_hovered is not card_priority:
+                            if card_hovered is not None:
+                                self.task_dehover_card()
+                                self.task_deselect_card()
+                            self.task_hover_card(
+                                card_object = card_priority
+                                )
 
             # Handling motion in table zone:
             elif zone_selection_motion == ZONE_TABLE:
@@ -1844,64 +1985,3 @@ class Game_Controller:
                 target_object = self,
                 target_attribute = cached_property
                 )
-
-    
-    """
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    EVENT METHODS BLOCK
-
-    """
-
-
-    def event_click_card(self, card_object: Card_Object) -> None:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Nothing to do, yet.
-        pass
-
-
-    def event_draw_card(self, player_controller: Player_Controller) -> None:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Drawing, if deck has cards to draw:
-        if self.deck.deck_count > 0:
-            card_object: Card_Object = self.deck.draw_card()
-
-            # Revealing the card:
-            if player_controller.player_type == PLAYER_TYPE_PLAYER:
-                card_object.set_state_revealed(
-                    set_value = True,
-                    )
-
-            # Adding card to player controller:
-            player_controller.hand.add_card(
-                card_object = card_object,
-                clear_cache = True
-                )
-            
-    
-    def event_fill_hand(self, player_controller: Player_Controller) -> None:
-        """
-        TODO: Create a docstring.
-        """
-
-        # Adding card to the hand container:
-        while player_controller.hand.hand_count < HAND_CARD_COUNT_DEFAULT:
-
-            # Exiting, if no more cards available:
-            if self.deck.deck_count == 0:
-                break
-
-            # Drawing cards:
-            else:
-                self.event_draw_card(
-                    player_controller = player_controller,
-                    )
-
-
-
-    

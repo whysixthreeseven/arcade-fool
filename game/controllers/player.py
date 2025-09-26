@@ -601,15 +601,15 @@ class Player_Controller:
         if self.state_active != set_value:
             self.__state_active: bool = set_value
 
-            # Clearing cache (property):
-            cached_property_list: tuple[str, ...] = (
-                "player_active",
-                "player_inactive",
-                )
-            clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
+        # Clearing cache (property):
+        cached_property_list: tuple[str, ...] = (
+            "state_active",
+            "state_inactive",
+            )
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = cached_property_list
+            )
 
 
     def set_state_focus(self, 

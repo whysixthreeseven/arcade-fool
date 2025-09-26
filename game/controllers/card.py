@@ -1638,7 +1638,6 @@ class Card_Object:
             stack_index_f: int = convert_value_to_integer(
                 convert_value = stack_index
                 )
-        
 
         # Updating attributes:
         if self.position_table != position_index_f and self.position_index != stack_index_f:

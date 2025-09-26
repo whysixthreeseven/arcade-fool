@@ -175,7 +175,7 @@ class Gameshell(arcade.Window):
         # Rendering containers:
         self.game.deck.render()
         # self.game.discard.render()        # <- TODO: Implement
-        # self.game.table.render()
+        self.game.table.render()
 
         # Rendering player controller's hand containers:
         self.game.player_one.hand.render()
