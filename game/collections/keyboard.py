@@ -35,6 +35,11 @@ class Keyboard_Mapping:
     KEY_DEBUG_SORT_HAND_BY_TIME_ADDED:    int = arcade.key.C
     KEY_DEBUG_SORT_HAND_BY_SUIT:          int = arcade.key.V
 
+    # DEBUG Sweep key mapping：
+    KEY_DEBUG_SWEEP_TO_HAND_PLAYER:   int = arcade.key.NUM_1
+    KEY_DEBUG_SWEEP_TO_HAND_OPPONENT: int = arcade.key.NUM_2
+    KEY_DEBUG_SWEEP_TO_DISCARD:       int = arcade.key.NUM_0
+
     # Action key mapping:
     KEY_BACK:        int = arcade.key.ESCAPE    # <- Escape to menu, back to previous menu, exit game
     KEY_CONFIRM:     int = arcade.key.SPACE     # <- Confirm play, confirm prompt, selection
@@ -174,6 +179,23 @@ class Keyboard_Mapping:
         key_list: tuple[int, ...] = (
             self.KEY_DEBUG_DRAW_CARD_PLAYER,
             self.KEY_DEBUG_DRAW_CARD_OPPONENT,
+            )
+        
+        # Returning:
+        return key_list
+    
+
+    @cached_property
+    def key_debug_sweep_list(self) -> tuple[int, ...]:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Collecting key list:
+        key_list: tuple[int, ...] = (
+            self.KEY_DEBUG_SWEEP_TO_HAND_PLAYER,
+            self.KEY_DEBUG_SWEEP_TO_HAND_OPPONENT,
+            self.KEY_DEBUG_SWEEP_TO_DISCARD,
             )
         
         # Returning:

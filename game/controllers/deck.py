@@ -23,6 +23,13 @@ from game.settings import (
     CARD_TEXTURE_WIDTH_SCALED
     )
 
+# Global session variables:
+from game.session import (
+    SESSION_ENABLE_ASSERTION,
+    SESSION_ENABLE_DEBUG,
+    SESSION_ENABLE_ECHO
+    )
+
 # Variables import:
 from game.variables import CARD_SUIT_TAG
 
@@ -31,8 +38,6 @@ from game.collections.texturepack import Texture_Pack
 
 # Controllers import:
 from game.controllers.card import Card_Object
-
-# Session controller import:
 from game.session import Session_Controller
 
 # Scripts import:
@@ -317,6 +322,10 @@ class Deck_Controller:
 
         :raise AssertionError: ...
         """
+
+        # Assertion control:
+        if SESSION_ENABLE_ASSERTION and not ignore_assertion:
+            ...
     
         # Updating texture packs per card object:
         for card_object in self.deck_render:

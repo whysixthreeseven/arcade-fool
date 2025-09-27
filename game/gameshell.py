@@ -174,12 +174,14 @@ class Gameshell(arcade.Window):
 
         # Rendering containers:
         self.game.deck.render()
-        # self.game.discard.render()        # <- TODO: Implement
         self.game.table.render()
 
         # Rendering player controller's hand containers:
         self.game.player_one.hand.render()
         self.game.player_two.hand.render()
+
+        # Rendering discard:
+        self.game.discard.render()        # <- TODO: Implement
 
     
     def on_key_press(self, key_pressed: Any, key_modifiers):

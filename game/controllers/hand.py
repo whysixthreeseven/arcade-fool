@@ -40,10 +40,10 @@ from game.settings import (
     HAND_WIDTH_ALLOWED,
 
     # Slide settings:
-    SLIDE_DISTANCE_HAND_X,
-    SLIDE_DISTANCE_HAND_Y,
-    SLIDE_DISTANCE_AXIS_PLAYER,
-    SLIDE_DISTANCE_AXIS_COMPUTER,
+    CARD_SLIDE_DISTANCE_HAND_X,
+    CARD_SLIDE_DISTANCE_HAND_Y,
+    CARD_SLIDE_DISTANCE_AXIS_PLAYER,
+    CARD_SLIDE_DISTANCE_AXIS_COMPUTER,
 
     )
 
@@ -435,6 +435,13 @@ class Hand_Controller:
                     set_value = False,
                     )
             
+            # Changing opponent flag:
+            if self.hand_owner == PLAYER_TYPE_COMPUTER:
+                card_object.set_state_opponent(
+                    set_value = True,
+                    ignore_assertion = True,
+                    )
+            
             # Updating card object's added position:
             self.adjust_hand_added(
                 adjust_value = 1
@@ -545,11 +552,11 @@ class Hand_Controller:
             
             # Calculating slide coordinates:
             hand_coordinate_x, hand_coordinate_y = hand_coordinates
-            slide_axis: int = SLIDE_DISTANCE_AXIS_PLAYER 
+            slide_axis: int = CARD_SLIDE_DISTANCE_AXIS_PLAYER 
             if self.hand_owner == PLAYER_TYPE_COMPUTER:
-                slide_axis: int = SLIDE_DISTANCE_AXIS_COMPUTER
-            slide_coordinate_x: int = hand_coordinate_x + SLIDE_DISTANCE_HAND_X
-            slide_coordinate_y: int = int(hand_coordinate_y + SLIDE_DISTANCE_HAND_Y * slide_axis)
+                slide_axis: int = CARD_SLIDE_DISTANCE_AXIS_COMPUTER
+            slide_coordinate_x: int = hand_coordinate_x + CARD_SLIDE_DISTANCE_HAND_X
+            slide_coordinate_y: int = int(hand_coordinate_y + CARD_SLIDE_DISTANCE_HAND_Y * slide_axis)
 
             # Updating slide coordinates:
             slide_coordinates: tuple[int, int] = (

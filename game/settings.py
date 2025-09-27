@@ -11,8 +11,8 @@ PROJECT SETTINGS BLOCK
 
 PROJECT_NAME: str = "Arcade Fool"
 PROJECT_DATE_STARTED: str = "2025.08.22"
-PROJECT_DATE_UPDATED: str = "2025.09.26"
-PROJECT_VERSION: str = "0.5.33"
+PROJECT_DATE_UPDATED: str = "2025.09.27"
+PROJECT_VERSION: str = "0.5.34"
 
 
 """
@@ -78,8 +78,18 @@ CARD_SLIDE_TABLE_DISTANCE_Y: int = 0
 CARD_SLIDE_SPEED_DEFAULT: int = int(CARD_TEXTURE_HEIGHT_DEFAULT / 5)
 CARD_SLIDE_SPEED_THROTTLE: float = 0.75             # <- Fine-tuned modifier for 1/60 delta time
 CARD_SLIDE_SPEED_MODIFIER_DEFAULT: float = 1.00
-CARD_SLIDE_SPEED_MODIFIER_SLOW: float = 0.65
+CARD_SLIDE_SPEED_MODIFIER_SLOW: float = 0.45
 CARD_SLIDE_SPEED_MODIFIER_FAST: float = 5.00
+
+# Slide within hand settings:
+CARD_SLIDE_DISTANCE_HAND_X: int = 0
+CARD_SLIDE_DISTANCE_HAND_Y: int = int(CARD_TEXTURE_HEIGHT_DEFAULT * 0.70)
+CARD_SLIDE_DISTANCE_AXIS_PLAYER: int = +1
+CARD_SLIDE_DISTANCE_AXIS_COMPUTER: int = -1
+
+# Slide within stack settings:
+CARD_SLIDE_DISTANCE_TABLE_X: int = int(CARD_TEXTURE_WIDTH_DEFAULT * 0.30)
+CARD_SLIDE_DSITANCE_TABLE_Y: int = 0
 
 
 """
@@ -190,6 +200,27 @@ DECK_SIZE_MAX: int = 52                         # <- Max size, if lowest value i
 
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+DECK SETTINGS BLOCK
+
+"""
+
+
+DISCARD_COORDINATE_X: int = int(
+    GAME_AREA_SIDE_COORDINATE_X + 
+    CARD_TEXTURE_WIDTH_SCALED / 5
+    )
+DISCARD_COORDINATE_Y: int = int(
+    GAME_AREA_SIDE_HEIGHT - 
+    CARD_TEXTURE_HEIGHT_SCALED / 2 -
+    CARD_TEXTURE_HEIGHT_SCALED / 5
+    )
+DISCARD_COORDINATE_SHIFT_MIN: int = 0
+DISCARD_COORDINATE_SHIFT_MAX: int = 3
+DISCARD_COORDINATE_SHIFT_AXIS: tuple[int, int] = (-1, +1)
+
+
+"""
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 HAND SETTINGS BLOCK
 
 """
@@ -222,24 +253,6 @@ HAND_WIDTH_ALLOWED: int = int(
 
 # Hand size default:
 HAND_CARD_COUNT_DEFAULT: int = 6
-
-
-"""
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-SLIDE SETTINGS BLOCK
-
-"""
-
-
-# Slide within hand settings:
-SLIDE_DISTANCE_HAND_X: int = 0
-SLIDE_DISTANCE_HAND_Y: int = int(CARD_TEXTURE_HEIGHT_DEFAULT * 0.70)
-SLIDE_DISTANCE_AXIS_PLAYER: int = +1
-SLIDE_DISTANCE_AXIS_COMPUTER: int = -1
-
-# Slide within stack settings:
-SLIDE_DISTANCE_TABLE_X: int = int(CARD_TEXTURE_WIDTH_DEFAULT * 0.30)
-SLIDE_DSITANCE_TABLE_Y: int = 0
 
 
 """

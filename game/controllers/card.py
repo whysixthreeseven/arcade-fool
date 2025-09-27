@@ -1138,6 +1138,13 @@ class Card_Object:
                 target_object = self,
                 target_attribute = cached_property
                 )
+            
+            # Clearing cache (render):
+            cached_property: str = "render_texture_object"
+            clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
     
 
     def set_state_playable(self, set_value: bool, ignore_assertion: bool = False) -> None:
@@ -1233,6 +1240,12 @@ class Card_Object:
 
             # Clearing cache (property):
             cached_property: str = "state_arrived"
+            clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+            
+            cached_property: str = "__slide_speed_delta"
             clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
@@ -1376,6 +1389,12 @@ class Card_Object:
             self.__position_table:   int | None = None
             self.__position_index:   int | None = None
 
+            # Resetting state arrived:
+            self.set_state_arrived(
+                set_value = False,
+                ignore_assertion = True,
+                )
+
             # Clearing cache (position):
             clear_cached_property_list(
                 target_object = self,
@@ -1497,6 +1516,12 @@ class Card_Object:
             self.__position_table:   int | None = None
             self.__position_index:   int | None = None
 
+            # Resetting state arrived:
+            self.set_state_arrived(
+                set_value = False,
+                ignore_assertion = True,
+                )
+
             # Clearing cache (position):
             clear_cached_property_list(
                 target_object = self,
@@ -1558,6 +1583,12 @@ class Card_Object:
             self.__position_deck:    int | None = None
             self.__position_table:   int | None = None
             self.__position_index:   int | None = None
+
+            # Resetting state arrived:
+            self.set_state_arrived(
+                set_value = False,
+                ignore_assertion = True,
+                )
 
             # Clearing cache (position):
             clear_cached_property_list(
@@ -1650,6 +1681,12 @@ class Card_Object:
             self.__position_deck:    int | None = None
             self.__position_discard: int | None = None
 
+            # Resetting state arrived:
+            self.set_state_arrived(
+                set_value = False,
+                ignore_assertion = True,
+                )
+
             # Clearing cache (position):
             clear_cached_property_list(
                 target_object = self,
@@ -1675,6 +1712,12 @@ class Card_Object:
         self.__position_discard: int | None = None
         self.__position_table:   int | None = None
         self.__position_index:   int | None = None
+
+        # Resetting state arrived:
+        self.set_state_arrived(
+            set_value = False,
+            ignore_assertion = True,
+            )
 
         # Clearing cache:
         clear_cached_property_list(
@@ -2824,7 +2867,9 @@ class Card_Object:
 
         # Checking if front texture is forced:
         force_front: bool = bool(
-            self.location == CARD_LOCATION_HAND and self.state_revealed or
+            bool(self.location == CARD_LOCATION_HAND and 
+                 self.state_revealed and 
+                 not self.state_opponent) or
             self.location == CARD_LOCATION_DECK and self.state_showcase or
             self.location == CARD_LOCATION_DISCARD or
             self.location == CARD_LOCATION_TABLE
@@ -2904,6 +2949,10 @@ class Card_Object:
                 render_angle_selected: int = DECK_RENDER_ANGLE_SHOWCASE
             else:
                 render_angle_selected: int = CARD_RENDER_ANGLE_DEFAULT
+
+        # Checking angle based on location (discard):
+        elif self.location == CARD_LOCATION_DISCARD:
+            render_angle_selected: int = self.render_angle_value_random
 
         # Returning:
         return render_angle_selected
@@ -3005,7 +3054,7 @@ class Card_Object:
 
         # Returning:
         return coordinate_next
-
+    
 
     def __slide_to_coordinates(self, 
                                target_coordinates: tuple[int, int], 
@@ -3042,7 +3091,10 @@ class Card_Object:
                     )
 
                 # Getting coordinate current:
-                coordinates_current: int = (self.coordinate_x_current, self.coordinate_y_current)
+                coordinates_current: tuple[int, int] = (
+                    self.coordinate_x_current, 
+                    self.coordinate_y_current
+                    )
                 coordinate_index: int = target_coordinates.index(target_coordinate)
                 coordinate_current: int = coordinates_current[coordinate_index]
 

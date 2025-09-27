@@ -571,6 +571,7 @@ class Game_Controller:
 
         # Creating discard controller:
         discard_controller: Discard_Controller = Discard_Controller()
+        discard_controller.create_discard()
         
         # Updating attribute:
         self.__discard_controller: Discard_Controller = discard_controller
@@ -1462,6 +1463,71 @@ class Game_Controller:
                 )
             
 
+    def __task_sweep_cards(self) -> list[Card_Object]:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Creating list of cards to sweep:
+        card_sweep_list: list[Card_Object] = []
+
+        # Cycling through all cards available on table:
+        for card_object in self.table.table_container:
+
+            # Resetting card's state:
+            card_object.reset_state()
+
+            # Removing card from table:
+            self.table.remove_card(
+                card_object = card_object,
+                clear_cache = False
+                )
+            
+            # Adding card to sweep list:
+            card_sweep_list.append(
+                card_object
+                )
+        
+        # Clearing table's cache (forced):
+        self.table.reset_cache()
+
+        # Returning:
+        return card_sweep_list
+            
+    
+    def task_sweep_cards_hand(self, player_controller: Player_Controller) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Creating list of cards to sweep:
+        card_sweep_list: list[Card_Object] = self.__task_sweep_cards()
+
+        # Adding cards to player's hand and updating:
+        player_controller.hand.add_card_list(
+            card_list = card_sweep_list
+            )
+        self.task_update_hand(
+            player_controller = player_controller,
+            update_position = True,
+            update_state = False,
+            )
+        
+    
+    def task_sweep_cards_discard(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Creating list of cards to sweep:
+        card_sweep_list: list[Card_Object] = self.__task_sweep_cards()
+
+        # Adding cards to discard container:
+        self.discard.add_card_list(
+            card_list = card_sweep_list
+            )
+            
+
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     DEBUG HANDLERS BLOCK
@@ -1555,10 +1621,35 @@ class Game_Controller:
                     update_state = True,
                     table_map = self.table.table_map
                     )
+                
+        # Sweeping cards:
+        elif key_pressed in self.keyboard.key_debug_sweep_list:
+
+            # Asserting there are cards to sweep:
+            if self.table.table_container_count > 0:
+
+                # Sweeping cards to player:
+                if key_pressed == self.keyboard.KEY_DEBUG_SWEEP_TO_HAND_PLAYER:
+                    self.task_sweep_cards_hand(
+                        player_controller = self.player_one
+                        )
+                
+                # Sweeping cards to opponent:
+                elif key_pressed == self.keyboard.KEY_DEBUG_SWEEP_TO_HAND_OPPONENT:
+                    self.task_sweep_cards_hand(
+                        player_controller = self.player_two
+                        )
+                    
+                # Sweeping to discard:
+                elif key_pressed == self.keyboard.KEY_DEBUG_SWEEP_TO_DISCARD:
+                    self.task_sweep_cards_discard()
+
 
         # RESTART GAME:
         elif key_pressed == self.keyboard.KEY_DEBUG_RESTART_GAME:
             self.create_game_default()
+
+        
 
 
     """
@@ -1571,8 +1662,6 @@ class Game_Controller:
     def handle_slide(self) -> None:
         """
         TODO: Create a docstring.
-
-        :param bool force_instant: ...
         """
 
         # Checking if slide is forced:
@@ -1594,6 +1683,12 @@ class Game_Controller:
         
         # Handling slide in table:
         for card_object in self.table.table_container:
+            card_object.slide(
+                force_instant = force_instant
+                )
+            
+        # Handling slide in discard:
+        for card_object in self.discard.discard_container:
             card_object.slide(
                 force_instant = force_instant
                 )
@@ -1718,7 +1813,7 @@ class Game_Controller:
                 
                     # Checking if cursor is hovering over a card:
                     card_hovered_list: list[Card_Object] = []
-                    for card_object in player_controller.hand.hand_playable:
+                    for card_object in player_controller.hand.hand_container:
                         card_hovered: bool = bool(
                             motion_coordinate_x in card_object.boundary_x_range and
                             motion_coordinate_y in card_object.boundary_y_range

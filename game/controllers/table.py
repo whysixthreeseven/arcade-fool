@@ -82,6 +82,18 @@ class Table_Controller:
         return cached_property_list
     
 
+    def reset_cache(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Clearing cache:
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_table_property_list
+            )
+    
+
     """
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     TABLE MAP METHODS AND PROPERTIES BLOCK
@@ -369,6 +381,31 @@ class Table_Controller:
             target_object = self,
             target_attribute_list = self.__cached_table_property_list
             )
+        
+    
+    def remove_card(self, card_object: Card_Object, clear_cache: bool = True) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Asserting card object is on table:
+        if card_object in self.table_container:
+
+            # Removing card from its position:
+            position_index: int = card_object.position_table
+            stack_index: int = card_object.position_index
+            self.__table_map[position_index][stack_index] = None
+
+            # Resetting card attributes:
+            card_object.reset_state()
+            card_object.reset_position()
+
+            # Clearing cache:
+            if clear_cache:
+                clear_cached_property_list(
+                    target_object = self,
+                    target_attribute_list = self.__cached_table_property_list
+                    )
         
     
     def find_card(self, 

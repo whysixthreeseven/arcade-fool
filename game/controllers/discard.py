@@ -4,10 +4,19 @@ from __future__ import annotations
 # Cache-related import:
 from functools import cached_property
 
-# # Related settings import:
-# from game.settings import (
-#     ...
-#     )
+# Random library:
+import random
+
+# Settings variables import list:
+from game.settings import (
+
+    # Discard-related settings:
+    DISCARD_COORDINATE_X,
+    DISCARD_COORDINATE_Y,
+    DISCARD_COORDINATE_SHIFT_MIN,
+    DISCARD_COORDINATE_SHIFT_MAX,
+    DISCARD_COORDINATE_SHIFT_AXIS,
+    )
 
 # Controllers import:
 from game.controllers.card import Card_Object
@@ -136,6 +145,24 @@ class Discard_Controller:
         return discard_value
     
 
+    def create_discard(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Creating a new container:
+        discard_container: list[Card_Object] = []
+
+        # Updating attribute:
+        self.__discard_container: list[Card_Object] = discard_container
+
+        # Clearing cache:
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_discard_property_list
+            )
+    
+
     def reset_discard(self) -> None:
         """
         TODO: Create a docstring.
@@ -158,7 +185,11 @@ class Discard_Controller:
     """
 
 
-    def add_card(self, card_object: Card_Object, clear_cache: bool = True) -> None:
+    def add_card(self, 
+                 card_object: Card_Object, 
+                 clear_cache: bool = True, 
+                 force_instant: bool = False
+                 ) -> None:
         """
         TODO: Create a docstring.
         """
@@ -186,6 +217,46 @@ class Discard_Controller:
                 card_object
                 )
             
+            # Preparing coordinates to update:
+            coordinate_x_discard: int = DISCARD_COORDINATE_X
+            coordinate_y_discard: int = DISCARD_COORDINATE_Y
+
+            # Checking if shift is required:
+            coordinate_shift_required: bool = random.choice((True, False))
+            if coordinate_shift_required:
+
+                # Calculating coordinate x shift:
+                coordinate_x_shift_value: int = random.randint(
+                    a = DISCARD_COORDINATE_SHIFT_MIN,
+                    b = DISCARD_COORDINATE_SHIFT_MAX
+                    )
+                coordinate_x_shift_axis = random.choice(DISCARD_COORDINATE_SHIFT_AXIS)
+                coordinate_x_shift: int = coordinate_x_shift_value * coordinate_x_shift_axis
+
+                # Calculating coordinate y shift:
+                coordinate_y_shift_value: int = random.randint(
+                    a = DISCARD_COORDINATE_SHIFT_MIN,
+                    b = DISCARD_COORDINATE_SHIFT_MAX
+                    )
+                coordinate_y_shift_axis = random.choice(DISCARD_COORDINATE_SHIFT_AXIS)
+                coordinate_y_shift: int = coordinate_y_shift_value * coordinate_y_shift_axis
+
+                # Updating coordinates generated:
+                coordinate_x_discard += coordinate_x_shift
+                coordinate_y_discard += coordinate_y_shift
+
+            # Packing up coordinates:
+            coordinates_discard: tuple[int, int] = (
+                coordinate_x_discard,
+                coordinate_y_discard
+                )
+            
+            # Updating coordinates:
+            card_object.set_coordinates_default(
+                set_container = coordinates_discard,
+                ignore_assertion = True
+                )
+            
             # Clearing cache (hand):
             if clear_cache:
                 clear_cached_property_list(
@@ -209,6 +280,23 @@ class Discard_Controller:
         # Clearing cache (hand):
         clear_cached_property_list(
             target_object = self,
-            target_attribute_list = self.__cached_hand_property_list
+            target_attribute_list = self.__cached_discard_property_list
             )
+
+
+    """
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    RENDER METHODS BLOCK
+    
+    """
+
+
+    def render(self) -> None:
+        """
+        TODO: Create a docstring.
+        """
+
+        # Cycling through cards and calling render method:
+        for card_object in reversed(self.discard_container):
+            card_object.render()
 
