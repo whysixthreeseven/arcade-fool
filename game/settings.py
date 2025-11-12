@@ -5,7 +5,7 @@ from arcade.types import Color
 
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-PROJECT SETTINGS BLOCK
+PROJECT SETTINGS 
 
 """
 
@@ -17,7 +17,7 @@ PROJECT_VERSION: str = "0.5.35"
 
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-GAME AREA SETTINGS BLOCK
+GAME AREA SETTINGS 
 
 """
 
@@ -43,7 +43,7 @@ GAME_AREA_SIDE_BG_COLOR: arcade.color = arcade.color.FLORAL_WHITE
 
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-CARD SETTINGS BLOCK
+CARD SETTINGS 
 
 """
 
@@ -94,7 +94,7 @@ CARD_SLIDE_DSITANCE_TABLE_Y: int = 0
 
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-ZONES SETTINGS BLOCK
+ZONES SETTINGS 
 
 """
 
@@ -143,7 +143,7 @@ ZONE_DISCARD_BG_COLOR: Color = arcade.color.LIGHT_CRIMSON
 
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-TABLE SETTINGS BLOCK
+TABLE SETTINGS 
 
 """
 
@@ -168,7 +168,7 @@ TABLE_POSITION_GAP: int = int(CARD_TEXTURE_WIDTH_SCALED / 4)
 
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-DECK SETTINGS BLOCK
+DECK SETTINGS 
 
 """
 
@@ -200,7 +200,7 @@ DECK_SIZE_MAX: int = 52                         # <- Max size, if lowest value i
 
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-DECK SETTINGS BLOCK
+DECK SETTINGS 
 
 """
 
@@ -221,7 +221,7 @@ DISCARD_COORDINATE_SHIFT_AXIS: tuple[int, int] = (-1, +1)
 
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-HAND SETTINGS BLOCK
+HAND SETTINGS 
 
 """
 
@@ -257,7 +257,7 @@ HAND_CARD_COUNT_DEFAULT: int = 6
 
 """
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-GAMESHELL SETTINGS BLOCK
+GAMESHELL SETTINGS 
 
 """
 
