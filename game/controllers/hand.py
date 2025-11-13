@@ -424,7 +424,7 @@ class Hand_Controller:
             card_object.reset_position()
 
             # Updating card object's hand position:
-            position_hand_index: int = len(self.__hand_container)   # <- Using init container
+            position_hand_index: int = len(self.__hand_container)
             card_object.set_position_hand(
                 position_index = position_hand_index
                 )
