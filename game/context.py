@@ -64,3 +64,36 @@ class CARD_COLOR:
     RED: str = "Red"
     BLACK: str = "Black"
 
+
+class CARD_TEXTURE_FRONT_INDEX:
+    DARK: tuple[str, ...] = (
+        "1_1",                  # Mono colors
+        "2_1"                   # Dual colors
+        )
+    LIGHT: tuple[str, ...] = (
+        "1_1",                  # Mono colors
+        "2_1", "2_2",           # Dual colors
+        "4_1", "4_2", "4_3"     # Quad colors
+        )
+    SEPIA: tuple[str, ...] = (
+        "1_1",                  # Mono colors
+        "2_1",                  # Dual colors
+        )
+
+
+class CARD_TEXTURE_BACK_INDEX:
+    COLOR_LIST: tuple[str, ...] =(
+        "Blue", 
+        "Green", 
+        "Navy",
+        "Orange",
+        "Purple",
+        "Red",
+        "White"
+        )
+    STYLE_LIST: tuple[str, ...] = (
+        "Cross",
+        "Mountains",
+        "Plain",
+        "Sun"
+        )
