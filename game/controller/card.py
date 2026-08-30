@@ -28,6 +28,7 @@ from game.utilities.scripts.cache import (
 
 # Assertion scripts:
 from game.utilities.scripts.assertion import (
+    assert_setter_entry,
     assert_value_type,
     assert_value_default,
     assert_value_ge_zero,
@@ -215,20 +216,20 @@ class Card:
 
     def clear_cached_coordinates_attributes(self) -> None:
         
-            # Clearing cached properties:
-            clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = self.__cached_coordinates_attributes
-                )
+        # Clearing cached properties:
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_coordinates_attributes
+            )
     
     
     def clear_cached_state_attributes(self) -> None:
         
-            # Clearing cached properties:
-            clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = self.__cached_state_attributes
-                )
+        # Clearing cached properties:
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_state_attributes
+            )
         
     
     def clear_cached_attributes(self) -> None:
@@ -321,7 +322,23 @@ class Card:
             
         # Debug verification:
         if SESSION.ENABLE_DEBUG:
-            ...     # TODO: Implmenet duplicate setter check!
+            assert_setter_entry(
+                check_object = self,
+                check_attribute = "name",
+                sentinel_value = None,
+                raise_error = True
+                )
+
+        # Setting attribute:
+        self.__name = set_value
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property_list: tuple[str, ...] = (
+                "name",
+                "name_ascii",
+                "value"
+            )
             
         # Updating attribute:
         self.__name = set_value
@@ -404,7 +421,12 @@ class Card:
 
         # Debug verification:
         if SESSION.ENABLE_DEBUG:
-            ...     # TODO: Implmenet duplicate setter check!
+            assert_setter_entry(
+                check_object = self,
+                check_attribute = "suit",
+                sentinel_value = None,
+                raise_error = True
+                )
             
         # Updating attribute:
         self.__suit = set_value
