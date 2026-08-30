@@ -285,6 +285,83 @@ class Card:
         return name_ascii
     
     
+    @cached_property
+    def suit(self) -> str:
+
+        # Returning:
+        return self.__suit
+    
+
+    @cached_property
+    def suit_ascii(self) -> str:
+
+        # Generating a dictionary index:
+        suit_ascii_index = {
+            attr_name.capitalize(): getattr(CARD_SUIT_ASCII, attr_name)
+            for attr_name, attr_value in CARD_SUIT.__dict__.items()
+            if not attr_name.startswith("_") and hasattr(CARD_SUIT_ASCII, attr_name)
+            }
+        
+        # Getting correct value:
+        suit_ascii: str = suit_ascii_index.get(
+            self.suit,          # Cached property (None by default)
+            None                # Default return, if name not set
+            )
+        
+        # Returning:
+        return suit_ascii
+    
+    
+    @cached_property
+    def color(self) -> str:
+        
+        # Getting correct color:
+        color_index: dict[str, str] = {
+            CARD_SUIT.HEARTS:   CARD_COLOR.RED,
+            CARD_SUIT.DIAMONDS: CARD_COLOR.RED,
+            CARD_SUIT.CLUBS:    CARD_COLOR.BLACK,
+            CARD_SUIT.SPADES:   CARD_COLOR.BLACK,
+            }
+        color: str = color_index.get(
+            self.suit,      # Cached property (None by default)
+            None            # Default return, if suit not set
+            )
+
+        # Returning:
+        return color
+
+
+    @cached_property
+    def trump(self) -> bool:
+        
+        # Returning:
+        return self.__trump
+    
+    
+    @cached_property
+    def value(self) -> int:
+        
+        # Generating a dictionary index:
+        value_index = {
+            attr_name.capitalize(): getattr(CARD_VALUE, attr_name)
+            for attr_name, attr_value in CARD_NAME.__dict__.items()
+            if not attr_name.startswith("_") and hasattr(CARD_VALUE, attr_name)
+            }
+                
+        # Getting correct value:
+        value: str = value_index.get(
+            self.name,      # Cached property (None by default)
+            None            # Default return, if name not set
+            )
+                
+        # Calculating value:
+        if value is not None and self.trump:
+            value += 100
+        
+        # Returning:
+        return value
+    
+    
     def __validate_name(self, validate_value: str) -> None:
         
         # Asserting value is valid type:
@@ -357,32 +434,6 @@ class Card:
                 )
  
     
-    @cached_property
-    def suit(self) -> str:
-
-        # Returning:
-        return self.__suit
-    
-
-    @cached_property
-    def suit_ascii(self) -> str:
-
-        # Generating a dictionary index:
-        suit_ascii_index = {
-            attr_name.capitalize(): getattr(CARD_SUIT_ASCII, attr_name)
-            for attr_name, attr_value in CARD_SUIT.__dict__.items()
-            if not attr_name.startswith("_") and hasattr(CARD_SUIT_ASCII, attr_name)
-            }
-        
-        # Getting correct value:
-        suit_ascii: str = suit_ascii_index.get(
-            self.suit,          # Cached property (None by default)
-            None                # Default return, if name not set
-            )
-        
-        # Returning:
-        return suit_ascii
-    
     
     def __validate_suit(self, validate_value: str) -> None:
 
@@ -444,32 +495,6 @@ class Card:
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
-        
-        
-    @cached_property
-    def color(self) -> str:
-        
-        # Getting correct color:
-        color_index: dict[str, str] = {
-            CARD_SUIT.HEARTS:   CARD_COLOR.RED,
-            CARD_SUIT.DIAMONDS: CARD_COLOR.RED,
-            CARD_SUIT.CLUBS:    CARD_COLOR.BLACK,
-            CARD_SUIT.SPADES:   CARD_COLOR.BLACK,
-            }
-        color: str = color_index.get(
-            self.suit,      # Cached property (None by default)
-            None            # Default return, if suit not set
-            )
-
-        # Returning:
-        return color
-
-
-    @cached_property
-    def trump(self) -> bool:
-        
-        # Returning:
-        return self.__trump
     
     
     def __validate_trump(self, validate_value: bool) -> None:
@@ -522,32 +547,8 @@ class Card:
                 )
     
     
-    @cached_property
-    def value(self) -> int:
-        
-        # Generating a dictionary index:
-        value_index = {
-            attr_name.capitalize(): getattr(CARD_VALUE, attr_name)
-            for attr_name, attr_value in CARD_NAME.__dict__.items()
-            if not attr_name.startswith("_") and hasattr(CARD_VALUE, attr_name)
-            }
-                
-        # Getting correct value:
-        value: str = value_index.get(
-            self.name,      # Cached property (None by default)
-            None            # Default return, if name not set
-            )
-                
-        # Calculating value:
-        if value is not None and self.trump:
-            value += 100
-        
-        # Returning:
-        return value
-    
-    
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        COORDINATES CACHED PROPERTIES AND METHODS:
+        COORDINATES (CURRENT) CACHED PROPERTIES AND METHODS:
         
     """
     
@@ -736,7 +737,13 @@ class Card:
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        COORDINATES (POSITION) CACHED PROPERTIES AND METHODS:
         
+    """
+    
 
     @cached_property
     def coordinate_x_position(self) -> int:
@@ -846,6 +853,12 @@ class Card:
                 target_attribute_list = cached_property_list
                 )
             
+            
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        COORDINATES (EXPECTED) CACHED PROPERTIES AND METHODS:
+        
+    """
+            
     
     @cached_property
     def coordinate_x_expected(self) -> int:
@@ -954,6 +967,12 @@ class Card:
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        COORDINATES (HOVER) CACHED PROPERTIES AND METHODS:
+        
+    """
     
     
     @cached_property
@@ -1264,7 +1283,7 @@ class Card:
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        RENDER CACHED PROPERTIES AND METHODS:
+        RENDER (SCALE) CACHED PROPERTIES AND METHODS:
     
     """
     
@@ -1420,6 +1439,12 @@ class Card:
                 target_object = self,
                 target_attribute = cached_property
                 )
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        RENDER (ALPHA) CACHED PROPERTIES AND METHODS:
+    
+    """
     
     
     @cached_property
@@ -1561,6 +1586,12 @@ class Card:
                 target_object = self,
                 target_attribute = cached_property
                 )
+        
+            
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        RENDER (TILT) CACHED PROPERTIES AND METHODS:
+    
+    """
 
     
     @cached_property
@@ -1734,6 +1765,12 @@ class Card:
                 target_object = self,
                 target_attribute = cached_property
                 )
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        OTHER RENDER CACHED PROPERTIES AND METHODS:
+    
+    """
 
 
     @cached_property
