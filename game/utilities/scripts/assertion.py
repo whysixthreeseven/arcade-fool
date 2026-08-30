@@ -71,3 +71,18 @@ def assert_value_in_range(check_value: int | float, check_range: range, raise_er
     # Returning:
     return assert_eval
 
+
+def assert_setter_entry(check_object: object, check_attribute: str, sentinel_value: Any = None, raise_error: bool = True) -> None:
+    
+    # Acquiring attribute:
+    attribute_value = getattr(check_object, check_attribute, sentinel_value)
+    assert_eval: bool = attribute_value == sentinel_value
+    
+    # Raising error, if required:
+    if not assert_eval and raise_error:
+        error_message: str = f"<'{check_attribute}'> is already set to <'{attribute_value}'>"
+        raise AttributeError(error_message)
+
+    # Returning:
+    return assert_eval
+
