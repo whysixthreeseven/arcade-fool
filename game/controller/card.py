@@ -238,7 +238,8 @@ class Card:
             self.__cached_core_attributes,
             self.__cached_texture_attributes,
             self.__cached_render_attributes,
-            self.__cached_coordinates_attributes
+            self.__cached_coordinates_attributes,
+            self.__cached_state_attributes,
             )
         
         # Looping throught the list and clearing cache:
