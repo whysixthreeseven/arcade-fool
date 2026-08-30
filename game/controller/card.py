@@ -119,7 +119,8 @@ class Card:
             "texture_filepath_front",
             "texture_filepath_back",
             "texture_object_front",
-            "texture_object_back"
+            "texture_object_back",
+            "texture_object_selected",
             )
 
         # Returning:
@@ -1084,6 +1085,56 @@ class Card:
         return self.__texture_pack_back
     
     
+    @cached_property
+    def texture_filepath_front(self) -> str:
+        
+        # Acquiring filename:
+        texture_filepath: str = self.texture_pack_front.texture_index[self.suit].get(self.name, None)
+        if texture_filepath is None:
+            error_message: str = f"Texture filepath for card <{self.suit_ascii}{self.name_ascii}> not provided."
+            raise FileNotFoundError(error_message)
+
+        # Returning:
+        return texture_filepath
+    
+    
+    @cached_property
+    def texture_filepath_back(self) -> str:
+
+        # Acquiring filename:
+        texture_filepath: str = self.texture_pack_back.texture_index[self.suit].get(self.name, None)
+        if texture_filepath is None:
+            error_message: str = f"Texture filepath for card <{self.suit_ascii}{self.name_ascii}> not provided."
+            raise FileNotFoundError(error_message)
+
+        # Returning:
+        return texture_filepath
+    
+    
+    @cached_property
+    def texture_object_front(self) -> Texture:
+        
+        # Returning:
+        return self.__texture_object_front
+    
+    
+    @cached_property
+    def texture_object_back(self) -> Texture:
+
+        # Returning:
+        return self.__texture_object_back
+    
+    
+    @cached_property
+    def texture_object_selected(self) -> Texture:
+        
+        # Selecting texture:
+        texture_selected: Texture = self.texture_object_front if self.state_revealed else self.texture_object_back
+
+        # Returning:
+        return texture_selected 
+    
+    
     def __validate_texture_pack(self, validate_value: TexturePack) -> None:
         
         # Asserting value is valid type:
@@ -1172,53 +1223,6 @@ class Card:
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
-    
-    
-    @cached_property
-    def texture_filepath_front(self) -> str:
-        
-        # Acquiring filename:
-        texture_filepath: str = self.texture_pack_front.texture_index[self.suit].get(self.name, None)
-        if texture_filepath is None:
-            error_message: str = f"Texture filepath for card <{self.suit_ascii}{self.name_ascii}> not provided."
-            raise FileNotFoundError(error_message)
-
-        # Returning:
-        return texture_filepath
-    
-    
-    @cached_property
-    def texture_filepath_back(self) -> str:
-
-        # Acquiring filename:
-        texture_filepath: str = self.texture_pack_back.texture_index[self.suit].get(self.name, None)
-        if texture_filepath is None:
-            error_message: str = f"Texture filepath for card <{self.suit_ascii}{self.name_ascii}> not provided."
-            raise FileNotFoundError(error_message)
-
-        # Returning:
-        return texture_filepath
-    
-    
-    @cached_property
-    def texture_object_front(self) -> Texture:
-        
-        # Returning:
-        return self.__texture_object_front
-    
-    
-    @cached_property
-    def texture_object_back(self) -> Texture:
-
-        # Returning:
-        return self.__texture_object_back
-    
-    
-    @cached_property
-    def texture_selected(self) -> Texture:
-        
-        # TODO: Create logic based on card's revealed state!
-        return None
     
     
     def load_texture_object_front(self, clear_cache: bool = True) -> None:
