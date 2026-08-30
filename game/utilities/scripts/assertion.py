@@ -57,3 +57,17 @@ def assert_value_ge_zero(check_value: int | float, raise_error: bool = True) -> 
     # Returning:
     return assert_eval
 
+
+def assert_value_in_range(check_value: int | float, check_range: range, raise_error: bool = True) -> bool:
+    
+    # Evaluating:
+    assert_eval: bool = check_value in check_range
+    
+    # Raising error, if required:
+    if not assert_eval and raise_error:
+        error_message: str = f"Value appears not to be in range: <{check_value}>. Expected range: <{check_range}>."
+        raise AssertionError(error_message)
+    
+    # Returning:
+    return assert_eval
+
