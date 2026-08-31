@@ -47,6 +47,13 @@ from game.context import (
     )
 
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    CARD CLASS OBJECT CONSTRUCTOR
+    
+"""
+
+
+
 class Card:
     
     def __init__(self) -> None:
@@ -85,7 +92,7 @@ class Card:
         self.__state_playable: bool = None
         
         
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         CACHED PROPETIES AND CLEAN METHODS
     
     """
@@ -250,9 +257,213 @@ class Card:
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        VALIDATE METHODS:
+    
+    """
+    
+    
+    def __validate_name(self, validate_value: str) -> None:
+            
+        # Asserting value is valid type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = str,
+            raise_error = True
+            )
+        
+        # Asserting value is not empty:
+        assert_value_not_empty(
+            check_value = validate_value,
+            raise_error = True
+            )
+        
+        # Asserting value is default:
+        default_list: tuple[str, ...] = tuple(
+            attribute_name for attribute_name, attribute_value
+            in CARD_NAME.__dict__.items()
+            if not attribute_name.startswith("_")
+            )
+        assert_value_default(
+            check_value = validate_value,
+            check_default = default_list,
+            raise_error = True
+            )
+        
+        
+    def __validate_suit(self, validate_value: str) -> None:
+    
+        # Asserting value is valid type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = str,
+            raise_error = True
+            )
+        
+        # Asserting value is not empty:
+        assert_value_not_empty(
+            check_value = validate_value,
+            raise_error = True
+            )
+
+        # Asserting value is default:
+        default_list: tuple[str, ...] = tuple(
+            attribute_name for attribute_name, attribute_value
+            in CARD_SUIT.__dict__.items()
+            if not attribute_name.startswith("_")
+            )
+        assert_value_default(
+            check_value = validate_value,
+            check_default = default_list,
+            raise_error = True
+            )
         
     
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    def __validate_trump(self, validate_value: bool) -> None:
+            
+        # Asserting value is valid type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = bool,
+            raise_error = True
+            )
+        
+    
+    def __validate_coordinate(self, validate_value: int) -> None:
+    
+        # Asserting value is valid type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = int,
+            raise_error = True
+            )
+        
+        # Asserting value is not negative:
+        assert_value_ge_zero(
+            check_value = validate_value,
+            raise_error = True
+            )
+        
+    
+    def __validate_coordiante_container(self, validate_value: tuple[int, int]) -> None:
+            
+        # Asserting value is valid type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = tuple,
+            raise_error = True,
+            )
+        
+        # Asserting container item count:
+        assert_eval: bool = len(validate_value) == 2
+        if not assert_eval:
+            container_len: int = len(validate_value)
+            error_message: str = f"Invalid container item count. Expected 2, got {container_len}."
+            raise AssertionError(error_message)
+        
+        # Asserting each item:
+        for container_item in validate_value:
+            self.__validate_coordinate(
+                validate_value = container_item
+                )
+            
+    
+    def __validate_texture_pack(self, validate_value: TexturePack) -> None:
+            
+        # Asserting value is valid type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = TexturePack,
+            raise_error = True
+            )
+        
+        # Asserting value is default:
+        texture_pack = validate_value
+        if texture_pack.type == "Front":
+            texture_pack_list: tuple[TexturePack, ...] = tuple(
+                texture_pack_object for texture_pack_name, texture_pack_object 
+                in TEXTURE_PACK_FRONT.__dict__.items()
+                if isinstance(texture_pack_object, TexturePack)
+                )
+        else:
+            texture_pack_list: tuple[TexturePack, ...] = tuple(
+                texture_pack_object for texture_pack_name, texture_pack_object 
+                in TEXTURE_PACK_BACK.__dict__.items()
+                if isinstance(texture_pack_object, TexturePack)
+                )
+        assert_value_default(
+            check_value = texture_pack,
+            check_default_list = texture_pack_list,
+            raise_error = True
+            )
+        
+        
+    def __validate_render_scale(self, validate_value: float) -> None:
+            
+        # Asserting value type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = float,
+            raise_error = True
+            )
+        
+        # Asserting value is not negative:
+        assert_value_ge_zero(
+            check_value = validate_value,
+            raise_error = True
+            )
+        
+        
+    def __validate_render_alpha(self, validate_value: int) -> None:
+    
+        # Asserting value type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = int,
+            raise_error = True
+            )
+        
+        # Asserting value is not negative:
+        assert_value_ge_zero(
+            check_value = validate_value,
+            raise_error = True
+            )
+        
+        
+    def __validate_render_tilt(self, validate_value: int) -> None:
+            
+        # Asserting value type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = int,
+            raise_error = True
+            )
+
+        # Asserting value in range:
+        assert_value_in_range(
+            check_value = abs(validate_value),
+            check_range = (
+                SETTINGS.CARD_RENDER_TILT_MIN, 
+                SETTINGS.CARD_RENDER_TILT_MAX +1
+                ),
+            raise_error = True
+            )
+        
+        
+    def __validate_state(self, validate_value: bool) -> None:
+            
+        # Asserting value type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = bool,
+            raise_error = True
+            )
+    
+        
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         CARD CORE CACHED PROPERTIES AND METHODS
     
     """
@@ -362,34 +573,6 @@ class Card:
         return value
     
     
-    def __validate_name(self, validate_value: str) -> None:
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = str,
-            raise_error = True
-            )
-        
-        # Asserting value is not empty:
-        assert_value_not_empty(
-            check_value = validate_value,
-            raise_error = True
-            )
-        
-        # Asserting value is default:
-        default_list: tuple[str, ...] = tuple(
-            attribute_name for attribute_name, attribute_value
-            in CARD_NAME.__dict__.items()
-            if not attribute_name.startswith("_")
-            )
-        assert_value_default(
-            check_value = validate_value,
-            check_default = default_list,
-            raise_error = True
-            )
-        
-    
     def set_name(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
@@ -432,35 +615,6 @@ class Card:
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
- 
-    
-    
-    def __validate_suit(self, validate_value: str) -> None:
-
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = str,
-            raise_error = True
-            )
-        
-        # Asserting value is not empty:
-        assert_value_not_empty(
-            check_value = validate_value,
-            raise_error = True
-            )
-
-        # Asserting value is default:
-        default_list: tuple[str, ...] = tuple(
-            attribute_name for attribute_name, attribute_value
-            in CARD_SUIT.__dict__.items()
-            if not attribute_name.startswith("_")
-            )
-        assert_value_default(
-            check_value = validate_value,
-            check_default = default_list,
-            raise_error = True
-            )
         
         
     def set_suit(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -495,16 +649,6 @@ class Card:
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
-    
-    
-    def __validate_trump(self, validate_value: bool) -> None:
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = bool,
-            raise_error = True
-            )
 
 
     def set_trump(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -547,7 +691,7 @@ class Card:
                 )
     
     
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         COORDINATES (CURRENT) CACHED PROPERTIES AND METHODS:
         
     """
@@ -578,22 +722,6 @@ class Card:
 
         # Returning:
         return coordinates
-
-
-    def __validate_coordinate(self, validate_value: int) -> None:
-
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = int,
-            raise_error = True
-            )
-        
-        # Asserting value is not negative:
-        assert_value_ge_zero(
-            check_value = validate_value,
-            raise_error = True
-            )
         
         
     def set_coordinate_x(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -679,29 +807,6 @@ class Card:
             clear_cache = clear_cache
             )
             
-            
-    def __validate_coordiante_container(self, validate_value: tuple[int, int]) -> None:
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = tuple,
-            raise_error = True,
-            )
-        
-        # Asserting container item count:
-        assert_eval: bool = len(validate_value) == 2
-        if not assert_eval:
-            container_len: int = len(validate_value)
-            error_message: str = f"Invalid container item count. Expected 2, got {container_len}."
-            raise AssertionError(error_message)
-        
-        # Asserting each item:
-        for container_item in validate_value:
-            self.__validate_coordinate(
-                validate_value = container_item
-                )
-            
     
     def set_coordinates(self, set_value: tuple[int, int], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
@@ -739,7 +844,7 @@ class Card:
                 )
             
     
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         COORDINATES (POSITION) CACHED PROPERTIES AND METHODS:
         
     """
@@ -854,7 +959,7 @@ class Card:
                 )
             
             
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         COORDINATES (EXPECTED) CACHED PROPERTIES AND METHODS:
         
     """
@@ -969,7 +1074,7 @@ class Card:
                 )
             
     
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         COORDINATES (HOVER) CACHED PROPERTIES AND METHODS:
         
     """
@@ -1084,7 +1189,7 @@ class Card:
                 )
 
 
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         TEXTURE CACHED PROPETIES AND METHODS
     
     """
@@ -1152,36 +1257,6 @@ class Card:
 
         # Returning:
         return texture_selected 
-    
-    
-    def __validate_texture_pack(self, validate_value: TexturePack) -> None:
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = TexturePack,
-            raise_error = True
-            )
-        
-        # Asserting value is default:
-        texture_pack = validate_value
-        if texture_pack.type == "Front":
-            texture_pack_list: tuple[TexturePack, ...] = tuple(
-                texture_pack_object for texture_pack_name, texture_pack_object 
-                in TEXTURE_PACK_FRONT.__dict__.items()
-                if isinstance(texture_pack_object, TexturePack)
-                )
-        else:
-            texture_pack_list: tuple[TexturePack, ...] = tuple(
-                texture_pack_object for texture_pack_name, texture_pack_object 
-                in TEXTURE_PACK_BACK.__dict__.items()
-                if isinstance(texture_pack_object, TexturePack)
-                )
-        assert_value_default(
-            check_value = texture_pack,
-            check_default_list = texture_pack_list,
-            raise_error = True
-            )
     
     
     def set_texture_pack_front(self, texture_pack_object: TexturePack, ignore_assertion: bool = False, 
@@ -1282,7 +1357,7 @@ class Card:
                 )
             
     
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         RENDER (SCALE) CACHED PROPERTIES AND METHODS:
     
     """
@@ -1321,22 +1396,6 @@ class Card:
 
         # Returning:
         return SETTINGS.CARD_RENDER_SCALE_STEP_MOD_SELECTED
-    
-    
-    def __validate_render_scale(self, validate_value: float) -> None:
-        
-        # Asserting value type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = float,
-            raise_error = True
-            )
-        
-        # Asserting value is not negative:
-        assert_value_ge_zero(
-            check_value = validate_value,
-            raise_error = True
-            )
         
         
     def set_render_scale(self, set_value: float, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -1441,7 +1500,7 @@ class Card:
                 )
             
     
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         RENDER (ALPHA) CACHED PROPERTIES AND METHODS:
     
     """
@@ -1466,22 +1525,6 @@ class Card:
 
         # Returning:
         return SETTINGS.CARD_RENDER_ALPHA_FADED
-
-
-    def __validate_render_alpha(self, validate_value: int) -> None:
-
-        # Asserting value type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = int,
-            raise_error = True
-            )
-        
-        # Asserting value is not negative:
-        assert_value_ge_zero(
-            check_value = validate_value,
-            raise_error = True
-            )
 
 
     def set_render_alpha(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -1588,7 +1631,7 @@ class Card:
                 )
         
             
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         RENDER (TILT) CACHED PROPERTIES AND METHODS:
     
     """
@@ -1639,26 +1682,6 @@ class Card:
 
         # Returning:
         return SETTINGS.CARD_RENDER_TILT_STEP_OUT
-    
-    
-    def __validate_render_tilt(self, validate_value: int) -> None:
-        
-        # Asserting value type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = int,
-            raise_error = True
-            )
-
-        # Asserting value in range:
-        assert_value_in_range(
-            check_value = abs(validate_value),
-            check_range = (
-                SETTINGS.CARD_RENDER_TILT_MIN, 
-                SETTINGS.CARD_RENDER_TILT_MAX +1
-                ),
-            raise_error = True
-            )
     
     
     def set_render_tilt(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -1767,7 +1790,7 @@ class Card:
                 )
             
     
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         OTHER RENDER CACHED PROPERTIES AND METHODS:
     
     """
@@ -1788,7 +1811,7 @@ class Card:
         return rect_object
     
     
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         STATE CACHED PROPERTIES AND METHODS:
         
     """
@@ -1820,16 +1843,6 @@ class Card:
         
         # Returning:
         return self.__state_selected
-
-
-    def __validate_state(self, validate_value: bool) -> None:
-        
-        # Asserting value type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = bool,
-            raise_error = True
-            )
         
     
     def set_state_visible(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
