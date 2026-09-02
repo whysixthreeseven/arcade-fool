@@ -97,3 +97,12 @@ class CARD_TEXTURE_BACK_INDEX:
         "Plain",
         "Sun"
         )
+
+
+class CARD_LOCATION:
+    DECK: str = "Deck"
+    DISCARD: str = "Discard"
+    TABLE: str = "Table"
+    HAND: str = "Hand"
+    
+    
