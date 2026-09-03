@@ -1,9 +1,5 @@
 # Typing and annotations:
 from __future__ import annotations
-from typing import Any, Optional, Literal, LiteralString
-
-# System management:
-import os
 
 # Random library:
 import random
@@ -2183,3 +2179,4 @@ class Card:
             target_object = self,
             target_attribute = cached_property
             )
+        
