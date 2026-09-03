@@ -40,6 +40,12 @@ class __SETTINGS:
     CARD_TEXTURE_WIDTH: int = int(CARD_TEXTURE_WIDTH_FILE * CARD_TEXTURE_SCALE_DEFAULT)
     CARD_TEXTURE_HEIGHT_FILE: int = 480
     CARD_TEXTURE_HEIGHT: int = int(CARD_TEXTURE_HEIGHT_FILE * CARD_TEXTURE_SCALE_DEFAULT)
+    
+    # Deck settings:
+    DECK_SIZE_MIN: int = 36
+    DECK_SIZE_MAX: int = 52
+    DECK_SIZE_OPTIONS: tuple[int, int] = (DECK_SIZE_MIN, DECK_SIZE_MAX)
+    DECK_SIZE_DEFAULT: int = DECK_SIZE_MIN
         
         
 # Initializing settings instance:
