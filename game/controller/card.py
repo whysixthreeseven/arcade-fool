@@ -93,6 +93,58 @@ class Card:
         
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        NATIVE METHODS
+    
+    """
+    
+    
+    def __gt__(self, other: Card) -> bool:
+        
+        # Comparing values:
+        assert_eval: bool = bool(
+            self.trump and self.value > other.value or
+            self.suit == other.suit and self.value > other.value
+            )
+        
+        # Returning:
+        return assert_eval
+
+
+    def __lt__(self, other: Card) -> bool:
+
+        # Comparing values:
+        assert_eval: bool = bool(
+            self.trump and self.value < other.value or
+            self.suit == other.suit and self.value < other.value
+            )
+
+        # Returning:
+        return assert_eval
+    
+    
+    def __repr__(self) -> str:
+        
+        # Generating repr string:
+        card: str = "{card_name} @{card_location} ({card_coordinates})".format(
+            card_name = "{self.suit_ascii}{self.name_ascii}",
+            card_location = "{self.location}:{self.location_index}",
+            card_coordinates = f"{self.coordinate_x}:{self.coordinate_y}"
+            )
+        
+        # Returning:
+        return card
+        
+        
+    def __str__(self) -> str:
+        
+        # Generating string:
+        card: str = f"{self.suit_ascii}{self.name_ascii}"
+        
+        # Returning:
+        return card
+
+
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         CACHED PROPETIES AND CLEAN METHODS
     
     """
