@@ -43,7 +43,8 @@ from game.context import (
     CARD_SUIT, 
     CARD_SUIT_ASCII, 
     CARD_COLOR, 
-    CARD_VALUE
+    CARD_VALUE,
+    CARD_LOCATION,
     )
 
 
@@ -51,7 +52,6 @@ from game.context import (
     CARD CLASS OBJECT CONSTRUCTOR
     
 """
-
 
 
 class Card:
@@ -90,6 +90,10 @@ class Card:
         self.__state_hovered: bool = None
         self.__state_selected: bool = None
         self.__state_playable: bool = None
+        
+        # Play location and index:
+        self.__location: str = None
+        self.__location_index: int = None
         
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -194,6 +198,19 @@ class Card:
         # Returning:
         return cached_property_list
     
+    
+    @cached_property
+    def __cached_location_attributes(self) -> tuple[str, ...]:
+    
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "location",
+            "location_index",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
 
     def clear_cached_core_attributes(self) -> None:
 
@@ -239,6 +256,15 @@ class Card:
             target_attribute_list = self.__cached_state_attributes
             )
         
+        
+    def clear_cached_location_attributes(self) -> None:
+            
+        # Clearing cached properties:
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_location_attributes
+            )
+        
     
     def clear_cached_attributes(self) -> None:
         
@@ -249,6 +275,7 @@ class Card:
             self.__cached_render_attributes,
             self.__cached_coordinates_attributes,
             self.__cached_state_attributes,
+            self.__cached_location_attributes,
             )
         
         # Looping throught the list and clearing cache:
@@ -460,7 +487,46 @@ class Card:
             check_type = bool,
             raise_error = True
             )
+        
     
+    def __validate_location(self, validate_value: str) -> None:
+        
+        # Asserting value type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = str,
+            raise_error = True,
+            )
+        
+        # Asserting value is default:
+        default_list: tuple[str, ...] = tuple(
+            attribute_value for attribute_name, attribute_value
+            in CARD_LOCATION.__dict__.items()
+            if not attribute_name.startswith("_")
+            and isinstance(attribute_value, str)
+            )
+        assert_value_default(
+            check_value = validate_value,
+            check_list = default_list,
+            raise_error = True,
+            )
+        
+    
+    def __validate_location_index(self, validate_value: int) -> None:
+        
+        # Asserting value type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = int,
+            raise_error = True,
+            )
+        
+        # Asserting value is default:
+        assert_value_in_range(
+            check_value = validate_value,
+            check_range = range(0, SETTINGS.DECK_SIZE_MAX),     # Assuming first is always 0
+            raise_error = True,
+            )
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -2015,3 +2081,105 @@ class Card:
                 )
     
     
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        LOCATION CACHED PROPERTIES AND METHODS:
+        
+    """
+    
+    
+    @cached_property
+    def location(self) -> str:
+        
+        # Returning:
+        return self.__location
+    
+    
+    def set_location(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            self.__validate_location(
+                validate_value = set_value
+                )
+            
+        # Updating attribute:
+        self.__location = set_value
+        
+        # Clearing cache:
+        cached_property: str = "location"
+        clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+    
+    def set_location_hand(self, clear_cache: bool = True) -> None:
+        
+        # Updating attribute:
+        self.set_location(
+            set_value = CARD_LOCATION.HAND,
+            ignore_assertion = True,
+            clear_cache = clear_cache
+            )
+        
+    
+    def set_location_deck(self, clar_cache: bool = True) -> None:
+        
+        # Updating attribute:
+        self.set_location(
+            set_value = CARD_LOCATION.DECK,
+            ignore_assertion = True,
+            clear_cache = clar_cache
+            )
+        
+        
+    def set_location_discard(self, clear_cache: bool = True) -> None:
+
+        # Updating attribute:
+        self.set_location(
+            set_value = CARD_LOCATION.DISCARD,
+            ignore_assertion = True,
+            clear_cache = clear_cache
+            )
+        
+    
+    def set_location_table(self, clear_cache: bool = True) -> None:
+        
+        # Updating attribute:
+        self.set_location(
+            set_value = CARD_LOCATION.TABLE,
+            ignore_assertion = True,
+            clear_cache = clear_cache
+            )
+        
+
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        INDEX CACHED PROPERTIES AND METHODS:
+        
+    """
+    
+    
+    @cached_property
+    def location_index(self) -> int:
+
+        # Returning:
+        return self.__location_index
+
+
+    def set_index(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            self.__validate_location_index(
+                validate_value = set_value
+                )
+
+        # Updating attribute:
+        self.__location_index = set_value
+
+        # Clearing cache:
+        cached_property: str = "location_index"
+        clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
