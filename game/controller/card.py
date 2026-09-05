@@ -85,6 +85,7 @@ class Card:
         self.__state_revealed: bool = None
         self.__state_hovered: bool = None
         self.__state_selected: bool = None
+        self.__state_faded: bool = None
         self.__state_playable: bool = None
         
         # Play location and index:
@@ -201,6 +202,21 @@ class Card:
     
     
     @cached_property
+    def __cached_render_rect_attributes(self) -> tuple[str, ...]:
+
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "render_rect",
+            "render_width",
+            "render_height",
+            "render_text",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+    
+    @cached_property
     def __cached_coordinates_attributes(self) -> tuple[str, ...]:
 
         # Collecting related cached properties:
@@ -240,6 +256,8 @@ class Card:
             "state_revealed",
             "state_hovered",
             "state_selected",
+            "state_faded",
+            "state_idle",
             "state_playable"
             )
         
@@ -286,6 +304,15 @@ class Card:
             target_attribute_list = self.__cached_render_attributes
             )
         
+        
+    def clear_cached_render_rect_attributes(self) -> None:
+        
+        # Clearing cache:
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_render_rect_attributes
+            )
+        
 
     def clear_cached_coordinates_attributes(self) -> None:
         
@@ -321,6 +348,7 @@ class Card:
             self.__cached_core_attributes,
             self.__cached_texture_attributes,
             self.__cached_render_attributes,
+            self.__cached_render_rect_attributes,
             self.__cached_coordinates_attributes,
             self.__cached_state_attributes,
             self.__cached_location_attributes,
@@ -335,7 +363,7 @@ class Card:
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        VALIDATE METHODS:
+        VALIDATE METHODS
     
     """
     
@@ -806,7 +834,7 @@ class Card:
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        COORDINATES (CURRENT) CACHED PROPERTIES AND METHODS:
+        COORDINATES (CURRENT) CACHED PROPERTIES AND METHODS
         
     """
     
@@ -959,7 +987,7 @@ class Card:
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        COORDINATES (POSITION) CACHED PROPERTIES AND METHODS:
+        COORDINATES (POSITION) CACHED PROPERTIES AND METHODS
         
     """
     
@@ -1074,7 +1102,7 @@ class Card:
             
             
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        COORDINATES (EXPECTED) CACHED PROPERTIES AND METHODS:
+        COORDINATES (EXPECTED) CACHED PROPERTIES AND METHODS
         
     """
             
@@ -1189,7 +1217,7 @@ class Card:
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        COORDINATES (HOVER) CACHED PROPERTIES AND METHODS:
+        COORDINATES (HOVER) CACHED PROPERTIES AND METHODS
         
     """
     
@@ -1472,7 +1500,7 @@ class Card:
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        RENDER (SCALE) CACHED PROPERTIES AND METHODS:
+        RENDER (SCALE) CACHED PROPERTIES AND METHODS
     
     """
     
@@ -1615,7 +1643,7 @@ class Card:
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        RENDER (ALPHA) CACHED PROPERTIES AND METHODS:
+        RENDER (ALPHA) CACHED PROPERTIES AND METHODS
     
     """
     
@@ -1746,7 +1774,7 @@ class Card:
         
             
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        RENDER (TILT) CACHED PROPERTIES AND METHODS:
+        RENDER (TILT) CACHED PROPERTIES AND METHODS
     
     """
 
@@ -1905,7 +1933,7 @@ class Card:
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        OTHER RENDER CACHED PROPERTIES AND METHODS:
+        OTHER RENDER CACHED PROPERTIES AND METHODS
     
     """
 
@@ -1918,15 +1946,60 @@ class Card:
             x = self.coordinate_x,
             y = self.coordinate_y,
             w = self.render_width,
-            h = self.render_height,
+            h = self.render_height
             )
         
         # Returning:
         return rect_object
     
     
+    @cached_property
+    def render_rect_color(self) -> tuple[int, int, int]:
+        
+        # Returning:
+        return SETTINGS.CARD_RENDER_BG_COLOR
+    
+    
+    @cached_property
+    def render_width(self) -> int:
+        
+        # Calculating:
+        render_width: int = int(SETTINGS.CARD_TEXTURE_WIDTH * self.render_scale)
+        
+        # Returning:
+        return render_width
+    
+    
+    @cached_property
+    def render_height(self) -> int:
+        
+        # Calculating:
+        render_height: int = int(SETTINGS.CARD_TEXTURE_HEIGHT * self.render_scale)
+
+        # Returning:
+        return render_height
+    
+    
+    @cached_property
+    def render_text(self) -> Text:
+        
+        # Creating text object:
+        text: Text = Text(
+            text = self.__repr__,
+            x = self.coordinate_x,
+            y = int(self.coordinate_y - self.render_height / 2 - self.render_height / 8),
+            color = SETTINGS.CARD_RENDER_TEXT_COLOR,
+            font_size = SETTINGS.CARD_RENDER_TEXT_FONT_SIZE,
+            font_name = SETTINGS.CARD_RENDER_TEXT_FONT_NAME,
+            anchor_x = "center"
+            )
+        
+        # Returning:
+        return text
+    
+    
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        STATE CACHED PROPERTIES AND METHODS:
+        STATE CACHED PROPERTIES AND METHODS
         
     """
     
@@ -1957,8 +2030,30 @@ class Card:
         
         # Returning:
         return self.__state_selected
-        
     
+    
+    @cached_property
+    def state_faded(self) -> bool:
+        
+        # Returning:
+        return self.__state_faded
+    
+    
+    @cached_property
+    def state_idle(self) -> bool:
+        
+        # Checking:
+        state_idle: bool = bool(
+            self.coordinate_x == self.coordinate_x_expected and 
+            self.coordinate_y == self.coordinate_y_expected and
+            not self.state_hovered and
+            not self.state_selected
+            )
+
+        # Returning:
+        return state_idle
+
+
     def set_state_visible(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
@@ -2040,10 +2135,13 @@ class Card:
         
         # Clearing cache:
         if clear_cache:
-            cached_property: str = "state_hovered"
-            clear_cached_property(
+            cached_property_list: tuple[str, ...] = (
+                "state_hovered",
+                "state_idle"
+                )
+            clear_cached_property_list(
                 target_object = self,
-                target_attribute = cached_property
+                target_attribute = cached_property_list
                 )
             
 
@@ -2054,10 +2152,13 @@ class Card:
 
         # Clearing cache:
         if clear_cache:
-            cached_property: str = "state_hovered"
-            clear_cached_property(
+            cached_property_list: tuple[str, ...] = (
+                "state_hovered",
+                "state_idle"
+                )
+            clear_cached_property_list(
                 target_object = self,
-                target_attribute = cached_property
+                target_attribute = cached_property_list
                 )
             
     
@@ -2074,11 +2175,15 @@ class Card:
 
         # Clearing cache:
         if clear_cache:
-            cached_property: str = "state_selected"
-            clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
+            if clear_cache:
+                cached_property_list: tuple[str, ...] = (
+                    "state_selected",
+                    "state_idle"
+                    )
+                clear_cached_property_list(
+                    target_object = self,
+                    target_attribute = cached_property_list
+                    )
             
     
     def switch_state_selected(self, clear_cache: bool = True) -> None:
@@ -2088,7 +2193,44 @@ class Card:
 
         # Clearing cache:
         if clear_cache:
-            cached_property: str = "state_selected"
+            cached_property_list: tuple[str, ...] = (
+                "state_selected",
+                "state_idle"
+                )
+            clear_cached_property_list(
+                target_object = self,
+                target_attribute = cached_property_list
+                )
+            
+            
+    def set_state_faded(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            self.__validate_state(
+                validate_value = set_value
+                )
+            
+        # Updating attribute:
+        self.__state_faded = set_value
+        
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "state_faded"
+            clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+            
+    
+    def switch_state_faded(self, clear_cache: bool = True) -> None:
+        
+        # Updating attribute:
+        self.__state_faded = not self.state_faded
+        
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "state_faded"
             clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
@@ -2130,7 +2272,7 @@ class Card:
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        LOCATION CACHED PROPERTIES AND METHODS:
+        LOCATION CACHED PROPERTIES AND METHODS
         
     """
     
@@ -2202,7 +2344,7 @@ class Card:
         
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        INDEX CACHED PROPERTIES AND METHODS:
+        INDEX CACHED PROPERTIES AND METHODS
         
     """
     
@@ -2232,3 +2374,173 @@ class Card:
             target_attribute = cached_property
             )
         
+
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        DISPLAY METHODS
+        
+    """
+    
+    
+    def display(self) -> None:
+        
+        # Rendering:
+        arcade.draw_texture_rect(
+            texture = self.texture_object_selected,
+            rect = self.render_rect,
+            color = self.render_rect_color,
+            angle = self.render_tilt,
+            alpa = self.render_alpha,
+            )
+
+
+    def display_info(self) -> None:
+        
+        # Calling text object's draw method:
+        self.render_text.draw()
+        
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        JOB METHODS
+        
+    """
+    
+    
+    def auto_scale(self) -> None:
+        
+        # Preparing flag variables:
+        clear_cache: bool = False
+        job_required: bool = False
+        
+        # Checking hovered or selected states:
+        if self.state_hovered or self.state_selected:
+            if self.render_scale != self.render_scale_selected:
+                render_scale_target: float = self.render_scale_selected
+                job_required = True
+                
+        # Checking default state:
+        else:
+            if self.render_scale != self.render_scale_default:
+                render_scale_target: float = self.render_scale_default
+                job_required = True
+            
+        # Running job:
+        if job_required:
+            render_scale_prev: float = self.render_scale
+            self.transition_render_scale(
+                target_value = render_scale_target,
+                ignore_assertion = True,
+                clear_cache = False,
+                )
+            clear_cache = self.__render_scale != render_scale_prev
+                
+            # Clearing cache, if required:
+            if clear_cache:
+                cached_property_list: tuple[str, ...] = (
+                    "render_scale",
+                    "render_rect",
+                    "render_text"
+                    )
+                clear_cached_property_list(
+                    target_object = self,
+                    target_attribute_list = cached_property_list
+                    )
+                
+    
+    def auto_tilt(self, instant_mode: bool = False) -> None:
+        
+        # Preparing flag variables:
+        clear_cache: bool = False
+        job_required: bool = False
+        
+        # Checking hovered or selected states:
+        if self.state_idle:
+            if self.render_tilt != self.render_tilt_random:
+                render_tilt_target: int = self.render_tilt_random
+                job_required = True
+                
+        # Checking default state:
+        else:
+            if self.location == CARD_LOCATION.OPPONENT:
+                if self.render_tilt != self.render_tilt_opp:
+                    render_tilt_target: int = self.render_tilt_opp
+                    job_required = True
+            elif self.location == CARD_LOCATION.PLAYER:
+                if self.render_tilt != self.render_tilt_default:
+                    render_tilt_target: int = self.render_tilt_default
+                    job_required = True
+
+        # Running job:
+        if job_required:
+            render_tilt_prev: int = self.render_tilt
+            if instant_mode:
+                self.set_render_tilt(
+                    set_value = render_tilt_target,
+                    ignore_assertion = True,
+                    clear_cache = False,
+                    )
+            else:
+                self.transition_render_tilt(
+                    target_value = render_tilt_target,
+                    ignore_assertion = True,
+                    clear_cache = False,
+                    )
+            clear_cache = self.__render_tilt != render_tilt_prev
+            
+            # Clearing cache, if required:
+            if clear_cache:
+                cached_property_list: tuple[str, ...] = (
+                    "render_tilt",
+                    )  
+                clear_cached_property_list(
+                    target_object = self,
+                    target_attribute_list = cached_property_list
+                    )
+                
+                # Checking if old randomly generated tilt angle needs to be cleared:
+                if not self.state_selected and not self.state_hovered:
+                    if self.render_tilt == render_tilt_target:
+                        cached_property: str = "render_tilt_random"
+                        clear_cached_property(
+                            target_object = self,
+                            target_attribute = cached_property
+                            )
+
+
+    def auto_alpha(self) -> None:
+
+        # Preparing flag variables:
+        clear_cache: bool = False
+        job_required: bool = False
+        
+        # Checking faded state:
+        if self.state_faded:
+            if self.render_alpha != self.render_alpha_faded:
+                render_alpha_target: int = self.render_alpha_faded
+                job_required = True
+
+        # Checking default state:
+        else:
+            if self.render_alpha != self.render_alpha_default:
+                render_alpha_target: int = self.render_alpha_default
+                job_required = True
+
+        # Running job:
+        if job_required:
+            render_alpha_prev: int = self.render_alpha
+            self.transition_render_alpha(
+                target_value = render_alpha_target,
+                ignore_assertion = True,
+                clear_cache = False,
+                )
+            clear_cache = self.__render_alpha != render_alpha_prev
+            
+            # Clearing cache, if required:
+            if clear_cache:
+                cached_property_list: tuple[str, ...] = (
+                    "render_alpha",
+                    )  
+                clear_cached_property_list(
+                    target_object = self,
+                    target_attribute_list = cached_property_list
+                    )
+
