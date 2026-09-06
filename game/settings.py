@@ -33,7 +33,10 @@ class __SETTINGS:
     CARD_RENDER_ALPHA_FADED: int = int(CARD_RENDER_ALPHA_DEFAULT * CARD_RENDER_ALPHA_FADED_MOD)
     CARD_RENDER_ALPHA_STEP_MOD_DEFAULT: float = 0.015
     CARD_RENDER_ALPHA_STEP_MOD_FADED: float = 0.045
-    CARD_RENDER_DEBUG_COLOR: tuple[int, int, int] = (215, 0, 0)
+    CARD_RENDER_BG_COLOR: tuple[int, int, int] = (215, 0, 0)
+    CARD_RENDER_TEXT_COLOR: tuple[int, int, int] = (255, 255, 255)
+    CARD_RENDER_TEXT_FONT_SIZE: int = 12
+    CARD_RENDER_TEXT_FONT_NAME: str = "DengXian"
     
     # Card texture settings:
     CARD_TEXTURE_SCALE_DEFAULT: float = 0.40
@@ -47,7 +50,49 @@ class __SETTINGS:
     DECK_SIZE_MAX: int = 52
     DECK_SIZE_OPTIONS: tuple[int, int] = (DECK_SIZE_MIN, DECK_SIZE_MAX)
     DECK_SIZE_DEFAULT: int = DECK_SIZE_MIN
-        
+    
+    # Area dimensions settings:
+    __AREA_HAND_WIDTH: int = 800
+    __AREA_HAND_HEIGHT: int = int(CARD_TEXTURE_HEIGHT * 2.20)
+    __AREA_SIDE_WIDTH: int = int(CARD_TEXTURE_WIDTH * 2.00)
+    AREA_PLAYER_WIDTH: int = __AREA_HAND_WIDTH
+    AREA_PLAYER_HEIGHT: int = __AREA_HAND_HEIGHT
+    AREA_TABLE_WIDTH: int = __AREA_HAND_WIDTH
+    AREA_TABLE_HEIGHT: int = int(CARD_TEXTURE_HEIGHT * 1.80)
+    AREA_OPPONENT_WIDTH: int = __AREA_HAND_WIDTH
+    AREA_OPPONENT_HEIGHT: int = __AREA_HAND_HEIGHT
+    AREA_DECK_WIDTH: int = __AREA_SIDE_WIDTH
+    AREA_DECK_HEIGHT: int = int((__AREA_HAND_HEIGHT * 2 + AREA_TABLE_HEIGHT) / 2)
+    AREA_DISCARD_WIDTH: int = __AREA_SIDE_WIDTH
+    AREA_DISCARD_HEIGHT: int = int((__AREA_HAND_HEIGHT * 2 + AREA_TABLE_HEIGHT) / 2)
+    
+    # Area coordinates settings:
+    AREA_PLAYER_CENTER_COORDINATE_X: int = int(AREA_PLAYER_WIDTH / 2)
+    AREA_PLAYER_CENTER_COORDINATE_Y: int = int(AREA_PLAYER_HEIGHT / 2)
+    AREA_TABLE_CENTER_COORDINATE_X: int = int(AREA_TABLE_WIDTH / 2)
+    AREA_TABLE_CENTER_COORDINATE_Y: int = int(AREA_PLAYER_HEIGHT + AREA_TABLE_HEIGHT / 2)
+    AREA_OPPONENT_CENTER_COORDINATE_X: int = int(AREA_OPPONENT_WIDTH / 2)
+    AREA_OPPONENT_CENTER_COORDINATE_Y: int = int(AREA_PLAYER_HEIGHT + AREA_TABLE_HEIGHT + AREA_OPPONENT_HEIGHT / 2)
+    AREA_DECK_CENTER_COORDINATE_X: int = int(AREA_PLAYER_WIDTH + AREA_DECK_WIDTH / 2)
+    AREA_DECK_CENTER_COORDINATE_Y: int = int(AREA_DECK_HEIGHT / 2)
+    AREA_DISCARD_CENTER_COORDINATE_X: int = int(AREA_OPPONENT_WIDTH + AREA_DISCARD_WIDTH / 2)
+    AREA_DISCARD_CENTER_COORDINATE_Y: int = int(AREA_DECK_HEIGHT + AREA_DECK_HEIGHT / 2)
+
+    # Area debug color settings:
+    __AREA_HAND_COLOR_BACKGROUND: tuple[int, int, int] = (215, 15, 15)                      # ~Red
+    AREA_PLAYER_COLOR_BACKGROUND: tuple[int, int, int] = __AREA_HAND_COLOR_BACKGROUND       # ~Red
+    AREA_TABLE_COLOR_BACKGROUND: tuple[int, int, int] = (15, 215, 15)                       # ~Green
+    AREA_OPPONENT_COLOR_BACKGROUND: tuple[int, int, int] = __AREA_HAND_COLOR_BACKGROUND     # ~Red
+    AREA_DECK_COLOR_BACKGROUND: tuple[int, int, int] = (15, 15, 215)                        # ~Blue
+    AREA_DISCARD_COLOR_BACKGROUND: tuple[int, int, int] = (215, 15, 215)                    # ~Magenta
+    
+    # Surface settings:
+    SURFACE_WIDTH: int = int(__AREA_HAND_WIDTH + __AREA_SIDE_WIDTH)
+    SURFACE_HEIGHT: int = int(__AREA_HAND_HEIGHT * 2 + AREA_TABLE_HEIGHT)
+    SURFACE_CENTER_COORDINATE_X: int = int(SURFACE_WIDTH / 2)
+    SURFACE_CENTER_COORDINATE_Y: int = int(SURFACE_HEIGHT / 2)
+    SURFACE_COLOR_BACKGROUND: tuple[int, int, int] = (0, 0, 0)                             # ~Black
+
         
 # Initializing settings instance:
 SETTINGS = __SETTINGS()
