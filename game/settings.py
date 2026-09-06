@@ -80,6 +80,7 @@ class __SETTINGS:
 
     # Area debug color settings:
     __AREA_HAND_COLOR_BACKGROUND: tuple[int, int, int] = (215, 15, 15)                      # ~Red
+    AREA_TEXT_COLOR: tuple[int, int, int] = (255, 255, 255)                                 # ~White
     AREA_PLAYER_COLOR_BACKGROUND: tuple[int, int, int] = __AREA_HAND_COLOR_BACKGROUND       # ~Red
     AREA_TABLE_COLOR_BACKGROUND: tuple[int, int, int] = (15, 215, 15)                       # ~Green
     AREA_OPPONENT_COLOR_BACKGROUND: tuple[int, int, int] = __AREA_HAND_COLOR_BACKGROUND     # ~Red
