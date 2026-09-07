@@ -1,3 +1,20 @@
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    NAMESPACE VARIABLES
+    
+"""
+
+
+RGB_Color = tuple[int, int, int]
+Coordinates = tuple[int, int]
+Position = tuple[str, int]
+
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    CARD-RELATED CONTEXT VARIABLES
+
+"""
+
+
 class CARD_SUIT:
     HEARTS: str = "Hearts"
     DIAMONDS: str = "Diamonds"
@@ -103,6 +120,23 @@ class CARD_LOCATION:
     DECK: str = "Deck"
     DISCARD: str = "Discard"
     TABLE: str = "Table"
-    HAND: str = "Hand"
+    PLAYER: str = "Player"
+    OPPONENT: str = "Opponent"
+    
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    AREA-RELATED CONTEXT VARIABLES
+
+"""
+
+
+class AREA_TYPE:
+    SURFACE: str = "Surface"
+    INTERFACE: str = "Interface"
+    PLAYER: str = "Player"
+    OPPONENT: str = "Opponent"
+    TABLE: str = "Table"
+    DECK: str = "Deck"
+    DISCARD: str = "Discard"
     
     
