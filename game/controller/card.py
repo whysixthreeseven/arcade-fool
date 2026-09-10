@@ -2405,6 +2405,23 @@ class Card:
     """
     
     
+    def slide(self, target_coordinates: tuple[int, int], speed_modifier: float, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            self.__validate_coordiante_container(
+                validate_value = target_coordinates
+                )
+            
+        # TODO: Continue!
+        
+        
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        JOB METHODS
+        
+    """
+    
+    
     def auto_scale(self) -> None:
         
         # Preparing flag variables:
@@ -2543,4 +2560,5 @@ class Card:
                     target_object = self,
                     target_attribute_list = cached_property_list
                     )
+
 
