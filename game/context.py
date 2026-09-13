@@ -10,7 +10,7 @@ Position = tuple[str, int]
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    CARD-RELATED CONTEXT VARIABLES
+    CARD-RELATED CONTEXT VARIABLES 
 
 """
 
@@ -77,7 +77,7 @@ class CARD_VALUE:
     ACE: int = 13
 
 
-class CARD_COLOR:
+class CARD_SUIT_COLOR:
     RED: str = "Red"
     BLACK: str = "Black"
 
@@ -122,6 +122,48 @@ class CARD_LOCATION:
     TABLE: str = "Table"
     PLAYER: str = "Player"
     OPPONENT: str = "Opponent"
+    
+
+CARD_SUIT_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_SUIT.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
+
+CARD_SUIT_ASCII_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_SUIT_ASCII.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
+
+CARD_SUIT_COLOR_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_SUIT_COLOR.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+    
+    
+CARD_NAME_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_NAME.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
+
+CARD_NAME_ASCII_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_NAME_ASCII.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
+
+CARD_VALUE_LIST: tuple[int, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_VALUE.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, int)
+    )
+    
+
+CARD_LOCATION_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_LOCATION.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
     
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
