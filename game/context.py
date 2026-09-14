@@ -10,7 +10,7 @@ Position = tuple[str, int]
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    CARD-RELATED CONTEXT VARIABLES 
+    CARD-RELATED CONTEXT VARIABLES (CLASS OBJECTS)
 
 """
 
@@ -122,6 +122,12 @@ class CARD_LOCATION:
     TABLE: str = "Table"
     PLAYER: str = "Player"
     OPPONENT: str = "Opponent"
+    
+    
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    CARD-RELATED CONTEXT VARIABLES (TUPLE COLLECTIONS)
+
+"""
     
 
 CARD_SUIT_LIST: tuple[str, ...] = tuple(
