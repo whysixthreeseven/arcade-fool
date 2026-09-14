@@ -3,6 +3,14 @@ import os
 
 
 class __SETTINGS:
+    
+    # Application information:
+    APP_NAME: str = "Arcade Fool"
+    APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
+    APP_VERSION: str = "0.0.1R"
+    APP_STARTED: str = "2026.09.02"
+    APP_UPDATED: str = "2026.09.14"
+    APP_AUTHOR: str = "Andrey Vostokov"
 
     # Root directory settings:    
     DIR_APP: str = os.path.dirname(__file__)
