@@ -33,15 +33,7 @@ from game.utilities.scripts.assertion import (
     )
 
 # Context and other card variables:
-from game.context import (
-    CARD_NAME, 
-    CARD_NAME_ASCII, 
-    CARD_SUIT, 
-    CARD_SUIT_ASCII, 
-    CARD_COLOR, 
-    CARD_VALUE,
-    CARD_LOCATION,
-    )
+from game.context import *
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -143,6 +135,37 @@ class Card:
         
         # Returning:
         return card
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        CLASS METHODS
+    
+    """
+    
+    
+    @classmethod
+    def generate(cls, init_suit, init_name) -> Card:
+        
+        # Creating basic card object:
+        card_object: Card = Card()
+        
+        # Adding core attributes:
+        card_object.set_suit(
+            set_value = init_suit,
+            ignore_assertion = False,
+            clear_cache = False,
+            )
+        card_object.set_name(
+            set_value = init_name,
+            ignore_assertion = False,
+            clear_cache = False,
+            )
+        
+        # Clearing core cached attributes:
+        card_object.clear_cached_core_attributes()
+        
+        # Returning:
+        return card_object
 
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -670,10 +693,10 @@ class Card:
         
         # Getting correct color:
         color_index: dict[str, str] = {
-            CARD_SUIT.HEARTS:   CARD_COLOR.RED,
-            CARD_SUIT.DIAMONDS: CARD_COLOR.RED,
-            CARD_SUIT.CLUBS:    CARD_COLOR.BLACK,
-            CARD_SUIT.SPADES:   CARD_COLOR.BLACK,
+            CARD_SUIT.HEARTS:   CARD_SUIT_COLOR.RED,
+            CARD_SUIT.DIAMONDS: CARD_SUIT_COLOR.RED,
+            CARD_SUIT.CLUBS:    CARD_SUIT_COLOR.BLACK,
+            CARD_SUIT.SPADES:   CARD_SUIT_COLOR.BLACK,
             }
         color: str = color_index.get(
             self.suit,      # Cached property (None by default)
