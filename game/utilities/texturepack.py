@@ -14,7 +14,6 @@ from game.utilities.scripts.cache import (
 
 # Settings and session instances:
 from game.settings import SETTINGS
-from game.session import SESSION
 
 # Card-related variables:
 from game.context import (
@@ -188,7 +187,7 @@ class TexturePack:
     def set_name(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+        if not ignore_assertion:
             self.__valudate_name(
                 validate_value = set_value,
                 
@@ -245,7 +244,7 @@ class TexturePack:
     def set_type(self, set_value: str, ignore_assertion = False, clear_cache = True) -> None:
         
         # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+        if not ignore_assertion:
             self.__validate_type(
                 validate_value = set_value,
                 )
@@ -329,7 +328,7 @@ class TexturePack:
     def set_colorcode(self, set_value: str, ignore_assertion = False, clear_cache = True) -> None:
         
         # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+        if not ignore_assertion:
             self.__validate_colorcode(
                 validate_value = set_value,
                 )
@@ -417,7 +416,7 @@ class TexturePack:
     def set_style(self, set_value: str, ignore_assertion = False, clear_cache = True) -> None:
 
         # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+        if not ignore_assertion:
             self.__validate_style(
                 validate_value = set_value,
                 )
@@ -570,14 +569,14 @@ class TEXTURE_PACK_BACK:
 """
 
 
-TEXTURE_PACK_FRONT_INDEX: tuple[TexturePack, ...] = (
+TEXTURE_PACK_FRONT_INDEX: tuple[TexturePack, ...] = tuple(
     attribute_value for attribute_name, attribute_value 
     in TEXTURE_PACK_FRONT.__dict__.items()
     if isinstance(attribute_value, TexturePack)
     )
 
 
-TEXTURE_PACK_BACK_INDEX: tuple[TexturePack, ...] = (
+TEXTURE_PACK_BACK_INDEX: tuple[TexturePack, ...] = tuple(
     attribute_value for attribute_name, attribute_value 
     in TEXTURE_PACK_BACK.__dict__.items()
     if isinstance(attribute_value, TexturePack)
