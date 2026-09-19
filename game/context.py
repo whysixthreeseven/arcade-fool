@@ -6,7 +6,7 @@
 
 RGB_Color = tuple[int, int, int]
 Coordinates = tuple[int, int]
-Position = tuple[str, int]
+Location = tuple[str, int]
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
