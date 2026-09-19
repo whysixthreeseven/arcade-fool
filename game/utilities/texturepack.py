@@ -498,7 +498,13 @@ class TexturePack:
         # Returning:
         return texture_index        
 
-# Texture pack collection (front):
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    TEXTURE PACK COLLECTION (FRONT & BACK)
+
+"""
+
+
 class TEXTURE_PACK_FRONT:
     
     # Dark texture packs:
@@ -516,7 +522,7 @@ class TEXTURE_PACK_FRONT:
     # Sepia texture packss
     SEPIA_1_1 = TexturePack.create("Washed", "Front", "Sepia", "1_1")
     SEPIA_2_1 = TexturePack.create("Faded", "Front", "Sepia", "2_1")
-
+    
 
 # Texture pack collection (back):
 class TEXTURE_PACK_BACK:
@@ -556,5 +562,24 @@ class TEXTURE_PACK_BACK:
     SUN_PURPLE = TexturePack.create("Sun (Purple)", "Back", "Purple", "Sun")
     SUN_RED = TexturePack.create("Sun (Red)", "Back", "Red", "Sun")
     SUN_WHITE = TexturePack.create("Sun (White)", "Back", "White", "Sun")
-    
-    
+
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    TEXTURE PACK LISTS (FRONT & BACK)
+
+"""
+
+
+TEXTURE_PACK_FRONT_INDEX: tuple[TexturePack, ...] = (
+    attribute_value for attribute_name, attribute_value 
+    in TEXTURE_PACK_FRONT.__dict__.items()
+    if isinstance(attribute_value, TexturePack)
+    )
+
+
+TEXTURE_PACK_BACK_INDEX: tuple[TexturePack, ...] = (
+    attribute_value for attribute_name, attribute_value 
+    in TEXTURE_PACK_BACK.__dict__.items()
+    if isinstance(attribute_value, TexturePack)
+    )
+
