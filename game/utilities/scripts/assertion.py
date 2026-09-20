@@ -58,6 +58,20 @@ def assert_value_ge_zero(check_value: int | float, raise_error: bool = True) -> 
     return assert_eval
 
 
+def assert_value_gt_zero(check_value: int | float, raise_error: bool = True) -> bool:
+
+    # Evaluating:
+    assert_eval: bool = check_value > 0
+
+    # Raising error, if required:
+    if not assert_eval and raise_error:
+        error_message: str = f"Value is not positive: <{check_value}>."
+        raise AssertionError(error_message)
+
+    # Returning:
+    return assert_eval
+
+
 def assert_value_in_range(check_value: int | float, check_range: range, raise_error: bool = True) -> bool:
     
     # Evaluating:
