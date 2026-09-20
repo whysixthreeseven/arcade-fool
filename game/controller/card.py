@@ -9,7 +9,7 @@ import arcade
 from arcade import Rect, Text, Texture, XYWH
 
 # Texture packs:
-from game.utilities.texturepack import TexturePack, TEXTURE_PACK_FRONT, TEXTURE_PACK_BACK
+from game.utilities.texturepack import TexturePack, TEXTURE_PACK_FRONT_INDEX, TEXTURE_PACK_BACK_INDEX
 
 # Settings and session instances:
 from game.settings import SETTINGS
@@ -19,7 +19,8 @@ from game.session import SESSION
 from functools import cached_property
 from game.utilities.scripts.cache import (
     clear_cached_property, 
-    clear_cached_property_list
+    clear_cached_property_list,
+    refresh_object,
     )
 
 # Assertion scripts:
@@ -33,6 +34,7 @@ from game.utilities.scripts.assertion import (
     )
 
 # Context and other card variables:
+from game.context import Location, Coordinates
 from game.context import *
 
 
@@ -53,36 +55,40 @@ class Card:
         
         # Texture attributes:
         self.__texture_pack_front: TexturePack = None
-        self.__texture_object_front: Texture = None
         self.__texture_pack_back: TexturePack = None
+        self.__texture_object_front: Texture = None
         self.__texture_object_back: Texture = None
         
         # Render attributes:
-        self.__render_scale: float = None
-        self.__render_alpha: int = None
-        self.__render_tilt: int = None
+        self.__render_scale: float = SETTINGS.CARD_RENDER_SCALE_DEFAULT
+        self.__render_alpha: int = SETTINGS.CARD_RENDER_ALPHA_DEFAULT
+        self.__render_tilt: int = SETTINGS.CARD_RENDER_TILT_DEFAULT
         
         # Coordinates attributes:
-        self.__coordinate_x_current: int = None
-        self.__coordinate_y_current: int = None
-        self.__coordinate_x_position: int = None
-        self.__coordinate_y_position: int = None
-        self.__coordinate_x_hover: int = None
-        self.__coordinate_y_hover: int = None
-        self.__coordinate_x_expected: int = None
-        self.__coordinate_y_expected: int = None
+        self.__coordinate_x_current: int = 0
+        self.__coordinate_y_current: int = 0
+        self.__coordinate_x_position: int = 0
+        self.__coordinate_y_position: int = 0
+        self.__coordinate_x_hover: int = 0
+        self.__coordinate_y_hover: int = 0
+        self.__coordinate_x_expected: int = 0
+        self.__coordinate_y_expected: int = 0
         
         # State attributes:
-        self.__state_visible: bool = None
-        self.__state_revealed: bool = None
-        self.__state_hovered: bool = None
-        self.__state_selected: bool = None
-        self.__state_faded: bool = None
-        self.__state_playable: bool = None
+        self.__state_visible: bool = False
+        self.__state_revealed: bool = False
+        self.__state_hovered: bool = False
+        self.__state_selected: bool = False
+        self.__state_faded: bool = False
+        self.__state_playable: bool = False
         
         # Play location and index:
         self.__location: str = None
         self.__location_index: int = None
+        
+        # Other attributes:
+        self.__id: int = None
+        self.__added: int = None
         
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -119,8 +125,8 @@ class Card:
         
         # Generating repr string:
         card: str = "{card_name} @{card_location} ({card_coordinates})".format(
-            card_name = "{self.suit_ascii}{self.name_ascii}",
-            card_location = "{self.location}:{self.location_index}",
+            card_name = f"{self.suit_ascii}{self.name_ascii}",
+            card_location = f"{self.location}:{self.location_index}",
             card_coordinates = f"{self.coordinate_x}:{self.coordinate_y}"
             )
         
@@ -144,7 +150,7 @@ class Card:
     
     
     @classmethod
-    def generate(cls, init_suit, init_name) -> Card:
+    def generate(cls, init_suit: str, init_name: str, init_location: Location | None) -> Card:
         
         # Creating basic card object:
         card_object: Card = Card()
@@ -163,6 +169,57 @@ class Card:
         
         # Clearing core cached attributes:
         card_object.clear_cached_core_attributes()
+        
+        # Updating location and coordinates:
+        if init_location is not None:
+            card_object.set_location(
+                set_value = init_location,
+                update_coordinates = False,
+                ignore_assertion = False,
+                clear_cache = False,
+                )
+        else:
+            default_coordinates: tuple[int, int] = (0, 0)
+            card_object.set_coordinates(
+                set_value = default_coordinates,
+                ignore_assertion = False,
+                clear_cache = False,
+                )
+            card_object.set_coordinates_position(
+                set_value = default_coordinates,
+                ignore_assertion = False,
+                clear_cache = False,
+                )
+            card_object.set_coordinates_expected(
+                set_value = default_coordinates,
+                ignore_assertion = False,
+                clear_cache = False,
+                )
+            card_object.set_coordinates_hover(
+                set_value = default_coordinates,
+                ignore_assertion = False,
+                clear_cache = False,
+                )
+            
+        # Loading default textures:
+        card_object.set_texture_pack_front(
+            texture_pack_object = SESSION.TEXTURE_PACK_FRONT_DEFAULT,
+            update_texture = True,
+            ignore_assertion = False,
+            clear_cache = True,
+            )
+        card_object.set_texture_pack_back(
+            texture_pack_object = SESSION.TEXTURE_PACK_BACK_DEFAULT,
+            update_texture = True,
+            ignore_assertion = False,
+            clear_cache = True,
+            )
+        
+        # Waking up all other attributes:
+        card_object.clear_cached_attributes()
+        refresh_object(
+            target_object = card_object,
+            )
         
         # Returning:
         return card_object
@@ -407,14 +464,9 @@ class Card:
             )
         
         # Asserting value is default:
-        default_list: tuple[str, ...] = tuple(
-            attribute_name for attribute_name, attribute_value
-            in CARD_NAME.__dict__.items()
-            if not attribute_name.startswith("_")
-            )
         assert_value_default(
             check_value = validate_value,
-            check_default = default_list,
+            check_list = CARD_NAME_LIST,
             raise_error = True
             )
         
@@ -435,14 +487,9 @@ class Card:
             )
 
         # Asserting value is default:
-        default_list: tuple[str, ...] = tuple(
-            attribute_name for attribute_name, attribute_value
-            in CARD_SUIT.__dict__.items()
-            if not attribute_name.startswith("_")
-            )
         assert_value_default(
             check_value = validate_value,
-            check_default = default_list,
+            check_list = CARD_SUIT_LIST,
             raise_error = True
             )
         
@@ -508,20 +555,12 @@ class Card:
         # Asserting value is default:
         texture_pack = validate_value
         if texture_pack.type == "Front":
-            texture_pack_list: tuple[TexturePack, ...] = tuple(
-                texture_pack_object for texture_pack_name, texture_pack_object 
-                in TEXTURE_PACK_FRONT.__dict__.items()
-                if isinstance(texture_pack_object, TexturePack)
-                )
+            texture_pack_list: tuple[TexturePack, ...] = TEXTURE_PACK_FRONT_INDEX
         else:
-            texture_pack_list: tuple[TexturePack, ...] = tuple(
-                texture_pack_object for texture_pack_name, texture_pack_object 
-                in TEXTURE_PACK_BACK.__dict__.items()
-                if isinstance(texture_pack_object, TexturePack)
-                )
+            texture_pack_list: tuple[TexturePack, ...] = TEXTURE_PACK_BACK_INDEX
         assert_value_default(
             check_value = texture_pack,
-            check_default_list = texture_pack_list,
+            check_list = texture_pack_list,
             raise_error = True
             )
         
@@ -598,12 +637,7 @@ class Card:
             )
         
         # Asserting value is default:
-        default_list: tuple[str, ...] = tuple(
-            attribute_value for attribute_name, attribute_value
-            in CARD_LOCATION.__dict__.items()
-            if not attribute_name.startswith("_")
-            and isinstance(attribute_value, str)
-            )
+        default_list: tuple[str, ...] = CARD_LOCATION_LIST
         assert_value_default(
             check_value = validate_value,
             check_list = default_list,
@@ -629,7 +663,7 @@ class Card:
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        CARD CORE CACHED PROPERTIES AND METHODS
+        CARD NAME CACHED PROPERTIES AND METHODS
     
     """
     
@@ -661,6 +695,46 @@ class Card:
         return name_ascii
     
     
+    def set_name(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+            
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            self.__validate_name(
+                validate_value = set_value
+                )
+            
+        # Debug verification:
+        if SESSION.ENABLE_DEBUG:
+            assert_setter_entry(
+                check_object = self,
+                check_attribute = "name",
+                sentinel_value = None,
+                raise_error = True
+                )
+            
+        # Updating attribute:
+        self.__name = set_value
+        
+        # Clearing cache:
+        if clear_cache:
+            cached_property_list: tuple[str, ...] = (
+                "name",
+                "name_ascii",
+                "value",
+                "render_text"
+                )
+            clear_cached_property_list(
+                target_object = self,
+                target_attribute_list = cached_property_list
+                )
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        CARD SUIT CACHED PROPERTIES AND METHODS
+    
+    """
+    
+    
     @cached_property
     def suit(self) -> str:
 
@@ -688,6 +762,47 @@ class Card:
         return suit_ascii
     
     
+    def set_suit(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            self.__validate_suit(
+                validate_value = set_value
+                )
+
+        # Debug verification:
+        if SESSION.ENABLE_DEBUG:
+            assert_setter_entry(
+                check_object = self,
+                check_attribute = "suit",
+                sentinel_value = None,
+                raise_error = True
+                )
+            
+        # Updating attribute:
+        self.__suit = set_value
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property_list: tuple[str, ...] = (
+                "suit",
+                "suit_ascii",
+                "color",
+                "trump",
+                "render_text"
+                )
+            clear_cached_property_list(
+                target_object = self,
+                target_attribute_list = cached_property_list
+                )
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        CARD COLOR CACHED PROPERTIES AND METHODS
+    
+    """
+    
+    
     @cached_property
     def color(self) -> str:
         
@@ -705,6 +820,12 @@ class Card:
 
         # Returning:
         return color
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        CARD VALUE CACHED PROPERTIES AND METHODS
+    
+    """
 
 
     @cached_property
@@ -736,84 +857,6 @@ class Card:
         
         # Returning:
         return value
-    
-    
-    def set_name(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
-        
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_name(
-                validate_value = set_value
-                )
-            
-        # Debug verification:
-        if SESSION.ENABLE_DEBUG:
-            assert_setter_entry(
-                check_object = self,
-                check_attribute = "name",
-                sentinel_value = None,
-                raise_error = True
-                )
-
-        # Setting attribute:
-        self.__name = set_value
-
-        # Clearing cache:
-        if clear_cache:
-            cached_property_list: tuple[str, ...] = (
-                "name",
-                "name_ascii",
-                "value"
-            )
-            
-        # Updating attribute:
-        self.__name = set_value
-        
-        # Clearing cache:
-        if clear_cache:
-            cached_property_list: tuple[str, ...] = (
-                "name",
-                "name_ascii",
-                "value"
-                )
-            clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
-        
-        
-    def set_suit(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
-
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_suit(
-                validate_value = set_value
-                )
-
-        # Debug verification:
-        if SESSION.ENABLE_DEBUG:
-            assert_setter_entry(
-                check_object = self,
-                check_attribute = "suit",
-                sentinel_value = None,
-                raise_error = True
-                )
-            
-        # Updating attribute:
-        self.__suit = set_value
-
-        # Clearing cache:
-        if clear_cache:
-            cached_property_list: tuple[str, ...] = (
-                "suit",
-                "suit_ascii",
-                "color",
-                "trump"
-                )
-            clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
 
 
     def set_trump(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -831,7 +874,8 @@ class Card:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "trump",
-                "value"
+                "value",
+                "render_text",
                 )
             clear_cached_property_list(
                 target_object = self,
@@ -904,7 +948,8 @@ class Card:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "coordinate_x",
-                "coordinates"
+                "coordinates",
+                "render_text",
                 )
             clear_cached_property_list(
                 target_object = self,
@@ -946,7 +991,8 @@ class Card:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "coordinate_y",
-                "coordinates"
+                "coordinates",
+                "render_text"
                 )
             clear_cached_property_list(
                 target_object = self,
@@ -1446,7 +1492,7 @@ class Card:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "texture_pack_front",
-                "texture_filepath_front"
+                "texture_filepath_front",
                 )
             clear_cached_property_list(
                 target_object = self,
@@ -1476,7 +1522,7 @@ class Card:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "texture_pack_back",
-                "texture_filepath_back"
+                "texture_filepath_back",
                 )
             clear_cached_property_list(
                 target_object = self,
@@ -1496,10 +1542,15 @@ class Card:
         
         # Clearing cache:
         if clear_cache:
-            cached_property: str = "texture_object_front"
-            clear_cached_property(
+            cached_property_list: tuple[str, ...] = (
+                "texture_object_front",
+                "render_rect",
+                "render_width",
+                "render_height",
+                )
+            clear_cached_property_list(
                 target_object = self,
-                target_attribute = cached_property
+                target_attribute_list = cached_property_list
                 )
             
     
@@ -1515,10 +1566,15 @@ class Card:
 
         # Clearing cache:
         if clear_cache:
-            cached_property: str = "texture_object_back"
-            clear_cached_property(
+            cached_property_list: tuple[str, ...] = (
+                "texture_object_back",
+                "render_rect",
+                "render_width",
+                "render_height",
+                )
+            clear_cached_property_list(
                 target_object = self,
-                target_attribute = cached_property
+                target_attribute_list = cached_property_list
                 )
             
     
@@ -1968,8 +2024,8 @@ class Card:
         rect_object: Rect = XYWH(
             x = self.coordinate_x,
             y = self.coordinate_y,
-            w = self.render_width,
-            h = self.render_height
+            width = self.render_width,
+            height = self.render_height
             )
         
         # Returning:
@@ -2075,7 +2131,22 @@ class Card:
 
         # Returning:
         return state_idle
-
+    
+    
+    def reset_state_global(self, clear_cache: bool = True) -> None:
+        
+        # Resetting:
+        self.__state_visible: bool = False
+        self.__state_revealed: bool = False
+        self.__state_hovered: bool = False
+        self.__state_selected: bool = False
+        self.__state_faded: bool = False
+        self.__state_playable: bool = False
+        
+        # Clearing cache:
+        if clear_cache:
+            self.clear_cached_state_attributes()
+        
 
     def set_state_visible(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
@@ -2307,60 +2378,73 @@ class Card:
         return self.__location
     
     
-    def set_location(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_location(self, set_value: Location, update_coordinates: bool = True, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Unpacking:
+        set_location, set_location_index = set_value
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
             self.__validate_location(
-                validate_value = set_value
+                validate_value = set_location
+                )
+            self.__validate_location_index(
+                validate_value = set_location_index
                 )
             
-        # Updating attribute:
-        self.__location = set_value
+        # Updating attributes:
+        self.__location = set_location
+        self.__location_index = set_location_index
+        
+        # Updating coordinates, if required:
+        if update_coordinates:
+            # TODO!
+            ...
         
         # Clearing cache:
-        cached_property: str = "location"
-        clear_cached_property(
-            target_object = self,
-            target_attribute = cached_property
-            )
+        if clear_cache:
+            self.clear_cached_location_attributes()
         
     
-    def set_location_hand(self, clear_cache: bool = True) -> None:
+    def set_location_hand(self, update_coordinates: bool = True, clear_cache: bool = True) -> None:
         
         # Updating attribute:
         self.set_location(
             set_value = CARD_LOCATION.HAND,
+            update_coordinates = update_coordinates,
             ignore_assertion = True,
             clear_cache = clear_cache
             )
         
     
-    def set_location_deck(self, clar_cache: bool = True) -> None:
+    def set_location_deck(self, update_coordinates: bool = True, clar_cache: bool = True) -> None:
         
         # Updating attribute:
         self.set_location(
             set_value = CARD_LOCATION.DECK,
+            update_coordinates = update_coordinates,
             ignore_assertion = True,
             clear_cache = clar_cache
             )
         
         
-    def set_location_discard(self, clear_cache: bool = True) -> None:
+    def set_location_discard(self, update_coordinates: bool = True, clear_cache: bool = True) -> None:
 
         # Updating attribute:
         self.set_location(
             set_value = CARD_LOCATION.DISCARD,
+            update_coordinates = update_coordinates,
             ignore_assertion = True,
             clear_cache = clear_cache
             )
         
     
-    def set_location_table(self, clear_cache: bool = True) -> None:
+    def set_location_table(self, update_coordinates: bool = True, clear_cache: bool = True) -> None:
         
         # Updating attribute:
         self.set_location(
             set_value = CARD_LOCATION.TABLE,
+            update_coordinates = update_coordinates,
             ignore_assertion = True,
             clear_cache = clear_cache
             )
@@ -2368,6 +2452,17 @@ class Card:
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         INDEX CACHED PROPERTIES AND METHODS
+        
+        Location index allows for precise coordinates position on screen. Index range is either 0-MAX or 0-11 depending on the 
+        location (MAX for HAND, OPPONENT, DISCARD and DECK; 11 for TABLE). While location tells the controllers what area the 
+        card belongs to, index either calculated on demand or predetermined (e.g. on TABLE).
+        
+        1. HAND & OPPONENT index position is calculated based on the number of cards in the hand;
+        2. DECK & DISCARD index position in predertermined and allows the controller to shift card's coordinates X and Y 
+           according to its placement (later or "higher" on the stack cards get shifted more, while the first few are centered);
+        3. TABLE index position is predetermined. There are a total of six stacks available, thus the positions are set in pairs 
+           where even (including zero) are bottom positions and odd are top positions, e.g. TABLE's index 3 corresponds to stack
+           two top position.
         
     """
     
