@@ -1,6 +1,15 @@
 # System management:
 import os
 
+# Context variables:
+from game import context
+
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    SETTINGS CLASS OBJECT CONSTRUCTOR
+
+"""
+
 
 class __SETTINGS:
     
@@ -9,7 +18,7 @@ class __SETTINGS:
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_VERSION: str = "0.0.1R"
     APP_STARTED: str = "2026.09.02"
-    APP_UPDATED: str = "2026.09.19"
+    APP_UPDATED: str = "2026.09.20"
     APP_AUTHOR: str = "Andrey Vostokov"
 
     # Root directory settings:    
@@ -101,7 +110,22 @@ class __SETTINGS:
     SURFACE_CENTER_COORDINATE_X: int = int(SURFACE_WIDTH / 2)
     SURFACE_CENTER_COORDINATE_Y: int = int(SURFACE_HEIGHT / 2)
     SURFACE_COLOR_BACKGROUND: tuple[int, int, int] = (0, 0, 0)                             # ~Black
+    
+    # Player settings:
+    PLAYER_NAME_LEN_MAX: int = 16
+    PLAYER_NAME_LEN_MIN: int = 2
+    PLAYER_STAT_RATIO_NDIGITS: int = 3
+    
+    # Computer settings:
+    COMPUTER_PLAY_STYLE_DEFAULT: str = context.COMPUTER_STYLE.RANDOM
+    COMPUTER_DIFFICULTY_DEFAULT: str = context.COMPUTER_DIFFICULTY_LEVEL.MEDIUM
+    
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    SETTINGS CLASS OBJECT (GLOBAL) ACCESS POINT
+
+"""
+   
         
 # Initializing settings instance:
 SETTINGS = __SETTINGS()
