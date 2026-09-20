@@ -2,7 +2,7 @@
 import os
 
 # Context variables:
-from game import context
+from game.context import RGB_Color
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -32,10 +32,10 @@ class __SETTINGS:
     
     # Card render settings:
     CARD_RENDER_SCALE_DEFAULT: float = 1.00
-    CARD_RENDER_SCALE_SELECTED_MOD: float = 1.20
-    CARD_RENDER_SCALE_SELECTED: float = CARD_RENDER_SCALE_DEFAULT * CARD_RENDER_SCALE_SELECTED_MOD
+    CARD_RENDER_SCALE_SELECT_MOD: float = 1.20
+    CARD_RENDER_SCALE_SELECT: float = CARD_RENDER_SCALE_DEFAULT * CARD_RENDER_SCALE_SELECT_MOD
     CARD_RENDER_SCALE_STEP_MOD_DEFAULT: float = 0.015
-    CARD_RENDER_SCALE_STEP_MOD_SELECTED: float = 0.045
+    CARD_RENDER_SCALE_STEP_MOD_SELECT: float = 0.045
     CARD_RENDER_TILT_DEFAULT: int = 0
     CARD_RENDER_TILT_OPP: int = 180
     CARD_RENDER_TILT_DECK: int = 0
@@ -46,12 +46,12 @@ class __SETTINGS:
     CARD_RENDER_TILT_STEP_IN: float = 2.15
     CARD_RENDER_TILT_STEP_OUT: float = 1.75
     CARD_RENDER_ALPHA_DEFAULT: int = 255
-    CARD_RENDER_ALPHA_FADED_MOD: float = 0.75
-    CARD_RENDER_ALPHA_FADED: int = int(CARD_RENDER_ALPHA_DEFAULT * CARD_RENDER_ALPHA_FADED_MOD)
+    CARD_RENDER_ALPHA_FADE_MOD: float = 0.75
+    CARD_RENDER_ALPHA_FADE: int = int(CARD_RENDER_ALPHA_DEFAULT * CARD_RENDER_ALPHA_FADE_MOD)
     CARD_RENDER_ALPHA_STEP_MOD_DEFAULT: float = 0.015
     CARD_RENDER_ALPHA_STEP_MOD_FADED: float = 0.045
-    CARD_RENDER_BG_COLOR: tuple[int, int, int] = (215, 0, 0)
-    CARD_RENDER_TEXT_COLOR: tuple[int, int, int] = (255, 255, 255)
+    CARD_RENDER_BG_COLOR: RGB_Color = (215, 0, 0)
+    CARD_RENDER_TEXT_COLOR: RGB_Color = (255, 255, 255)
     CARD_RENDER_TEXT_FONT_SIZE: int = 12
     CARD_RENDER_TEXT_FONT_NAME: str = "DengXian"
     
@@ -96,29 +96,52 @@ class __SETTINGS:
     AREA_DISCARD_CENTER_COORDINATE_Y: int = int(AREA_DECK_HEIGHT + AREA_DECK_HEIGHT / 2)
 
     # Area debug color settings:
-    __AREA_HAND_COLOR_BACKGROUND: tuple[int, int, int] = (215, 15, 15)                      # ~Red
-    AREA_TEXT_COLOR: tuple[int, int, int] = (255, 255, 255)                                 # ~White
-    AREA_PLAYER_COLOR_BACKGROUND: tuple[int, int, int] = __AREA_HAND_COLOR_BACKGROUND       # ~Red
-    AREA_TABLE_COLOR_BACKGROUND: tuple[int, int, int] = (15, 215, 15)                       # ~Green
-    AREA_OPPONENT_COLOR_BACKGROUND: tuple[int, int, int] = __AREA_HAND_COLOR_BACKGROUND     # ~Red
-    AREA_DECK_COLOR_BACKGROUND: tuple[int, int, int] = (15, 15, 215)                        # ~Blue
-    AREA_DISCARD_COLOR_BACKGROUND: tuple[int, int, int] = (215, 15, 215)                    # ~Magenta
+    __AREA_HAND_COLOR_BACKGROUND: RGB_Color = (215, 15, 15)                      # ~Red
+    AREA_TEXT_COLOR: RGB_Color = (255, 255, 255)                                 # ~White
+    AREA_PLAYER_COLOR_BACKGROUND: RGB_Color = __AREA_HAND_COLOR_BACKGROUND       # ~Red
+    AREA_TABLE_COLOR_BACKGROUND: RGB_Color = (15, 215, 15)                       # ~Green
+    AREA_OPPONENT_COLOR_BACKGROUND: RGB_Color = __AREA_HAND_COLOR_BACKGROUND     # ~Red
+    AREA_DECK_COLOR_BACKGROUND: RGB_Color = (15, 15, 215)                        # ~Blue
+    AREA_DISCARD_COLOR_BACKGROUND: RGB_Color = (215, 15, 215)                    # ~Magenta
     
     # Surface settings:
     SURFACE_WIDTH: int = int(__AREA_HAND_WIDTH + __AREA_SIDE_WIDTH)
     SURFACE_HEIGHT: int = int(__AREA_HAND_HEIGHT * 2 + AREA_TABLE_HEIGHT)
     SURFACE_CENTER_COORDINATE_X: int = int(SURFACE_WIDTH / 2)
     SURFACE_CENTER_COORDINATE_Y: int = int(SURFACE_HEIGHT / 2)
-    SURFACE_COLOR_BACKGROUND: tuple[int, int, int] = (0, 0, 0)                             # ~Black
+    SURFACE_COLOR_BACKGROUND: RGB_Color = (0, 0, 0)                              # ~Black
+    
+    # Location (deck) coordinates settings:
+    LOCATION_DECK_COORDINATE_X: int = AREA_DECK_CENTER_COORDINATE_X
+    LOCATION_DECK_COORDINATE_Y: int = AREA_DECK_CENTER_COORDINATE_Y
+    LOCATION_DECK_SHIFT_COORDINATE_X: int = 2
+    LOCATION_DECK_SHIFT_COORDINATE_Y: int = 1
+    LOCATION_DECK_SHIFT_PER_CARD: int = 4
+    
+    # Location (discard) coordinates settings:
+    LOCATION_DISCARD_COORDINATE_X: int = AREA_DISCARD_CENTER_COORDINATE_X
+    LOCATION_DISCARD_COORDINATE_Y: int = AREA_DISCARD_CENTER_COORDINATE_Y
+    LOCATION_DISCARD_SHIFT_COORDINATE_X: int = 2
+    LOCATION_DISCARD_SHIFT_COORDINATE_Y: int = 1
+    LOCATION_DISCARD_SHIFT_PER_CARD: int = 4
+    
+    # Location (table) coordinates settings:
+    LOCATION_TABLE_COORDINATE_X: int = AREA_TABLE_CENTER_COORDINATE_X
+    LOCATION_TABLE_SHIFT_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.4)
+    LOCATION_TABLE_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.3)
+    
+    # Location (hand) coordinates settings:
+    LOCATION_HAND_COORDINATE_X: int = AREA_PLAYER_CENTER_COORDINATE_X
+    LOCATION_HAND_HOVER_SHIFT_COORDINATE_X: int = 0
+    LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.4)
+    LOCATION_HAND_SELECT_SHIFT_COORDINATE_X: int = 0
+    LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.3)
+
     
     # Player settings:
     PLAYER_NAME_LEN_MAX: int = 16
     PLAYER_NAME_LEN_MIN: int = 2
     PLAYER_STAT_RATIO_NDIGITS: int = 3
-    
-    # Computer settings:
-    COMPUTER_PLAY_STYLE_DEFAULT: str = context.COMPUTER_STYLE.RANDOM
-    COMPUTER_DIFFICULTY_DEFAULT: str = context.COMPUTER_DIFFICULTY_LEVEL.MEDIUM
     
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
