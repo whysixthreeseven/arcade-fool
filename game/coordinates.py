@@ -17,8 +17,8 @@ for location_index in range(0, 12):
     coordinate_x: int = int(
         __TABLE_USED_SURFACE_START_COORDINATE_X +
         SETTINGS.CARD_TEXTURE_WIDTH / 2 +
-        SETTINGS.CARD_TEXTURE_WIDTH * location_index if location_index % 2 == 0 or location_index == 0 else 1 +
-        SETTINGS.LOCATION_TABLE_INDEX_SHIFT_COORDINATE_X if location_index % 2 != 0 and location_index > 1 else 0
+        SETTINGS.CARD_TEXTURE_WIDTH * location_index if location_index == 0 or location_index % 2 == 0 else 1 +
+        SETTINGS.LOCATION_TABLE_INDEX_SHIFT_COORDINATE_X if location_index > 1 and location_index % 2 != 0 else 0
         )
     coordinate_y: int = int(
         SETTINGS.LOCATION_TABLE_CENTER_COORDINATE_Y + 
