@@ -180,7 +180,7 @@ class Card:
                 clear_cache = False,
                 )
         else:
-            default_coordinates: tuple[int, int] = (0, 0)
+            default_coordinates: Coordinates = (0, 0)
             card_object.set_coordinates(
                 set_value = default_coordinates,
                 ignore_assertion = False,
@@ -598,7 +598,7 @@ class Card:
             )
         
     
-    def __validate_coordiante_container(self, validate_value: tuple[int, int]) -> None:
+    def __validate_coordiante_container(self, validate_value: Coordinates) -> None:
             
         # Asserting value is valid type:
         assert_value_type(
@@ -721,7 +721,7 @@ class Card:
             check_list = default_list,
             raise_error = True,
             )
-        
+
     
     def __validate_location_index(self, validate_value: int) -> None:
         
@@ -999,10 +999,10 @@ class Card:
     
     
     @cached_property
-    def coordinates(self) -> tuple[int, int]:
+    def coordinates(self) -> Coordinates:
         
         # Making container:
-        coordinates: tuple[int, int] = (
+        coordinates: Coordinates = (
             self.coordinate_x,
             self.coordinate_y
             )
@@ -1097,7 +1097,7 @@ class Card:
             )
             
     
-    def set_coordinates(self, set_value: tuple[int, int], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_coordinates(self, set_value: Coordinates, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1154,10 +1154,10 @@ class Card:
     
     
     @cached_property
-    def coordinates_position(self) -> tuple[int, int]:
+    def coordinates_position(self) -> Coordinates:
         
         # Packing container:
-        coordinates_position: tuple[int, int] = (
+        coordinates_position: Coordinates = (
             self.__coordinate_x_position,
             self.__coordinate_y_position
             )
@@ -1212,7 +1212,7 @@ class Card:
                 )
         
         
-    def set_coordinates_position(self, set_value: tuple[int, int], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_coordinates_position(self, set_value: Coordinates, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1269,10 +1269,10 @@ class Card:
 
 
     @cached_property
-    def coordinates_expected(self) -> tuple[int, int]:
+    def coordinates_expected(self) -> Coordinates:
 
         # Packing container:
-        coordinates_expected: tuple[int, int] = (
+        coordinates_expected: Coordinates = (
             self.__coordinate_x_expected,
             self.__coordinate_y_expected
             )
@@ -1327,7 +1327,7 @@ class Card:
                 )
             
     
-    def set_coordinates_expected(self, set_value: tuple[int, int], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_coordinates_expected(self, set_value: Coordinates, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1384,10 +1384,10 @@ class Card:
 
 
     @cached_property
-    def coordinates_hover(self) -> tuple[int, int]:
+    def coordinates_hover(self) -> Coordinates:
 
         # Packing container:
-        coordinates_hover: tuple[int, int] = (
+        coordinates_hover: Coordinates = (
             self.__coordinate_x_hover,
             self.__coordinate_y_hover
             )
@@ -1442,7 +1442,7 @@ class Card:
                 )
             
     
-    def set_coordinates_hover(self, set_value: tuple[int, int], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_coordinates_hover(self, set_value: Coordinates, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -2681,7 +2681,7 @@ class Card:
     """
     
     
-    def slide(self, target_coordinates: tuple[int, int], speed_modifier: float, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def slide(self, target_coordinates: Coordinates, speed_modifier: float, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
             self.__validate_coordiante_container(
