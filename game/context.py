@@ -266,3 +266,4 @@ COMPUTER_NAME_COLLECTION: tuple[str, ...] = (
     "Margaret", "Matthew", "Mia", "Michael", "Noah", "Oliver", "Olivia", "Oscar", "Penelope", "Rose", "Samuel",
     "Scarlett", "Sophia", "Thomas", "Victoria", "William", "Zoe",
     )
+
