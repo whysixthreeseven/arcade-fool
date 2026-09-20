@@ -1687,14 +1687,14 @@ class Card:
     def render_scale_selected(self) -> float:
 
         # Returning:
-        return SETTINGS.CARD_RENDER_SCALE_SELECTED
+        return SETTINGS.CARD_RENDER_SCALE_SELECT
     
 
     @cached_property
     def render_scale_step_mod_selected(self) -> float:
 
         # Returning:
-        return SETTINGS.CARD_RENDER_SCALE_STEP_MOD_SELECTED
+        return SETTINGS.CARD_RENDER_SCALE_STEP_MOD_SELECT
         
         
     def set_render_scale(self, set_value: float, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -1731,7 +1731,7 @@ class Card:
         
         # Updating attribute:
         self.set_render_scale(
-            set_value = SETTINGS.CARD_RENDER_SCALE_SELECTED,
+            set_value = SETTINGS.CARD_RENDER_SCALE_SELECT,
             ignore_assertion = False,
             clear_cache = clear_cache,
             )
@@ -1823,7 +1823,7 @@ class Card:
     def render_alpha_faded(self) -> int:
 
         # Returning:
-        return SETTINGS.CARD_RENDER_ALPHA_FADED
+        return SETTINGS.CARD_RENDER_ALPHA_FADE
 
 
     def set_render_alpha(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -1860,7 +1860,7 @@ class Card:
 
         # Updating attribute:
         self.set_render_alpha(
-            set_value = SETTINGS.CARD_RENDER_ALPHA_FADED,
+            set_value = SETTINGS.CARD_RENDER_ALPHA_FADE,
             ignore_assertion = True,
             clear_cache = clear_cache,
             )
