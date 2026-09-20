@@ -151,7 +151,7 @@ class Card:
     
     
     @classmethod
-    def generate(cls, init_suit: str, init_name: str, init_location: Location | None) -> Card:
+    def generate(cls, init_suit: str, init_name: str, init_location: Location) -> Card:
         
         # Creating basic card object:
         card_object: Card = Card()
@@ -172,45 +172,22 @@ class Card:
         card_object.clear_cached_core_attributes()
         
         # Updating location and coordinates:
-        if init_location is not None:
-            card_object.set_location(
-                set_value = init_location,
-                update_coordinates = False,
-                ignore_assertion = False,
-                clear_cache = False,
-                )
-        else:
-            default_coordinates: Coordinates = (0, 0)
-            card_object.set_coordinates(
-                set_value = default_coordinates,
-                ignore_assertion = False,
-                clear_cache = False,
-                )
-            card_object.set_coordinates_position(
-                set_value = default_coordinates,
-                ignore_assertion = False,
-                clear_cache = False,
-                )
-            card_object.set_coordinates_expected(
-                set_value = default_coordinates,
-                ignore_assertion = False,
-                clear_cache = False,
-                )
-            card_object.set_coordinates_hover(
-                set_value = default_coordinates,
-                ignore_assertion = False,
-                clear_cache = False,
-                )
+        card_object.set_location(
+            set_value = init_location,
+            update_coordinates = True,
+            ignore_assertion = False,
+            clear_cache = False,
+            )
             
         # Loading default textures:
         card_object.set_texture_pack_front(
-            texture_pack_object = SESSION.TEXTURE_PACK_FRONT_DEFAULT,
+            texture_pack_object = SESSION.TEXTURE_PACK_FRONT_SELECTED,
             update_texture = True,
             ignore_assertion = False,
             clear_cache = True,
             )
         card_object.set_texture_pack_back(
-            texture_pack_object = SESSION.TEXTURE_PACK_BACK_DEFAULT,
+            texture_pack_object = SESSION.TEXTURE_PACK_BACK_SELECTED,
             update_texture = True,
             ignore_assertion = False,
             clear_cache = True,
