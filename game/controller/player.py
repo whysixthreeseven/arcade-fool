@@ -53,6 +53,32 @@ class Player:
         # Computer (!) attributes:
         self.__difficulty: str = None
         self.__play_style: str = None
+        
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        NATIVE METHODS
+    
+    """
+    
+    
+    def __str__(self) -> str:
+        
+        # Generating string:
+        repr_string: str = f"{self.name_repr} ({self.type_repr})"
+        
+        # Returning:
+        return repr_string
+    
+    
+    def __repr__(self) -> str:
+        
+        # Generating string:
+        repr_string: str = f"{self.name_repr} ({self.type_repr})"
+        
+        # TODO: Implement repr string with more information!
+        
+        # Returning:
+        return repr_string
 
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
