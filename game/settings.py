@@ -2,7 +2,7 @@
 import os
 
 # Context variables:
-from game.context import RGB_Color
+from game.context import RGB_Color, Coordinates
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -130,6 +130,7 @@ class __SETTINGS:
     LOCATION_TABLE_CENTER_COORDINATE_Y: int = AREA_TABLE_CENTER_COORDINATE_Y
     LOCATION_TABLE_INDEX_SHIFT_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.4)
     LOCATION_TABLE_INDEX_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.3)
+    LOCATION_TABLE_MARGIN: int = int(CARD_TEXTURE_WIDTH * 0.5)
     
     # Location (hand) coordinates settings:
     LOCATION_HAND_CENTER_COORDINATE_X: int = AREA_PLAYER_CENTER_COORDINATE_X
