@@ -29,6 +29,7 @@ from game.utilities.scripts.assertion import (
     assert_value_type,
     assert_value_default,
     assert_value_ge_zero,
+    assert_value_gt_zero,
     assert_value_not_empty,
     assert_value_in_range,
     )
@@ -86,9 +87,9 @@ class Card:
         self.__location: str = None
         self.__location_index: int = None
         
-        # Other attributes:
+        # Added attributes:
         self.__id: int = None
-        self.__added: int = None
+        self.__added_index: int = None
         
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -126,7 +127,7 @@ class Card:
         # Generating repr string:
         card: str = "{card_name} @{card_location} ({card_coordinates})".format(
             card_name = f"{self.suit_ascii}{self.name_ascii}",
-            card_location = f"{self.location}:{self.location_index}",
+            card_location = f"{self.location[:2].upper()}:{self.location_index}",
             card_coordinates = f"{self.coordinate_x}:{self.coordinate_y}"
             )
         
@@ -357,6 +358,31 @@ class Card:
         # Returning:
         return cached_property_list
     
+    
+    @cached_property
+    def __cached_id_attributes(self) -> tuple[str, ...]:
+    
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "id",
+            "id_repr",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+    
+    @cached_property
+    def __cached_added_index_attributes(self) -> tuple[str, ...]:
+    
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "added_index",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
 
     def clear_cached_core_attributes(self) -> None:
 
@@ -421,6 +447,24 @@ class Card:
             )
         
     
+    def clear_cached_id_attributes(self) -> None:
+    
+        # Clearing cached properties:
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_id_attributes
+            )
+    
+    
+    def clear_cached_added_index_attributes(self) -> None:
+    
+        # Clearing cached properties:
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_added_index_attributes
+            )
+        
+    
     def clear_cached_attributes(self) -> None:
         
         # Collecting cached properties:
@@ -432,6 +476,8 @@ class Card:
             self.__cached_coordinates_attributes,
             self.__cached_state_attributes,
             self.__cached_location_attributes,
+            self.__cached_id_attributes,
+            self.__cached_added_index_attributes,
             )
         
         # Looping throught the list and clearing cache:
@@ -468,6 +514,38 @@ class Card:
             check_value = validate_value,
             check_list = CARD_NAME_LIST,
             raise_error = True
+            )
+        
+    
+    def __validate_id(self, validate_value: int) -> None:
+        
+        # Asserting value is valid type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = int,
+            raise_error = True
+            )
+        
+        # Asserting value is not negative:
+        assert_value_gt_zero(
+            check_value = validate_value,
+            raise_error = True,
+            )
+        
+    
+    def __validate_added(self, validate_value: int) -> None:
+            
+        # Asserting value is valid type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = int,
+            raise_error = True
+            )
+        
+        # Asserting value is not negative:
+        assert_value_ge_zero(
+            check_value = validate_value,
+            raise_error = True,
             )
         
         
@@ -2487,6 +2565,86 @@ class Card:
 
         # Clearing cache:
         cached_property: str = "location_index"
+        clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        ID CACHED PROPERTIES AND METHODS
+        
+    """
+    
+    
+    @cached_property
+    def id(self) -> int:
+        
+        # Returning:
+        return self.__id
+    
+    
+    @cached_property
+    def id_repr(self) -> str:
+        
+        # Formatting to string:
+        id_repr: str = f"#{self.id:06d}"
+        
+        # Returning:
+        return id_repr
+    
+    
+    def set_id(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            self.__validate_id(
+                validate_value = set_value
+                )
+            
+        # Debug verification:
+        if SESSION.ENABLE_DEBUG:
+            assert_setter_entry(
+                check_object = self,
+                check_attribute = "id",
+                sentinel_value = None,
+                raise_error = True
+                )
+
+        # Updating attribute:
+        self.__id = set_value
+
+        # Clearing cache:
+        if clear_cache:
+            self.clear_cached_id_attributes()
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        ADDED INDEX CACHED PROPERTIES AND METHODS
+        
+    """
+    
+    
+    @cached_property
+    def added_index(self) -> int:
+        
+        # Returning:
+        return self.__added_index
+    
+    
+    def set_added_index(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            self.__validate_added(
+                validate_value = set_value
+                )
+
+        # Updating attribute:
+        self.__added_index = set_value
+
+        # Clearing cache:
+        cached_property: str = "added_index"
         clear_cached_property(
             target_object = self,
             target_attribute = cached_property
