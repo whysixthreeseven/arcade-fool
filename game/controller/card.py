@@ -2484,44 +2484,47 @@ class Card:
             self.clear_cached_location_attributes()
         
     
-    def set_location_hand(self, update_coordinates: bool = True, clear_cache: bool = True) -> None:
+    def set_location_hand(self, location_index: int = 0, update_coordinates: bool = True, clear_cache: bool = True) -> None:
         
         # Updating attribute:
+        location_container: Location = (CARD_LOCATION.HAND, location_index)
         self.set_location(
-            set_value = CARD_LOCATION.HAND,
+            set_value = (CARD_LOCATION.HAND, location_index),
             update_coordinates = update_coordinates,
             ignore_assertion = True,
             clear_cache = clear_cache
             )
         
-    
-    def set_location_deck(self, update_coordinates: bool = True, clar_cache: bool = True) -> None:
+    def set_location_deck(self, location_index: int = 0, update_coordinates: bool = True, clar_cache: bool = True) -> None:
         
         # Updating attribute:
+        location_container: Location = (CARD_LOCATION.DECK, location_index)
         self.set_location(
-            set_value = CARD_LOCATION.DECK,
+            set_value = location_container,
             update_coordinates = update_coordinates,
             ignore_assertion = True,
             clear_cache = clar_cache
             )
         
         
-    def set_location_discard(self, update_coordinates: bool = True, clear_cache: bool = True) -> None:
+    def set_location_discard(self, location_index: int = 0, update_coordinates: bool = True, clear_cache: bool = True) -> None:
 
         # Updating attribute:
+        location_container: Location = (CARD_LOCATION.DISCARD, location_index)
         self.set_location(
-            set_value = CARD_LOCATION.DISCARD,
+            set_value = location_container,
             update_coordinates = update_coordinates,
             ignore_assertion = True,
             clear_cache = clear_cache
             )
         
     
-    def set_location_table(self, update_coordinates: bool = True, clear_cache: bool = True) -> None:
+    def set_location_table(self, location_index: int = 0, update_coordinates: bool = True, clear_cache: bool = True) -> None:
         
         # Updating attribute:
+        location_container: Location = (CARD_LOCATION.DECK, location_index)
         self.set_location(
-            set_value = CARD_LOCATION.TABLE,
+            set_value = location_container,
             update_coordinates = update_coordinates,
             ignore_assertion = True,
             clear_cache = clear_cache
@@ -2552,7 +2555,7 @@ class Card:
         return self.__location_index
 
 
-    def set_index(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_location_index(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
