@@ -132,12 +132,12 @@ class Player:
         
         # Setting up related attributes to default values:
         self.set_play_style(
-            set_value = SETTINGS.COMPUTER_PLAY_STYLE_DEFAULT,
+            set_value = COMPUTER_PLAY_STYLE.RANDOM,     # TODO: Add to SESSION variables!
             ignore_assertion = True,
             clear_cache = True,
             )
         self.set_difficulty(
-            set_value = SETTINGS.COMPUTER_DIFFICULTY_DEFAULT,
+            set_value = COMPUTER_DIFFICULTY.MEDIUM,     # TODO: Add to SESSION variables!
             ignore_assertion = True,
             clear_cache = True,
             )
