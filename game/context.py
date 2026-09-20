@@ -228,13 +228,13 @@ PLAYER_ROLE_LIST: tuple[str, ...] = tuple(
 """
 
 
-class COMPUTER_DIFFICULTY_LEVEL:
+class COMPUTER_DIFFICULTY:
     EASY: str = "Easy"
     MEDIUM: str = "Medium"
     HARD: str = "Hard"
 
 
-class COMPUTER_STYLE:
+class COMPUTER_PLAY_STYLE:
     RECKLESS: str = "Reckless"
     DEFENSIVE: str = "Defensive"
     HOARDING: str = "Hoarding"
@@ -248,13 +248,13 @@ class COMPUTER_STYLE:
 
 
 COMPUTER_DIFFICULTY_LEVEL_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in COMPUTER_DIFFICULTY_LEVEL.__dict__.items()
+    attribute_value for attribute_name, attribute_value in COMPUTER_DIFFICULTY.__dict__.items()
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
     )
 
 
 COMPUTER_PLAY_STYLE_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in COMPUTER_STYLE.__dict__.items()
+    attribute_value for attribute_name, attribute_value in COMPUTER_PLAY_STYLE.__dict__.items()
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
     )
 
