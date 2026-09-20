@@ -6,23 +6,46 @@ from game.settings import SETTINGS
 from game.session import SESSION
 
 
-__TABLE_USED_SURFACE_WIDTH: int = int(SETTINGS.CARD_TEXTURE_WIDTH * 6 + SETTINGS.LOCATION_TABLE_MARGIN * 5)
-__TABLE_USED_SURFACE_START_COORDINATE_X: int = int(__TABLE_USED_SURFACE_WIDTH / 2)
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    LOCATION (TABLE) COORDINATES 
 
+"""
 
-
+# Generating coordinates dictionary index:
 LOCATION_TABLE_COORDINATES_INDEX: dict[int, Coordinates] = {}
-for location_index in range(0, 12):
-    LOCATION_TABLE_COORDINATES_INDEX[location_index] = None
-    coordinate_x: int = int(
-        __TABLE_USED_SURFACE_START_COORDINATE_X +
-        SETTINGS.CARD_TEXTURE_WIDTH / 2 +
-        SETTINGS.CARD_TEXTURE_WIDTH * location_index if location_index == 0 or location_index % 2 == 0 else 1 +
-        SETTINGS.LOCATION_TABLE_INDEX_SHIFT_COORDINATE_X if location_index > 1 and location_index % 2 != 0 else 0
+
+# Preparing variables:
+__COORDINATE_X_START: int = int(SETTINGS.AREA_TABLE_CENTER_COORDINATE_X 
+    - SETTINGS.LOCATION_TABLE_USED_SURFACE / 2
+    + SETTINGS.CARD_TEXTURE_WIDTH / 2
+    )
+__COORDINATE_X_SHIFT_POS: int = SETTINGS.CARD_TEXTURE_WIDTH + SETTINGS.LOCATION_TABLE_MARGIN
+__COORDINATE_X_SHIFT_INDEX: int = SETTINGS.LOCATION_TABLE_INDEX_SHIFT_COORDINATE_X
+__COORDINATE_Y: int = SETTINGS.AREA_TABLE_CENTER_COORDINATE_Y
+__COORDINATE_Y_SHIFT_INDEX: int = SETTINGS.LOCATION_TABLE_INDEX_SHIFT_COORDINATE_Y
+
+# Preparing variables:
+__coordinate_x_calc: int = __COORDINATE_X_START
+__coordinate_y_calc: int = __COORDINATE_Y
+__location_index_range: range = range(0, 11 + 1)
+
+# Calculating table position coordinates:
+for location_index in __location_index_range:
+    if location_index >= 1:
+        if location_index % 2 == 0:
+            __coordinate_x_calc += __COORDINATE_X_SHIFT_POS         # PILE POS (Card + margin)
+        else:
+            __coordinate_x_calc += __COORDINATE_X_SHIFT_INDEX       # STACK POS (Slight shift right)
+            __coordinate_y_calc += __COORDINATE_Y_SHIFT_INDEX       # STACK POS (Slight shift up)
+    
+    # Adding coordinates container to dictionary index:
+    LOCATION_TABLE_COORDINATES_INDEX[location_index] = (
+        __coordinate_x_calc, 
+        __coordinate_y_calc
         )
-    coordinate_y: int = int(
-        SETTINGS.LOCATION_TABLE_CENTER_COORDINATE_Y + 
-        SETTINGS.LOCATION_TABLE_INDEX_SHIFT_COOR
-        )
+    
+    # Resetting slight shift positions:
+    if location_index % 2 != 0:
+        __coordinate_x_calc -= __COORDINATE_X_SHIFT_INDEX
+        __coordinate_y_calc -= __COORDINATE_Y_SHIFT_INDEX
         
-                
