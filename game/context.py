@@ -188,3 +188,81 @@ class AREA_TYPE:
     DISCARD: str = "Discard"
     
     
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    PLAYER-RELATED CONTEXT VARIABLES (CLASS OBJECTS)
+
+"""
+
+
+class PLAYER_TYPE:
+    HUMAN: str = "Human"
+    COMPUTER: str = "Computer"
+    
+    
+class PLAYER_ROLE:
+    ATTACKING: str = "Attacking"
+    DEFENDING: str = "Defending"
+    
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    PLAYER-RELATED CONTEXT VARIABLES (TUPLE COLLECTIONS)
+
+"""
+
+
+PLAYER_TYPE_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in PLAYER_TYPE.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
+
+PLAYER_ROLE_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in PLAYER_ROLE.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    COMPUTER-RELATED CONTEXT VARIABLES (CLASS OBJECTS)
+
+"""
+
+
+class COMPUTER_DIFFICULTY_LEVEL:
+    EASY: str = "Easy"
+    MEDIUM: str = "Medium"
+    HARD: str = "Hard"
+
+
+class COMPUTER_STYLE:
+    RECKLESS: str = "Reckless"
+    DEFENSIVE: str = "Defensive"
+    HOARDING: str = "Hoarding"
+    RANDOM: str = "Random"
+    
+    
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    COMPUTER-RELATED CONTEXT VARIABLES (TUPLE COLLECTIONS)
+
+"""
+
+
+COMPUTER_DIFFICULTY_LEVEL_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in COMPUTER_DIFFICULTY_LEVEL.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
+
+COMPUTER_PLAY_STYLE_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in COMPUTER_STYLE.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
+
+COMPUTER_NAME_COLLECTION: tuple[str, ...] = (
+    "Alice", "Amelia", "Arthur", "Audrey", "Benjamin", "Charlotte", "Chloe", "Daniel", "Eleanor", "Elizabeth", "Emily",
+    "Emma", "Ethan", "Evelyn", "Florence", "Frederick", "George", "Grace", "Hannah", "Harper", "Harry", "Henry",
+    "Isabella", "Jack", "Jacob", "James", "Jasmine", "John", "Joseph", "Katherine", "Liam", "Lily", "Lucy",
+    "Margaret", "Matthew", "Mia", "Michael", "Noah", "Oliver", "Olivia", "Oscar", "Penelope", "Rose", "Samuel",
+    "Scarlett", "Sophia", "Thomas", "Victoria", "William", "Zoe",
+    )
