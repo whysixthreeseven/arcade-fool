@@ -18,7 +18,7 @@ from game.session import SESSION
 from game.utilities.area import Area, AREA_PLAYER, AREA_OPPONENT, AREA_DECK, AREA_DISCARD, AREA_TABLE
 
 
-class SurfaceController:
+class Surface:
     
     
     def __init__(self) -> None:
