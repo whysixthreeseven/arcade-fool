@@ -165,6 +165,15 @@ class __SETTINGS:
     PLAYER_NAME_LEN_MIN: int = 2
     PLAYER_STAT_RATIO_NDIGITS: int = 2
     
+    # Window settings:
+    WINDOW_TITLE: str = f"{APP_NAME} (v{APP_VERSION})"
+    WINDOW_WIDTH: int = SURFACE_WIDTH
+    WINDOW_HEIGHT: int = SURFACE_HEIGHT
+    WINDOW_UPDATE_RATE: float = 1/60
+    WINDOW_ANTIALIASING: bool = False
+    WINDOW_RESIZABLE: bool = False
+    WINDOW_FULLSCREEN: bool = False
+    
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     SETTINGS CLASS OBJECT (GLOBAL) ACCESS POINT
