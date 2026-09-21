@@ -49,6 +49,10 @@ class __SESSION:
         self.__texture_pack_back_default: TexturePack = TEXTURE_PACK_BACK.PLAIN_WHITE
         self.__texture_pack_back_selected: TexturePack = TEXTURE_PACK_BACK.PLAIN_WHITE
         
+        # Game modes:
+        self.__game_mode_secret: bool = True
+        self.__game_mode_reverse: bool = True
+        
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         CACHED PROPETIES AND CLEAN METHODS
@@ -82,6 +86,19 @@ class __SESSION:
         return cached_property_list
     
     
+    @cached_property
+    def __cached_game_mode_attributes(self) -> tuple[str, ...]:
+        
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "GAME_MODE_SECRET",
+            "GAME_MODE_REVERSE"
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+    
     def clear_cached_debug_attributes(self) -> None:
     
         # Clearing cached properties:
@@ -100,12 +117,22 @@ class __SESSION:
             )
         
     
+    def clear_cached_game_mode_attributes(self) -> None:
+            
+        # Clearing cached properties:
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_game_mode_attributes
+            )
+        
+    
     def clear_cached_attributes(self) -> None:
             
         # Collecting cached properties:
         cached_property_list_collection: tuple[tuple[str, ...], ...] = (
             self.__cached_debug_attributes,
             self.__cached_texture_pack_attributes,
+            self.__cached_game_mode_attributes,
             )
         
         # Looping throught the list and clearing cache:
@@ -122,7 +149,17 @@ class __SESSION:
     """
     
     
-    def __validate_texturepack(self, validate_value: object) -> bool:
+    def __validate_flag(self, validate_value: bool) -> bool:
+        
+        # Asserting value is valid type:
+        assert_value_type(
+            check_value = validate_value,
+            check_type = bool,
+            raise_error = True,
+            )
+    
+    
+    def __validate_texture_pack(self, validate_value: TexturePack) -> bool:
         
         # Asserting value is valid type:
         assert_value_type(
@@ -164,10 +201,9 @@ class __SESSION:
         
         # Assertion control:
         if not ignore_assertion:
-            assert_eval: bool = isinstance(set_value, bool)
-            if not assert_eval:
-                error_message: str = "Invalid set value, expected boolean!"
-                raise AssertionError(error_message)
+            self.__validate_flag(
+                validate_value = set_value
+                )
             
         # Updating attribute:
         self.__enable_assertion = set_value
@@ -184,10 +220,9 @@ class __SESSION:
 
         # Assertion control:
         if not ignore_assertion:
-            assert_eval: bool = isinstance(set_value, bool)
-            if not assert_eval:
-                error_message: str = "Invalid set value, expected boolean!"
-                raise AssertionError(error_message)
+            self.__validate_flag(
+                validate_value = set_value
+                )
 
         # Updating attribute:
         self.__enable_debug = set_value
@@ -260,11 +295,11 @@ class __SESSION:
         return self.__texture_pack_back_selected
     
     
-    def set_texture_pack_front(self, set_value: object, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_texture_pack_front(self, set_value: object, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if not ignore_assertion:
-            self.__validate_texturepack(
+            self.__validate_texture_pack(
                 validate_value = set_value,
                 )
 
@@ -272,12 +307,11 @@ class __SESSION:
         self.__texture_pack_front_selected = set_value
 
         # Clearing cache:
-        if clear_cache:
-            cached_property: str = "TEXTURE_PACK_FRONT_SELECTED"
-            clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
+        cached_property: str = "TEXTURE_PACK_FRONT_SELECTED"
+        clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
         
         
     def set_texture_pack_front_random(self, clear_cache: bool = True) -> None:
@@ -293,11 +327,11 @@ class __SESSION:
             )
         
 
-    def set_texture_pack_back(self, set_value: object, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_texture_pack_back(self, set_value: object, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if not ignore_assertion:
-            self.__validate_texturepack(
+            self.__validate_texture_pack(
                 validate_value = set_value,
                 )
 
@@ -305,12 +339,11 @@ class __SESSION:
         self.__texture_pack_back_selected = set_value
 
         # Clearing cache:
-        if clear_cache:
-            cached_property: str = "TEXTURE_PACK_BACK_SELECTED"
-            clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
+        cached_property: str = "TEXTURE_PACK_BACK_SELECTED"
+        clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
             
     
     def set_texture_pack_back_random(self, clear_cache: bool = True) -> None:
@@ -323,6 +356,89 @@ class __SESSION:
             set_value = texture_pack_random,
             ignore_assertion = True,
             clear_cache = clear_cache,
+            )
+        
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        GAME MODE CACHED PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @cached_property
+    def GAME_MODE_SECRET(self) -> bool:
+        
+        # Returning:
+        return self.__game_mode_secret
+    
+    
+    def GAME_MODE_REVERSE(self) -> bool:
+        
+        # Returning:
+        return self.__game_mode_reverse
+    
+
+    def set_game_mode_secret(self, set_value: bool, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if not ignore_assertion:
+            self.__validate_flag(
+                validate_value = set_value
+                )
+            
+        # Updating attribute:
+        self.__game_mode_secret = set_value
+        
+        # Clearing cache:
+        cached_property: str = "GAME_MODE_SECRET"
+        clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+    
+
+    def set_game_mode_reverse(self, set_value: bool, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if not ignore_assertion:
+            self.__validate_flag(
+                validate_value = set_value
+                )
+
+        # Updating attribute:
+        self.__game_mode_reverse = set_value
+
+        # Clearing cache:
+        cached_property: str = "GAME_MODE_REVERSE"
+        clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+        
+    def switch_game_mode_secret(self) -> None:
+
+        # Switching value:
+        self.__game_mode_secret = not self.__game_mode_secret
+
+        # Clearing cache:
+        cached_property: str = "GAME_MODE_SECRET"
+        clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+
+    def switch_game_mode_reverse(self) -> None:
+
+        # Switching value:
+        self.__game_mode_reverse = not self.__game_mode_reverse
+        
+        # Clearing cache:
+        cached_property: str = "GAME_MODE_REVERSE"
+        clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
             )
 
 
