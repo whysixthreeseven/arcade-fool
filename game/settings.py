@@ -18,7 +18,7 @@ class __SETTINGS:
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_VERSION: str = "0.0.1R"
     APP_STARTED: str = "2026.09.02"
-    APP_UPDATED: str = "2026.09.20"
+    APP_UPDATED: str = "2026.09.22"
     APP_AUTHOR: str = "Andrey Vostokov"
 
     # Root directory settings:    
@@ -56,7 +56,7 @@ class __SETTINGS:
     CARD_RENDER_TEXT_FONT_NAME: str = "DengXian"
     
     # Card texture settings:
-    CARD_TEXTURE_SCALE_DEFAULT: float = 0.40
+    CARD_TEXTURE_SCALE_DEFAULT: float = 0.35
     CARD_TEXTURE_WIDTH_FILE: int = 320
     CARD_TEXTURE_WIDTH: int = int(CARD_TEXTURE_WIDTH_FILE * CARD_TEXTURE_SCALE_DEFAULT)
     CARD_TEXTURE_HEIGHT_FILE: int = 480
@@ -75,11 +75,11 @@ class __SETTINGS:
     
     # Area (main) dimensions settings:
     __AREA_HAND_WIDTH: int = __AREA_MAIN_WIDTH
-    __AREA_HAND_HEIGHT: int = int(CARD_TEXTURE_HEIGHT * 2.20)
+    __AREA_HAND_HEIGHT: int = int(CARD_TEXTURE_HEIGHT * 1.20)
     AREA_PLAYER_WIDTH: int = __AREA_HAND_WIDTH
     AREA_PLAYER_HEIGHT: int = __AREA_HAND_HEIGHT
     AREA_TABLE_WIDTH: int = __AREA_HAND_WIDTH
-    AREA_TABLE_HEIGHT: int = int(CARD_TEXTURE_HEIGHT * 1.80)
+    AREA_TABLE_HEIGHT: int = __AREA_HAND_HEIGHT
     AREA_OPPONENT_WIDTH: int = __AREA_HAND_WIDTH
     AREA_OPPONENT_HEIGHT: int = __AREA_HAND_HEIGHT
     AREA_DECK_WIDTH: int = __AREA_SIDE_WIDTH
@@ -100,13 +100,13 @@ class __SETTINGS:
     AREA_DISCARD_CENTER_COORDINATE_Y: int = int(AREA_DECK_HEIGHT + AREA_DECK_HEIGHT / 2)
 
     # Area debug color settings:
-    __AREA_HAND_COLOR_BACKGROUND: RGB_Color = (215, 15, 15)                      # ~Red
-    AREA_TEXT_COLOR: RGB_Color = (255, 255, 255)                                 # ~White
-    AREA_PLAYER_COLOR_BACKGROUND: RGB_Color = __AREA_HAND_COLOR_BACKGROUND       # ~Red
-    AREA_TABLE_COLOR_BACKGROUND: RGB_Color = (15, 215, 15)                       # ~Green
-    AREA_OPPONENT_COLOR_BACKGROUND: RGB_Color = __AREA_HAND_COLOR_BACKGROUND     # ~Red
-    AREA_DECK_COLOR_BACKGROUND: RGB_Color = (15, 15, 215)                        # ~Blue
-    AREA_DISCARD_COLOR_BACKGROUND: RGB_Color = (215, 15, 215)                    # ~Magenta
+    __AREA_HAND_COLOR_BACKGROUND: RGB_Color = (210, 100, 100)                    # Pale red
+    AREA_TEXT_COLOR: RGB_Color = (255, 255, 255)                                 # White
+    AREA_PLAYER_COLOR_BACKGROUND: RGB_Color = __AREA_HAND_COLOR_BACKGROUND       # Pale red
+    AREA_TABLE_COLOR_BACKGROUND: RGB_Color = (185, 210, 100)                     # Pale yellow
+    AREA_OPPONENT_COLOR_BACKGROUND: RGB_Color = __AREA_HAND_COLOR_BACKGROUND     # Pale red
+    AREA_DECK_COLOR_BACKGROUND: RGB_Color = (100, 210, 120)                      # Pale green
+    AREA_DISCARD_COLOR_BACKGROUND: RGB_Color = (200, 100, 210)                   # Pale magenta
     
     # Surface settings:
     SURFACE_WIDTH: int = int(__AREA_HAND_WIDTH + __AREA_SIDE_WIDTH)
