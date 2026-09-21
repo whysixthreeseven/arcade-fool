@@ -9,7 +9,11 @@ import arcade
 from arcade import Rect, Text, Texture, XYWH
 
 # Texture packs:
-from game.utilities.texturepack import TexturePack, TEXTURE_PACK_FRONT_INDEX, TEXTURE_PACK_BACK_INDEX
+from game.utilities.texturepack import (
+    TexturePack, 
+    TEXTURE_PACK_FRONT_INDEX, 
+    TEXTURE_PACK_BACK_INDEX
+    )
 
 # Settings and session instances:
 from game.settings import SETTINGS
@@ -23,7 +27,7 @@ from game.utilities.scripts.cache import (
     refresh_object,
     )
 
-# Assertion scripts:
+# Assertion control:
 from game.utilities.scripts.assertion import (
     assert_setter_entry,
     assert_value_type,
@@ -2441,7 +2445,7 @@ class Card:
         
         Returns
         -------
-        self.__location : str
+        self.__location : `str`
             Card object's current location (general): `"Table"`, `"Hand"`, `"Opponet"`, `"Deck"`, or `"Discard"`.
         """
         
@@ -2463,7 +2467,7 @@ class Card:
         
         Returns
         -------
-        dict[str, dict[int, Coordinates]]
+        location_coordinates : `dict[str, dict[int, Coordinates]]`
             Card object's precalculated coordinates in dictionary format: `{CARD_LOCATION.VALUE: {int: Coordinates}}`.
         """
 
@@ -2496,14 +2500,13 @@ class Card:
         
         Parameters
         ----------
-        set_value : Location
+        set_value : `Location`
             New location value for card object in tuple collection format: `(CARD_LOCATION.VALUE, int)`.
-        ignore_assertion : bool, optional
+        ignore_assertion : `bool`, optional
             If `True`, assertion control is ignored. The default is `False`.
-        clear_cache : bool, optional
+        clear_cache : `bool`, optional
             If `True`, related cached properties are cleared. The default is `True`.
         """
-        
         
         # Unpacking:
         set_location, set_location_index = set_value
@@ -2534,7 +2537,7 @@ class Card:
         and provide coordinates for `calculated_coordinates` parameter if location does not have precalculated set of 
         coordinates, such as "Hand" or "Opponent".
         
-        While general location is handled internall, may raise `AssertionError` if its validate method 
+        While general location is handled internally, may raise `AssertionError` if its validate method 
         `self.__validate_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
         Parameter `location_index` is optional, but expected to be an `int` type value in `range(0, SETTINGS.DECK_SIZE_MAX)`
         range (0 through 51).
@@ -2543,9 +2546,9 @@ class Card:
         
         Parameters
         ----------
-        location_index : int, optional
+        location_index : `int`, optional
             New index value for card object's location. The default is `0`.
-        clear_cache : bool, optional
+        clear_cache : `bool`, optional
             If `True`, related cached properties are cleared. The default is `True`.
         """
         
@@ -2566,7 +2569,7 @@ class Card:
         and provide coordinates for `calculated_coordinates` parameter if location does not have precalculated set of 
         coordinates, such as "Hand" or "Opponent".
         
-        While general location is handled internall, may raise `AssertionError` if its validate method 
+        While general location is handled internally, may raise `AssertionError` if its validate method 
         `self.__validate_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
         Parameter `location_index` is optional, but expected to be an `int` type value in `range(0, SETTINGS.DECK_SIZE_MAX)`
         range (0 through 51).
@@ -2575,9 +2578,9 @@ class Card:
         
         Parameters
         ----------
-        location_index : int, optional
+        location_index : `int`, optional
             New index value for card object's location. The default is `0`.
-        clear_cache : bool, optional
+        clear_cache : `bool`, optional
             If `True`, related cached properties are cleared. The default is `True`.
         """
         
@@ -2598,7 +2601,7 @@ class Card:
         and provide coordinates for `calculated_coordinates` parameter if location does not have precalculated set of 
         coordinates, such as "Hand" or "Opponent".
         
-        While general location is handled internall, may raise `AssertionError` if its validate method 
+        While general location is handled internally, may raise `AssertionError` if its validate method 
         `self.__validate_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
         Parameter `location_index` is optional, but expected to be an `int` type value in `range(0, SETTINGS.DECK_SIZE_MAX)`
         range (0 through 51).
@@ -2607,9 +2610,9 @@ class Card:
         
         Parameters
         ----------
-        location_index : int, optional
+        location_index : `int`, optional
             New index value for card object's location. The default is `0`.
-        clear_cache : bool, optional
+        clear_cache : `bool`, optional
             If `True`, related cached properties are cleared. The default is `True`.
         """
 
@@ -2630,7 +2633,7 @@ class Card:
         and provide coordinates for `calculated_coordinates` parameter if location does not have precalculated set of 
         coordinates, such as "Hand" or "Opponent".
         
-        While general location is handled internall, may raise `AssertionError` if its validate method 
+        While general location is handled internally, may raise `AssertionError` if its validate method 
         `self.__validate_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
         Parameter `location_index` is optional, but should to be an `int` type value in `range(0, SETTINGS.DECK_SIZE_MAX)`
         range (0 through 51). Unique to "Table" location, it is expected to be in `range(0, 12)` range (0 through 11).
@@ -2639,9 +2642,9 @@ class Card:
         
         Parameters
         ----------
-        location_index : int, optional
+        location_index : `int`, optional
             New index value for card object's location. The default is `0`.
-        clear_cache : bool, optional
+        clear_cache : `bool`, optional
             If `True`, related cached properties are cleared. The default is `True`.
         """
         
@@ -2682,7 +2685,7 @@ class Card:
         
         Returns
         -------
-        self.__location_index : int
+        self.__location_index : `int`
             Card object's current location index.
         """
 
@@ -2707,11 +2710,11 @@ class Card:
         
         Parameters
         ----------
-        set_value : int
+        set_value : `int`
             New location index value for card object.
-        ignore_assertion : bool, optional
+        ignore_assertion : `bool`, optional
             If `True`, assertion control is ignored. The default is `False`.
-        clear_cache : bool, optional
+        clear_cache : `bool`, optional
             If `True`, related cached properties are cleared. The default is `True`.
         
         """
