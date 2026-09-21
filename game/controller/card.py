@@ -158,11 +158,15 @@ class Card:
     
     
     @classmethod
+    def generate(cls, init_id: int, init_suit: str, init_name: str, init_location: Location) -> Card:
         
         # Creating basic card object:
         card_object: Card = Card()
         
         # Adding core attributes:
+        card_object.set_id(
+            set_value = 1,
+            )
         card_object.set_suit(
             set_value = init_suit,
             )
