@@ -2856,8 +2856,6 @@ class Card:
         
     def update_coordinates_location(self, calculated_coordinates: Coordinates | None, clear_cache: bool = True) -> None:
         """
-        About
-        ----------
         Updated coordinates based on card's location and `calculated_coordinates` parameter provided.
         
         If `calculated_coordinates` parameter is set to None, assumes that card's current location is either "Deck", "Discard", or
