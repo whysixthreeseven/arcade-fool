@@ -2657,17 +2657,6 @@ class Card:
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         INDEX CACHED PROPERTIES AND METHODS
         
-        Location index allows for precise coordinates position on screen. Index range is either 0-MAX or 0-11 depending on the 
-        location (MAX for HAND, OPPONENT, DISCARD and DECK; 11 for TABLE). While location tells the controllers what area the 
-        card belongs to, index either calculated on demand or predetermined (e.g. on TABLE).
-        
-        1. HAND & OPPONENT index position is calculated based on the number of cards in the hand;
-        2. DECK & DISCARD index position in predertermined and allows the controller to shift card's coordinates X and Y 
-           according to its placement (later or "higher" on the stack cards get shifted more, while the first few are centered);
-        3. TABLE index position is predetermined. There are a total of six stacks available, thus the positions are set in pairs 
-           where even (including zero) are bottom positions and odd are top positions, e.g. TABLE's index 3 corresponds to stack
-           two top position.
-        
     """
     
     
