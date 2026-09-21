@@ -32,6 +32,8 @@ __location_index_range: range = range(0, 11 + 1)
 
 # Calculating table position coordinates:
 for location_index in __location_index_range:
+    
+    # Shifting positions per each card other than default (first):
     if location_index >= 1:
         if location_index % 2 == 0:
             __coordinate_x_calc += __COORDINATE_X_SHIFT_POS         # PILE POS (Card + margin)
@@ -74,9 +76,9 @@ __SHIFT_PER_CARD: int = SETTINGS.LOCATION_DECK_SHIFT_PER_CARD
 # Preparing loop variables:
 __coordinate_x_calc: int = __COORDINATE_X_START
 __coordinate_y_calc: int = __COORDINATE_Y_START
-__location_index_range: range = range(0, SETTINGS.DECK_SIZE_MAX)
-__location_index_special_list: tuple[int, int] = (0, 1)
-__location_shifted_special: bool = False
+__location_index_range: range = range(0, SETTINGS.DECK_SIZE_MAX)        # 52 cards by default
+__location_index_special_list: tuple[int, int] = (0, 1)                 # 0 = last/hidden, 1 = last last if no hidden
+__location_shifted_special: bool = False                                # Reset flag
 
 # Calculating table position coordinates:
 for location_index in __location_index_range:
@@ -90,6 +92,8 @@ for location_index in __location_index_range:
             __coordinate_x_calc = __COORDINATE_X_START + __COORDINATE_X_SHIFT_SECRET
             __coordinate_y_calc = __COORDINATE_Y_START + __COORDINATE_Y_SHIFT_SECRET
         __location_shifted_special = True
+        
+    # Shift all other cards in deck based on __SHIFT_PER_CARD skip value:
     else:
         if location_index % __SHIFT_PER_CARD == 0:
             __coordinate_x_calc += __COORDINATE_X_SHIFT_INDEX
@@ -107,3 +111,37 @@ for location_index in __location_index_range:
         __coordinate_y_calc: int = __COORDINATE_Y_START
         __location_shifted_special = False
     
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    LOCATION (DISCARD PILE) COORDINATES 
+
+"""
+
+
+# Generating coordinates dictionary index:
+LOCATION_DISCARD_COORDINATES_INDEX: dict[int, Coordinates] = {}
+
+# Preparing coordinates and shift values:
+__COORDINATE_X_START: int = SETTINGS.AREA_DISCARD_CENTER_COORDINATE_X
+__COORDINATE_X_SHIFT_INDEX: int = SETTINGS.LOCATION_DISCARD_SHIFT_COORDINATE_X
+__COORDINATE_Y_START: int = SETTINGS.AREA_DISCARD_CENTER_COORDINATE_Y
+__COORDINATE_Y_SHIFT_INDEX: int = SETTINGS.LOCATION_DISCARD_SHIFT_COORDINATE_Y
+__SHIFT_PER_CARD: int = SETTINGS.LOCATION_DISCARD_SHIFT_PER_CARD
+
+# Preparing loop variables:
+__coordinate_x_calc: int = __COORDINATE_X_START
+__coordinate_y_calc: int = __COORDINATE_Y_START
+__location_index_range: range = range(0, SETTINGS.DECK_SIZE_MAX)        # 52 cards by default
+
+# Calculating table position coordinates:
+for location_index in __location_index_range:
+    if location_index % __SHIFT_PER_CARD == 0:
+        __coordinate_x_calc += __COORDINATE_X_SHIFT_INDEX
+        __coordinate_y_calc += __COORDINATE_Y_SHIFT_INDEX
+
+    # Adding coordinates container to dictionary index:
+    LOCATION_DISCARD_COORDINATES_INDEX[location_index] = (
+        __coordinate_x_calc, 
+        __coordinate_y_calc
+        )
+
