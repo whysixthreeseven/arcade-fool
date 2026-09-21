@@ -38,6 +38,13 @@ from game.utilities.scripts.assertion import (
 from game.context import Location, Coordinates
 from game.context import *
 
+# Coordinates variables:
+from game.coordinates import (
+    LOCATION_TABLE_COORDINATES_INDEX,
+    LOCATION_DECK_COORDINATES_INDEX,
+    LOCATION_DISCARD_COORDINATES_INDEX,
+    )
+
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     CARD CLASS OBJECT CONSTRUCTOR
@@ -151,7 +158,6 @@ class Card:
     
     
     @classmethod
-    def generate(cls, init_suit: str, init_name: str, init_location: Location) -> Card:
         
         # Creating basic card object:
         card_object: Card = Card()
@@ -159,17 +165,10 @@ class Card:
         # Adding core attributes:
         card_object.set_suit(
             set_value = init_suit,
-            ignore_assertion = False,
-            clear_cache = False,
             )
         card_object.set_name(
             set_value = init_name,
-            ignore_assertion = False,
-            clear_cache = False,
             )
-        
-        # Clearing core cached attributes:
-        card_object.clear_cached_core_attributes()
         
         # Updating location and coordinates:
         card_object.set_location(
@@ -2433,7 +2432,54 @@ class Card:
         return self.__location
     
     
-    def set_location(self, set_value: Location, update_coordinates: bool = True, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    @cached_property
+    def __location_precalc_coordinates(self) -> dict[str, dict[int, Coordinates]]:
+        """
+        Card object's precalculated coordinates in dictionary format available for three locations: "Deck", "Discard", and 
+        "Table". Used for quick coordinates update on location change.
+                
+        Accessed by method `self.update_coordinates_location()` providing `self.location` on location change event, if location
+        uses precalculated coordinates. This property is for internal use only!
+        
+        Cached. Cannot be cleared.
+        
+        Returns
+        -------
+        dict[str, dict[int, Coordinates]]
+            Card object's precalculated coordinates in dictionary format: `{CARD_LOCATION.VALUE: {int: Coordinates}}`.
+        """
+
+
+        # Compiling coordinates dictionary index:
+        location_coordinates: dict[str, dict[int, Coordinates]] = {
+            CARD_LOCATION.TABLE: LOCATION_TABLE_COORDINATES_INDEX,
+            CARD_LOCATION.DECK: LOCATION_DECK_COORDINATES_INDEX,
+            CARD_LOCATION.DISCARD: LOCATION_DISCARD_COORDINATES_INDEX,
+            }
+        
+        # Returning:
+        return location_coordinates
+    
+    
+    def set_location(self, set_value: Location, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        """
+        Sets new location value for card object.
+        
+        This method uses only default values found in `game.context.CARD_LOCATION` class collection, and will raise raise 
+        `AssertionError` if its validate method `self.__validate_location()` is unable to assert parameter's validity. Its 
+        validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter `ignore_assertion` is flagged as
+        `False`.
+        
+        Parameters
+        ----------
+        set_value : Location
+            New location value for card object in tuple collection format: `(CARD_LOCATION.VALUE, int)`.
+        ignore_assertion : bool, optional
+            If `True`, assertion control is ignored. The default is `False`.
+        clear_cache : bool, optional
+            If `True`, cached properties are cleared. The default is `True`.
+        """
+        
         
         # Unpacking:
         set_location, set_location_index = set_value
@@ -2451,58 +2497,49 @@ class Card:
         self.__location = set_location
         self.__location_index = set_location_index
         
-        # Updating coordinates, if required:
-        if update_coordinates:
-            # TODO!
-            ...
-        
         # Clearing cache:
         if clear_cache:
             self.clear_cached_location_attributes()
         
     
-    def set_location_hand(self, location_index: int = 0, update_coordinates: bool = True, clear_cache: bool = True) -> None:
+    def set_location_hand(self, location_index: int = 0, clear_cache: bool = True) -> None:
         
         # Updating attribute:
         location_container: Location = (CARD_LOCATION.HAND, location_index)
         self.set_location(
             set_value = (CARD_LOCATION.HAND, location_index),
-            update_coordinates = update_coordinates,
             ignore_assertion = True,
             clear_cache = clear_cache
             )
         
-    def set_location_deck(self, location_index: int = 0, update_coordinates: bool = True, clar_cache: bool = True) -> None:
+    def set_location_deck(self, location_index: int = 0, clar_cache: bool = True) -> None:
         
         # Updating attribute:
         location_container: Location = (CARD_LOCATION.DECK, location_index)
         self.set_location(
             set_value = location_container,
-            update_coordinates = update_coordinates,
             ignore_assertion = True,
             clear_cache = clar_cache
             )
         
         
-    def set_location_discard(self, location_index: int = 0, update_coordinates: bool = True, clear_cache: bool = True) -> None:
+    def set_location_discard(self, location_index: int = 0, clear_cache: bool = True) -> None:
 
         # Updating attribute:
         location_container: Location = (CARD_LOCATION.DISCARD, location_index)
         self.set_location(
             set_value = location_container,
-            update_coordinates = update_coordinates,
             ignore_assertion = True,
             clear_cache = clear_cache
             )
         
     
-    def set_location_table(self, location_index: int = 0, update_coordinates: bool = True, clear_cache: bool = True) -> None:
+    def set_location_table(self, location_index: int = 0, clear_cache: bool = True) -> None:
         
         # Updating attribute:
         location_container: Location = (CARD_LOCATION.DECK, location_index)
         self.set_location(
             set_value = location_container,
-            update_coordinates = update_coordinates,
             ignore_assertion = True,
             clear_cache = clear_cache
             )
@@ -2670,6 +2707,120 @@ class Card:
             
         # TODO: Continue!
         
+        
+    def update_coordinates_location(self, calculated_coordinates: Coordinates | None, clear_cache: bool = True) -> None:
+        """
+        About
+        ----------
+        Updated coordinates based on card's location and `calculated_coordinates` parameter provided.
+        
+        If `calculated_coordinates` parameter is set to None, assumes that card's current location is either "Deck", "Discard", or
+        "Table", allowing it to load precaclulcated coordinates values from `self.__location_precalc_coordinates` dictionary index
+        cached property. Otherwise, assumes that `calculated_coordinates` parameter is provided, allowing it to update card's
+        coordinates based on provided value.
+        
+        Parameter `calculated_coordinates` is calculated and provided by `Hand` controller and is mutable, based on card 
+        object's current location index in hand. Hand controller checks how many cards there are in its container and based on 
+        its value and `SETTINGS.__AREA_HAND_WIDTH` (and other predetermined surface restrictions) calculates new coordinates for
+        each card available.
+        
+        Calls card object's native method `set_coordinates_position` to update card's coordinates values. This and other similar
+        methods may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` is set to `True` and coordinates container provided does
+        not pass validation and assertion checks. Precalculated coordinates do not required assertion control.
+        
+        Parameters
+        ----------
+        calculated_coordinates : Coordinates | None
+            Coordinates to update card's position with. If set to None, assumes that card's current location is either "Deck",
+            "Discard", or "Table", allowing it to load precaclulcated coordinates values from `self.__location_precalc_coordinates`
+            
+        clear_cache : bool = True
+            If set to True, clears cached properties and attributes.
+        """
+        
+        
+        # Loading precalculated coordinates:
+        if calculated_coordinates is None:
+            coordinates_precaculated: bool = True if self.location in self.__location_precalc_coordinates.keys() else False
+            if coordinates_precaculated:
+                
+                # Updating coordinates (position):
+                coordinates_position: Coordinates = self.__location_precalc_coordinates[self.location]
+                self.set_coordinates_position(
+                    set_value = coordinates_position,
+                    ignore_assertion = True,
+                    clear_cache = clear_cache
+                    )
+        
+        # Updating coordinates based on provided value:
+        else:
+
+            # Updating coordinates (position):
+            self.set_coordinates_position(
+                set_value = calculated_coordinates,
+                ignore_assertion = False,
+                clear_cache = clear_cache
+                )
+            
+    
+    def update_coordinates_state(self, clear_cache: bool = True) -> None:
+        """
+        Updates `coordinates_expected` cached properties based on card object's state.
+        
+        If card object is in "Selected" state, updates `coordinates_expected` cached property to `coordinates_selected` value, if
+        card object is in "Hovered" state, updates `coordinates_expected` cached property to `coordinates_hovered` value, and if
+        card object is in "Default" (on in-position) state, updates `coordinates_expected` cached property to 
+        `coordinates_position` value, expecting it to be in its place.
+        
+        This method takes priority in checking states, as "selected" state takes the highest priority due to user's mouse 
+        movement. It is technically possible to have a card object selected on screen and have it being "hovered" over at the 
+        same time, if cursor lingers. Thus, it first checks `self.state_selected`, then `self.state_hovered`, and only then 
+        attempts to reset `self.coordinates_expected` to `self.coordinates_position`.
+
+        Calls card object's native method `set_coordinates_expected` to update card's coordinates values. This and other similar
+        methods may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` is set to `True` and coordinates container provided does
+        not pass validation and assertion checks. Precalculated coordinates do not required assertion control, thus parameters
+        `ignore_assertion` are set to `True`. Adjust them for debug purposes only.
+
+        Parameters
+        ----------
+        clear_cache : bool = True
+            If set to True, clears cached properties and attributes.
+        """
+        
+        
+        # Selected state:
+        if self.state_selected:
+            
+            # Checking if expected coordinates are set to selected coordinates:
+            if self.coordinates_expected != self.coordinates_selected:
+                self.set_coordinates_expected(
+                    set_value = self.coordinates_selected,
+                    ignore_assertion = True,
+                    clear_cache = clear_cache
+                    )
+        
+        # Hovered state:
+        elif self.state_hovered:
+            
+            # Checking if expected coordinates are set to hover coordinates:
+            if self.coordinates_expected != self.coordinates_hovered:
+                self.set_coordinates_expected(
+                    set_value = self.coordinates_hovered,
+                    ignore_assertion = True,
+                    clear_cache = clear_cache
+                    )
+
+        # Default (in position) state:
+        else:
+            
+            # Checking if expected coordinates are set to default (in position) coordinates:
+            if self.coordinates_expected != self.coordinates_position:
+                self.set_coordinates_expected(
+                    set_value = self.coordinates_position,
+                    ignore_assertion = True,
+                    clear_cache = clear_cache
+                    )
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
