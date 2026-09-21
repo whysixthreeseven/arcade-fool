@@ -321,12 +321,12 @@ class Area:
             )
     
     
-    def __validate_coordinate(self, validate_value: int) -> None:
+    def __validate_coordinate(self, validate_value: int | float) -> None:
         
         # Asserting value is valid type:
         assert_value_type(
             check_value = validate_value,
-            check_type = int,
+            check_type = (int, float),
             raise_error = True
             )
         
@@ -935,7 +935,7 @@ class Area:
         arcade.draw_rect_filled(
             rect = self.render_rect,
             color = self.color_background,
-            tilt = 0
+            tilt_angle = 0
             )
     
 
