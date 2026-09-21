@@ -2,7 +2,7 @@
 import os
 
 # Context variables:
-from game.context import RGB_Color, Coordinates
+from game.context import RGB_Color
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -50,8 +50,8 @@ class __SETTINGS:
     CARD_RENDER_ALPHA_FADE: int = int(CARD_RENDER_ALPHA_DEFAULT * CARD_RENDER_ALPHA_FADE_MOD)
     CARD_RENDER_ALPHA_STEP_MOD_DEFAULT: float = 0.015
     CARD_RENDER_ALPHA_STEP_MOD_FADED: float = 0.045
-    CARD_RENDER_BG_COLOR: RGB_Color = (215, 0, 0)                               # ~ Red
-    CARD_RENDER_TEXT_COLOR: RGB_Color = (255, 255, 255)                         # ~ White
+    CARD_RENDER_BG_COLOR: RGB_Color = (215, 0, 0)                                           # Red
+    CARD_RENDER_TEXT_COLOR: RGB_Color = (255, 255, 255)                                     # White
     CARD_RENDER_TEXT_FONT_SIZE: int = 12
     CARD_RENDER_TEXT_FONT_NAME: str = "DengXian"
     
@@ -100,20 +100,20 @@ class __SETTINGS:
     AREA_DISCARD_CENTER_COORDINATE_Y: int = int(AREA_DECK_HEIGHT + AREA_DECK_HEIGHT / 2)
 
     # Area debug color settings:
-    __AREA_HAND_COLOR_BACKGROUND: RGB_Color = (210, 100, 100)                    # Pale red
-    AREA_TEXT_COLOR: RGB_Color = (255, 255, 255)                                 # White
-    AREA_PLAYER_COLOR_BACKGROUND: RGB_Color = __AREA_HAND_COLOR_BACKGROUND       # Pale red
-    AREA_TABLE_COLOR_BACKGROUND: RGB_Color = (185, 210, 100)                     # Pale yellow
-    AREA_OPPONENT_COLOR_BACKGROUND: RGB_Color = __AREA_HAND_COLOR_BACKGROUND     # Pale red
-    AREA_DECK_COLOR_BACKGROUND: RGB_Color = (100, 210, 120)                      # Pale green
-    AREA_DISCARD_COLOR_BACKGROUND: RGB_Color = (200, 100, 210)                   # Pale magenta
+    __AREA_HAND_COLOR_BACKGROUND: RGB_Color = (210, 100, 100)                               # Pale red
+    AREA_TEXT_COLOR: RGB_Color = (255, 255, 255)                                            # White
+    AREA_PLAYER_COLOR_BACKGROUND: RGB_Color = __AREA_HAND_COLOR_BACKGROUND                  # Pale red
+    AREA_TABLE_COLOR_BACKGROUND: RGB_Color = (185, 210, 100)                                # Pale yellow
+    AREA_OPPONENT_COLOR_BACKGROUND: RGB_Color = __AREA_HAND_COLOR_BACKGROUND                # Pale red
+    AREA_DECK_COLOR_BACKGROUND: RGB_Color = (100, 210, 120)                                 # Pale green
+    AREA_DISCARD_COLOR_BACKGROUND: RGB_Color = (200, 100, 210)                              # Pale magenta
     
     # Surface settings:
     SURFACE_WIDTH: int = int(__AREA_HAND_WIDTH + __AREA_SIDE_WIDTH)
     SURFACE_HEIGHT: int = int(__AREA_HAND_HEIGHT * 2 + AREA_TABLE_HEIGHT)
     SURFACE_CENTER_COORDINATE_X: int = int(SURFACE_WIDTH / 2)
     SURFACE_CENTER_COORDINATE_Y: int = int(SURFACE_HEIGHT / 2)
-    SURFACE_COLOR_BACKGROUND: RGB_Color = (0, 0, 0)                              # ~Black
+    SURFACE_COLOR_BACKGROUND: RGB_Color = (0, 0, 0)                                         # Black
     
     # Location (deck and discard) common settings:
     __SHIFT_PER_CARD: int = 8
@@ -124,10 +124,10 @@ class __SETTINGS:
     LOCATION_DECK_SHIFT_COORDINATE_X: int = 2
     LOCATION_DECK_SHIFT_COORDINATE_Y: int = 1
     LOCATION_DECK_SHIFT_PER_CARD: int = __SHIFT_PER_CARD
-    LOCATION_DECK_SHIFT_LAST_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.25) * -1
-    LOCATION_DECK_SHIFT_LAST_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.10) * -1
-    LOCATION_DECK_SHIFT_SECRET_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.25) * -1
-    LOCATION_DECK_SHIFT_SECRET_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.10)
+    LOCATION_DECK_SHIFT_LAST_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.25) * -1        # Shift left
+    LOCATION_DECK_SHIFT_LAST_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.10) * -1       # Shift down
+    LOCATION_DECK_SHIFT_SECRET_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.25) * -1      # Shift left
+    LOCATION_DECK_SHIFT_SECRET_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.10)          # Shift up
     
     # Location (discard) coordinates settings:
     LOCATION_DISCARD_COORDINATE_X: int = AREA_DISCARD_CENTER_COORDINATE_X
@@ -169,7 +169,7 @@ class __SETTINGS:
     WINDOW_TITLE: str = f"{APP_NAME} (v{APP_VERSION})"
     WINDOW_WIDTH: int = SURFACE_WIDTH
     WINDOW_HEIGHT: int = SURFACE_HEIGHT
-    WINDOW_UPDATE_RATE: float = 1/60
+    WINDOW_UPDATE_RATE: float = 1 / 60
     WINDOW_ANTIALIASING: bool = False
     WINDOW_RESIZABLE: bool = False
     WINDOW_FULLSCREEN: bool = False
