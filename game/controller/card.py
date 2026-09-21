@@ -2745,6 +2745,20 @@ class Card:
     
     @cached_property
     def id(self) -> int:
+        """
+        Card object's unique identifier.
+        
+        Used to track individual cards through multiple games.
+        
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `game.utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in its setter method.
+
+        Returns
+        -------
+        self.__id : `int`
+            Card object's unique identifier.
+        """
         
         # Returning:
         return self.__id
@@ -2752,6 +2766,20 @@ class Card:
     
     @cached_property
     def id_repr(self) -> str:
+        """
+        Card object's unique identifier formatted as string.
+        
+        Converts `self.id` to be represented as a `str` in `#00000X` format.
+
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `game.utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in its setter method.
+
+        Returns
+        -------
+        id_repr : `str`
+            Card object's unique identifier formatted as string.
+        """
         
         # Formatting to string:
         id_repr: str = f"#{self.id:06d}"
@@ -2761,6 +2789,24 @@ class Card:
     
     
     def set_id(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        """
+        Sets a new unique identifier for card object.
+
+        This method may raise `AssertionError` if its validate method `self.__validate_id()` is unable to assert parameter's
+        validity. Its validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter `ignore_assertion`
+        is flagged as `False`.
+
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+
+        Parameters
+        ----------
+        set_value : `int`
+            New unique identifier value for card object.
+        ignore_assertion : `bool`, optional
+            If `True`, assertion control is ignored. The default is `False`.
+        clear_cache : `bool`, optional
+            If `True`, related cached properties are cleared. The default is `True`.
+        """
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -2793,12 +2839,45 @@ class Card:
     
     @cached_property
     def added_index(self) -> int:
+        """
+        Card object's index representing its position (order) added to new container (Hand, Deck, or Discard piles). The lower 
+        it is the "older" the card is, the higher it is the "newer" the card is.
+        
+        Used for sorting methods available to `Hand` controller class object.
+
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `game.utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in its setter method.
+        
+        Returns
+        -------
+        self.__added_index : `int`
+            Card object's index representing its position (order) added to new container (Hand, Deck, or Discard piles).
+        """
         
         # Returning:
         return self.__added_index
     
     
     def set_added_index(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        """
+        Sets a new index representing card object's position (order) added to new container (Hand, Deck, or Discard piles).
+        
+        Called by container controllers when card object changes its location and is added to a different container. Added index 
+        is determined by controller based on number of cards previously present in the container. The lower the index is the 
+        "older" the card is, the higher it is the "newer" the card is.
+
+        This method may raise `AssertionError` if its validate method `self.__validate_added()` is unable to assert parameter's
+        validity. Its validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter `ignore_assertion`
+        is flagged as `False`.
+
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+        
+        Parameters
+        ----------
+        set_value : `int`
+            New index representing card object's position (order) added to new container (Hand, Deck, or Discard piles).
+        """
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -2824,6 +2903,12 @@ class Card:
     
     
     def display(self) -> None:
+        """
+        Renders the card object's texture on screen. Used by `Gameshell` object's `on_draw` method within loop logic. 
+        
+        Uses predefined `arcade.Rect` object, card object's `self.texture_object_selected` texture based on its state and other
+        render properties.
+        """
         
         # Rendering:
         arcade.draw_texture_rect(
@@ -2836,6 +2921,12 @@ class Card:
 
 
     def display_info(self) -> None:
+        """
+        Renders the card object's debug info on screen. Used by `Gameshell` object's `on_draw` method within loop logic. 
+        
+        Uses predefined `arcade.Text` object and other core attributes values available to the card. Calls 
+        `self.render_text.draw()` method to render text object on screen.
+        """
         
         # Calling text object's draw method:
         self.render_text.draw()
@@ -2847,8 +2938,36 @@ class Card:
     """
     
     
-    def slide(self, target_coordinates: Coordinates, speed_modifier: float, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
-
+    def slide(self, target_coordinates: Coordinates, speed_modifier: float, 
+                    ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        """
+        Slides card object's position to new coordinates provided in `target_coordinates` parameter. Uses `speed_modifier` to 
+        determine how fast the card should slide to new coordinates. 
+        
+        Parameter `speed_modifier` cannot be less than default min value in `SETTINGS`, otherwise the card will never reach its
+        destination. If `speed_modifier` is set to `0.00` the slide will finish its job instantly. 
+        
+        Used by `Gameshell` object's `on_update` method within loop logic.
+        
+        Calls card object's native method `set_coordinates_position()` to update card's coordinates values. This and other similar
+        methods may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` is set to `True` and coordinates container provided does
+        not pass validation and assertion checks. Precalculated coordinates do not required assertion control.
+        
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+        
+        Parameters
+        ----------
+        target_coordinates : `Coordinates`
+            Coordinates tuple collection to slide card object to.
+        speed_modifier : `float`
+            Speed modifier to determine how fast the card should slide to new coordinates.
+        ignore_assertion : `bool` = `True`
+            Flag to determine if assertion control should be ignored. If set to `True`, assertion control will be ignored.
+        clear_cache : `bool` = `True`
+            Flag to determine if related cache should be cleared. If set to `True`, related cache will be cleared.
+        """
+        
+        # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
             self.__validate_coordiante_container(
                 validate_value = target_coordinates
@@ -2977,13 +3096,28 @@ class Card:
     
     
     def auto_scale(self) -> None:
+        """
+        Scaler method. Automatically adjusts card object's scale values based on its state and available scale values.
+        
+        If card object is in "Selected" state, adjusts `render_scale` cached property to `render_scale_selected` value, and if
+        card object is in "Default" (on in-position) state, adjusts `render_scale` cached property to `render_scale_default` 
+        value.
+        
+        Used by `Gameshell` object via `on_update()` method to automatically adjust card object's scale values within game logic 
+        loop.
+        
+        Calls card object's native method `transition_render_scale()` to update card's scale values. This and other similar
+        methods may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` is set to `True` and scale value provided does not
+        pass validation and assertion checks. Precalculated scale values do not required assertion control, thus parameters
+        `ignore_assertion` are set to `True`. Adjust them for debug purposes only.
+        """
         
         # Preparing flag variables:
         clear_cache: bool = False
         job_required: bool = False
         
-        # Checking hovered or selected states:
-        if self.state_hovered or self.state_selected:
+        # Checking selected states:
+        if self.state_selected:
             if self.render_scale != self.render_scale_selected:
                 render_scale_target: float = self.render_scale_selected
                 job_required = True
@@ -3018,6 +3152,21 @@ class Card:
                 
     
     def auto_tilt(self, instant_mode: bool = False) -> None:
+        """
+        Tilter method. Automatically adjusts card object's tilt values based on its state and available tilt values.
+
+        If card object is in "Idle" state, adjusts `render_tilt` cached property to `render_tilt_random` value, and if
+        card object is in "Default" (on in-position) state, adjusts `render_tilt` cached property to `render_tilt_default`
+        value. If card object is in "Opponent" state, adjusts `render_tilt` cached property to `render_tilt_opp` value.
+
+        Used by `Gameshell` object via `on_update()` method to automatically adjust card object's tilt values within game logic 
+        loop.
+        
+        Calls card object's native method `transition_render_tilt()` to update card's tilt values. This and other similar
+        methods may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` is set to `True` and tilt value provided does not
+        pass validation and assertion checks. Precalculated tilt values do not required assertion control, thus parameters
+        `ignore_assertion` are set to `True`. Adjust them for debug purposes only.
+        """
         
         # Preparing flag variables:
         clear_cache: bool = False
@@ -3078,6 +3227,21 @@ class Card:
 
 
     def auto_alpha(self) -> None:
+        """
+        Alpha controller method. Automatically adjusts card object's alpha values based on its state.
+
+        If card object is in "Faded" state, adjusts `render_alpha` cached property to `render_alpha_faded` value. If card
+        object is in "Default" (on in-position) state, adjusts `render_alpha` cached property to `render_alpha_default`
+        value.
+        
+        Used by `Gameshell` object via `on_update()` method to automatically adjust card object's alpha values within game logic
+        loop.
+        
+        Calls card object's native method `transition_render_alpha()` to update card's alpha values. This and other similar
+        methods may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` is set to `True` and alpha value provided does not
+        pass validation and assertion checks. Precalculated alpha values do not required assertion control, thus parameters
+        `ignore_assertion` are set to `True`. Adjust them for debug purposes only.
+        """
 
         # Preparing flag variables:
         clear_cache: bool = False
