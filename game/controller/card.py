@@ -2431,6 +2431,20 @@ class Card:
     
     @cached_property
     def location(self) -> str:
+        """
+        Card object's current location (general): "Table", "Hand", "Opponet", "Deck", or "Discard".
+        
+        Uses exclusively default values found in `game.context.CARD_LOCATION` class collection.
+        
+        Cached property. Can be flushed via `cache` script's `clear_cached_property` function, or cache-management methods 
+        available to this class, or with `clear_cache` parameter in its setter method.
+        
+        Returns
+        -------
+        self.__location : str
+            Card object's current location (general): `"Table"`, `"Hand"`, `"Opponet"`, `"Deck"`, or `"Discard"`.
+        """
+        
         
         # Returning:
         return self.__location
@@ -2474,6 +2488,12 @@ class Card:
         validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter `ignore_assertion` is flagged as
         `False`.
         
+        Does not automatically update card object's coordinates. To do so, use method `self.update_coordinates_location()`
+        and provide coordinates for `calculated_coordinates` parameter if location does not have precalculated set of 
+        coordinates, such as "Hand" or "Opponent".
+        
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+        
         Parameters
         ----------
         set_value : Location
@@ -2481,7 +2501,7 @@ class Card:
         ignore_assertion : bool, optional
             If `True`, assertion control is ignored. The default is `False`.
         clear_cache : bool, optional
-            If `True`, cached properties are cleared. The default is `True`.
+            If `True`, related cached properties are cleared. The default is `True`.
         """
         
         
@@ -2507,38 +2527,123 @@ class Card:
         
     
     def set_location_hand(self, location_index: int = 0, clear_cache: bool = True) -> None:
+        """
+        Sets card object's location to "Hand" and updates its index value.
+        
+        Does not automatically update card object's coordinates. To do so, use method `self.update_coordinates_location()`
+        and provide coordinates for `calculated_coordinates` parameter if location does not have precalculated set of 
+        coordinates, such as "Hand" or "Opponent".
+        
+        While general location is handled internall, may raise `AssertionError` if its validate method 
+        `self.__validate_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
+        Parameter `location_index` is optional, but expected to be an `int` type value in `range(0, SETTINGS.DECK_SIZE_MAX)`
+        range (0 through 51).
+
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+        
+        Parameters
+        ----------
+        location_index : int, optional
+            New index value for card object's location. The default is `0`.
+        clear_cache : bool, optional
+            If `True`, related cached properties are cleared. The default is `True`.
+        """
+        
         
         # Updating attribute:
         location_container: Location = (CARD_LOCATION.HAND, location_index)
         self.set_location(
             set_value = (CARD_LOCATION.HAND, location_index),
-            ignore_assertion = True,
+            ignore_assertion = False,
             clear_cache = clear_cache
             )
         
     def set_location_deck(self, location_index: int = 0, clar_cache: bool = True) -> None:
+        """
+        Sets card object's location to "Deck" and updates its index value.
+        
+        Does not automatically update card object's coordinates. To do so, use method `self.update_coordinates_location()`
+        and provide coordinates for `calculated_coordinates` parameter if location does not have precalculated set of 
+        coordinates, such as "Hand" or "Opponent".
+        
+        While general location is handled internall, may raise `AssertionError` if its validate method 
+        `self.__validate_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
+        Parameter `location_index` is optional, but expected to be an `int` type value in `range(0, SETTINGS.DECK_SIZE_MAX)`
+        range (0 through 51).
+
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+        
+        Parameters
+        ----------
+        location_index : int, optional
+            New index value for card object's location. The default is `0`.
+        clear_cache : bool, optional
+            If `True`, related cached properties are cleared. The default is `True`.
+        """
         
         # Updating attribute:
         location_container: Location = (CARD_LOCATION.DECK, location_index)
         self.set_location(
             set_value = location_container,
-            ignore_assertion = True,
+            ignore_assertion = False,
             clear_cache = clar_cache
             )
         
         
     def set_location_discard(self, location_index: int = 0, clear_cache: bool = True) -> None:
+        """
+        Sets card object's location to "Discard" and updates its index value.
+        
+        Does not automatically update card object's coordinates. To do so, use method `self.update_coordinates_location()`
+        and provide coordinates for `calculated_coordinates` parameter if location does not have precalculated set of 
+        coordinates, such as "Hand" or "Opponent".
+        
+        While general location is handled internall, may raise `AssertionError` if its validate method 
+        `self.__validate_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
+        Parameter `location_index` is optional, but expected to be an `int` type value in `range(0, SETTINGS.DECK_SIZE_MAX)`
+        range (0 through 51).
+
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+        
+        Parameters
+        ----------
+        location_index : int, optional
+            New index value for card object's location. The default is `0`.
+        clear_cache : bool, optional
+            If `True`, related cached properties are cleared. The default is `True`.
+        """
 
         # Updating attribute:
         location_container: Location = (CARD_LOCATION.DISCARD, location_index)
         self.set_location(
             set_value = location_container,
-            ignore_assertion = True,
+            ignore_assertion = False,
             clear_cache = clear_cache
             )
         
     
     def set_location_table(self, location_index: int = 0, clear_cache: bool = True) -> None:
+        """
+        Sets card object's location to "Table" and updates its index value.
+        
+        Does not automatically update card object's coordinates. To do so, use method `self.update_coordinates_location()`
+        and provide coordinates for `calculated_coordinates` parameter if location does not have precalculated set of 
+        coordinates, such as "Hand" or "Opponent".
+        
+        While general location is handled internall, may raise `AssertionError` if its validate method 
+        `self.__validate_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
+        Parameter `location_index` is optional, but should to be an `int` type value in `range(0, SETTINGS.DECK_SIZE_MAX)`
+        range (0 through 51). Unique to "Table" location, it is expected to be in `range(0, 12)` range (0 through 11).
+
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+        
+        Parameters
+        ----------
+        location_index : int, optional
+            New index value for card object's location. The default is `0`.
+        clear_cache : bool, optional
+            If `True`, related cached properties are cleared. The default is `True`.
+        """
         
         # Updating attribute:
         location_container: Location = (CARD_LOCATION.DECK, location_index)
@@ -2568,12 +2673,60 @@ class Card:
     
     @cached_property
     def location_index(self) -> int:
+        """
+        Card object's current location index: integers 0 through 51.
+        
+        Location index is used to calculate coordinates of card on screen. While locations such as "Deck", "Discard" and "Table"
+        use precalculated values based on all available index values (0 through 51), `Hand` controller calculates coordinates for
+        locations "Hand" and "Opponent".
+        
+        For pile-type locations index simply shows it's position on stack (the lowest being the first or the closest to the table,
+        and the highest being the last or the closes to the player). "Table" location uses stack system (pairs of 0-1, 2-3, 4-5, 
+        ..., 10-11), where even numbers are bottom positions and odd numbers are top positions.
+        
+        Additionally, Table location uses these index values to determine offset coordinates values, and pile-type locations use
+        them to slightly shift coordinates to top-right corner to create a 3D visual effect of the stack for better readability 
+        (being able to visually determine approximate size of a pile).
+        
+        Cached property. Can be flushed via `cache` script's `clear_cached_property` function, or cache-management methods 
+        available to this class, or with `clear_cache` parameter in its setter method.
+        
+        Returns
+        -------
+        self.__location_index : int
+            Card object's current location index.
+        """
+
 
         # Returning:
         return self.__location_index
 
 
     def set_location_index(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        """
+        Sets a new location index for card object.
+        
+        This method may raise `AssertionError` if its validate method `self.__validate_location_index()` is unable to assert 
+        parameter's validity. Its validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter 
+        `ignore_assertion` is flagged as `False`.
+        
+        Does not automatically update card object's coordinates. To do so, use method `self.update_coordinates_location()`
+        and provide coordinates for `calculated_coordinates` parameter if location does not have precalculated set of 
+        coordinates, such as "Hand" or "Opponent".
+        
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+        
+        Parameters
+        ----------
+        set_value : int
+            New location index value for card object.
+        ignore_assertion : bool, optional
+            If `True`, assertion control is ignored. The default is `False`.
+        clear_cache : bool, optional
+            If `True`, related cached properties are cleared. The default is `True`.
+        
+        """
+        
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
