@@ -292,6 +292,47 @@ class Deck:
         if clear_cache:
             self.clear_cached_cards_attributes()
             
+            
+    def draw_card(self, clear_cache: bool = True) -> Card | None:
+        
+        # Returning None, if no more cards available:
+        if self.cards_count == 0:
+            return None
+        
+        # Popping a card from the list:
+        else:
+            card: Card = self.cards[-1]
+            self.remove_card(
+                card_object = card,
+                clear_cache = False,
+                )
+            
+            # Updating secret card, if it exists:
+            card_count: int = len(self.__card_list)
+            if card_count == 1 and SESSION.GAME_MODE_SECRET:
+                card_secret = self.__card_list[0]
+                card_secret.set_trump(
+                    set_value = True,
+                    ignore_assertion = True,
+                    clear_cache = True
+                    )
+                card_secret.set_state_revealed(
+                    set_value = True,
+                    ignore_assertion = True,
+                    clear_cache = True
+                    )
+            
+            # Clearing cache:
+            if clear_cache:
+                self.clear_cached_cards_attributes()
+            
+            # Returning card object:
+            return card
+        
+        
+        
+        
+            
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         UPDATE METHODS
