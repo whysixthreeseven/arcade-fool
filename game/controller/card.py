@@ -2132,7 +2132,7 @@ class Card:
     
     
     @cached_property
-    def render_rect_color(self) -> tuple[int, int, int]:
+    def render_rect_color(self) -> RGB_Color:
         
         # Returning:
         return SETTINGS.CARD_RENDER_BG_COLOR
@@ -2294,8 +2294,11 @@ class Card:
         
         # Clearing cache:
         if clear_cache:
-            cached_property: str = "state_revealed"
-            clear_cached_property(
+            cached_property_list: tuple[str, ...] = (
+                "state_revealed",
+                "texture_object_selected"
+                )
+            clear_cached_property_list(
                 target_object = self,
                 target_attribute = cached_property
                 )
@@ -2953,7 +2956,7 @@ class Card:
             rect = self.render_rect,
             color = self.render_rect_color,
             angle = self.render_tilt,
-            alpa = self.render_alpha,
+            alpha = self.render_alpha,
             )
 
 
