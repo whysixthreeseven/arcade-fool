@@ -10,6 +10,7 @@ from game.context import Coordinates, Location, RGB_Color
 
 # Controllers and other instances:
 from game.controller.surface import Surface
+from game.controller.deck import Deck
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -38,6 +39,10 @@ class Gameshell(arcade.Window):
         self.__game_controller: object = None               # TODO: Implement!
         self.__ui_controller: object = None                 # TODO: Implement!
         
+        # Test attributes:
+        self.__deck = Deck()
+        self.__deck.generate(None, SETTINGS.DECK_SIZE_MIN)
+        
     
     def on_draw(self) -> None:
         
@@ -47,6 +52,9 @@ class Gameshell(arcade.Window):
         # Rendering area in debug mode:
         if SESSION.ENABLE_DEBUG:
             self.__surface_controller.display_debug()
+            
+        for card in self.__deck.cards:
+            card.display()
             
             
     def on_mouse_motion(self, coordinate_x, coordinate_y, shift_x, shift_y):
