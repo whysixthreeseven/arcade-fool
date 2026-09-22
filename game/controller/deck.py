@@ -604,3 +604,36 @@ class Deck:
         return deck_sorted
     
     
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        DISPLAY INFO CACHED PROPERTIES AND METHODS
+    
+    """
+    
+    
+    def display_info(self, display_coordinates: Coordinates, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            ...
+            
+        # Unpacking coordinates:
+        coordinate_x, coordinate_y = display_coordinates
+        
+        # Creating text object:
+        render_text: Text = Text(
+            text = "{num} {literal}".format(
+                num = self.cards_count,
+                literal = "cards" if self.cards_count > 1 or self.cards_count == 0 else "card"
+                ),
+            x = coordinate_x,
+            y = coordinate_y,
+            color = arcade.color.WHITE,
+            font_size = 24,
+            anchor_x = "center",
+            anchor_y = "center"
+            )
+        
+        # Displaying text:
+        render_text.draw()
+    
+    
