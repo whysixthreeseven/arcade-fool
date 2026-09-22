@@ -471,6 +471,7 @@ class Deck:
             if card_object.trump
             )
         trump_card: Card = random.choice(trump_card_list)
+        
             
         # Selecting a secret card:
         secret_card: Card = random.choice(card_list_gen)
@@ -490,6 +491,9 @@ class Deck:
                 )
             
         # Adding trump card to the list and updating it:
+        card_list_gen.remove(
+            trump_card
+            )
         card_list_adjusted.append(
             trump_card
             )
