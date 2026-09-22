@@ -259,6 +259,24 @@ class Card:
 
         # Returning:
         return cached_property_list
+    
+    
+    @cached_property
+    def __cached_boundary_attributes(self) -> tuple[str, ...]:
+        
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "boundary_left",
+            "boundary_right",
+            "boundary_top",
+            "boundary_bottom",
+            "boundary_horizontal",
+            "boundary_vertical",
+            "boundary"
+            )
+        
+        # Returning:
+        return cached_property_list
 
 
     @cached_property
@@ -395,6 +413,15 @@ class Card:
             target_attribute_list = self.__cached_texture_attributes
             )
         
+        
+    def clear_cached_boundary_attributes(self) -> None:
+        
+        # Clearing cached properties:
+        clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_boundary_attributes
+            )
+        
     
     def clear_cached_render_attributes(self) -> None:
     
@@ -465,6 +492,7 @@ class Card:
         cached_property_list_collection: tuple[tuple[str, ...], ...] = (
             self.__cached_core_attributes,
             self.__cached_texture_attributes,
+            self.__cached_boundary_attributes,
             self.__cached_render_attributes,
             self.__cached_render_rect_attributes,
             self.__cached_coordinates_attributes,
@@ -1023,15 +1051,20 @@ class Card:
 
         # Clearing cache:
         if clear_cache:
+            
+            # Clearing target cached properties:
             cached_property_list: tuple[str, ...] = (
                 "coordinate_x",
                 "coordinates",
-                "render_text",
+                "render_rect",
                 )
             clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
+            
+            # Clearing related cached properties:
+            self.clear_cached_boundary_attributes() 
             
             
     def adjust_coordinate_x(self, adjust_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -1066,15 +1099,20 @@ class Card:
         
         # Clearing cache:
         if clear_cache:
+            
+            # Clearing target cached properties:
             cached_property_list: tuple[str, ...] = (
                 "coordinate_y",
                 "coordinates",
-                "render_text"
+                "render_rect"
                 )
             clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
+
+            # Clearing related cached properties:
+            self.clear_cached_boundary_attributes()
             
             
     def adjust_coordinate_y(self, adjust_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -1121,15 +1159,21 @@ class Card:
         
         # Clearing cache:
         if clear_cache:
+            
+            # Clearing target cached properties:
             cached_property_list: tuple[str, ...] = (
                 "coordinate_x",
                 "coordinate_y",
-                "coordinates"
+                "coordinates",
+                "render_rect"
                 )
             clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
+            
+            # Clearing related cached properties:
+            self.clear_cached_boundary_attributes()
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1656,6 +1700,202 @@ class Card:
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        BOUNDARY CACHED PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @property
+    def boundary_showcase(self) -> bool:
+        
+        # Checking if card is showcased:
+        boundary_showcase: bool = bool(
+            self.location == CARD_LOCATION.DECK and
+            self.location_index == 0 or
+            bool(
+                SESSION.GAME_MODE_SECRET and 
+                self.__location_index == 1
+                )
+            )
+        
+        # Returning:
+        return boundary_showcase
+    
+    
+    @cached_property
+    def boundary_left(self) -> int:
+        
+        # Calculating showcase boundary:
+        if self.boundary_showcase:
+            boundary: int = int(
+                self.coordinate_x - 
+                self.render_height / 2
+                )
+            
+        # Calculating default boundary:
+        else:
+            boundary: int = int(
+                self.coordinate_x - 
+                self.render_width / 2
+                )
+        
+        # Returning:
+        return boundary
+
+
+    @cached_property
+    def boundary_right(self) -> int:
+        
+        # Calculating showcase boundary:
+        if self.boundary_showcase:
+            boundary: int = int(
+                self.coordinate_x + 
+                self.render_height / 2
+                )
+
+        # Calculating default boundary:
+        else:
+            boundary: int = int(
+                self.coordinate_x + 
+                self.render_width / 2
+                )
+
+        # Returning:
+        return boundary
+
+
+    @cached_property
+    def boundary_top(self) -> int:
+        
+        # Calculating showcase boundary:
+        if self.boundary_showcase:
+            boundary: int = int(
+                self.coordinate_y + 
+                self.render_width / 2
+                )
+
+        # Calculating default boundary:
+        else:
+            boundary: int = int(
+                self.coordinate_y + 
+                self.render_height / 2
+                )
+
+        # Returning:
+        return boundary
+
+
+    @cached_property
+    def boundary_bottom(self) -> int:
+
+        # Calculating showcase boundary:
+        if self.boundary_showcase:
+            boundary: int = int(
+                self.coordinate_y - 
+                self.render_width / 2
+                )
+
+        # Calculating default boundary:
+        else:
+            boundary: int = int(
+                self.coordinate_y -
+                self.render_height / 2
+                )
+
+        # Returning:
+        return boundary
+    
+    
+    @cached_property
+    def boundary_horizontal(self) -> range:
+        
+        # Collecting boundary values:
+        boundary: range = range(
+            self.boundary_left, 
+            self.boundary_right + 1
+            )
+
+        # Returning:
+        return boundary
+    
+    
+    @cached_property
+    def boundary_vertical(self) -> range:
+
+        # Collecting boundary values:
+        boundary: range = range(
+            self.boundary_bottom, 
+            self.boundary_top + 1
+            )
+
+        # Returning:
+        return boundary
+
+
+    @cached_property
+    def boundary(self) -> tuple[range, range]:
+        
+        # Collecting boundary values:
+        boundary: tuple[range, range] = (
+            self.boundary_horizontal,
+            self.boundary_vertical
+            )
+
+        # Returning:
+        return boundary
+    
+    
+    def reset_boundary(self) -> None:
+            
+        # Clearing cache:
+        self.clear_cached_boundary_attributes()
+        
+        # Forcing refresh:
+        refresh_object(
+            target_object = self,
+            )
+    
+    
+    def hit_boundary(self, hit_coordinates: Coordinates, ignore_assertion: bool = False) -> bool:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            self.__validate_coordiante_container(
+                validate_value = hit_coordinates,
+                )
+        
+        # Unpacking coordinates:
+        hit_coordinate_x, hit_coordinate_y = hit_coordinates
+        
+        # Checking if coordinates hit card object's boundary:
+        hit_boundary: bool = bool(
+            hit_coordinate_x in self.boundary_horizontal and
+            hit_coordinate_y in self.boundary_vertical
+            )
+
+        # Returning:
+        return hit_boundary
+
+        
+    def hit_boundary_value(self, hit_coordinates: Coordinates, ignore_assertion: bool = False) -> int:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            self.__validate_coordiante_container(
+                validate_value = hit_coordinates,
+                )
+        
+        # Unpacking coordinates:
+        hit_coordinate_x, hit_coordinate_y = hit_coordinates
+        
+        # Calculating coordinate x difference:
+        hit_boundary_value: int = int(hit_coordinate_x / self.boundary_left)
+        
+        # Returning:
+        return hit_boundary_value
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         RENDER (SCALE) CACHED PROPERTIES AND METHODS
     
     """
@@ -1709,11 +1949,16 @@ class Card:
 
         # Clearing cache:
         if clear_cache:
+            
+            # Clearing target cached property:
             cached_property: str = "render_scale"
             clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
+            
+            # Clearing related cached properties:
+            self.clear_cached_boundary_attributes()
             
     
     def set_render_scale_default(self, clear_cache: bool = True) -> None:
