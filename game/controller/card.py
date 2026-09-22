@@ -40,7 +40,24 @@ from game.utilities.scripts.assertion import (
 
 # Context and other card variables:
 from game.context import Location, Coordinates
-from game.context import *
+from game.context import (
+    CARD_SUIT,
+    CARD_SUIT_LIST,
+    CARD_SUIT_ASCII,
+    CARD_SUIT_ASCII_LIST,
+    CARD_SUIT_COLOR,
+    CARD_SUIT_COLOR_LIST,
+    CARD_NAME,
+    CARD_NAME_LIST,
+    CARD_NAME_ASCII,
+    CARD_NAME_ASCII_LIST,
+    CARD_VALUE,
+    CARD_VALUE_LIST,
+    CARD_TEXTURE_FRONT_INDEX,
+    CARD_TEXTURE_BACK_INDEX,
+    CARD_LOCATION,
+    CARD_LOCATION_LIST,
+    )
 
 # Coordinates variables:
 from game.coordinates import (
@@ -3278,5 +3295,4 @@ class Card:
                     target_object = self,
                     target_attribute_list = cached_property_list
                     )
-
 
