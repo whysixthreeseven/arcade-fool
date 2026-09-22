@@ -6,11 +6,26 @@ from game.settings import SETTINGS
 from game.session import SESSION
 
 # Context and namespace variables:
-from game.context import Coordinates, Location, RGB_Color
+from game.context import (
+    Coordinates, 
+    Location, 
+    RGB_Color
+    )
 
 # Controllers and other instances:
 from game.controller.surface import Surface
 from game.controller.deck import Deck
+from game.controller.card import Card
+
+# Area instances:
+from game.utilities.area import (
+    Area, 
+    AREA_TABLE,
+    AREA_DECK,
+    AREA_DISCARD,
+    AREA_PLAYER,
+    AREA_OPPONENT,
+    )
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -43,6 +58,10 @@ class Gameshell(arcade.Window):
         self.__deck = Deck()
         self.__deck.generate(None, SETTINGS.DECK_SIZE_MIN)
         
+        # Boundary attributes:
+        self.__hit_area: Area | None = None
+        self.__hit_card_list: list[Card] = []
+        
     
     def on_draw(self) -> None:
         
@@ -55,10 +74,42 @@ class Gameshell(arcade.Window):
             
         for card in self.__deck.cards:
             card.display()
+        if self.__hit_card_list:
+            print(self.__deck.cards_count, self.__deck.cards_value)
             
             
     def on_mouse_motion(self, coordinate_x, coordinate_y, shift_x, shift_y):
-        ...     # TODO: Implement
+        
+        # Packing coordinates:
+        coordinates: Coordinates = (
+            int(coordinate_x), 
+            int(coordinate_y)
+            )
+
+        # Updating area hit:
+        hit_area: Area | None = self.__surface_controller.locate_area(coordinates)
+        if self.__hit_area != hit_area:
+            self.__hit_area = hit_area
+        
+        # Updating card hit:
+        hit_card: Card | None = None
+        if hit_area is None:
+            pass
+        else:
+            if hit_area == AREA_DECK:
+                card_hit_list: list[Card] = []
+                for card_object in self.__deck.cards:
+                    card_object_hit: bool = card_object.hit_boundary(
+                        hit_coordinates = coordinates,
+                        ignore_assertion = True
+                        )
+                    if card_object_hit:
+                        if card_object not in card_hit_list:
+                            card_hit_list.append(
+                                card_object
+                                )
+                self.__hit_card_list = card_hit_list
+        
             
 
     def on_mouse_press(self, coordinate_x, coordinate_y, button, modifiers):
