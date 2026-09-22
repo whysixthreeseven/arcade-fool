@@ -62,6 +62,10 @@ class Gameshell(arcade.Window):
         self.__hit_area: Area | None = None
         self.__hit_card_list: list[Card] = []
         
+        # Cursor coordinates:
+        self.__cursor_coordinate_x: int = 0
+        self.__cursor_coordinate_y: int = 0
+        
     
     def on_draw(self) -> None:
         
@@ -75,7 +79,13 @@ class Gameshell(arcade.Window):
         for card in self.__deck.cards:
             card.display()
         if self.__hit_card_list:
-            print(self.__deck.cards_count, self.__deck.cards_value)
+            self.__deck.display_info(
+                display_coordinates = (
+                    self.__cursor_coordinate_x,
+                    self.__cursor_coordinate_y,
+                    ),
+                ignore_assertion = True,
+                )
             
             
     def on_mouse_motion(self, coordinate_x, coordinate_y, shift_x, shift_y):
@@ -109,7 +119,8 @@ class Gameshell(arcade.Window):
                                 card_object
                                 )
                 self.__hit_card_list = card_hit_list
-        
+                self.__cursor_coordinate_x = coordinate_x
+                self.__cursor_coordinate_y = coordinate_y
             
 
     def on_mouse_press(self, coordinate_x, coordinate_y, button, modifiers):
