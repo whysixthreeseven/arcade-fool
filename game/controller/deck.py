@@ -528,8 +528,13 @@ class Deck:
                 clear_cache = True,
                 )
             
+        # Sorting by index:
+        card_list_sorted: list[Card] = self.__sort(
+            deck_object = card_list_adjusted
+            )
+
         # Returning:
-        return card_list_adjusted
+        return card_list_sorted
     
     
     def __shuffle(self, deck_object: tuple[Card, ...]) -> tuple[Card, ...]:
@@ -542,5 +547,19 @@ class Deck:
         
         # Returning:
         return deck_copy
+    
+    
+    def __sort(self, deck_object: tuple[Card, ...] | list[Card]) -> list[Card]:
+        
+        # Returning:
+        deck_sorted: list[Card] = list(
+            sorted(
+                deck_object,
+                key = lambda card_object: card_object.location_index
+                )
+            )
+        
+        # Returning:
+        return deck_sorted
     
     
