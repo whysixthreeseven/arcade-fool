@@ -186,7 +186,7 @@ class Card:
         
         # Adding core attributes:
         card_object.set_id(
-            set_value = 1,
+            set_value = init_id,
             )
         card_object.set_suit(
             set_value = init_suit,
@@ -208,13 +208,13 @@ class Card:
             texture_pack_object = SESSION.TEXTURE_PACK_FRONT_SELECTED,
             update_texture = True,
             ignore_assertion = False,
-            clear_cache = True,
+            clear_cache = False,
             )
         card_object.set_texture_pack_back(
             texture_pack_object = SESSION.TEXTURE_PACK_BACK_SELECTED,
             update_texture = True,
             ignore_assertion = False,
-            clear_cache = True,
+            clear_cache = False,
             )
         
         # Waking up all other attributes:
@@ -340,7 +340,8 @@ class Card:
             "state_selected",
             "state_faded",
             "state_idle",
-            "state_playable"
+            "state_playable",
+            "state_secret",
             )
         
         # Returning:
@@ -631,12 +632,17 @@ class Card:
             raise_error = True
             )
         
-        # Asserting value is default:
+        # Selecting default value list:
         texture_pack = validate_value
         if texture_pack.type == "Front":
             texture_pack_list: tuple[TexturePack, ...] = TEXTURE_PACK_FRONT_INDEX
-        else:
+        elif texture_pack.type == "Back":
             texture_pack_list: tuple[TexturePack, ...] = TEXTURE_PACK_BACK_INDEX
+        else:
+            error_message: str = f"Invalid texture pack type: {texture_pack.type}."
+            raise AssertionError(error_message)
+
+        # Asserting value is default:
         assert_value_default(
             check_value = texture_pack,
             check_list = texture_pack_list,
@@ -1959,6 +1965,20 @@ class Card:
     
     
     @cached_property
+    def render_tilt_deck(self) -> int:
+        
+        # Returning:
+        return SETTINGS.CARD_RENDER_TILT_DECK
+
+
+    @cached_property
+    def render_tilt_deck_bottom(self) -> int:
+        
+        # Returning:
+        return SETTINGS.CARD_RENDER_TILT_DECK_BOTTOM
+    
+    
+    @cached_property
     def render_tilt_random(self) -> int:
         
         # Generating a new random tilt angle:
@@ -2442,7 +2462,7 @@ class Card:
                 target_object = self,
                 target_attribute = cached_property
                 )
-    
+            
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         LOCATION CACHED PROPERTIES AND METHODS
