@@ -25,7 +25,6 @@ from game.utilities.scripts.assertion import (
     assert_value_in_range,
     )
 
-
 # Area objects:
 from game.utilities.area import (
     Area, 
