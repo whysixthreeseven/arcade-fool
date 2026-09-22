@@ -39,7 +39,7 @@ from game.utilities.scripts.assertion import (
     )
 
 # Context and other card variables:
-from game.context import Location, Coordinates
+from game.context import Location, Coordinates, RGB_Color
 from game.context import (
     CARD_SUIT,
     CARD_SUIT_LIST,
@@ -198,7 +198,6 @@ class Card:
         # Updating location and coordinates:
         card_object.set_location(
             set_value = init_location,
-            update_coordinates = True,
             ignore_assertion = False,
             clear_cache = False,
             )
@@ -1116,7 +1115,7 @@ class Card:
         coordinate_x, coordinate_y = set_value
             
         # Updating attributes:
-        self.set_coordinate_y(
+        self.set_coordinate_x(
             set_value = coordinate_x,
             ignore_assertion = True,
             clear_cache = False,
@@ -2300,7 +2299,7 @@ class Card:
                 )
             clear_cached_property_list(
                 target_object = self,
-                target_attribute = cached_property
+                target_attribute_list = cached_property_list
                 )
 
 
@@ -2954,7 +2953,6 @@ class Card:
         arcade.draw_texture_rect(
             texture = self.texture_object_selected,
             rect = self.render_rect,
-            color = self.render_rect_color,
             angle = self.render_tilt,
             alpha = self.render_alpha,
             )
@@ -3051,7 +3049,7 @@ class Card:
             if coordinates_precaculated:
                 
                 # Updating coordinates (position):
-                coordinates_position: Coordinates = self.__location_precalc_coordinates[self.location]
+                coordinates_position: Coordinates = self.__location_precalc_coordinates[self.location][self.location_index]
                 self.set_coordinates_position(
                     set_value = coordinates_position,
                     ignore_assertion = True,
