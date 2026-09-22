@@ -320,7 +320,7 @@ class Surface:
         # Unpacking coordinates:
         for area in self.__area_list:
             area_hit: bool = area.hit_boundary(
-                check_coordinates = coordinates,
+                hit_coordinates = coordinates,
                 ignore_assertion = ignore_assertion
                 )
             
