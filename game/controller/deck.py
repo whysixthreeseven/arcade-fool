@@ -55,7 +55,7 @@ class Deck:
     def __init__(self) -> None:
         
         # Core attributes:
-        self.__card_list: list[Card] = []
+        self.__card_list: tuple[Card, ...] = ()
         self.__card_gen_count: int = 0
     
     
@@ -175,10 +175,17 @@ class Deck:
     
     def generate(self, trump_suit: str | None, deck_size: int | None) -> None:
         
-        # Selecting correct deck size:
-        deck_size: int | None = deck_size
-        if deck_size is None:
-            deck_size: int = SETTINGS.DECK_SIZE_MIN     # Replace with SESSION value!
+        # Generating new deck:        
+        deck = self.__generate(
+            trump_suit = trump_suit,
+            deck_size = deck_size
+            )
+        
+        # Updating attributes:
+        self.__card_list: list[Card] = deck
+        
+        # Clearing cache:
+        self.clear_cached_cards_attributes()
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -375,7 +382,7 @@ class Deck:
     """
     
     
-    def __generate(self, deck_size: int, trump_suit: str | None) -> tuple[Card, ...]:
+    def __generate(self, deck_size: int, trump_suit: str | None) -> list[Card]:
 
         # Collecting restricted cards:
         restricted_card_list: tuple[str, ...] = ()
@@ -515,15 +522,14 @@ class Deck:
                 calculated_coordinates = None,
                 clear_cache = True
                 )
+            card_object.set_coordinates(
+                set_value = card_object.coordinates_position,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
             
-        # Converting:
-        card_list_converted: tuple[Card, ...] = tuple(
-            card_object for card_object
-            in card_list_gen
-            )
-        
         # Returning:
-        return card_list_converted
+        return card_list_adjusted
     
     
     def __shuffle(self, deck_object: tuple[Card, ...]) -> tuple[Card, ...]:
@@ -538,28 +544,3 @@ class Deck:
         return deck_copy
     
     
-    @cached_property
-    def __sealed_default(self) -> tuple[Card, ...]:
-        
-        # Generating cards:
-        sealed_deck: tuple[Card, ...] = self.__generate(
-            deck_size = SETTINGS.DECK_SIZE_MIN,
-            shuffle = False,
-            )
-        
-        # Returning:
-        return sealed_deck
-        
-        
-    @cached_property
-    def __sealed_extended(self) -> tuple[Card, ...]:
-        
-        # Generating cards:
-        sealed_deck: tuple[Card, ...] = self.__generate(
-            deck_size = SETTINGS.DECK_SIZE_MAX,
-            shuffle = False,
-            )
-
-        # Returning:
-        return sealed_deck
-                
