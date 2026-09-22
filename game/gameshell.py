@@ -82,7 +82,11 @@ class Gameshell(arcade.Window):
     
     
     def on_key_release(self, key_released, modifiers):
-        ...     # TODO: Check documentation and implement!
+        if key_released == arcade.key.D:
+            card = self.__deck.draw_card()
+            print(card)
+        if key_released == arcade.key.R:
+            self.__deck.generate(None, SETTINGS.DECK_SIZE_MIN)
     
     
     def on_update(self, delta_time):
