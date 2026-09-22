@@ -25,7 +25,11 @@ from game.utilities.scripts.assertion import (
     )
 
 # Namespaces and context:
-from game.context import RGB_Color, AREA_TYPE
+from game.context import (
+    Coordinates, 
+    RGB_Color, 
+    AREA_TYPE
+    )
 
 
 class Area:
@@ -866,7 +870,7 @@ class Area:
             )
         
     
-    def hit_boundary(self, check_coordinates: tuple[int, int], ignore_assertion: bool = False) -> bool:
+    def hit_boundary(self, hit_coordinates: Coordinates, ignore_assertion: bool = False) -> bool:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -878,11 +882,11 @@ class Area:
             
             # Asserting coordinates:
             self.__validate_coordiante_container(
-                validate_value = check_coordinates
+                validate_value = hit_coordinates
                 )
             
         # Unpacking container:
-        check_coordinate_x, check_coordinate_y = check_coordinates
+        check_coordinate_x, check_coordinate_y = hit_coordinates
             
         # Evaluating:
         hit: bool = bool(
