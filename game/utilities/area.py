@@ -2,9 +2,6 @@
 import arcade
 from arcade import Rect, Text, Texture, XYWH
 
-# Texture packs:
-from game.utilities.texturepack import TexturePack, TEXTURE_PACK_FRONT, TEXTURE_PACK_BACK
-
 # Settings and session instances:
 from game.settings import SETTINGS
 from game.session import SESSION
@@ -28,8 +25,7 @@ from game.utilities.scripts.assertion import (
     )
 
 # Namespaces and context:
-from game.context import RGB_Color
-from game.context import AREA_TYPE
+from game.context import RGB_Color, AREA_TYPE
 
 
 class Area:
