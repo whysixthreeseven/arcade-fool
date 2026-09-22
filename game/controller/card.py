@@ -214,9 +214,6 @@ class Card:
         
         # Waking up all other attributes:
         card_object.clear_cached_attributes()
-        refresh_object(
-            target_object = card_object,
-            )
         
         # Returning:
         return card_object

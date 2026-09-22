@@ -415,11 +415,6 @@ class Area:
         # Clearing cache:
         area_object.update_boundary()
         
-        # Refreshing all cached properties:
-        refresh_object(
-            target_object = area_object
-            )
-        
         # Returning:
         return area_object
         
