@@ -152,12 +152,8 @@ class Card:
     
     def __repr__(self) -> str:
         
-        # Generating repr string:
-        card: str = "{card_name} @{card_location} ({card_coordinates})".format(
-            card_name = f"{self.suit_ascii}{self.name_ascii}",
-            card_location = f"{self.location[:2].upper()}:{self.location_index}",
-            card_coordinates = f"{self.coordinate_x}:{self.coordinate_y}"
-            )
+        # Generating string:
+        card: str = f"{self.suit_ascii}{self.name_ascii}"
         
         # Returning:
         return card
@@ -2162,7 +2158,7 @@ class Card:
         
         # Creating text object:
         text: Text = Text(
-            text = self.__repr__,
+            text = self.__repr__(),
             x = self.coordinate_x,
             y = int(self.coordinate_y - self.render_height / 2 - self.render_height / 8),
             color = SETTINGS.CARD_RENDER_TEXT_COLOR,
