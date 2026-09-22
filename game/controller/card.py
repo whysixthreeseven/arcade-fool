@@ -1549,8 +1549,8 @@ class Card:
         return texture_selected 
     
     
-    def set_texture_pack_front(self, texture_pack_object: TexturePack, ignore_assertion: bool = False, 
-                               update_texture: bool = True, clear_cache: bool = True) -> None:
+    def set_texture_pack_front(self, texture_pack_object: TexturePack, update_texture: bool = True, 
+                                     ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
