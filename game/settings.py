@@ -116,7 +116,7 @@ class __SETTINGS:
     SURFACE_COLOR_BACKGROUND: RGB_Color = (0, 0, 0)                                         # Black
     
     # Location (deck and discard) common settings:
-    __SHIFT_PER_CARD: int = 8
+    __SHIFT_PER_CARD: int = 4
     
     # Location (deck) coordinates settings:
     LOCATION_DECK_COORDINATE_X: int = AREA_DECK_CENTER_COORDINATE_X
@@ -125,9 +125,9 @@ class __SETTINGS:
     LOCATION_DECK_SHIFT_COORDINATE_Y: int = 1
     LOCATION_DECK_SHIFT_PER_CARD: int = __SHIFT_PER_CARD
     LOCATION_DECK_SHIFT_LAST_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.15) * -1        # Shift left
-    LOCATION_DECK_SHIFT_LAST_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.05) * -1       # Shift down
+    LOCATION_DECK_SHIFT_LAST_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025) * -1       # Shift down
     LOCATION_DECK_SHIFT_SECRET_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.15) * -1      # Shift left
-    LOCATION_DECK_SHIFT_SECRET_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.05)          # Shift up
+    LOCATION_DECK_SHIFT_SECRET_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025)          # Shift up
     
     # Location (discard) coordinates settings:
     LOCATION_DISCARD_COORDINATE_X: int = AREA_DISCARD_CENTER_COORDINATE_X
