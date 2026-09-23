@@ -26,13 +26,40 @@ from game.utilities.scripts import assertion, validate
 
 
 class Card:
+    """
+    Card class object.
+    
+    This class object is responsible for the creation and management of a card object. Cards are the main elements of the game
+    and, therefore, have the most logic written in them. Thus, this and other class instances utilize `functools` library's 
+    `cached_property` decorator to cache their attributes and methods, and custom-written `utilities.scripts.cache` 
+    module to manage the cache.
+    
+    All the render attributes are calculated and rendering on screen are done by the class native methods, with textures loaded,
+    stored, and used by it. 
+    
+    There are a total of 52 available cards in the game, with 13 cards per suit, and 4 suits available. Default cards are cards
+    including and above the six and stretch all the way to the aces, jokers are not part of the game. Trump cards are refered to
+    cards whose suit is chosen to be trump suit for the game (or period of game, if secret mode is enabled in `SESSION`). Card
+    objects can be used to compare one to another to determine if they can be played.
+    """
     
     def __init__(self) -> None:
+        """
+        Card class object constructor.
+        
+        Initializes attributes with default values drawn from `SETTINGS` class instance, or with `None` or `0` value sentinels 
+        to avoid raising errors when accessing them and `pyglet` complaining about creating render-related instances before the
+        game screen is available to the user.
+        """
         
         # Core attributes:
         self.__name: str = None
         self.__suit: str = None
         self.__trump: bool = None
+        
+        # Added attributes:
+        self.__id: int = None
+        self.__added_index: int = None
         
         # Texture pack attributes:
         self.__texturepack_front: texturepack.TexturePack = None
@@ -69,10 +96,6 @@ class Card:
         self.__location: str = None
         self.__location_index: int = None
         
-        # Added attributes:
-        self.__id: int = None
-        self.__added_index: int = None
-        
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         NATIVE METHODS
@@ -81,6 +104,18 @@ class Card:
     
     
     def __gt__(self, other: Card) -> bool:
+        """
+        Allows this card object compare itself to other cards based on its value. 
+        
+        The comparison is done by comparing the value of the cards and the suit of the cards. If the card is a trump card, it 
+        will always be greater than other cards of the same suit. If the card is not a trump card, it will only be greater than 
+        other cards of the same suit if its value is greater than the value of the other card.
+        
+        Returns
+        -------
+        assert_eval : `bool`
+            `True` if the card is greater than the other card, `False` otherwise.
+        """
         
         # Comparing values:
         assert_eval: bool = bool(
@@ -93,6 +128,18 @@ class Card:
 
 
     def __lt__(self, other: Card) -> bool:
+        """
+        Allows this card object compare itself to other cards based on its value.
+        
+        The comparison is done by comparing the value of the cards and the suit of the cards. If the card is a trump card, it
+        will always be less than other cards of the same suit. If the card is not a trump card, it will only be less than
+        other cards of the same suit if its value is less than the value of the other card.
+        
+        Returns
+        -------
+        assert_eval : `bool`
+            `True` if the card is less than the other card, `False` otherwise.
+        """
 
         # Comparing values:
         assert_eval: bool = bool(
@@ -105,15 +152,31 @@ class Card:
     
     
     def __repr__(self) -> str:
+        """
+        Returns a string representation of the card object.
+        
+        Returns
+        -------
+        card : `str`
+            A string representation of the card object.
+        """
         
         # Generating string:
-        card: str = f"{self.suit_ascii}{self.name_ascii}"
+        card: str = f"{self.suit_ascii}{self.name_ascii}"       # TODO: Replace with a better repr string
         
         # Returning:
         return card
         
         
     def __str__(self) -> str:
+        """
+        Returns a string representation of the card object.
+
+        Returns
+        -------
+        card : `str`
+            A string representation of the card object.
+        """
         
         # Generating string:
         card: str = f"{self.suit_ascii}{self.name_ascii}"
@@ -130,6 +193,30 @@ class Card:
     
     @classmethod
     def generate(cls, init_id: int, init_suit: str, init_name: str, init_location: context.Location) -> Card:
+        """
+        Generates a new card object with the given attributes.
+        
+        Used by `Deck` controller to create a new instance of container. Does not call `game.utilities.script.cache` module's
+        `refresh_object()` function at the end, allowing properties to remain "lazy" until they are first called to avoid any 
+        issues with `pyglet` library creating and/or attempting to render objects on screen before the game window is 
+        initialized.
+
+        Parameters
+        ----------
+        init_id : `int`
+            The id of the card.
+        init_suit : `str`
+            The suit of the card.
+        init_name : `str`
+            The name of the card.
+        init_location : `context.Location`
+            The location of the card in tuple collection format: `(context.CARD_LOCATION.VALUE, int)`.
+
+        Returns
+        -------
+        card_object : `Card`
+            The generated card object.
+        """
         
         # Creating basic card object:
         card_object: Card = Card()
@@ -181,6 +268,20 @@ class Card:
     
     @cached_property
     def __cached_core_attributes(self) -> tuple[str, ...]:
+        """
+        Core attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
         
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
@@ -199,11 +300,25 @@ class Card:
     
     @cached_property
     def __cached_texture_attributes(self) -> tuple[str, ...]:
+        """
+        Texture and texturepack attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
         
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
-            "texture_pack_front",
-            "texture_pack_back",
+            "texturepack_front",
+            "texturepack_back",
             "texture_filepath_front",
             "texture_filepath_back",
             "texture_object_front",
@@ -217,6 +332,20 @@ class Card:
     
     @cached_property
     def __cached_boundary_attributes(self) -> tuple[str, ...]:
+        """
+        Boundary attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
         
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
@@ -235,6 +364,20 @@ class Card:
 
     @cached_property
     def __cached_render_attributes(self) -> tuple[str, ...]:
+        """
+        Render attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
 
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
@@ -249,6 +392,20 @@ class Card:
     
     @cached_property
     def __cached_render_rect_attributes(self) -> tuple[str, ...]:
+        """
+        Render rect attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
 
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
@@ -264,6 +421,20 @@ class Card:
     
     @cached_property
     def __cached_coordinates_attributes(self) -> tuple[str, ...]:
+        """
+        Coordinates attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
 
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
@@ -295,6 +466,20 @@ class Card:
 
     @cached_property
     def __cached_state_attributes(self) -> tuple[str, ...]:
+        """
+        State attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
 
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
@@ -314,6 +499,20 @@ class Card:
     
     @cached_property
     def __cached_location_attributes(self) -> tuple[str, ...]:
+        """
+        Location attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
     
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
@@ -327,6 +526,20 @@ class Card:
     
     @cached_property
     def __cached_id_attributes(self) -> tuple[str, ...]:
+        """
+        Identicator attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
     
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
@@ -340,6 +553,20 @@ class Card:
     
     @cached_property
     def __cached_added_index_attributes(self) -> tuple[str, ...]:
+        """
+        Added index attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
     
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
@@ -351,6 +578,14 @@ class Card:
     
 
     def clear_cached_core_attributes(self) -> None:
+        """
+        Clears all cached core attribute properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function to and related property list available to
+        clear all cached properties of this card object.
+
+        """
+        
 
         # Clearing cached properties:
         cache.clear_cached_property_list(
@@ -1309,7 +1544,7 @@ class Card:
         # Clearing cache:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
-                "texture_pack_front",
+                "texturepack_front",
                 "texture_filepath_front",
                 )
             cache.clear_cached_property_list(
@@ -1339,7 +1574,7 @@ class Card:
         # Clearing cache:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
-                "texture_pack_back",
+                "texturepack_back",
                 "texture_filepath_back",
                 )
             cache.clear_cached_property_list(
@@ -2408,7 +2643,7 @@ class Card:
         """
         Card object's current location (general): "Table", "Hand", "Opponet", "Deck", or "Discard".
         
-        Uses exclusively default values found in `game.context.CARD_LOCATION` class collection.
+        Uses exclusively default values found in `context.CARD_LOCATION` class collection.
         
         Cached property. Can be flushed via `cache` script's `clear_cached_property` function, or cache-management methods 
         available to this class, or with `clear_cache` parameter in its setter method.
@@ -2455,7 +2690,7 @@ class Card:
         """
         Sets new location value for card object.
         
-        This method uses only default values found in `game.context.CARD_LOCATION` class collection, and will raise raise 
+        This method uses only default values found in `context.CARD_LOCATION` class collection, and will raise raise 
         `AssertionError` if its validate method `self.__validate_location()` is unable to assert parameter's validity. Its 
         validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter `ignore_assertion` is flagged as
         `False`.
@@ -2727,7 +2962,7 @@ class Card:
         
         Used to track individual cards through multiple games.
         
-        Cached with `functools` module's `cached_property` decorator. Can be flushed via `game.utilities.scripts.cache` module's
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
         `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
         in its setter method.
 
@@ -2748,7 +2983,7 @@ class Card:
         
         Converts `self.id` to be represented as a `str` in `#00000X` format.
 
-        Cached with `functools` module's `cached_property` decorator. Can be flushed via `game.utilities.scripts.cache` module's
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
         `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
         in its setter method.
 
@@ -2822,7 +3057,7 @@ class Card:
         
         Used for sorting methods available to `Hand` controller class object.
 
-        Cached with `functools` module's `cached_property` decorator. Can be flushed via `game.utilities.scripts.cache` module's
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
         `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
         in its setter method.
         
