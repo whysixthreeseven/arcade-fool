@@ -348,7 +348,7 @@ class Deck:
         # Updating texture pack for all cards:
         if self.cards_count > 0:
             for card_object in self.cards:
-                card_object.set_texture_pack_front(
+                card_object.set_texturepack_front(
                     set_value = texture_pack_object,
                     update_texture = True,
                     ignore_assertion = True,
@@ -376,7 +376,7 @@ class Deck:
         # Updating texture pack for all cards:
         if self.cards_count > 0:
             for card_object in self.cards:
-                card_object.set_texture_pack_back(
+                card_object.set_texturepack_back(
                     set_value = texture_pack_object,
                     update_texture = True,
                     ignore_assertion = True,
@@ -467,14 +467,14 @@ class Deck:
                             )
                     
                     # Updating textures:
-                    card_object.set_texture_pack_front(
-                        texture_pack_object = SESSION.TEXTURE_PACK_FRONT_SELECTED,
+                    card_object.set_texturepack_front(
+                        texturepack_object = SESSION.TEXTURE_PACK_FRONT_SELECTED,
                         update_texture = True,
                         ignore_assertion = True,
                         clear_cache = True,
                         )
-                    card_object.set_texture_pack_back(
-                        texture_pack_object = SESSION.TEXTURE_PACK_BACK_SELECTED,
+                    card_object.set_texturepack_back(
+                        texturepack_object = SESSION.TEXTURE_PACK_BACK_SELECTED,
                         update_texture = True,
                         ignore_assertion = True,
                         clear_cache = True,
