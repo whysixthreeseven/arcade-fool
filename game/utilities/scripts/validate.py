@@ -7,6 +7,9 @@ from game import context
 from game.utilities.scripts import assertion
 from game.utilities import texturepack
 
+# Card class object:
+from game.controller.card import Card
+
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     VALIDATE FUNCTIONS
@@ -441,3 +444,34 @@ def validate_card_location_index(validate_value: int) -> None:
         raise_error = True,
         )
     
+
+def validate_card_object(validate_value: Card) -> None:
+    
+    # Asserting value type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = Card,
+        raise_error = True
+        )
+    
+
+def validate_deck_size(validate_value: int) -> None:
+    
+    # Asserting value is valid type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = int,
+        raise_error = True
+        )
+
+    # Asserting value is default:
+    default_list: tuple[int, int] = (
+        SETTINGS.DECK_SIZE_MIN,
+        SETTINGS.DECK_SIZE_MAX
+        )
+    assertion.assert_value_default(
+        check_value = validate_value,
+        check_list = default_list,
+        raise_error = True
+        )
+
