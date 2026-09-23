@@ -1,62 +1,31 @@
 # Card class object:
 from game.controller.card import Card
 
-# Random library:
+# External libraries:
 import random
-
-# Arcade library:
 import arcade
-from arcade import Rect, Text, Texture, XYWH
 
-# Texture packs:
-from game.utilities.texturepack import (
-    TexturePack, 
-    TEXTURE_PACK_FRONT, 
-    TEXTURE_PACK_FRONT_INDEX,
-    TEXTURE_PACK_BACK,
-    TEXTURE_PACK_BACK_INDEX,
-    )
-
-# Settings and session instances:
+# Settings, session and context:
 from game.settings import SETTINGS
 from game.session import SESSION
+from game import context
 
 # Cache management:
 from functools import cached_property
-from game.utilities.scripts.cache import (
-    clear_cached_property, 
-    clear_cached_property_list,
-    refresh_object,
-    )
+from game.utilities.scripts import cache
 
-# Assertion scripts:
-from game.utilities.scripts.assertion import (
-    assert_setter_entry,
-    assert_value_type,
-    assert_value_default,
-    assert_value_ge_zero,
-    assert_value_not_empty,
-    assert_value_in_range,
-    )
-
-# Context and other card variables:
-from game.context import Location, Coordinates, RGB_Color
-from game.context import (
-    CARD_SUIT_LIST,
-    CARD_NAME,
-    CARD_NAME_LIST,
-    CARD_LOCATION
-    )
+# Various utilities:
+from game.utilities import texturepack
+from game.utilities.scripts import validate
 
 
 class Deck:
     
-    
     def __init__(self) -> None:
         
         # Core attributes:
-        self.__card_list: tuple[Card, ...] = ()
-        self.__card_gen_count: int = 0
+        self.__card_list: list[Card] = []       # Current deck container
+        self.__card_gen_count: int = 0          # Cards generated count (global)
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -67,6 +36,20 @@ class Deck:
     
     @cached_property
     def __cached_cards_attributes(self) -> tuple[str, ...]:
+        """
+        Cards attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
         
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
@@ -80,15 +63,27 @@ class Deck:
     
     
     def clear_cached_cards_attributes(self) -> None:
+        """
+        Clears all public cached core properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear texturepack properties of this card object.
+        """
     
         # Clearing cached properties:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_cards_attributes
             )
         
     
     def clear_cached_attributes(self) -> None:
+        """
+        Clears all public cached properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and all property lists available to
+        clear all cached properties of this card object in a single loop through lists collection.
+        """
             
         # Collecting cached properties:
         cached_property_list_collection: tuple[tuple[str, ...], ...] = (
@@ -97,74 +92,10 @@ class Deck:
         
         # Looping throught the list and clearing cache:
         for cached_property_list in cached_property_list_collection:
-            clear_cached_property_list(
+            cache.clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
-        
-    
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        VALIDATE METHODS
-    
-    """
-    
-    
-    def __validate_card(self, validate_value: Card) -> None:
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = Card,
-            raise_error = True,
-            )
-        
-        
-    def __validate_texture_pack(self, validate_value: TexturePack) -> None:
-                
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = TexturePack,
-            raise_error = True
-            )
-        
-        # Selecting default value list:
-        texture_pack = validate_value
-        if texture_pack.type == "Front":
-            texture_pack_list: tuple[TexturePack, ...] = TEXTURE_PACK_FRONT_INDEX
-        elif texture_pack.type == "Back":
-            texture_pack_list: tuple[TexturePack, ...] = TEXTURE_PACK_BACK_INDEX
-        else:
-            error_message: str = f"Invalid texture pack type: {texture_pack.type}."
-            raise AssertionError(error_message)
-
-        # Asserting value is default:
-        assert_value_default(
-            check_value = texture_pack,
-            check_list = texture_pack_list,
-            raise_error = True
-            )
-        
-        
-    def __validate_deck_size(self, validate_value: int) -> None:
-
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = int,
-            raise_error = True
-            )
-
-        # Asserting value is default:
-        default_list: tuple[int, int] = (
-            SETTINGS.DECK_SIZE_MIN,
-            SETTINGS.DECK_SIZE_MAX
-            )
-        assert_value_default(
-            check_value = validate_value,
-            check_list = default_list,
-            raise_error = True
-            )
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -198,7 +129,10 @@ class Deck:
     def cards(self) -> tuple[Card, ...]:
         
         # Converting list to tuple:
-        card_list: tuple[Card, ...] = tuple(card_object for card_object in self.__card_list)
+        card_list: tuple[Card, ...] = tuple(
+            card_object for card_object 
+            in self.__card_list
+            )
 
         # Returning:
         return card_list
@@ -218,7 +152,10 @@ class Deck:
     def cards_value(self) -> int:
         
         # Calculating:
-        cards_value: int = sum(card.value for card in self.cards)
+        cards_value: int = sum(
+            card.value for card 
+            in self.cards
+            )
         
         # Returning:
         return cards_value
@@ -229,7 +166,7 @@ class Deck:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_card(
+            validate.validate_card_object(
                 validate_value = card_object
                 )
             
@@ -245,7 +182,11 @@ class Deck:
         if update_card:
             
             # Updating location and location index attributes:
-            set_location: Location = (CARD_LOCATION.DECK, self.__card_list.index(card_object))
+            location_index: int = self.__card_list.index(card_object)
+            set_location: context.Location = (
+                context.CARD_LOCATION.DECK, 
+                location_index,
+                )
             card_object.set_location(
                 set_value = set_location,
                 ignore_assertion = True,
@@ -272,7 +213,7 @@ class Deck:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_card(
+            validate.validate_card_object(
                 validate_value = card_object
                 )
             
@@ -336,12 +277,12 @@ class Deck:
     """
     
     
-    def update_texture_pack_front(self, texture_pack_object: TexturePack, 
+    def update_texture_pack_front(self, texture_pack_object: texturepack.TexturePack, 
                                         ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_texture_pack(
+            validate.validate_texturepack(
                 validate_value = texture_pack_object
                 )
 
@@ -358,18 +299,18 @@ class Deck:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "cards"
-            clear_cached_property(
+            cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
             
     
-    def update_texture_pack_back(self, texture_pack_object: TexturePack, 
+    def update_texture_pack_back(self, texture_pack_object: texturepack.TexturePack, 
                                        ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_texture_pack(
+            validate.validate_texturepack(
                 validate_value = texture_pack_object
                 )
 
@@ -386,7 +327,7 @@ class Deck:
         # Clearing cache:   
         if clear_cache:
             cached_property: str = "cards"
-            clear_cached_property(
+            cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
@@ -407,7 +348,7 @@ class Deck:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "cards"
-            clear_cached_property(
+            cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
@@ -425,10 +366,10 @@ class Deck:
         restricted_card_list: tuple[str, ...] = ()
         if deck_size == SETTINGS.DECK_SIZE_MIN:        
             restricted_card_list: tuple[str, ...] = (
-                CARD_NAME.TWO,
-                CARD_NAME.THREE,
-                CARD_NAME.FOUR,
-                CARD_NAME.FIVE,
+                context.CARD_NAME.TWO,
+                context.CARD_NAME.THREE,
+                context.CARD_NAME.FOUR,
+                context.CARD_NAME.FIVE,
                 )
         
         # Creating container:
@@ -437,11 +378,11 @@ class Deck:
         
         # Selecting trump suit:
         if trump_suit is None:
-            trump_suit = random.choice(CARD_SUIT_LIST)
+            trump_suit = random.choice(context.CARD_SUIT_LIST)
         
         # Looping through card suits and names:
-        for card_suit in CARD_SUIT_LIST:
-            for card_name in CARD_NAME_LIST:
+        for card_suit in context.CARD_SUIT_LIST:
+            for card_name in context.CARD_NAME_LIST:
                 
                 # Checking if card name is in restricted list:
                 if card_name not in restricted_card_list:
@@ -450,7 +391,11 @@ class Deck:
                     self.__card_gen_count += 1          # TODO: Replace with method
                     
                     # Creating card object:
-                    card_location: Location = (CARD_LOCATION.DECK, len(card_list_gen))
+                    card_location_index: int = len(card_list_gen)
+                    card_location: context.Location = (
+                        context.CARD_LOCATION.DECK, 
+                        card_location_index,
+                        )
                     card_object: Card = Card.generate(
                         init_id = self.__card_gen_count,
                         init_suit = card_suit,
@@ -509,7 +454,6 @@ class Deck:
             )
         trump_card: Card = random.choice(trump_card_list)
         
-            
         # Selecting a secret card:
         secret_card: Card = random.choice(card_list_gen)
         while secret_card == trump_card:
@@ -610,17 +554,20 @@ class Deck:
     """
     
     
-    def display_info(self, display_coordinates: Coordinates, ignore_assertion: bool = False) -> None:
+    def display_info(self, display_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
+        """
+        THIS METHOD HAS NOT BEEN PROPERLY IMPLEMENTED AND IS FOR TEST USES ONLY!        
+        """
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            ...
+            ...     # TODO: Implement
             
         # Unpacking coordinates:
         coordinate_x, coordinate_y = display_coordinates
         
         # Creating text object:
-        render_text: Text = Text(
+        render_text: arcade.Text = arcade.Text(
             text = "{num} {literal}".format(
                 num = self.cards_count,
                 literal = "cards" if self.cards_count > 1 or self.cards_count == 0 else "card"
