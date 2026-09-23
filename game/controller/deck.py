@@ -277,20 +277,20 @@ class Deck:
     """
     
     
-    def update_texture_pack_front(self, texture_pack_object: texturepack.TexturePack, 
-                                        ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def update_texturepack_front(self, texturepack_object: texturepack.TexturePack, 
+                                       ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
             validate.validate_texturepack(
-                validate_value = texture_pack_object
+                validate_value = texturepack_object
                 )
 
         # Updating texture pack for all cards:
         if self.cards_count > 0:
             for card_object in self.cards:
                 card_object.set_texturepack_front(
-                    set_value = texture_pack_object,
+                    set_value = texturepack_object,
                     update_texture = True,
                     ignore_assertion = True,
                     clear_cache = True
@@ -305,20 +305,20 @@ class Deck:
                 )
             
     
-    def update_texture_pack_back(self, texture_pack_object: texturepack.TexturePack, 
-                                       ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def update_texturepack_back(self, texturepack_object: texturepack.TexturePack, 
+                                      ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
             validate.validate_texturepack(
-                validate_value = texture_pack_object
+                validate_value = texturepack_object
                 )
 
         # Updating texture pack for all cards:
         if self.cards_count > 0:
             for card_object in self.cards:
                 card_object.set_texturepack_back(
-                    set_value = texture_pack_object,
+                    set_value = texturepack_object,
                     update_texture = True,
                     ignore_assertion = True,
                     clear_cache = True
