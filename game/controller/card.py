@@ -241,13 +241,13 @@ class Card:
             
         # Loading default textures:
         card_object.set_texturepack_front(
-            texturepack_object = SESSION.TEXTURE_PACK_FRONT_SELECTED,
+            texturepack_object = SESSION.TEXTUREPACK_FRONT_SELECTED,
             update_texture = True,
             ignore_assertion = False,
             clear_cache = False,
             )
         card_object.set_texturepack_back(
-            texturepack_object = SESSION.TEXTURE_PACK_BACK_SELECTED,
+            texturepack_object = SESSION.TEXTUREPACK_BACK_SELECTED,
             update_texture = True,
             ignore_assertion = False,
             clear_cache = False,
