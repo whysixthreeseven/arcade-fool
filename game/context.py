@@ -267,3 +267,28 @@ COMPUTER_NAME_COLLECTION: tuple[str, ...] = (
     "Scarlett", "Sophia", "Thomas", "Victoria", "William", "Zoe",
     )
 
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    HAND-RELATED CONTEXT VARIABLES (CLASS OBJECTS)
+
+"""
+
+
+class HAND_SORT_SEQ:
+    ADDED: str = "Added"
+    VALUE: str = "Value"
+    SUIT: str = "Suit"
+    COLOR: str = "Color"
+    
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    HAND-RELATED CONTEXT VARIABLES (TUPLE COLLECTIONS)
+
+"""
+
+
+HAND_SORT_SEQ_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in HAND_SORT_SEQ.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
