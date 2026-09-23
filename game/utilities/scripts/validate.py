@@ -474,4 +474,21 @@ def validate_deck_size(validate_value: int) -> None:
         check_list = default_list,
         raise_error = True
         )
+    
+    
+def validate_sort_seq(validate_value: str) -> None:
+    
+    # Asserting value is valid type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = str,
+        raise_error = True
+        )
+    
+    # Asserting value is default:
+    assertion.assert_value_default(
+        check_value = validate_value,
+        check_list = context.SORT_SEQ_LIST,
+        raise_error = True
+        )
 
