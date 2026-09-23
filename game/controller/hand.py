@@ -215,7 +215,9 @@ class Hand:
         
         # Sorting cards, if required
         if sort_container:
-            ...             # TODO: Implement!
+            self.sort_default(
+                clear_cache = clear_cache,
+                )
         
         # Clearing cache:
         if clear_cache:
@@ -241,7 +243,9 @@ class Hand:
         
         # Sorting cards, if required:
         if sort_container:
-            ...            # TODO: Implement!
+            self.sort_default(
+                clear_cache = clear_cache,
+                )
 
         # Clearing cache:
         if clear_cache:
@@ -308,6 +312,10 @@ class Hand:
                 target_object = self,
                 target_attribute = cached_property
                 )
+            
+    
+    def update_coordinates(self, clear_cache: bool = True) -> None:
+        ...
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -316,28 +324,141 @@ class Hand:
     """
     
     
-    def __sort_added(self) -> None:
-        ...
+    def __sort_added(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
+        
+        # Sorting cards:
+        self.__card_list.sort(
+            key = lambda card: card.added_index,
+            reverse = sort_reverse,
+            )
+        
+        # Clearing cache, if required:
+        if clear_cache:
+            self.clear_cached_cards_attributes()
         
         
-    def __sort_added_reverse(self) -> None:
-        ...
+    def __sort_value(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
         
+        # Sorting cards:
+        self.__card_list.sort(
+            key = lambda card: card.value,
+            reverse = sort_reverse,
+            )
+        
+        # Clearing cache, if required:
+        if clear_cache:
+            self.clear_cached_cards_attributes()
+        
+        
+    def __sort_suit(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
+        
+        # Creating a suit order dictionary index:
+        suit_order: dict[str, int] = {
+            suit: index
+            for index, suit in enumerate(context.CARD_SUIT_LIST)
+            }
 
-    def __sort_value(self) -> None:
-        ...
+        # Sorting cards:
+        self.__card_list.sort(
+            key = lambda card: (
+                suit_order[card.suit],
+                - card.value,
+                ),
+            reverse = sort_reverse,
+            )   
+        
+        # Clearing cache, if required:
+        if clear_cache:
+            self.clear_cached_cards_attributes()
+    
+        
+    def __sort_color(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
+        
+        # Creating a suit order dictionary index:
+        color_order: dict[str, int] = {
+            color: index
+            for index, color in enumerate(context.CARD_SUIT_COLOR_LIST)
+            }
+
+        # Sorting cards:
+        self.__card_list.sort(
+            key = lambda card: (
+                color_order[card.color],
+                - card.value,
+                ),
+            reverse = sort_reverse,
+            )
+        
+        # Clearing cache, if required:
+        if clear_cache:
+            self.clear_cached_cards_attributes()
         
         
-    def __sort_value_reverse(self) -> None:
+    def __sort_default(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
         ...
         
     
-    def __sort_suit(self) -> None:
-        ...
+    def sort(self, sort_seq: str, sort_reverse: bool = False, update_coordinates: bool = True,
+                   ignore_assertion: bool = True, clear_cache: bool = True) -> None:
         
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_sort_sequence(
+                validate_value = sort_seq
+                )
+            validate.validate_flag(
+                validate_value = sort_reverse
+                )
+            
+        # Creating sort sequence switch dictionary:
+        sort_seq: dict[str, function] = {
+            context.HAND_SORT_SEQ.ADDED: lambda: self.__sort_added(sort_reverse, clear_cache),
+            context.HAND_SORT_SEQ.VALUE: lambda: self.__sort_value(sort_reverse, clear_cache),
+            context.HAND_SORT_SEQ.SUIT: lambda: self.__sort_suit(sort_reverse, clear_cache),
+            context.HAND_SORT_SEQ.COLOR: lambda: self.__sort_color(sort_reverse, clear_cache),
+            }
         
-    def __sort_suit_reverse(self) -> None:
-        ...
+        # Getting correct sorting sequence:
+        sort_seq_func: function = sort_seq.get(
+            sort_seq, 
+            lambda: self.__sort_default(sort_reverse)
+            )
+        
+        # Calling sorting sequence:
+        sort_seq_func()
+        
+        # Updating coordinates, if required:
+        if update_coordinates:
+            self.update_coordinates(
+                clear_cache = clear_cache
+                )
+
+        # Clearing cache:
+        if clear_cache:
+            self.clear_cached_cards_attributes()
+                
+        
+    def sort_default(self, sort_reverse: bool = False, update_coordinates: bool = True, clear_cache: bool = True) -> None:
+        
+        # Calling default sorting sequence:
+        self.sort(
+            sort_seq = SESSION.HAND_SORT_SEQ_DEFAULT,
+            sort_reverse = SESSION.HAND_SORT_SEQ_REVERSE,
+            update_coordinates = update_coordinates,
+            ignore_assertion = True,
+            clear_cache = clear_cache
+            )
+        
+    
+    def sort_selected(self, sort_reverse: bool = False, update_coordinates: bool = True, clear_cache: bool = True) -> None:
+
+        # Calling default sorting sequence:
+        self.sort(
+            sort_seq = SESSION.HAND_SORT_SEQ_SELECTED,
+            sort_reverse = SESSION.HAND_SORT_SEQ_REVERSE,
+            update_coordinates = update_coordinates,
+            ignore_assertion = True,
+            clear_cache = clear_cache
+            )
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
