@@ -579,13 +579,11 @@ class Card:
 
     def clear_cached_core_attributes(self) -> None:
         """
-        Clears all cached core attribute properties of this card object.
+        Clears all public cached core properties of this card object.
         
-        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function to and related property list available to
-        clear all cached properties of this card object.
-
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear texturepack properties of this card object.
         """
-        
 
         # Clearing cached properties:
         cache.clear_cached_property_list(
@@ -595,6 +593,12 @@ class Card:
     
     
     def clear_cached_texture_attributes(self) -> None:
+        """
+        Clears all public cached texture properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear all cached properties of this card object.
+        """
     
         # Clearing cached properties:
         cache.clear_cached_property_list(
@@ -604,6 +608,12 @@ class Card:
         
         
     def clear_cached_boundary_attributes(self) -> None:
+        """
+        Clears all public cached boundary properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear all cached properties of this card object.
+        """
         
         # Clearing cached properties:
         cache.clear_cached_property_list(
@@ -613,6 +623,12 @@ class Card:
         
     
     def clear_cached_render_attributes(self) -> None:
+        """
+        Clears all public cached render properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear all cached properties of this card object.
+        """
     
         # Clearing cached properties:
         cache.clear_cached_property_list(
@@ -622,6 +638,12 @@ class Card:
         
         
     def clear_cached_render_rect_attributes(self) -> None:
+        """
+        Clears all public cached render rect properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear texturepack properties of this card object.
+        """
         
         # Clearing cache:
         cache.clear_cached_property_list(
@@ -631,6 +653,12 @@ class Card:
         
 
     def clear_cached_coordinates_attributes(self) -> None:
+        """
+        Clears all public cached coordinates properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear texturepack properties of this card object.
+        """
         
         # Clearing cached properties:
         cache.clear_cached_property_list(
@@ -640,6 +668,12 @@ class Card:
     
     
     def clear_cached_state_attributes(self) -> None:
+        """
+        Clears all public cached state properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear texturepack properties of this card object.
+        """
         
         # Clearing cached properties:
         cache.clear_cached_property_list(
@@ -649,6 +683,12 @@ class Card:
         
         
     def clear_cached_location_attributes(self) -> None:
+        """
+        Clears all public cached location properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear texturepack properties of this card object.
+        """
             
         # Clearing cached properties:
         cache.clear_cached_property_list(
@@ -658,6 +698,12 @@ class Card:
         
     
     def clear_cached_id_attributes(self) -> None:
+        """
+        Clears all public cached id properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear all cached properties of this card object.
+        """
     
         # Clearing cached properties:
         cache.clear_cached_property_list(
@@ -667,6 +713,12 @@ class Card:
     
     
     def clear_cached_added_index_attributes(self) -> None:
+        """
+        Clears all public cached added index properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear all cached properties of this card object.
+        """
     
         # Clearing cached properties:
         cache.clear_cached_property_list(
@@ -676,6 +728,12 @@ class Card:
         
     
     def clear_cached_attributes(self) -> None:
+        """
+        Clears all public cached properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and all property lists available to
+        clear all cached properties of this card object in a single loop through lists collection.
+        """
         
         # Collecting cached properties:
         cached_property_list_collection: tuple[tuple[str, ...], ...] = (
