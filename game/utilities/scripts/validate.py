@@ -7,9 +7,6 @@ from game import context
 from game.utilities.scripts import assertion
 from game.utilities import texturepack
 
-# Card class object:
-from game.controller.card import Card
-
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     VALIDATE FUNCTIONS
@@ -445,7 +442,10 @@ def validate_card_location_index(validate_value: int) -> None:
         )
     
 
-def validate_card_object(validate_value: Card) -> None:
+def validate_card_object(validate_value: object) -> None:
+    
+    # Card class object:
+    from game.controller.card import Card
     
     # Asserting value type:
     assertion.assert_value_type(
