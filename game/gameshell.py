@@ -155,22 +155,31 @@ class Gameshell(arcade.Window):
                 card = self.__deck.draw_card()
                 self.__hand.add_card(
                     card_object = card,
-                    sort_container = True,
-                    update_card = True,
                     ignore_assertion = False,
                     clear_cache = True,
                     )
-                self.__hand.update_coordinates(
-                    clear_cache = True
-                    )
-                card.set_coordinates(
-                    set_value = card.coordinates_position,
-                    ignore_assertion = False,
-                    clear_cache = True
-                    )
+                self.__hand.update_coordinates()
+                self.__hand.reset_coordinates()
             
         if key_released == arcade.key.R:
+            self.__deck = Deck()
             self.__deck.generate(None, SETTINGS.DECK_SIZE_MIN)
+            self.__hand = Hand()
+            
+        from game import context
+        if key_released == arcade.key.Z:
+            self.__hand.sort(context.HAND_SORT_SEQ.ADDED, False, True, True, True)
+            self.__hand.reset_coordinates(True)
+        if key_released == arcade.key.X:
+            self.__hand.sort(context.HAND_SORT_SEQ.VALUE, False, True, True, True)
+            self.__hand.reset_coordinates(True)
+        if key_released == arcade.key.C:
+            self.__hand.sort(context.HAND_SORT_SEQ.SUIT, False, True, True, True)
+            self.__hand.reset_coordinates(True)
+        if key_released == arcade.key.V:
+            self.__hand.sort(context.HAND_SORT_SEQ.COLOR, False, True, True, True)
+            self.__hand.reset_coordinates(True)
+            
     
     
     def on_update(self, delta_time):
