@@ -64,32 +64,6 @@ class Hand:
         return cached_property_list
     
     
-    @cached_property
-    def __cached_cards_attributes(self) -> tuple[str, ...]:
-        """
-        Cards precalc-related cached properties list.
-        
-        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
-        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
-        setter.
-        
-        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
-        
-        Returns
-        -------
-        cached_property_list : `tuple[str, ...]`
-            A tuple collection of related cached properties.
-        """
-        
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "precalc_coordinates"
-            )
-        
-        # Returning:
-        return cached_property_list
-    
-    
     def clear_cached_cards_attributes(self) -> None:
         """
         Clears all public cached cards properties of this card object.
@@ -105,21 +79,6 @@ class Hand:
             )
     
     
-    def clear_cached_precalc_attributes(self) -> None:
-        """
-        Clears all public cached precalc properties of this card object.
-        
-        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
-        clear texturepack properties of this card object.
-        """
-    
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_precalc_attributes
-            )
-        
-    
     def clear_cached_attributes(self) -> None:
         """
         Clears all public cached properties of this card object.
@@ -131,7 +90,6 @@ class Hand:
         # Collecting cached properties:
         cached_property_list_collection: tuple[tuple[str, ...], ...] = (
             self.__cached_cards_attributes,
-            self.clear_cached_precalc_attributes,
             )
         
         # Looping throught the list and clearing cache:
@@ -217,8 +175,7 @@ class Hand:
         return cards_value
     
     
-    def add_card(self, card_object: Card, sort_container: bool = True, update_card: bool = True,
-                       ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def add_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -234,68 +191,57 @@ class Hand:
         # Adding card to the list:
         self.__card_list.append(card_object)
         
-        # Updating card's attributes:
-        if update_card:
-            
-            # Updating location and location index attributes:
-            location_index: int = self.__card_list.index(card_object)
-            set_location: context.Location = (
-                context.CARD_LOCATION.DECK, 
-                location_index,
-                )
-            card_object.set_location(
-                set_value = set_location,
-                ignore_assertion = True,
-                clear_cache = True
-                )
-            
-            # Updating added index:
-            added_index: int = self.cards_count + 1
-            card_object.set_added_index(
-                set_value = added_index,
-                ignore_assertion = True,
-                clear_cache = True
-                )
-            
-            # Updating tilt:
-            if self.__owner == context.PLAYER_TYPE.COMPUTER:
-                card_object.set_render_tilt(
-                    set_value = card_object.render_tilt_opp,
-                    ignore_assertion = True,
-                    clear_cache = True,
-                    )
-            
-            # Updating states:
-            card_object.reset_state_global(
-                clear_cache = True,
-                )
-            card_object.set_state_visible(
+        # Updating card added index:
+        added_index: int = len(self.__card_list)
+        card_object.set_added_index(
+            set_value = added_index,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        
+        # Updating card's state:
+        card_object.reset_state_global(
+            clear_cache = True
+            )
+        if self.owner == context.PLAYER_TYPE.HUMAN:
+            card_object.set_state_revealed(
                 set_value = True,
                 ignore_assertion = True,
-                clear_cache = True,
-                )
-            if self.__owner == context.PLAYER_TYPE.HUMAN:
-                card_object.set_state_revealed(
-                    set_value = True,
-                    ignore_assertion = True,
-                    clear_cache = True,
-                    )
-            
-            # Updating coordinates based on precalculated position:
-            card_object.update_coordinates_location(
-                calculated_coordinates = None,
-                clear_cache = True,
-                )
-        
-        # Sorting cards, if required
-        if sort_container:
-            self.update_coordinates(
                 clear_cache = True
                 )
-            self.sort_default(
-                clear_cache = True,
+            
+        # Updatin card's tilt:
+        tilt_expected: int = card_object.render_tilt_default 
+        if self.owner == context.PLAYER_TYPE.COMPUTER:
+            tilt_expected: int = card_object.render_tilt_opp
+        if card_object.render_tilt != tilt_expected:
+            card_object.set_render_tilt(
+                set_value = tilt_expected,
+                ignore_assertion = True,
+                clear_cache = True
                 )
         
+        # Updating card's location:
+        location: context.Location = (
+            context.CARD_LOCATION.PLAYER,
+            self.__card_list.index(card_object)
+            )
+        card_object.set_location(
+            set_value = location,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        
+        # Updating card's expected coordinates:
+        card_count: int = len(self.__card_list)
+        container_index: int = self.__card_list.index(card_object)
+        coordinates_expected: context.Coordinates = self.precalc_coordinates[card_count][container_index]
+        card_object.set_coordinates_expected(
+            set_value = coordinates_expected,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+
         # Clearing cache:
         if clear_cache:
             self.clear_cached_cards_attributes()
@@ -408,76 +354,83 @@ class Hand:
             
 
     @cached_property
-    def precalc_coordinates(self) -> dict[int, context.Coordinates]:
+    def precalc_coordinates(self) -> dict[int, dict[int, context.Coordinates]]:
         
-        def calculate_hand_width(card_width: int, card_count: int, card_overlap: float) -> int:
-            
-            # Calculating current hand width (one card):
-            
-            
-            # Returning:
-            return hand_width_current
-
+        # Creating coordinates dictionary index:
+        coordinates_index: dict[int, dict[int, context.Coordinates]] = {
+            card_count: {} for card_count in range(1, SETTINGS.DECK_SIZE_MAX)
+            }
         
-        # Preparing variables:
-        card_width: int = SETTINGS.CARD_TEXTURE_WIDTH
-        card_count: int = len(self.__card_list)
-        card_overlap: int = SETTINGS.HAND_CARD_OVERLAP_START
-        card_overlap_stop: int = SETTINGS.HAND_CARD_OVERLAP_STOP
-        card_overlap_incr: int = SETTINGS.HAND_CARD_OVERLAP_INCREMENT
-        
-        # Getting hand width for only one card available:
-        if card_count == 1:
-            hand_width_current: int = card_width
+        # Starting loop:
+        for card_count, inner_index in coordinates_index.items():
             
-        # Calculating hand width for more than one card:
-        else:
+            # Preparing loop variables
+            card_width: int = SETTINGS.CARD_TEXTURE_WIDTH
+            card_overlap: int = SETTINGS.HAND_CARD_OVERLAP_START
+            card_overlap_stop: int = SETTINGS.HAND_CARD_OVERLAP_STOP
+            card_overlap_incr: int = SETTINGS.HAND_CARD_OVERLAP_INCREMENT
             
-            # First calculation attempt (for lesser amount of cards):
-            hand_width_current: int = (
-                card_width +                                        # Fully visible card
-                card_width * card_overlap * (card_count - 1)        # Obscured (overlapped) cards
-                )
-            
-            # Incrementing card overlap value until hand width current is less than max available:
-            hand_width_max: int = SETTINGS.HAND_WIDTH
-            while hand_width_current > hand_width_max:
-                card_overlap = card_overlap - card_overlap * card_overlap_incr
-                if card_overlap < card_overlap_stop:
-                    error_message: str = f"Card overlap value reached limit, check settings!"
-                    raise ValueError(error_message)
+            # Getting hand width for only one card available:
+            if card_count == 1:
+                hand_width_current: int = card_width
+                
+            # Calculating hand width for more than one card:
+            else:
+                
+                # First calculation attempt (for lesser amount of cards):
                 hand_width_current: int = (
-                    card_width +                                    # Fully visible card
-                    card_width * card_overlap * (card_count - 1)    # Obscured (overlapped) cards
+                    card_width +                                        # Fully visible card
+                    card_width * card_overlap * (card_count - 1)        # Obscured (overlapped) cards
                     )
                 
-        # Calculating start and shift x coordinates:
-        coordinate_x_start: int = int(
-            SETTINGS.AREA_PLAYER_CENTER_COORDINATE_X - 
-            hand_width_current / 2 +
-            card_width / 2
-            )
-        coordinate_x_shift: int = int(
-            card_width -
-            card_width * (1.00 - card_overlap)
-            )
-        
-        # Choosing start, hover and select y coordinate:
-        coordinate_y: int = SETTINGS.AREA_PLAYER_CENTER_COORDINATE_Y
-        if self.__owner == context.PLAYER_TYPE.COMPUTER:
-            coordinate_y: int = SETTINGS.AREA_OPPONENT_CENTER_COORDINATE_Y
-
-        # Creating coordinates dictionary index:
-        coordinates_index: dict[int, context.Coordinates] = {}
-        for location_index in range(0, card_count):
-            coordinate_x: int = coordinate_x_start + coordinate_x_shift * location_index
-            coordinates_index[location_index] = (
-                coordinate_x,
-                coordinate_y,
+                # Incrementing card overlap value until hand width current is less than max available:
+                hand_width_max: int = SETTINGS.HAND_WIDTH
+                while hand_width_current > hand_width_max:
+                    card_overlap = card_overlap - card_overlap * card_overlap_incr
+                    if card_overlap < card_overlap_stop:
+                        error_message: str = f"Card overlap value reached limit, check settings!"
+                        raise ValueError(error_message)
+                    hand_width_current: int = (
+                        card_width +                                    # Fully visible card
+                        card_width * card_overlap * (card_count - 1)    # Obscured (overlapped) cards
+                        )
+                
+            # Calculating start and shift x coordinates:
+            coordinate_x_start: int = int(
+                SETTINGS.AREA_PLAYER_CENTER_COORDINATE_X - 
+                hand_width_current / 2 +
+                card_width / 2
                 )
-        
+            coordinate_x_shift: int = int(
+                card_width -
+                card_width * (1.00 - card_overlap)
+                )
+            
+            # Choosing start, hover and select y coordinate:
+            coordinate_y: int = SETTINGS.AREA_PLAYER_CENTER_COORDINATE_Y
+            if self.__owner == context.PLAYER_TYPE.COMPUTER:
+                coordinate_y: int = SETTINGS.AREA_OPPONENT_CENTER_COORDINATE_Y
+
+            for location_index in range(0, card_count):
+                coordinate_x: int = coordinate_x_start + coordinate_x_shift * location_index
+                coordinates_index[card_count][location_index] = (
+                    coordinate_x,
+                    coordinate_y,
+                    )
+            
         # Returning:
         return coordinates_index
+    
+    
+    def __get_precalc_coordinates(self, card_object: Card) -> context.Coordinates:
+        
+        # Locating coordinates:
+        coordinates_index: dict[int, dict[int, context.Coordinates]] = self.precalc_coordinates
+        card_count: int = len(self.__card_list)
+        calculated_cordinates: context.Coordinates = coordinates_index[card_count][card_object.location_index]
+        
+        # Returning:
+        return calculated_cordinates
 
     
     def update_coordinates(self, clear_cache: bool = True) -> None:
@@ -488,7 +441,9 @@ class Hand:
             for card_object in self.__card_list:
                 
                 # Obtaining coordinates and updating card object:
-                coordinates_position: context.Coordinates = self.precalc_coordinates[card_object.location_index]
+                coordinates_position: context.Coordinates = self.__get_precalc_coordinates(
+                    card_object = card_object
+                    )
                 coordinate_x_position, coordinate_y_position = coordinates_position
                 card_object.set_coordinates_position(
                     set_value = coordinates_position,
@@ -538,6 +493,30 @@ class Hand:
                     clear_cache = clear_cache,
                     )
                 
+        # Clearing cache:
+        if clear_cache:
+            self.clear_cached_cards_attributes()
+
+    
+    def reset_coordinates(self, clear_cache: bool = True) -> None:
+        
+        # Updating position, hover and select coordinates:
+        self.update_coordinates(
+            clear_cache = False
+            )
+        
+        # Resetting current coordinates to position coordinates:
+        for card_object in self.__card_list:
+            card_object.set_coordinates(
+                set_value = card_object.coordinates_position,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
+
+        # Clearing cache:
+        if clear_cache:
+            self.clear_cached_cards_attributes()
+
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         SORT METHODS
