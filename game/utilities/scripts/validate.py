@@ -1,6 +1,5 @@
 # Settings, session and context:
 from game.settings import SETTINGS
-from game.session import SESSION
 from game import context
 
 # Various utilities:
@@ -290,6 +289,7 @@ def validate_texturepack(validate_value: texturepack.TexturePack) -> None:
         raise_error = True
         )
     
+    
 def validate_card_render_scale(validate_value: float) -> None:
     """
     Validates card object's render scale value.
@@ -489,6 +489,23 @@ def validate_sort_seq(validate_value: str) -> None:
     assertion.assert_value_default(
         check_value = validate_value,
         check_list = context.SORT_SEQ_LIST,
+        raise_error = True
+        )
+
+
+def validate_player_type(validate_value: str) -> None:
+    
+    # Asserting value type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = str,
+        raise_error = True
+        )
+    
+    # Asserting value is default:
+    assertion.assert_value_default(
+        check_value = validate_value,
+        check_list = context.PLAYER_TYPE_LIST,
         raise_error = True
         )
 
