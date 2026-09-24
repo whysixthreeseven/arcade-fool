@@ -546,7 +546,7 @@ class Hand:
         # Sorting cards:
         self.__card_list.sort(
             key = lambda card: card.value,
-            reverse = sort_reverse,
+            reverse = not sort_reverse,             # not sort_reverse, otherwise sorts ascending!
             )
         
         # Clearing cache, if required:
