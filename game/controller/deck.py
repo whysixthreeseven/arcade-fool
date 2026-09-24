@@ -336,9 +336,10 @@ class Deck:
     def update_location_index(self, clear_cache: bool = True) -> None:
         
         # Updating location index for all cards:
-        if self.cards_count > 0:
-            for card_object in self.cards:
-                location_index: int = self.cards.index(card_object)
+        card_count: int = len(self.__card_list)
+        if card_count > 0:
+            for card_object in self.__card_list:
+                location_index: int = self.__card_list.index(card_object)
                 card_object.set_location_index(
                     set_value = location_index,
                     ignore_assertion = True,
