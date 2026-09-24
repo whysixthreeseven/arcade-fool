@@ -1,6 +1,3 @@
-# Card class object:
-from game.controller.card import Card
-
 # External libraries:
 import random
 
