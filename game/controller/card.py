@@ -765,6 +765,24 @@ class Card:
     
     @cached_property
     def name(self) -> str:
+        """
+        Card object's name in its default format.
+        
+        This value can only be a default value stored in `context.CARD_NAME` class instance: `"Two"`, `"Three"`, `"Four"`, 
+        `...`, `"Jack"`, `"Queen"`, `"King"` and `"Ace"`. Jokers are not part of the game, thus, are excluded.
+        
+        Used for card generation, `name_ascii` property generation, texture object location, value calculations, console print 
+        and hint displays.
+        
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in its setter method.
+        
+        Returns
+        ------
+        self.__name : `str`
+            Card's name in its default format, e.g.: `"Six"`, or `"Jack"`.
+        """
         
         # Returning:
         return self.__name
@@ -772,6 +790,23 @@ class Card:
     
     @cached_property
     def name_ascii(self) -> str:
+        """
+        Card object's name in its ASCII format, e.g. `"6"` or `"J"`.
+        
+        This value can only be a default value stored in `context.CARD_NAME_ASCII` class instance: `"2"`, `"3"`, `"4"`, `...`, 
+        `"J"`, `"Q"`, `"K"` and `"A"`. Jokers are not part of the game, thus, are excluded.
+
+        Used for console print and hint displays.
+        
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in `set_name()` setter method.
+        
+        Returns
+        ------
+        name_ascii : `str`
+            Card's name in its ASCII format, e.g.: `"6"`, or `"J"`.
+        """
         
         # Generating a dictionary index:
         name_ascii_index = {
@@ -791,6 +826,31 @@ class Card:
     
     
     def set_name(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        """
+        Sets a new name for this card object.
+
+        Uses only default values stored in `context.CARD_NAME` class instance: `"Two"`, `"Three"`, `"Four"`, `...`, 
+        `"Jack"`, `"Queen"`, `"King"` and `"Ace"`. Jokers are not part of the game, thus, are excluded. Method can only be called
+        once if `SESSION.ENABLE_DEBUG` is `True` to avoid changing card's core attribute mid game.
+        
+        Clears related cached properties if `clear_cache` parameter is `True`.
+        
+        Parameters
+        ----------
+        set_value : `str`
+            New name for this card object in its default format.
+        ignore_assertion : `bool` = `False`, Optional
+            Whether to ignore assertion control or not. Defaults to `False`.
+        clear_cache : `bool` = `True`, Optional
+            Whether to clear cache or not. Defaults to `True`.
+        
+        Raises
+        ------
+        AssertionError
+            If `SESSION.ENABLE_DEBUG` is `True` and this method is called more than once.
+        AssertionError
+            If `set_value` is not a valid card name.
+        """
             
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -832,6 +892,21 @@ class Card:
     
     @cached_property
     def suit(self) -> str:
+        """
+        Card object's suit in its default format, e.g.: `"Spades"`, or `"Hearts"`.
+        
+        Used for card generation, `suit_ascii` property generation, value comparison calculations, console print and hint 
+        displays.
+        
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in its setter method.
+        
+        Returns
+        ------
+        suit : `str`
+            Card's suit in its default format, e.g.: `"Spades"`, or `"Hearts"`.
+        """
 
         # Returning:
         return self.__suit
@@ -839,6 +914,20 @@ class Card:
 
     @cached_property
     def suit_ascii(self) -> str:
+        """
+        Card object's suit in its ASCII format, e.g.: `"♠"`, or `"♥"`.
+
+        Used for console print and hint displays.
+        
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in `set_suit()` setter method.
+
+        Returns
+        ------
+        suit_ascii : `str`
+            Card's suit in its ASCII format, e.g.: `"♠"`, or `"♥"`.
+        """
 
         # Generating a dictionary index:
         suit_ascii_index = {
@@ -2626,7 +2715,7 @@ class Card:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_state(
+            validate.validate_flag(
                 validate_value = set_value
                 )
             
@@ -2749,7 +2838,7 @@ class Card:
         Sets new location value for card object.
         
         This method uses only default values found in `context.CARD_LOCATION` class collection, and will raise raise 
-        `AssertionError` if its validate method `self.__validate_location()` is unable to assert parameter's validity. Its 
+        `AssertionError` if its validate method `validate.validate_card_location()` is unable to assert parameter's validity. Its 
         validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter `ignore_assertion` is flagged as
         `False`.
         
@@ -2799,7 +2888,7 @@ class Card:
         coordinates, such as "Hand" or "Opponent".
         
         While general location is handled internally, may raise `AssertionError` if its validate method 
-        `self.__validate_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
+        `validate.validate_card_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
         Parameter `location_index` is optional, but expected to be an `int` type value in `range(0, SETTINGS.DECK_SIZE_MAX)`
         range (0 through 51).
 
@@ -2833,7 +2922,7 @@ class Card:
         coordinates, such as "Hand" or "Opponent".
         
         While general location is handled internally, may raise `AssertionError` if its validate method 
-        `self.__validate_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
+        `validate.validate_card_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
         Parameter `location_index` is optional, but expected to be an `int` type value in `range(0, SETTINGS.DECK_SIZE_MAX)`
         range (0 through 51).
 
@@ -2868,7 +2957,7 @@ class Card:
         coordinates, such as "Hand" or "Opponent".
         
         While general location is handled internally, may raise `AssertionError` if its validate method 
-        `self.__validate_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
+        `validate.validate_card_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
         Parameter `location_index` is optional, but expected to be an `int` type value in `range(0, SETTINGS.DECK_SIZE_MAX)`
         range (0 through 51).
 
@@ -2903,7 +2992,7 @@ class Card:
         coordinates, such as "Hand" or "Opponent".
         
         While general location is handled internally, may raise `AssertionError` if its validate method 
-        `self.__validate_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
+        `validate.validate_card_location_index()` is unable to assert parameter's validity, mainly `location_index` paremeter. 
         Parameter `location_index` is optional, but should to be an `int` type value in `range(0, SETTINGS.DECK_SIZE_MAX)`
         range (0 through 51). Unique to "Table" location, it is expected to be in `range(0, 12)` range (0 through 11).
 
@@ -2969,8 +3058,8 @@ class Card:
         """
         Sets a new location index for card object.
         
-        This method may raise `AssertionError` if its validate method `self.__validate_location_index()` is unable to assert 
-        parameter's validity. Its validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter 
+        This method may raise `AssertionError` if its validate method `validate.validate_card_location_index()` is unable to 
+        assert parameter's validity. Its validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter 
         `ignore_assertion` is flagged as `False`.
         
         Does not automatically update card object's coordinates. To do so, use method `self.update_coordinates_location()`
@@ -3062,7 +3151,7 @@ class Card:
         """
         Sets a new unique identifier for card object.
 
-        This method may raise `AssertionError` if its validate method `self.__validate_id()` is unable to assert parameter's
+        This method may raise `AssertionError` if its validate method `validate.validate_id()` is unable to assert parameter's
         validity. Its validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter `ignore_assertion`
         is flagged as `False`.
 
@@ -3137,9 +3226,9 @@ class Card:
         is determined by controller based on number of cards previously present in the container. The lower the index is the 
         "older" the card is, the higher it is the "newer" the card is.
 
-        This method may raise `AssertionError` if its validate method `self.__validate_added()` is unable to assert parameter's
-        validity. Its validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter `ignore_assertion`
-        is flagged as `False`.
+        This method may raise `AssertionError` if its validate method `validate.validate_added_index()` is unable to assert 
+        parameter's validity. Its validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter 
+        `ignore_assertion` is flagged as `False`.
 
         Clears related cache, if parameter `clear_cache` is set to `True`.
         
