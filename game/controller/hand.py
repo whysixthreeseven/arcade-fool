@@ -27,7 +27,7 @@ class Hand:
         self.__owner: str = None
         
         # Container attributes:
-        self.__card_list: list = []
+        self.__card_list: list[Card] = []
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -64,7 +64,33 @@ class Hand:
         return cached_property_list
     
     
-    def clear_cached_cards_attributes(self) -> None:
+    @cached_property
+    def __cached_cards_attributes(self) -> tuple[str, ...]:
+        """
+        Cards precalc-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
+        
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "precalc_coordinates"
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+    
+    def clear_cached_precalc_attributes(self) -> None:
         """
         Clears all public cached core properties of this card object.
         
@@ -90,6 +116,7 @@ class Hand:
         # Collecting cached properties:
         cached_property_list_collection: tuple[tuple[str, ...], ...] = (
             self.__cached_cards_attributes,
+            self.clear_cached_precalc_attributes,
             )
         
         # Looping throught the list and clearing cache:
@@ -221,8 +248,17 @@ class Hand:
         
         # Clearing cache:
         if clear_cache:
+            
+            # Clearing target cached properties:
             self.clear_cached_cards_attributes()
             
+            # Clearing related cached properties:
+            cached_property: str = "precalc_coordinates"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+
             
     def remove_card(self, card_object: Card, sort_container: bool = True, 
                           ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -249,7 +285,16 @@ class Hand:
 
         # Clearing cache:
         if clear_cache:
+            
+            # Clearing target cached properties:
             self.clear_cached_cards_attributes()
+            
+            # Clearing related cached properties:
+            cached_property: str = "precalc_coordinates"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -312,11 +357,162 @@ class Hand:
                 target_object = self,
                 target_attribute = cached_property
                 )
+    
+    
+    def update_location_index(self, clear_cache: bool = True) -> None:
             
+        # Updating location index for all cards:
+        card_count: int = len(self.__card_list)
+        if card_count > 0:
+            for card_object in self.__card_list:
+                location_index: int = self.__card_list.index(card_object)
+                card_object.set_location_index(
+                    set_value = location_index,
+                    ignore_assertion = True,
+                    clear_cache = True
+                    )
+        
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "cards"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+            
+
+    @cached_property
+    def precalc_coordinates(self) -> dict[int, context.Coordinates]:
+        
+        def calculate_hand_width(card_overlap: int) -> int:
+            
+            # Calculating current hand width (one card):
+            hand_width_current: int = (
+                card_width +                                    # Fully visible card
+                card_width * card_overlap * (card_count - 1)    # Obscured (overlapped) cards
+                )
+            
+            # Returning:
+            return hand_width_current
+            
+        
+        # Preparing variables:
+        card_width: int = SETTINGS.CARD_TEXTURE_WIDTH
+        card_count: int = len(self.__card_list)
+        card_overlap: int = SETTINGS.HAND_CARD_OVERLAP_MIN
+        card_overlap_max: int = SETTINGS.HAND_CARD_OVERLAP_MAX
+        card_overlap_incr: int = SETTINGS.HAND_CARD_OVERLAP_INCREMENT
+        
+        # Getting hand width for only one card available:
+        if card_count == 1:
+            hand_width_current: int = card_width
+            
+        # Calculating hand width for more than one card:
+        else:
+            
+            # First calculation attempt (for lesser amount of cards):
+            hand_width_current: int = calculate_hand_width(
+                card_overlap = card_overlap
+                )
+            
+            # Incrementing card overlap value until hand width current is less than max available:
+            hand_width_max: int = SETTINGS.HAND_WIDTH
+            while hand_width_current > hand_width_max:
+                card_overlap *= card_overlap_incr
+                if card_overlap > card_overlap_max:
+                    error_message: str = f"Card overlap value is too high, check settings!"
+                    raise ValueError(error_message)
+                hand_width_current: int = calculate_hand_width(
+                    card_overlap = card_overlap
+                    )
+                
+        # Calculating start and shift x coordinates:
+        coordinate_x_start: int = int(
+            SETTINGS.AREA_PLAYER_CENTER_COORDINATE_X - 
+            hand_width_current / 2 +
+            card_width / 2
+            )
+        coordinate_x_shift: int = int(
+            card_width -
+            card_width * (1.00 - card_overlap)
+            )
+        
+        # Choosing start, hover and select y coordinate:
+        coordinate_y: int = SETTINGS.AREA_PLAYER_CENTER_COORDINATE_Y
+        if self.__owner == context.PLAYER_TYPE.COMPUTER:
+            coordinate_y: int = SETTINGS.AREA_OPPONENT_CENTER_COORDINATE_Y
+
+        # Creating coordinates dictionary index:
+        coordinates_index: dict[int, context.Coordinates] = {}
+        for location_index in range(0, card_count):
+            coordinate_x: int = coordinate_x_start + coordinate_x_shift * location_index
+            coordinates_index[location_index] = (
+                coordinate_x,
+                coordinate_y,
+                )
+        
+        # Returning:
+        return coordinates_index
+
     
     def update_coordinates(self, clear_cache: bool = True) -> None:
-        ...
-    
+        
+        # Looping through each card, if cards are available:
+        card_count: int = len(self.__card_list)
+        if card_count > 0:
+            for card_object in self.__card_list:
+                
+                # Obtaining coordinates and updating card object:
+                coordinates_position: context.Coordinates = self.precalc_coordinates[card_object.location_index]
+                coordinate_x_position, coordinate_y_position = coordinates_position
+                card_object.set_coordinates_position(
+                    set_value = coordinates_position,
+                    ignore_assertion = False,
+                    clear_cache = clear_cache,
+                    )
+                
+                # Calculating hover coordinates and updating card object:
+                coordinate_x_hover: int = int(
+                    coordinate_x_position +
+                    SETTINGS.LOCATION_HAND_HOVER_SHIFT_COORDINATE_X if self.owner == context.PLAYER_TYPE.HUMAN 
+                        else SETTINGS.LOCATION_OPP_HOVER_SHIFT_COORDINATE_X * -1
+                    )
+                coordinate_y_hover: int = int(
+                    coordinate_y_position +
+                    SETTINGS.LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y if self.owner == context.PLAYER_TYPE.HUMAN 
+                        else SETTINGS.LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y * -1
+                    )
+                coordinates_hover: context.Coordinates = (
+                    coordinate_x_hover,
+                    coordinate_y_hover,
+                    )
+                card_object.set_coordinates_hover(
+                    set_value = coordinates_hover,
+                    ignore_assertion = False,
+                    clear_cache = clear_cache,
+                    )
+                
+                # Calculating selec coordinates and updating card object:
+                coordinate_x_select: int = int(
+                    coordinate_x_position +
+                    SETTINGS.LOCATION_HAND_SELECT_SHIFT_COORDINATE_X if self.owner == context.PLAYER_TYPE.HUMAN 
+                        else SETTINGS.LOCATION_OPP_SELECT_SHIFT_COORDINATE_X * -1
+                    )
+                coordinate_y_select: int = int(
+                    coordinate_y_position +
+                    SETTINGS.LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y if self.owner == context.PLAYER_TYPE.HUMAN 
+                        else SETTINGS.LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y * -1
+                    )
+                coordinates_select: context.Coordinates = (
+                    coordinate_x_select,
+                    coordinate_y_select,
+                    )
+                card_object.set_coordinates_selec(
+                    set_value = coordinates_select,
+                    ignore_assertion = False,
+                    clear_cache = clear_cache,
+                    )
+                
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         SORT METHODS
@@ -334,7 +530,11 @@ class Hand:
         
         # Clearing cache, if required:
         if clear_cache:
-            self.clear_cached_cards_attributes()
+            cached_property: str = "cards"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property,
+            )
         
         
     def __sort_value(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
@@ -347,7 +547,11 @@ class Hand:
         
         # Clearing cache, if required:
         if clear_cache:
-            self.clear_cached_cards_attributes()
+            cached_property: str = "cards"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property,
+            )
         
         
     def __sort_suit(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
@@ -369,7 +573,11 @@ class Hand:
         
         # Clearing cache, if required:
         if clear_cache:
-            self.clear_cached_cards_attributes()
+            cached_property: str = "cards"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property,
+            )
     
         
     def __sort_color(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
@@ -391,11 +599,25 @@ class Hand:
         
         # Clearing cache, if required:
         if clear_cache:
-            self.clear_cached_cards_attributes()
+            cached_property: str = "cards"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property,
+            )
+            
+    
+    def __sort_random(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
         
+        # Sorting cards:
+        random.shuffle(self.__card_list)
         
-    def __sort_default(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
-        ...
+        # Clearing cache, if required:
+        if clear_cache:
+            cached_property: str = "cards"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property,
+            )
         
     
     def sort(self, sort_seq: str, sort_reverse: bool = False, update_coordinates: bool = True,
@@ -411,33 +633,43 @@ class Hand:
             
         # Creating sort sequence switch dictionary:
         sort_seq: dict[str, function] = {
-            context.HAND_SORT_SEQ.ADDED: lambda: self.__sort_added(sort_reverse, clear_cache),
-            context.HAND_SORT_SEQ.VALUE: lambda: self.__sort_value(sort_reverse, clear_cache),
-            context.HAND_SORT_SEQ.SUIT: lambda: self.__sort_suit(sort_reverse, clear_cache),
-            context.HAND_SORT_SEQ.COLOR: lambda: self.__sort_color(sort_reverse, clear_cache),
+            context.HAND_SORT_SEQ.ADDED: lambda: self.__sort_added(sort_reverse = sort_reverse, clear_cache = False),
+            context.HAND_SORT_SEQ.VALUE: lambda: self.__sort_value(sort_reverse = sort_reverse, clear_cache = False),
+            context.HAND_SORT_SEQ.SUIT: lambda: self.__sort_suit(sort_reverse = sort_reverse, clear_cache = False),
+            context.HAND_SORT_SEQ.COLOR: lambda: self.__sort_color(sort_reverse = sort_reverse, clear_cache = False),
+            context.HAND_SORT_SEQ.RANDOM: lambda: self.__sort_random(sort_reverse = sort_reverse, clear_cache = False),
             }
         
         # Getting correct sorting sequence:
         sort_seq_func: function = sort_seq.get(
             sort_seq, 
-            lambda: self.__sort_default(sort_reverse)
+            lambda: self.__sort_default(sort_reverse = False, clear_cache = False)
             )
         
         # Calling sorting sequence:
         sort_seq_func()
         
+        # Updating location index:
+        self.update_location_index(
+            clear_cache = False
+            )
+
+        # Clearing cache, if required:
+        if clear_cache:
+            cached_property: str = "cards"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property,
+                )
+            
         # Updating coordinates, if required:
         if update_coordinates:
             self.update_coordinates(
                 clear_cache = clear_cache
                 )
-
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_cards_attributes()
                 
         
-    def sort_default(self, sort_reverse: bool = False, update_coordinates: bool = True, clear_cache: bool = True) -> None:
+    def sort_default(self, update_coordinates: bool = True, clear_cache: bool = True) -> None:
         
         # Calling default sorting sequence:
         self.sort(
@@ -449,7 +681,7 @@ class Hand:
             )
         
     
-    def sort_selected(self, sort_reverse: bool = False, update_coordinates: bool = True, clear_cache: bool = True) -> None:
+    def sort_selected(self, update_coordinates: bool = True, clear_cache: bool = True) -> None:
 
         # Calling default sorting sequence:
         self.sort(
