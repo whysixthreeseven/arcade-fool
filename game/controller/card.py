@@ -81,6 +81,8 @@ class Card:
         self.__coordinate_y_position: int = 0
         self.__coordinate_x_hover: int = 0
         self.__coordinate_y_hover: int = 0
+        self.__coordinate_x_select: int = 0
+        self.__coordinate_y_select: int = 0
         self.__coordinate_x_expected: int = 0
         self.__coordinate_y_expected: int = 0
         
@@ -453,6 +455,11 @@ class Card:
             "coordinate_x_hover",
             "coordinate_y_hover",
             "coordinates_hover",
+            
+            # Select coordinates:
+            "coordinate_x_select",
+            "coordinate_y_select",
+            "coordinates_select",
             
             # Expected coordinates:
             "coordinate_x_expected",
@@ -1124,7 +1131,7 @@ class Card:
             )
             
     
-    def set_coordinates(self, set_value: tuple[int, int], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_coordinates(self, set_value: context.Coordinates, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1504,6 +1511,121 @@ class Card:
                 "coordinate_x_hover",
                 "coordinate_y_hover",
                 "coordinates_hover"
+                )
+            cache.clear_cached_property_list(
+                target_object = self,
+                target_attribute_list = cached_property_list
+                )
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        COORDINATES (HOVER) CACHED PROPERTIES AND METHODS
+        
+    """
+    
+    
+    @cached_property
+    def coordinate_x_select(self) -> int:
+
+        # Returning:
+        return self.__coordinate_x_select
+    
+
+    @cached_property
+    def coordinate_y_select(self) -> int:
+
+        # Returning:
+        return self.__coordinate_y_select
+
+
+    @cached_property
+    def coordinates_select(self) -> tuple[int, int]:
+
+        # Packing container:
+        coordinates_select: tuple[int, int] = (
+            self.__coordinate_x_select,
+            self.__coordinate_y_select
+            )
+
+        # Returning:
+        return coordinates_select
+
+
+    def set_coordinate_x_select(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate(
+                validate_value = set_value
+                )
+
+        # Updating attribute:
+        self.__coordinate_x_select = set_value
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property_list: tuple[str, ...] = (
+                "coordinate_x_select",
+                "coordinates_select"
+                )
+            cache.clear_cached_property_list(
+                target_oject = self,
+                target_attribute_list = cached_property_list
+                )
+            
+    
+    def set_coordinate_y_select(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate(
+                validate_value = set_value
+                )
+
+        # Updating attribute:
+        self.__coordinate_y_select = set_value
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property_list: tuple[str, ...] = (
+                "coordinate_y_select",
+                "coordinates_select"
+                )
+            cache.clear_cached_property_list(
+                target_oject = self,
+                target_attribute_list = cached_property_list
+                )
+            
+    
+    def set_coordinates_select(self, set_value: tuple[int, int], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate_container(
+                validate_value = set_value
+                )
+
+        # Unpacking coordinates:
+        coordinate_x, coordinate_y = set_value
+        
+        # Updating attributes:
+        self.set_coordinate_x_select(
+            set_value = coordinate_x,
+            ignore_assertion = True,
+            clear_cache = False,
+            )
+        self.set_coordinate_y_select(
+            set_value = coordinate_y,
+            ignore_assertion = True,
+            clear_cache = False,
+            )
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property_list: tuple[str, ...] = (
+                "coordinate_x_select",
+                "coordinate_y_select",
+                "coordinates_select"
                 )
             cache.clear_cached_property_list(
                 target_object = self,
