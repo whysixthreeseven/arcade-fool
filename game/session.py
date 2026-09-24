@@ -421,7 +421,8 @@ class __SESSION:
             target_object = self,
             target_attribute = cached_property
             )
-        
+
+
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         HAND SORT CACHED PROPERTIES AND METHODS
     
@@ -464,10 +465,18 @@ class __SESSION:
         self.__hand_sort_seq_selected = set_value
         self.__hand_sort_seq_reverse = set_reverse_value
 
-
         # Clearing cache:
         self.clear_cached_hand_sort_seq_attributes()
         
+    
+    def set_hand_sort_seq_default(self) -> None:
+        
+        # Updating attribute:
+        self.set_hand_sort_seq(
+            set_value = context.HAND_SORT_SEQ.SUIT,
+            set_reverse_value = False,
+            ignore_assertion = True
+            )
 
 
 # Creating a session object:
