@@ -166,11 +166,11 @@ class __SETTINGS:
     PLAYER_STAT_RATIO_NDIGITS: int = 2
     
     # Hand settings:
-    HAND_WIDTH_MOD: int = int(CARD_TEXTURE_WIDTH * 1.5)
+    HAND_WIDTH_MOD: int = int(CARD_TEXTURE_WIDTH * 0.55)
     HAND_WIDTH: int = AREA_PLAYER_WIDTH - HAND_WIDTH_MOD
     HAND_CARD_OVERLAP_START: float = 0.90
-    HAND_CARD_OVERLAP_STOP: float = 0.15
-    HAND_CARD_OVERLAP_INCREMENT: float = 0.05
+    HAND_CARD_OVERLAP_STOP: float = 0.10
+    HAND_CARD_OVERLAP_INCREMENT: float = 0.035
     
     # Window settings:
     WINDOW_TITLE: str = f"{APP_NAME} (v{APP_VERSION})"
