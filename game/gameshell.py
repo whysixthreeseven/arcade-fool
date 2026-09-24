@@ -14,6 +14,7 @@ from game.context import (
 
 # Controllers and other instances:
 from game.controller.surface import Surface
+from game.controller.hand import Hand
 from game.controller.deck import Deck
 from game.controller.card import Card
 
@@ -57,6 +58,7 @@ class Gameshell(arcade.Window):
         # Test attributes:
         self.__deck = Deck()
         self.__deck.generate(None, SETTINGS.DECK_SIZE_MIN)
+        self.__hand = Hand()
         
         # Boundary attributes:
         self.__hit_area: Area | None = None
@@ -78,6 +80,9 @@ class Gameshell(arcade.Window):
             
         for card in self.__deck.cards:
             card.display()
+        for card in self.__hand.cards:
+            card.display()
+
         if self.__hit_card_list:
             self.__deck.display_info(
                 display_coordinates = (
@@ -144,9 +149,26 @@ class Gameshell(arcade.Window):
     
     
     def on_key_release(self, key_released, modifiers):
+        
         if key_released == arcade.key.D:
-            card = self.__deck.draw_card()
-            print(card)
+            if self.__deck.cards_count > 0:
+                card = self.__deck.draw_card()
+                self.__hand.add_card(
+                    card_object = card,
+                    sort_container = True,
+                    update_card = True,
+                    ignore_assertion = False,
+                    clear_cache = True,
+                    )
+                self.__hand.update_coordinates(
+                    clear_cache = True
+                    )
+                card.set_coordinates(
+                    set_value = card.coordinates_position,
+                    ignore_assertion = False,
+                    clear_cache = True
+                    )
+            
         if key_released == arcade.key.R:
             self.__deck.generate(None, SETTINGS.DECK_SIZE_MIN)
     
