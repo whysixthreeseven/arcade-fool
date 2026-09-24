@@ -71,10 +71,10 @@ class CARD_VALUE:
     EIGHT: int = 8
     NINE: int = 9
     TEN: int = 10
-    JACK: int = 10
-    QUEEN: int = 11
-    KING: int = 12
-    ACE: int = 13
+    JACK: int = 11
+    QUEEN: int = 12
+    KING: int = 13
+    ACE: int = 14
 
 
 class CARD_SUIT_COLOR:
