@@ -24,7 +24,7 @@ class Hand:
     def __init__(self) -> None:
         
         # Owner attributes:
-        self.__owner: str = None
+        self.__owner: str = context.PLAYER_TYPE.HUMAN       # TODO: TEST CODE, REMOVE!
         
         # Container attributes:
         self.__card_list: list[Card] = []
@@ -90,9 +90,9 @@ class Hand:
         return cached_property_list
     
     
-    def clear_cached_precalc_attributes(self) -> None:
+    def clear_cached_cards_attributes(self) -> None:
         """
-        Clears all public cached core properties of this card object.
+        Clears all public cached cards properties of this card object.
         
         Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
         clear texturepack properties of this card object.
@@ -102,6 +102,21 @@ class Hand:
         cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_cards_attributes
+            )
+    
+    
+    def clear_cached_precalc_attributes(self) -> None:
+        """
+        Clears all public cached precalc properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear texturepack properties of this card object.
+        """
+    
+        # Clearing cached properties:
+        cache.clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_precalc_attributes
             )
         
     
@@ -124,6 +139,39 @@ class Hand:
             cache.clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
+                )
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        OWNER CACHED PROPERTIES AND METHODS
+    
+    """      
+    
+    
+    @cached_property
+    def owner(self) -> str:
+        
+        # Returning:
+        return self.__owner
+    
+    
+    def set_owner(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_player_type(
+                validate_value = set_value
+                )
+            
+        # Updating attribute:
+        self.__owner = set_value
+
+        # Clearing cache, if required:
+        if clear_cache:
+            cached_property: str = "owner"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
                 )
         
     
@@ -219,20 +267,19 @@ class Hand:
             
             # Updating states:
             card_object.reset_state_global(
-                clear_cache = False,
+                clear_cache = True,
                 )
             card_object.set_state_visible(
                 set_value = True,
                 ignore_assertion = True,
-                clear_cache = False,
+                clear_cache = True,
                 )
             if self.__owner == context.PLAYER_TYPE.HUMAN:
                 card_object.set_state_revealed(
                     set_value = True,
                     ignore_assertion = True,
-                    clear_cache = False,
+                    clear_cache = True,
                     )
-            card_object.clear_cached_state_attributes()
             
             # Updating coordinates based on precalculated position:
             card_object.update_coordinates_location(
@@ -242,22 +289,16 @@ class Hand:
         
         # Sorting cards, if required
         if sort_container:
+            self.update_coordinates(
+                clear_cache = True
+                )
             self.sort_default(
-                clear_cache = clear_cache,
+                clear_cache = True,
                 )
         
         # Clearing cache:
         if clear_cache:
-            
-            # Clearing target cached properties:
             self.clear_cached_cards_attributes()
-            
-            # Clearing related cached properties:
-            cached_property: str = "precalc_coordinates"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
 
             
     def remove_card(self, card_object: Card, sort_container: bool = True, 
@@ -277,24 +318,9 @@ class Hand:
         # Removing card from the list:
         self.__card_list.remove(card_object)
         
-        # Sorting cards, if required:
-        if sort_container:
-            self.sort_default(
-                clear_cache = clear_cache,
-                )
-
         # Clearing cache:
         if clear_cache:
-            
-            # Clearing target cached properties:
             self.clear_cached_cards_attributes()
-            
-            # Clearing related cached properties:
-            cached_property: str = "precalc_coordinates"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -384,23 +410,20 @@ class Hand:
     @cached_property
     def precalc_coordinates(self) -> dict[int, context.Coordinates]:
         
-        def calculate_hand_width(card_overlap: int) -> int:
+        def calculate_hand_width(card_width: int, card_count: int, card_overlap: float) -> int:
             
             # Calculating current hand width (one card):
-            hand_width_current: int = (
-                card_width +                                    # Fully visible card
-                card_width * card_overlap * (card_count - 1)    # Obscured (overlapped) cards
-                )
+            
             
             # Returning:
             return hand_width_current
-            
+
         
         # Preparing variables:
         card_width: int = SETTINGS.CARD_TEXTURE_WIDTH
         card_count: int = len(self.__card_list)
-        card_overlap: int = SETTINGS.HAND_CARD_OVERLAP_MIN
-        card_overlap_max: int = SETTINGS.HAND_CARD_OVERLAP_MAX
+        card_overlap: int = SETTINGS.HAND_CARD_OVERLAP_START
+        card_overlap_stop: int = SETTINGS.HAND_CARD_OVERLAP_STOP
         card_overlap_incr: int = SETTINGS.HAND_CARD_OVERLAP_INCREMENT
         
         # Getting hand width for only one card available:
@@ -411,19 +434,21 @@ class Hand:
         else:
             
             # First calculation attempt (for lesser amount of cards):
-            hand_width_current: int = calculate_hand_width(
-                card_overlap = card_overlap
+            hand_width_current: int = (
+                card_width +                                        # Fully visible card
+                card_width * card_overlap * (card_count - 1)        # Obscured (overlapped) cards
                 )
             
             # Incrementing card overlap value until hand width current is less than max available:
             hand_width_max: int = SETTINGS.HAND_WIDTH
             while hand_width_current > hand_width_max:
-                card_overlap *= card_overlap_incr
-                if card_overlap > card_overlap_max:
-                    error_message: str = f"Card overlap value is too high, check settings!"
+                card_overlap = card_overlap - card_overlap * card_overlap_incr
+                if card_overlap < card_overlap_stop:
+                    error_message: str = f"Card overlap value reached limit, check settings!"
                     raise ValueError(error_message)
-                hand_width_current: int = calculate_hand_width(
-                    card_overlap = card_overlap
+                hand_width_current: int = (
+                    card_width +                                    # Fully visible card
+                    card_width * card_overlap * (card_count - 1)    # Obscured (overlapped) cards
                     )
                 
         # Calculating start and shift x coordinates:
@@ -507,7 +532,7 @@ class Hand:
                     coordinate_x_select,
                     coordinate_y_select,
                     )
-                card_object.set_coordinates_selec(
+                card_object.set_coordinates_select(
                     set_value = coordinates_select,
                     ignore_assertion = False,
                     clear_cache = clear_cache,
@@ -632,7 +657,7 @@ class Hand:
                 )
             
         # Creating sort sequence switch dictionary:
-        sort_seq: dict[str, function] = {
+        sort_seq_index: dict[str, function] = {
             context.HAND_SORT_SEQ.ADDED: lambda: self.__sort_added(sort_reverse = sort_reverse, clear_cache = False),
             context.HAND_SORT_SEQ.VALUE: lambda: self.__sort_value(sort_reverse = sort_reverse, clear_cache = False),
             context.HAND_SORT_SEQ.SUIT: lambda: self.__sort_suit(sort_reverse = sort_reverse, clear_cache = False),
@@ -641,7 +666,7 @@ class Hand:
             }
         
         # Getting correct sorting sequence:
-        sort_seq_func: function = sort_seq.get(
+        sort_seq_func: function = sort_seq_index.get(
             sort_seq, 
             lambda: self.__sort_default(sort_reverse = False, clear_cache = False)
             )
