@@ -171,24 +171,14 @@ class Discard:
                 clear_cache = True
                 )
             
-            # Updating card tilt:
+            # Setting random tilt angle for pile effect:
             card_object.set_render_tilt_random(
                 clear_cache = True,
                 )
             
-            # Updating card states:
-            card_object.reset_state_global(
+            # Updating card's states:
+            card_object.set_state_location(
                 clear_cache = True
-                )
-            card_object.set_state_visible(
-                set_value = True,
-                ignore_assertion = True,
-                clear_cache = True,
-                )
-            card_object.set_state_revealed(
-                set_value = True,
-                ignore_assertion = True,
-                clear_cache = True,
                 )
             
             # Updating coordinates based on precalculated position:
