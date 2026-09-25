@@ -2970,7 +2970,7 @@ class Card:
         Card object's precalculated coordinates in dictionary format available for three locations: "Deck", "Discard", and 
         "Table". Used for quick coordinates update on location change.
                 
-        Accessed by method `self.update_coordinates_location()` providing `self.location` on location change event, if location
+        Used by method `self.update_coordinates_location()` providing `self.location` on location change event, if location
         uses precalculated coordinates. This property is for internal use only!
         
         Cached. Cannot be cleared.
