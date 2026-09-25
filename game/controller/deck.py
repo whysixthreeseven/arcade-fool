@@ -161,79 +161,6 @@ class Deck:
         return cards_value
     
     
-    def add_card(self, card_object: Card, update_location_index: bool = True, update_card: bool = True,
-                       ignore_assertion: bool = False, clear_cache: bool = True) -> None:
-        
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            validate.validate_card_object(
-                validate_value = card_object
-                )
-            
-        # Checking if card is already added to the list:
-        if card_object in self.cards:
-            error_message: str = f"Card {card_object} appears to be in the deck card container!"
-            raise IndexError(error_message)
-            
-        # Adding card to the list:
-        self.__card_list.append(card_object)
-        
-        # Updating card's attributes:
-        if update_card:
-            
-            # Updating location and location index attributes:
-            location_index: int = self.__card_list.index(card_object)
-            set_location: context.Location = (
-                context.CARD_LOCATION.DECK, 
-                location_index,
-                )
-            card_object.set_location(
-                set_value = set_location,
-                ignore_assertion = True,
-                clear_cache = True
-                )
-            
-            # Updating coordinates based on precalculated position:
-            card_object.update_coordinates_location(
-                calculated_coordinates = None,
-                clear_cache = True,
-                )
-        
-        # Updating index:
-        if update_location_index:
-            self.update_location_index()
-        
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_cards_attributes()
-            
-            
-    def remove_card(self, card_object: Card, update_location_index: bool = True, 
-                          ignore_assertion: bool = False, clear_cache: bool = True) -> None:
-
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            validate.validate_card_object(
-                validate_value = card_object
-                )
-            
-        # Checking if card is in the list:
-        if card_object not in self.cards:
-            error_message: str = f"Card {card_object} appears to be not in the deck card container!"
-            raise IndexError(error_message)
-
-        # Removing card from the list:
-        self.__card_list.remove(card_object)
-        
-        # Updating index:
-        if update_location_index:
-            self.update_location_index()
-
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_cards_attributes()
-            
-            
     def draw_card(self, clear_cache: bool = True) -> Card | None:
         
         # Returning None, if no more cards available:
@@ -243,10 +170,7 @@ class Deck:
         # Popping a card from the list:
         else:
             card: Card = self.cards[-1]
-            self.remove_card(
-                card_object = card,
-                clear_cache = False,
-                )
+            self.__card_list.remove(card)
             
             # Updating secret card, if it exists:
             card_count: int = len(self.__card_list)
