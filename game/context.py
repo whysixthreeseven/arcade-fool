@@ -1,3 +1,7 @@
+# External libraries:
+import arcade
+
+
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     NAMESPACE VARIABLES
     
@@ -290,6 +294,76 @@ class HAND_SORT_SEQ:
 
 HAND_SORT_SEQ_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in HAND_SORT_SEQ.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    KEY CONTEXT VARIABLES (DICTIONARY)
+
+"""
+
+
+KEY_MODULE_INDEX: dict[str, int] = {
+    key_name: key_value
+    for key_name, key_value in vars(arcade.key).items()
+    if key_name.isupper()
+    and isinstance(key_value, int)
+    and not key_name.startswith("MOD_")
+    and not key_name.startswith("MOTION_")
+    }
+
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    KEY CONTEXT VARIABLES (TUPLE COLLECTIONS)
+
+"""
+
+
+KEY_MODULE_INDEX_STR_LIST: tuple[str, ...] = tuple(
+    key_name for key_name, key_value in KEY_MODULE_INDEX.items()
+    )
+
+
+KEY_MODULE_INDEX_INT_LIST: tuple[int, ...] = tuple(
+    key_value for key_name, key_value in KEY_MODULE_INDEX.items()
+    )
+
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    GAME ACTIONS CONTEXT VARIABLES (CLASS OBJECTS)
+
+"""
+
+
+class ACTION_GAME:
+    DRAW: str = "Draw"
+    CONFIRM: str = "Confirm"
+    PASS: str = "Pass"
+    SORT: str = "Sort"
+    CANCEL: str = "Cancel"
+    
+    
+class ACTION_MENU:
+    CONFIRM: str = "Confirm"
+    BACK: str = "Back"
+    RETURN: str = "Return"
+    
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    GAME ACTIONS CONTEXT VARIABLES (TUPLE COLLECTIONS)
+
+"""
+
+
+ACTION_GAME_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in ACTION_GAME.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
+
+ACTION_MENU_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in ACTION_MENU.__dict__.items()
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
     )
 
