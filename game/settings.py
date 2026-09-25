@@ -56,7 +56,7 @@ class __SETTINGS:
     CARD_RENDER_TEXT_FONT_NAME: str = "DengXian"
     
     # Card texture settings:
-    CARD_TEXTURE_SCALE_DEFAULT: float = 0.35
+    CARD_TEXTURE_SCALE_DEFAULT: float = 0.25
     CARD_TEXTURE_WIDTH_FILE: int = 320
     CARD_TEXTURE_WIDTH: int = int(CARD_TEXTURE_WIDTH_FILE * CARD_TEXTURE_SCALE_DEFAULT)
     CARD_TEXTURE_HEIGHT_FILE: int = 480
@@ -70,7 +70,7 @@ class __SETTINGS:
     
     # Area (main) dimensions settings:
     __AREA_POS_MARGIN: int = int(CARD_TEXTURE_WIDTH * 0.30)
-    __AREA_MAIN_WIDTH: int = int(CARD_TEXTURE_WIDTH * 6.00 + __AREA_POS_MARGIN * 5.00)
+    __AREA_MAIN_WIDTH: int = int(CARD_TEXTURE_WIDTH * 7.00 + __AREA_POS_MARGIN * 5.00)
     __AREA_SIDE_WIDTH: int = int(CARD_TEXTURE_WIDTH * 2.00)
     
     # Area (main) dimensions settings:
@@ -124,9 +124,9 @@ class __SETTINGS:
     LOCATION_DECK_SHIFT_COORDINATE_X: int = 2
     LOCATION_DECK_SHIFT_COORDINATE_Y: int = 1
     LOCATION_DECK_SHIFT_PER_CARD: int = __SHIFT_PER_CARD
-    LOCATION_DECK_SHIFT_LAST_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.15) * -1        # Shift left
+    LOCATION_DECK_SHIFT_LAST_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.050) * -1        # Shift left
     LOCATION_DECK_SHIFT_LAST_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025) * -1       # Shift down
-    LOCATION_DECK_SHIFT_SECRET_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.15) * -1      # Shift left
+    LOCATION_DECK_SHIFT_SECRET_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.050) * -1      # Shift left
     LOCATION_DECK_SHIFT_SECRET_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025)          # Shift up
     
     # Location (discard) coordinates settings:
