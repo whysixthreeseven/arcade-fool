@@ -2900,6 +2900,43 @@ class Card:
                 target_attribute = cached_property
                 )
             
+            
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        LOCATION-BASED STATE CACHED PROPERTIES AND METHODS
+        
+    """
+    
+    
+    def set_state_location(self, clear_cache: bool = True) -> None:
+        
+        # Resetting all states:
+        self.reset_state_global(
+            clear_cache = False,
+            )
+        
+        # Checking state revealed:
+        state_revealed: bool = True if bool(
+            self.location == context.CARD_LOCATION.PLAYER or
+            self.location == context.CARD_LOCATION.DISCARD or
+            self.location == context.CARD_LOCATION.TABLE or 
+            self.location == context.CARD_LOCATION.DECK and 
+                self.location_index == 0 or
+                self.location_index == 1 and SESSION.GAME_MODE_SECRET
+            ) else False
+        self.set_state_revealed(
+            set_value = state_revealed,
+            ignore_assertion = True,
+            clear_cache = True,
+            )
+        
+        # Checking state visible:
+        state_visible: bool = True
+        self.set_state_visible(
+            set_value = state_visible,
+            ignore_assertion = True,
+            clear_cache = True,
+            )
+        
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         LOCATION CACHED PROPERTIES AND METHODS
