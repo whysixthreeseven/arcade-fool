@@ -508,4 +508,143 @@ def validate_player_type(validate_value: str) -> None:
         check_list = context.PLAYER_TYPE_LIST,
         raise_error = True
         )
+    
+    
+def validate_player_name(validate_value: str) -> None:
+    
+    # Asserting value is valid type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = str,
+        raise_error = True,
+        )
+    
+    # Asserting value is not empty:
+    assertion.assert_value_not_empty(
+        check_value = validate_value,
+        raise_error = True
+        )
+    
+    # Asserting value is within range:
+    string_length: int = len(validate_value)
+    assertion.assert_value_in_range(
+        check_value = string_length,
+        check_range = range(
+            SETTINGS.PLAYER_NAME_LEN_MIN,
+            SETTINGS.PLAYER_NAME_LEN_MAX + 1
+            ),
+        raise_error = True
+        )
+    
+    # Asserting value contains only letters:
+    char_allowed: str = "abcdefghijklmnopqrstuvwxyz"
+    for char in validate_value:
+        if char.lower() not in char_allowed:
+            error_message: str = f"Name contains invalid character: <{char}>!"
+            raise AssertionError(error_message)
+        
+
+def validate_player_score(validate_value: int) -> None:
+    
+    # Asserting value is valid type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = int,
+        raise_error = True,
+        )
+    
+    # Asserting value is greater than or equal to zero:
+    assertion.assert_value_ge_zero(
+        check_value = validate_value,
+        raise_error = True
+        )
+    
+    
+def validate_computer_style(validate_value: int) -> None:
+    
+    # Asserting value is valid type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = int,
+        raise_error = True
+        )
+    
+    # Asserting value is default:
+    assertion.assert_value_default(
+        check_value = validate_value,
+        check_list = context.COMPUTER_PLAY_STYLE_LIST,
+        raise_error = True
+        )
+        
+
+def validate_computer_difficulty(validate_value: str) -> None:
+    
+    # Asserting value is valid type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = str,
+        raise_error = True
+        )
+
+    # Asserting value is default:
+    assertion.assert_value_default(
+        check_value = validate_value,
+        check_list = context.COMPUTER_DIFFICULTY_LEVEL_LIST,
+        raise_error = True
+        )
+    
+        
+def validate_hand(validate_value: object) -> None:
+    
+    # Card class object:
+    from game.controller.hand import Hand
+    
+    # Asserting value type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = Hand,
+        raise_error = True
+        )
+
+
+def validate_action(validate_value: str) -> None:
+    
+    # Asserting value type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = str,
+        raise_error = True
+        )
+    
+    # Asserting value is not empty:
+    assertion.assert_value_not_empty(
+        check_value = validate_value,
+        raise_error = True
+        )
+    
+    # Asserting value is default:
+    action_game: tuple[str, ...] = context.ACTION_GAME_LIST
+    action_menu: tuple[str, ...] = context.ACTION_MENU_LIST
+    default_list: tuple[str, ...] = action_game + action_menu
+    assertion.assert_value_default(
+        check_value = validate_value,
+        check_list = default_list,
+        raise_error = True
+        )
+
+
+def validate_key_id(validate_value: int) -> None:
+
+    # Asserting value type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = int,
+        raise_error = True
+        )
+    
+    # Asserting value is greater than zero:
+    assertion.assert_value_gt_zero(
+        check_value = validate_value,
+        raise_error = True,
+        )
 
