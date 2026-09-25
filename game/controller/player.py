@@ -1,36 +1,22 @@
-# Typing and annotations:
-from __future__ import annotations
-
-# Hand class object:
+# Hand controller class instance:
 from game.controller.hand import Hand
 
-# Random library:
+# External libraries:
 import random
+import arcade
 
-# Settings and session instances:
+# Settings, session and context:
 from game.settings import SETTINGS
 from game.session import SESSION
+from game import context
 
 # Cache management:
 from functools import cached_property
-from game.utilities.scripts.cache import (
-    clear_cached_property, 
-    clear_cached_property_list,
-    refresh_object,
-    )
+from game.utilities.scripts import cache
 
-# Assertion scripts:
-from game.utilities.scripts.assertion import (
-    assert_setter_entry,
-    assert_value_type,
-    assert_value_default,
-    assert_value_ge_zero,
-    assert_value_not_empty,
-    assert_value_in_range,
-    )
-
-# Context and other card variables:
-from game.context import *
+# Various utilities:
+from game.utilities import texturepack
+from game.utilities.scripts import assertion, validate
 
 
 class Player:
@@ -95,7 +81,7 @@ class Player:
             )
         
         # Refreshing object:
-        refresh_object(
+        cache.refresh_object(
             target_object = self,
             )
     
@@ -104,7 +90,7 @@ class Player:
             
         # Setting up core attributes to default values:
         self.set_type(
-            set_value = PLAYER_TYPE.HUMAN,
+            set_value = context.PLAYER_TYPE.HUMAN,
             ignore_assertion = True,
             clear_cache = True,
             )
@@ -122,7 +108,7 @@ class Player:
         
         # Setting up core attributes to default values:
         self.set_type(
-            set_value = PLAYER_TYPE.COMPUTER,
+            set_value = context.PLAYER_TYPE.COMPUTER,
             ignore_assertion = True,
             clear_cache = True,
             )
@@ -132,12 +118,12 @@ class Player:
         
         # Setting up related attributes to default values:
         self.set_play_style(
-            set_value = COMPUTER_PLAY_STYLE.RANDOM,     # TODO: Add to SESSION variables!
+            set_value = context.COMPUTER_PLAY_STYLE.RANDOM,     # TODO: Add to SESSION variables!
             ignore_assertion = True,
             clear_cache = True,
             )
         self.set_difficulty(
-            set_value = COMPUTER_DIFFICULTY.MEDIUM,     # TODO: Add to SESSION variables!
+            set_value = context.COMPUTER_DIFFICULTY.MEDIUM,     # TODO: Add to SESSION variables!
             ignore_assertion = True,
             clear_cache = True,
             )
@@ -228,7 +214,7 @@ class Player:
     def clear_cached_core_attributes(self) -> None:
     
         # Clearing cached properties:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_core_attributes
             )
@@ -237,7 +223,7 @@ class Player:
     def clear_cached_hand_attributes(self) -> None:
 
         # Clearing cached properties:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_hand_attributes
             )
@@ -246,7 +232,7 @@ class Player:
     def clear_cached_game_attributes(self) -> None:
         
         # Clearing cached properties:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_game_attributes
             )
@@ -255,7 +241,7 @@ class Player:
     def clear_cached_score_attributes(self) -> None:
     
         # Clearing cached properties:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_score_attributes
             )
@@ -264,7 +250,7 @@ class Player:
     def clear_cached_ai_attributes(self) -> None:
         
         # Clearing cached properties:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_core_attributes
             )
@@ -282,108 +268,25 @@ class Player:
         
         # Looping throught the list and clearing cache:
         for cached_property_list in cached_property_list_collection:
-            clear_cached_property_list(
+            cache.clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
             
         # Cleaning up computer-related cached properties:
-        if self.__type == PLAYER_TYPE.COMPUTER:
+        if self.__type == context.PLAYER_TYPE.COMPUTER:
             cached_property_list_collection: tuple[tuple[str, ...], ...] = (
                 self.__cached_ai_attributes,
                 )
 
             # Looping throught the list and clearing cache:
             for cached_property_list in cached_property_list_collection:
-                clear_cached_property_list(
+                cache.clear_cached_property_list(
                     target_object = self,
                     target_attribute_list = cached_property_list
                     )
     
     
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        VALIDATE METHODS
-    
-    """
-    
-    
-    def __validate_name(self, validate_value: str) -> None:
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = str,
-            raise_error = True,
-            )
-        
-        # Asserting value is not empty:
-        assert_value_not_empty(
-            check_value = validate_value,
-            raise_error = True
-            )
-        
-        # Asserting value is within range:
-        string_length: int = len(validate_value)
-        assert_value_in_range(
-            check_value = string_length,
-            check_range = range(
-                SETTINGS.PLAYER_NAME_LEN_MIN,
-                SETTINGS.PLAYER_NAME_LEN_MAX + 1
-                ),
-            raise_error = True
-            )
-        
-        # Asserting value contains only letters:
-        char_allowed: str = "abcdefghijklmnopqrstuvwxyz"
-        for char in validate_value:
-            if char.lower() not in char_allowed:
-                error_message: str = f"Name contains invalid character: <{char}>!"
-                raise AssertionError(error_message)
-        
-    
-    def __validate_type(self, validate_value: str) -> None:
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = str,
-            raise_error = True,
-            )
-        
-        # Asserting value is default:
-        assert_value_default(
-            check_value = validate_value,
-            check_default = PLAYER_TYPE_LIST,
-            raise_error = True
-            )
-        
-    
-    def __validate_hand(self, validate_value: Hand) -> None:
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = Hand,
-            raise_error = True,
-            )
-        
-    
-    def __validate_score(self, validate_value: int) -> None:
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = int,
-            raise_error = True,
-            )
-        
-        # Asserting value is greater than or equal to zero:
-        assert_value_ge_zero(
-            check_value = validate_value,
-            raise_error = True
-            )
-        
-        
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         RATIO CALC AND FORMAT METHODS
     
@@ -442,7 +345,7 @@ class Player:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_name(
+            validate.validate_player_name(
                 validate_value = set_value
                 )
 
@@ -455,7 +358,7 @@ class Player:
                 "name",
                 "name_repr",
                 )
-            clear_cached_property_list(
+            cache.clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
@@ -464,12 +367,12 @@ class Player:
     def set_name_random(self, clear_cache: bool = True) -> None:
         
         # Checking type:
-        if self.__type == PLAYER_TYPE.HUMAN:
+        if self.__type == context.PLAYER_TYPE.HUMAN:
             error_message: str = "Cannot set random name to HUMAN-type PLAYER controller!"
             raise ValueError(error_message)
             
         # Setting value:
-        name_random: str = random.choice(COMPUTER_NAME_COLLECTION)
+        name_random: str = random.choice(context.COMPUTER_NAME_COLLECTION)
         self.set_name(
             set_value = name_random,
             ignore_assertion = True,
@@ -494,13 +397,13 @@ class Player:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_type(
+            validate.validate_player_type(
                 validate_value = set_value
                 )
             
         # Debug verification:
         if SESSION.ENABLE_DEBUG:
-            assert_setter_entry(
+            assertion.assert_setter_entry(
                 check_object = self,
                 check_attribute = "type",
                 sentinel_value = None,
@@ -513,9 +416,9 @@ class Player:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "type"
-            clear_cached_property_list(
+            cache.clear_cached_property(
                 target_object = self,
-                target_attribute_list = (cached_property,)
+                target_attribute = cached_property
                 )
             
     
@@ -536,7 +439,7 @@ class Player:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_play_style(
+            validate.validate_computer_style(
                 validate_value = set_value
                 )
             
@@ -548,7 +451,7 @@ class Player:
             cached_property_list: tuple[str, ...] = (
                 "play_style",
                 )
-            clear_cached_property_list(
+            cache.clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
@@ -570,13 +473,13 @@ class Player:
     def set_difficulty(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Checking player type:
-        if self.__type == PLAYER_TYPE.HUMAN:
+        if self.__type == context.PLAYER_TYPE.HUMAN:
             error_message: str = "Cannot set difficulty to HUMAN-type PLAYER controller!"
             raise ValueError(error_message)
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_difficulty(
+            validate.validate_computer_difficulty(
                 validate_value = set_value
                 )
 
@@ -588,7 +491,7 @@ class Player:
             cached_property_list: tuple[str, ...] = (
                 "difficulty",
                 )
-            clear_cached_property_list(
+            cache.clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
@@ -597,7 +500,7 @@ class Player:
     def set_difficulty_random(self, clear_cache: bool = True) -> None:
         
         # Selecting difficulty:
-        difficulty_random: str = random.choice(COMPUTER_DIFFICULTY_LEVEL_LIST)
+        difficulty_random: str = random.choice(context.COMPUTER_DIFFICULTY_LEVEL_LIST)
 
         # Updating attribute:
         self.set_difficulty(
@@ -610,12 +513,12 @@ class Player:
     def increase_difficulty(self, clear_cache: bool = True) -> None:
         
         # Selecting difficulty:
-        difficulty_index: int = COMPUTER_DIFFICULTY_LEVEL_LIST.index(self.difficulty)
+        difficulty_index: int = context.COMPUTER_DIFFICULTY_LEVEL_LIST.index(self.difficulty)
         difficulty_index += 1
-        if difficulty_index >= len(COMPUTER_DIFFICULTY_LEVEL_LIST):
+        if difficulty_index >= len(context.COMPUTER_DIFFICULTY_LEVEL_LIST):
             return 
         else:
-            difficulty: str = COMPUTER_DIFFICULTY_LEVEL_LIST[difficulty_index]
+            difficulty: str = context.COMPUTER_DIFFICULTY_LEVEL_LIST[difficulty_index]
         
         # Updating attribute:
         self.set_difficulty(
@@ -628,12 +531,12 @@ class Player:
     def decrease_difficulty(self, clear_cache: bool = True) -> None:
 
         # Selecting difficulty:
-        difficulty_index: int = COMPUTER_DIFFICULTY_LEVEL_LIST.index(self.difficulty)
+        difficulty_index: int = context.COMPUTER_DIFFICULTY_LEVEL_LIST.index(self.difficulty)
         difficulty_index -= 1
         if difficulty_index < 0:
             return 
         else:
-            difficulty: str = COMPUTER_DIFFICULTY_LEVEL_LIST[difficulty_index]
+            difficulty: str = context.COMPUTER_DIFFICULTY_LEVEL_LIST[difficulty_index]
 
         # Updating attribute:
         self.set_difficulty(
@@ -660,7 +563,7 @@ class Player:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_hand(
+            validate.validate_hand(
                 validate_value = set_value
                 )
 
@@ -676,6 +579,11 @@ class Player:
         
         # Creating new hand:
         hand_object: Hand = Hand()
+        hand_object.set_owner(
+            set_value = self.type,
+            ignore_assertion = True,
+            clear_cache = True,
+            )
         
         # Updating attribute:
         self.set_hand(
@@ -688,8 +596,18 @@ class Player:
     def clear_hand(self, clear_cache: bool = True) -> None:
         
         # Updating attribute:
-        ...     # TODO!
+        if self.hand.cards_count > 0:
+            for card_object in self.hand.cards:
+                self.hand.remove_card(
+                    card_object = card_object,
+                    ignore_assertion = True,
+                    clear_cache = False
+                    )
+                self.hand.clear_cached_cards_attributes()
         
+        # Clearing cache:
+        if clear_cache:
+            self.clear_cached_hand_attributes()
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -709,7 +627,7 @@ class Player:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_score(
+            validate.validate_player_score(
                 validate_value = set_value
                 )
 
@@ -779,7 +697,7 @@ class Player:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_score(
+            validate.validate_player_score(
                 validate_value = set_value
                 )
 
@@ -849,7 +767,7 @@ class Player:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_score(
+            validate.validate_player_score(
                 validate_value = set_value
                 )
 
@@ -919,7 +837,7 @@ class Player:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_score(
+            validate.validate_player_score(
                 validate_value = set_value
                 )
 
