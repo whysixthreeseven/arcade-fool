@@ -199,17 +199,6 @@ class Hand:
             clear_cache = True
             )
         
-        # Updating card's state:
-        card_object.reset_state_global(
-            clear_cache = True
-            )
-        if self.owner == context.PLAYER_TYPE.HUMAN:
-            card_object.set_state_revealed(
-                set_value = True,
-                ignore_assertion = True,
-                clear_cache = True
-                )
-            
         # Updatin card's tilt:
         tilt_expected: int = card_object.render_tilt_default 
         if self.owner == context.PLAYER_TYPE.COMPUTER:
@@ -229,6 +218,11 @@ class Hand:
         card_object.set_location(
             set_value = location,
             ignore_assertion = True,
+            clear_cache = True
+            )
+        
+        # Updating card's states:
+        card_object.set_state_location(
             clear_cache = True
             )
         
