@@ -18,7 +18,7 @@ class __SETTINGS:
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_VERSION: str = "0.0.1R"
     APP_STARTED: str = "2026.09.02"
-    APP_UPDATED: str = "2026.09.22"
+    APP_UPDATED: str = "2026.09.25"
     APP_AUTHOR: str = "Andrey Vostokov"
 
     # Root directory settings:    
