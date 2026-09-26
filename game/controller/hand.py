@@ -400,11 +400,12 @@ class Hand:
                 card_width * (1.00 - card_overlap)
                 )
             
-            # Choosing start, hover and select y coordinate:
+            # Choosing y coordinate:
             coordinate_y: int = SETTINGS.AREA_PLAYER_CENTER_COORDINATE_Y
             if self.__owner == context.PLAYER_TYPE.COMPUTER:
                 coordinate_y: int = SETTINGS.AREA_OPPONENT_CENTER_COORDINATE_Y
 
+            # Setting coordinates:
             for location_index in range(0, card_count):
                 coordinate_x: int = coordinate_x_start + coordinate_x_shift * location_index
                 coordinates_index[card_count][location_index] = (
