@@ -75,8 +75,8 @@ class Card:
         self.__render_tilt: int = SETTINGS.CARD_RENDER_TILT_DEFAULT
         
         # Coordinates attributes:
-        self.__coordinate_x_current: int = 0
-        self.__coordinate_y_current: int = 0
+        self.__coordinate_x: int = 0
+        self.__coordinate_y: int = 0
         self.__coordinate_x_position: int = 0
         self.__coordinate_y_position: int = 0
         self.__coordinate_x_hover: int = 0
@@ -85,8 +85,6 @@ class Card:
         self.__coordinate_y_select: int = 0
         self.__coordinate_x_expected: int = 0
         self.__coordinate_y_expected: int = 0
-        self.__coordinate_x_unplayable: int = 0
-        self.__coordinate_y_unplayable: int = 0
         
         # State attributes:
         self.__state_visible: bool = False
@@ -1108,14 +1106,14 @@ class Card:
     def coordinate_x(self) -> int:
         
         # Returning:
-        return self.__coordinate_x_current
+        return self.__coordinate_x
 
 
     @cached_property
     def coordinate_y(self) -> int:
 
         # Returning:
-        return self.__coordinate_y_current
+        return self.__coordinate_y
     
     
     @cached_property
@@ -1140,7 +1138,7 @@ class Card:
                 )
 
         # Updating attribute:
-        self.__coordinate_x_current = set_value
+        self.__coordinate_x = set_value
 
         # Clearing cache:
         if clear_cache:
@@ -1188,7 +1186,7 @@ class Card:
                 )
 
         # Updating attribute:
-        self.__coordinate_y_current = set_value
+        self.__coordinate_y = set_value
         
         # Clearing cache:
         if clear_cache:
@@ -1378,22 +1376,18 @@ class Card:
         # Clearing cache:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
-                
-                # Position coordinates:
                 "coordinate_x_position",
                 "coordinate_y_position",
-                "coordinates_position"
-                
-                # Unplayable coordinates:
+                "coordinates_position",
                 "coordinate_x_unplayable",
                 "coordinate_y_unplayable",
-                "coordinates_unplayable"
+                "coordinates_unplayable",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
-            
+
             
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         COORDINATES (EXPECTED) CACHED PROPERTIES AND METHODS
@@ -1420,8 +1414,8 @@ class Card:
 
         # Packing container:
         coordinates_expected: tuple[int, int] = (
-            self.__coordinate_x_expected,
-            self.__coordinate_y_expected
+            self.coordinate_x_expected,
+            self.coordinate_y_expected
             )
 
         # Returning:
@@ -1478,7 +1472,7 @@ class Card:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            validate.validate_coordiante_container(
+            validate.validate_coordinate_container(
                 validate_value = set_value
                 )
 
@@ -1767,6 +1761,9 @@ class Card:
         if self.location == context.CARD_LOCATION.PLAYER:
             coordinate_y_shift: int = SETTINGS.LOCATION_HAND_UNPLAYABLE_SHIFT_COORDINATE_Y
             coordinate_y_unplayable = coordinate_y_unplayable - coordinate_y_shift
+            
+        # Returning:
+        return coordinate_y_unplayable
 
 
     @cached_property
@@ -1774,8 +1771,8 @@ class Card:
 
         # Packing container:
         coordinates_unplayable: tuple[int, int] = (
-            self.__coordinate_x_unplayable,
-            self.__coordinate_y_unplayable
+            self.coordinate_x_unplayable,
+            self.coordinate_y_unplayable
             )
 
         # Returning:
@@ -3522,8 +3519,7 @@ class Card:
     """
     
     
-    def slide(self, target_coordinates: tuple[int, int], speed_modifier: float, 
-                    ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def slide(self, slide_speed_modifier: float, clear_cache: bool = True) -> None:
         """
         Slides card object's position to new coordinates provided in `target_coordinates` parameter. Uses `speed_modifier` to 
         determine how fast the card should slide to new coordinates. 
@@ -3551,15 +3547,49 @@ class Card:
             Flag to determine if related cache should be cleared. If set to `True`, related cache will be cleared.
         """
         
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            validate.validate_coordinate_container(
-                validate_value = target_coordinates
+        # Preparing variables:
+        slide_speed: int = SETTINGS.CARD_SLIDE_SPEED_MIN
+        slide_speed_set: int = slide_speed * slide_speed_modifier
+        if slide_speed_set < SETTINGS.CARD_SLIDE_SPEED_MIN:
+            slide_speed_set = SETTINGS.CARD_SLIDE_SPEED_MIN
+            
+        # Adjusting coordinate x:
+        if self.coordinate_x != self.coordinate_x_expected:
+            
+            # Adjusting speed on difference:
+            difference_abs: int = abs(self.coordinate_x - self.coordinate_x_expected)
+            if difference_abs < slide_speed_set:
+                slide_speed_set: int = difference_abs
+            
+            # Choosing axis:
+            axis_x = 1 if self.coordinate_x < self.coordinate_x_expected else -1
+            
+            # Calling adjust method:
+            slide_amount: int = int(slide_speed_set * axis_x)
+            self.adjust_coordinate_x(
+                adjust_value = slide_amount,
+                clear_cache = True
                 )
             
-        # TODO: Continue!
-        
-        
+        # Adjusting coordinate y:
+        if self.coordinate_y != self.coordinate_y_expected:
+            
+            # Adjusting speed on difference:
+            difference_abs: int = abs(self.coordinate_y - self.coordinate_y_expected)
+            if difference_abs < slide_speed_set:
+                slide_speed_set: int = difference_abs
+            
+            # Choosing axis:
+            axis_y = 1 if self.coordinate_y < self.coordinate_y_expected else -1
+            
+            # Calling adjust method:
+            slide_amount: int = int(slide_speed_set * axis_y)
+            self.adjust_coordinate_y(
+                adjust_value = slide_amount,
+                clear_cache = clear_cache
+                )
+            
+            
     def update_coordinates_location(self, calculated_coordinates: tuple[int, int] | None, clear_cache: bool = True) -> None:
         """
         Updated coordinates based on card's location and `calculated_coordinates` parameter provided.
@@ -3636,8 +3666,21 @@ class Card:
             If set to True, clears cached properties and attributes.
         """
         
+        # Preparing allowed states in location lists: 
+        location_select: tuple[str, ...] = (
+            context.CARD_LOCATION.PLAYER, 
+            )
+        location_hover: tuple[str, ...] = (
+            context.CARD_LOCATION.PLAYER, 
+            context.CARD_LOCATION.OPPONENT, 
+            context.CARD_LOCATION.TABLE
+            )
+        location_playable: tuple[str, ...] = (
+            context.CARD_LOCATION.PLAYER, 
+            )
+        
         # Selected state:
-        if self.state_selected:
+        if self.state_selected and self.location in location_select:
             
             # Checking if expected coordinates are set to selected coordinates:
             if self.coordinates_expected != self.coordinates_selected:
@@ -3648,7 +3691,7 @@ class Card:
                     )
         
         # Hovered state:
-        elif self.state_hovered:
+        elif self.state_hovered and self.location in location_hover:
             
             # Checking if expected coordinates are set to hover coordinates:
             if self.coordinates_expected != self.coordinates_hovered:
@@ -3657,17 +3700,17 @@ class Card:
                     ignore_assertion = True,
                     clear_cache = clear_cache
                     )
-        
+                
         # Unplayable state:   
-        elif not self.state_playable:
+        elif not self.state_playable and self.location in location_playable:
             
-            # Checking if expected coordinates are set to unplayable coordinates:
-            if self.coordinates_expected != self.coordinates_unplayable:
-                self.set_coordinates_expected(
-                    set_value = self.coordinates_unplayable,
-                    ignore_assertion = True,
-                    clear_cache = clear_cache
-                    )
+                # Checking if expected coordinates are set to unplayable coordinates:
+                if self.coordinates_expected != self.coordinates_unplayable:
+                    self.set_coordinates_expected(
+                        set_value = self.coordinates_unplayable,
+                        ignore_assertion = True,
+                        clear_cache = clear_cache
+                        )
 
         # Default (in position) state:
         else:
