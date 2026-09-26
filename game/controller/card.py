@@ -85,6 +85,8 @@ class Card:
         self.__coordinate_y_select: int = 0
         self.__coordinate_x_expected: int = 0
         self.__coordinate_y_expected: int = 0
+        self.__coordinate_x_unplayable: int = 0
+        self.__coordinate_y_unplayable: int = 0
         
         # State attributes:
         self.__state_visible: bool = False
@@ -465,6 +467,11 @@ class Card:
             "coordinate_x_expected",
             "coordinate_y_expected",
             "coordinates_expected"
+            
+            # Unplayable coordinates:
+            "coordinate_x_unplayable",
+            "coordinate_y_unplayable",
+            "coordinates_unplayable"
             )
         
         # Returning:
@@ -1310,7 +1317,9 @@ class Card:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "coordinate_x_position",
-                "coordinates_position"
+                "coordinate_x_unplayable",
+                "coordinates_position",
+                "coordinates_unplayable"
                 )
             cache.clear_cached_property_list(
                 target_oject = self,
@@ -1333,7 +1342,9 @@ class Card:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "coordinate_y_position",
-                "coordinates_position"
+                "coordinate_y_unplayable",
+                "coordinates_position",
+                "coordinates_unplayable"
                 )
             cache.clear_cached_property_list(
                 target_oject = self,
@@ -1367,9 +1378,16 @@ class Card:
         # Clearing cache:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
+                
+                # Position coordinates:
                 "coordinate_x_position",
                 "coordinate_y_position",
                 "coordinates_position"
+                
+                # Unplayable coordinates:
+                "coordinate_x_unplayable",
+                "coordinate_y_unplayable",
+                "coordinates_unplayable"
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -1608,7 +1626,7 @@ class Card:
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        COORDINATES (HOVER) CACHED PROPERTIES AND METHODS
+        COORDINATES (SELECT) CACHED PROPERTIES AND METHODS
         
     """
     
@@ -1720,6 +1738,48 @@ class Card:
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        COORDINATES (UNPLAYABLE) CACHED PROPERTIES AND METHODS
+        
+    """
+    
+    
+    @cached_property
+    def coordinate_x_unplayable(self) -> int:
+        
+        # Calculating:
+        coordinate_x_unplayable: int = self.coordinate_x_position
+        if self.location == context.CARD_LOCATION.PLAYER:
+            coordinate_x_shift: int = SETTINGS.LOCATION_HAND_UNPLAYABLE_SHIFT_COORDINATE_X
+            coordinate_x_unplayable = coordinate_x_unplayable - coordinate_x_shift
+
+        # Returning:
+        return coordinate_x_unplayable
+    
+
+    @cached_property
+    def coordinate_y_unplayable(self) -> int:
+
+        # Calculating:
+        coordinate_y_unplayable: int = self.coordinate_y_position
+        if self.location == context.CARD_LOCATION.PLAYER:
+            coordinate_y_shift: int = SETTINGS.LOCATION_HAND_UNPLAYABLE_SHIFT_COORDINATE_Y
+            coordinate_y_unplayable = coordinate_y_unplayable - coordinate_y_shift
+
+
+    @cached_property
+    def coordinates_unplayable(self) -> tuple[int, int]:
+
+        # Packing container:
+        coordinates_unplayable: tuple[int, int] = (
+            self.__coordinate_x_unplayable,
+            self.__coordinate_y_unplayable
+            )
+
+        # Returning:
+        return coordinates_unplayable
 
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
