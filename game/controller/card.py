@@ -2726,6 +2726,13 @@ class Card:
         return state_idle
     
     
+    @cached_property
+    def state_playable(self) -> bool:
+
+        # Returning:
+        return self.__state_playable
+    
+    
     def reset_state_global(self, clear_cache: bool = True) -> None:
         
         # Resetting:
@@ -3647,6 +3654,17 @@ class Card:
             if self.coordinates_expected != self.coordinates_hovered:
                 self.set_coordinates_expected(
                     set_value = self.coordinates_hovered,
+                    ignore_assertion = True,
+                    clear_cache = clear_cache
+                    )
+        
+        # Unplayable state:   
+        elif not self.state_playable:
+            
+            # Checking if expected coordinates are set to unplayable coordinates:
+            if self.coordinates_expected != self.coordinates_unplayable:
+                self.set_coordinates_expected(
+                    set_value = self.coordinates_unplayable,
                     ignore_assertion = True,
                     clear_cache = clear_cache
                     )
