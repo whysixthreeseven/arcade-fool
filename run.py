@@ -15,7 +15,7 @@ def run() -> None:
     
     # Creating gameshell instance and running a quick set-up:
     gameshell: Gameshell = Gameshell()
-    
+
     # Starting arcade loop:
     arcade.run()
     
