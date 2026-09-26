@@ -199,6 +199,22 @@ class Hand:
             clear_cache = True
             )
         
+        # Updating card's location:
+        location: str = str(
+            context.CARD_LOCATION.PLAYER if self.owner == context.PLAYER_TYPE.HUMAN 
+            else context.CARD_LOCATION.OPPONENT
+            )
+        location_index: int = self.__card_list.index(card_object)
+        location_container: context.Location = (
+            location,
+            location_index
+            )
+        card_object.set_location(
+            set_value = location_container,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        
         # Updatin card's tilt:
         tilt_expected: int = card_object.render_tilt_default 
         if self.owner == context.PLAYER_TYPE.COMPUTER:
@@ -210,29 +226,8 @@ class Hand:
                 clear_cache = True
                 )
         
-        # Updating card's location:
-        location: context.Location = (
-            context.CARD_LOCATION.PLAYER,
-            self.__card_list.index(card_object)
-            )
-        card_object.set_location(
-            set_value = location,
-            ignore_assertion = True,
-            clear_cache = True
-            )
-        
         # Updating card's states:
         card_object.set_state_location(
-            clear_cache = True
-            )
-        
-        # Updating card's expected coordinates:
-        card_count: int = len(self.__card_list)
-        container_index: int = self.__card_list.index(card_object)
-        coordinates_expected: context.Coordinates = self.precalc_coordinates[card_count][container_index]
-        card_object.set_coordinates_expected(
-            set_value = coordinates_expected,
-            ignore_assertion = True,
             clear_cache = True
             )
 
@@ -431,9 +426,8 @@ class Hand:
     def update_coordinates(self, clear_cache: bool = True) -> None:
         
         # Looping through each card, if cards are available:
-        card_count: int = len(self.__card_list)
-        if card_count > 0:
-            for card_object in self.__card_list:
+        if self.cards_count > 0:
+            for card_object in self.cards:
                 
                 # Obtaining coordinates and updating card object:
                 coordinates_position: context.Coordinates = self.__get_precalc_coordinates(
@@ -443,7 +437,12 @@ class Hand:
                 card_object.set_coordinates_position(
                     set_value = coordinates_position,
                     ignore_assertion = False,
-                    clear_cache = clear_cache,
+                    clear_cache = True,
+                    )
+                card_object.set_coordinates_expected(
+                    set_value = coordinates_position,
+                    ignore_assertion = False,
+                    clear_cache = True,
                     )
                 
                 # Calculating hover coordinates and updating card object:
@@ -464,7 +463,7 @@ class Hand:
                 card_object.set_coordinates_hover(
                     set_value = coordinates_hover,
                     ignore_assertion = False,
-                    clear_cache = clear_cache,
+                    clear_cache = True,
                     )
                 
                 # Calculating selec coordinates and updating card object:
@@ -485,7 +484,7 @@ class Hand:
                 card_object.set_coordinates_select(
                     set_value = coordinates_select,
                     ignore_assertion = False,
-                    clear_cache = clear_cache,
+                    clear_cache = True,
                     )
                 
         # Clearing cache:
@@ -500,13 +499,14 @@ class Hand:
             clear_cache = False
             )
         
-        # Resetting current coordinates to position coordinates:
-        for card_object in self.__card_list:
-            card_object.set_coordinates(
-                set_value = card_object.coordinates_position,
-                ignore_assertion = True,
-                clear_cache = True,
-                )
+        # Resetting current coordinates to position:
+        if self.cards_count > 0:
+            for card_object in self.cards:
+                card_object.set_coordinates(
+                    set_value = card_object.coordinates_position,
+                    ignore_assertion = True,
+                    clear_cache = True,
+                    )
 
         # Clearing cache:
         if clear_cache:
