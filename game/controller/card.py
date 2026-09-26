@@ -3521,11 +3521,7 @@ class Card:
     
     def slide(self, slide_speed_modifier: float, clear_cache: bool = True) -> None:
         """
-        Slides card object's position to new coordinates provided in `target_coordinates` parameter. Uses `speed_modifier` to 
-        determine how fast the card should slide to new coordinates. 
-        
-        Parameter `speed_modifier` cannot be less than default min value in `SETTINGS`, otherwise the card will never reach its
-        destination. If `speed_modifier` is set to `0.00` the slide will finish its job instantly. 
+        Slides card object's position to expected coordinates.
         
         Used by `Gameshell` object's `on_update` method within loop logic.
         
@@ -3537,12 +3533,8 @@ class Card:
         
         Parameters
         ----------
-        target_coordinates : `tuple[int, int]`
-            Coordinates tuple collection to slide card object to.
-        speed_modifier : `float`
+        slide_speed_modifier : `float`
             Speed modifier to determine how fast the card should slide to new coordinates.
-        ignore_assertion : `bool` = `True`
-            Flag to determine if assertion control should be ignored. If set to `True`, assertion control will be ignored.
         clear_cache : `bool` = `True`
             Flag to determine if related cache should be cleared. If set to `True`, related cache will be cleared.
         """
