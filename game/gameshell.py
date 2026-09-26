@@ -158,8 +158,9 @@ class Gameshell(arcade.Window):
                     ignore_assertion = False,
                     clear_cache = True,
                     )
-                self.__hand.update_coordinates()
-                self.__hand.reset_coordinates()
+                self.__hand.update_coordinates(
+                    clear_cache = True
+                    )
             
         if key_released == arcade.key.R:
             self.__deck = Deck()
@@ -169,20 +170,27 @@ class Gameshell(arcade.Window):
         from game import context
         if key_released == arcade.key.Z:
             self.__hand.sort(context.HAND_SORT_SEQ.ADDED, False, True, True, True)
-            self.__hand.reset_coordinates(True)
+            self.__hand.update_coordinates(True)
         if key_released == arcade.key.X:
             self.__hand.sort(context.HAND_SORT_SEQ.VALUE, False, True, True, True)
-            self.__hand.reset_coordinates(True)
+            self.__hand.update_coordinates(True)
         if key_released == arcade.key.C:
             self.__hand.sort(context.HAND_SORT_SEQ.SUIT, False, True, True, True)
-            self.__hand.reset_coordinates(True)
+            self.__hand.update_coordinates(True)
         if key_released == arcade.key.V:
             self.__hand.sort(context.HAND_SORT_SEQ.COLOR, False, True, True, True)
-            self.__hand.reset_coordinates(True)
+            self.__hand.update_coordinates(True)
             
     
-    
     def on_update(self, delta_time):
-        return super().on_update(delta_time)
-        ...     # TODO: Implement
+        for card_object in self.__hand.cards:
+            card_object.update_coordinates_state(
+                clear_cache = True
+                )
+            co = card_object
+            card_object.slide(
+                slide_speed_modifier = 1.00,
+                clear_cache = True
+                )
+            
         
