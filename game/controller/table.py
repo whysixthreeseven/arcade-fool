@@ -144,7 +144,7 @@ class Table:
         cards_value: int = sum(card_object.value for card_object in self.cards)
 
         # Returning:
-        return 
+        return cards_value
     
     
     @cached_property
