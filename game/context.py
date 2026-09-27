@@ -128,12 +128,6 @@ class CARD_LOCATION:
     OPPONENT: str = "Opponent"
     
     
-""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    CARD-RELATED CONTEXT VARIABLES (TUPLE COLLECTIONS)
-
-"""
-    
-
 CARD_SUIT_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in CARD_SUIT.__dict__.items()
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
@@ -192,6 +186,12 @@ class AREA_TYPE:
     DISCARD: str = "Discard"
     
     
+AREA_TYPE_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in AREA_TYPE.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+    
+    
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     PLAYER-RELATED CONTEXT VARIABLES (CLASS OBJECTS)
 
@@ -208,12 +208,6 @@ class PLAYER_ROLE:
     DEFENDING: str = "Defending"
     
 
-""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    PLAYER-RELATED CONTEXT VARIABLES (TUPLE COLLECTIONS)
-
-"""
-
-
 PLAYER_TYPE_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in PLAYER_TYPE.__dict__.items()
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
@@ -227,7 +221,7 @@ PLAYER_ROLE_LIST: tuple[str, ...] = tuple(
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    COMPUTER-RELATED CONTEXT VARIABLES (CLASS OBJECTS)
+    COMPUTER-RELATED CONTEXT VARIABLES
 
 """
 
@@ -244,12 +238,6 @@ class COMPUTER_PLAY_STYLE:
     HOARDING: str = "Hoarding"
     RANDOM: str = "Random"
     
-    
-""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    COMPUTER-RELATED CONTEXT VARIABLES (TUPLE COLLECTIONS)
-
-"""
-
 
 COMPUTER_DIFFICULTY_LEVEL_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in COMPUTER_DIFFICULTY.__dict__.items()
@@ -273,7 +261,7 @@ COMPUTER_NAME_COLLECTION: tuple[str, ...] = (
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    HAND-RELATED CONTEXT VARIABLES (CLASS OBJECTS)
+    HAND-RELATED CONTEXT VARIABLES
 
 """
 
@@ -286,12 +274,6 @@ class HAND_SORT_SEQ:
     RANDOM: str = "Random"
     
 
-""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    HAND-RELATED CONTEXT VARIABLES (TUPLE COLLECTIONS)
-
-"""
-
-
 HAND_SORT_SEQ_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in HAND_SORT_SEQ.__dict__.items()
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
@@ -299,7 +281,7 @@ HAND_SORT_SEQ_LIST: tuple[str, ...] = tuple(
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    KEY CONTEXT VARIABLES (DICTIONARY)
+    KEY CONTEXT VARIABLES
 
 """
 
@@ -314,12 +296,6 @@ KEY_MODULE_INDEX: dict[str, int] = {
     }
 
 
-""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    KEY CONTEXT VARIABLES (TUPLE COLLECTIONS)
-
-"""
-
-
 KEY_MODULE_INDEX_STR_LIST: tuple[str, ...] = tuple(
     key_name for key_name, key_value in KEY_MODULE_INDEX.items()
     )
@@ -331,7 +307,7 @@ KEY_MODULE_INDEX_INT_LIST: tuple[int, ...] = tuple(
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    GAME ACTIONS CONTEXT VARIABLES (CLASS OBJECTS)
+    GAME ACTIONS CONTEXT VARIABLES
 
 """
 
@@ -350,12 +326,6 @@ class ACTION_MENU:
     RETURN: str = "Return"
     
 
-""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    GAME ACTIONS CONTEXT VARIABLES (TUPLE COLLECTIONS)
-
-"""
-
-
 ACTION_GAME_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in ACTION_GAME.__dict__.items()
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
@@ -367,3 +337,22 @@ ACTION_MENU_LIST: tuple[str, ...] = tuple(
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
     )
 
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    GAME-RELATED CONTEXT VARIABLES (CLASS OBJECTS)
+
+"""
+
+
+class GAME_PHASE:
+    ATTACKING: str = "Attacking"
+    DEFENDING: str = "Defending"
+    CLEANING: str = "Cleaning"
+    PREPARING: str = "Preparing"
+
+
+class GAME_RESULT:
+    WIN: str = "Win"
+    LOSS: str = "Loss"
+    DRAW: str = "Draw"
+    
