@@ -27,6 +27,7 @@ from game.utilities.area import (
     AREA_PLAYER,
     AREA_OPPONENT,
     )
+from game import context
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -59,6 +60,17 @@ class Gameshell(arcade.Window):
         self.__deck = Deck()
         self.__deck.generate(None, SETTINGS.DECK_SIZE_MIN)
         self.__hand = Hand()
+        self.__hand.set_owner(
+            set_value = context.PLAYER_TYPE.HUMAN,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        self.__hand_opp = Hand()
+        self.__hand_opp.set_owner(
+            set_value = context.PLAYER_TYPE.COMPUTER,
+            ignore_assertion = True,
+            clear_cache = True
+            )
         
         # Boundary attributes:
         self.__hit_area: Area | None = None
@@ -80,6 +92,7 @@ class Gameshell(arcade.Window):
             
         self.__deck.display()
         self.__hand.display()
+        self.__hand_opp.display()
 
         if self.__hit_card_list:
             self.__deck.display_info(
@@ -148,6 +161,7 @@ class Gameshell(arcade.Window):
     
     def on_key_release(self, key_released, modifiers):
         
+        # Drawing card for player:
         if key_released == arcade.key.D:
             if self.__deck.cards_count > 0:
                 card = self.__deck.draw_card()
@@ -159,36 +173,89 @@ class Gameshell(arcade.Window):
                 self.__hand.update_coordinates(
                     clear_cache = True
                     )
-            
+                
+        # Drawing card for opponent:
+        if key_released == arcade.key.F:
+            if self.__deck.cards_count > 0:
+                card = self.__deck.draw_card()
+                self.__hand_opp.add_card(
+                    card_object = card,
+                    ignore_assertion = False,
+                    clear_cache = True,
+                    )
+                self.__hand_opp.update_coordinates(
+                    clear_cache = True
+                    )
+        
+        # Resetting game state:
         if key_released == arcade.key.R:
             self.__deck = Deck()
             self.__deck.generate(None, SETTINGS.DECK_SIZE_MIN)
             self.__hand = Hand()
+            self.__hand_opp.set_owner(
+                set_value = context.PLAYER_TYPE.HUMAN,
+                ignore_assertion = True,
+                clear_cache = True
+                )
+            self.__hand_opp = Hand()
+            self.__hand_opp.set_owner(
+                set_value = context.PLAYER_TYPE.COMPUTER,
+                ignore_assertion = True,
+                clear_cache = True
+                )
             
-        from game import context
+        # Sorting player's hand:
         if key_released == arcade.key.Z:
-            self.__hand.sort(context.HAND_SORT_SEQ.ADDED, False, True, True, True)
-            self.__hand.update_coordinates(True)
+            self.__hand.sort(
+                sort_seq = context.HAND_SORT_SEQ.ADDED, 
+                sort_reverse = False, 
+                update_coordinates = True, 
+                ignore_assertion = True, 
+                clear_cache = True
+                )
         if key_released == arcade.key.X:
-            self.__hand.sort(context.HAND_SORT_SEQ.VALUE, False, True, True, True)
-            self.__hand.update_coordinates(True)
+            self.__hand.sort(
+                sort_seq = context.HAND_SORT_SEQ.VALUE, 
+                sort_reverse = False, 
+                update_coordinates = True, 
+                ignore_assertion = True, 
+                clear_cache = True
+                )
         if key_released == arcade.key.C:
-            self.__hand.sort(context.HAND_SORT_SEQ.SUIT, False, True, True, True)
-            self.__hand.update_coordinates(True)
+            self.__hand.sort(
+                sort_seq = context.HAND_SORT_SEQ.SUIT, 
+                sort_reverse = False, 
+                update_coordinates = True, 
+                ignore_assertion = True, 
+                clear_cache = True
+                )
         if key_released == arcade.key.V:
-            self.__hand.sort(context.HAND_SORT_SEQ.COLOR, False, True, True, True)
-            self.__hand.update_coordinates(True)
+            self.__hand.sort(
+                sort_seq = context.HAND_SORT_SEQ.COLOR, 
+                sort_reverse = False, 
+                update_coordinates = True, 
+                ignore_assertion = True, 
+                clear_cache = True
+                )
+        
+        # Randomly shuffling opponent's hand:
+        if key_released == arcade.key.B:
+            self.__hand_opp.sort_random(
+                update_coordinates = True, 
+                clear_cache = True
+                )
             
     
     def on_update(self, delta_time):
-        for card_object in self.__hand.cards:
-            card_object.update_coordinates_state(
-                clear_cache = True
-                )
-            co = card_object
-            card_object.slide(
-                slide_speed_modifier = 1.00,
-                clear_cache = True
-                )
+        for hand_container in (self.__hand.cards, self.__hand_opp.cards):
+            for card_object in hand_container:
+                card_object.update_coordinates_state(
+                    clear_cache = True
+                    )
+                co = card_object
+                card_object.slide(
+                    slide_speed_modifier = 0.50,
+                    clear_cache = True
+                    )
             
         
