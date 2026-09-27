@@ -199,12 +199,13 @@ class Hand:
             clear_cache = True
             )
         
-        # Updating card's location:
-        location: str = str(
-            context.CARD_LOCATION.PLAYER if self.owner == context.PLAYER_TYPE.HUMAN 
-            else context.CARD_LOCATION.OPPONENT
-            )
+        # Selecting card object's location and location index:
+        location: str = context.CARD_LOCATION.PLAYER 
+        if self.owner == context.PLAYER_TYPE.COMPUTER:
+            location = context.CARD_LOCATION.OPPONENT
         location_index: int = self.__card_list.index(card_object)
+        
+        # Packing up location container and setting up:
         location_container: context.Location = (
             location,
             location_index
@@ -214,11 +215,13 @@ class Hand:
             ignore_assertion = True,
             clear_cache = True
             )
-        
-        # Updatin card's tilt:
+
+        # Selecting correct tilt angle (expected):        
         tilt_expected: int = card_object.render_tilt_default 
         if self.owner == context.PLAYER_TYPE.COMPUTER:
             tilt_expected: int = card_object.render_tilt_opp
+            
+        # Updating card's tilt:
         if card_object.render_tilt != tilt_expected:
             card_object.set_render_tilt(
                 set_value = tilt_expected,
@@ -429,11 +432,13 @@ class Hand:
         if self.cards_count > 0:
             for card_object in self.cards:
                 
-                # Obtaining coordinates and updating card object:
+                # Obtaining position coordinates:
                 coordinates_position: context.Coordinates = self.__get_precalc_coordinates(
                     card_object = card_object
                     )
                 coordinate_x_position, coordinate_y_position = coordinates_position
+                
+                # Updating position and expected coordinates:
                 card_object.set_coordinates_position(
                     set_value = coordinates_position,
                     ignore_assertion = False,
@@ -445,17 +450,19 @@ class Hand:
                     clear_cache = True,
                     )
                 
-                # Calculating hover coordinates and updating card object:
-                coordinate_x_hover: int = int(
-                    coordinate_x_position +
-                    SETTINGS.LOCATION_HAND_HOVER_SHIFT_COORDINATE_X if self.owner == context.PLAYER_TYPE.HUMAN 
-                        else SETTINGS.LOCATION_OPP_HOVER_SHIFT_COORDINATE_X * -1
-                    )
-                coordinate_y_hover: int = int(
-                    coordinate_y_position +
-                    SETTINGS.LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y if self.owner == context.PLAYER_TYPE.HUMAN 
-                        else SETTINGS.LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y * -1
-                    )
+                # Calculating hover coordinate x:
+                coordinate_x_hover_shift: int = SETTINGS.LOCATION_HAND_HOVER_SHIFT_COORDINATE_X
+                if self.owner == context.PLAYER_TYPE.COMPUTER:
+                    coordinate_x_hover_shift = SETTINGS.LOCATION_OPP_HOVER_SHIFT_COORDINATE_X
+                coordinate_x_hover: int = coordinate_x_position + coordinate_x_hover_shift
+                
+                # Calculating hover coordinate y:
+                coordinate_y_hover_shift: int = SETTINGS.LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y
+                if self.owner == context.PLAYER_TYPE.COMPUTER:
+                    coordinate_y_hover_shift = SETTINGS.LOCATION_OPP_HOVER_SHIFT_COORDINATE_Y * -1
+                coordinate_y_hover: int = coordinate_y_position + coordinate_y_hover_shift
+                
+                # Packing up coordinates hover and updating:
                 coordinates_hover: context.Coordinates = (
                     coordinate_x_hover,
                     coordinate_y_hover,
@@ -466,17 +473,19 @@ class Hand:
                     clear_cache = True,
                     )
                 
-                # Calculating selec coordinates and updating card object:
-                coordinate_x_select: int = int(
-                    coordinate_x_position +
-                    SETTINGS.LOCATION_HAND_SELECT_SHIFT_COORDINATE_X if self.owner == context.PLAYER_TYPE.HUMAN 
-                        else SETTINGS.LOCATION_OPP_SELECT_SHIFT_COORDINATE_X * -1
-                    )
-                coordinate_y_select: int = int(
-                    coordinate_y_position +
-                    SETTINGS.LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y if self.owner == context.PLAYER_TYPE.HUMAN 
-                        else SETTINGS.LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y * -1
-                    )
+                # Calculating select coordinate x:
+                coordinate_x_select_shift: int = SETTINGS.LOCATION_HAND_SELECT_SHIFT_COORDINATE_X
+                if self.owner == context.PLAYER_TYPE.COMPUTER:
+                    coordinate_x_select_shift = SETTINGS.LOCATION_OPP_SELECT_SHIFT_COORDINATE_X
+                coordinate_x_select: int = coordinate_x_position + coordinate_x_select_shift
+                
+                # Calculating select coordinate y 
+                coordinate_y_select_shift: int = SETTINGS.LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y
+                if self.owner == context.PLAYER_TYPE.COMPUTER:
+                    coordinate_y_select_shift = SETTINGS.LOCATION_OPP_SELECT_SHIFT_COORDINATE_Y * -1
+                coordinate_y_select: int = coordinate_y_position + coordinate_y_select_shift
+                
+                # Packing up coordinates select and updating:
                 coordinates_select: context.Coordinates = (
                     coordinate_x_select,
                     coordinate_y_select,
@@ -666,6 +675,21 @@ class Hand:
             self.update_coordinates(
                 clear_cache = clear_cache
                 )
+            
+            
+    def sort_random(self, update_coordinates: bool = True, clear_cache: bool = True) -> None:
+        
+        # Choosing sort reverse randomly:
+        sort_reverse: bool = random.choice((True, False))
+        
+        # Calling sorting sequence:
+        self.sort(
+            sort_seq = context.HAND_SORT_SEQ.RANDOM,
+            sort_reverse = sort_reverse,
+            update_coordinates = update_coordinates,
+            ignore_assertion = True,
+            clear_cache = clear_cache
+            )
                 
         
     def sort_default(self, update_coordinates: bool = True, clear_cache: bool = True) -> None:
