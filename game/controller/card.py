@@ -2980,12 +2980,14 @@ class Card:
         
         # Checking state revealed:
         state_revealed: bool = True if bool(
-            self.location == context.CARD_LOCATION.PLAYER or
-            self.location == context.CARD_LOCATION.DISCARD or
-            self.location == context.CARD_LOCATION.TABLE or 
-            self.location == context.CARD_LOCATION.DECK and 
+            self.location == context.CARD_LOCATION.PLAYER or            # Always revealed
+            self.location == context.CARD_LOCATION.DISCARD or           # Always revealed
+            self.location == context.CARD_LOCATION.TABLE or             # Always revealed
+            self.location == context.CARD_LOCATION.DECK and             # Lower positions revealed
+            bool(
                 self.location_index == 0 or
                 self.location_index == 1 and SESSION.GAME_MODE_SECRET
+                )
             ) else False
         self.set_state_revealed(
             set_value = state_revealed,
