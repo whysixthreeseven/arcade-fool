@@ -1320,7 +1320,7 @@ class Card:
                 "coordinates_unplayable"
                 )
             cache.clear_cached_property_list(
-                target_oject = self,
+                target_object = self,
                 target_attribute = cached_property_list
                 )
             
@@ -1345,7 +1345,7 @@ class Card:
                 "coordinates_unplayable"
                 )
             cache.clear_cached_property_list(
-                target_oject = self,
+                target_object = self,
                 target_attribute = cached_property_list
                 )
         
@@ -1440,7 +1440,7 @@ class Card:
                 "coordinates_expected"
                 )
             cache.clear_cached_property_list(
-                target_oject = self,
+                target_object = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1463,7 +1463,7 @@ class Card:
                 "coordinates_expected"
                 )
             cache.clear_cached_property_list(
-                target_oject = self,
+                target_object = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1555,7 +1555,7 @@ class Card:
                 "coordinates_hover"
                 )
             cache.clear_cached_property_list(
-                target_oject = self,
+                target_object = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1578,7 +1578,7 @@ class Card:
                 "coordinates_hover"
                 )
             cache.clear_cached_property_list(
-                target_oject = self,
+                target_object = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1670,7 +1670,7 @@ class Card:
                 "coordinates_select"
                 )
             cache.clear_cached_property_list(
-                target_oject = self,
+                target_object = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1693,7 +1693,7 @@ class Card:
                 "coordinates_select"
                 )
             cache.clear_cached_property_list(
-                target_oject = self,
+                target_object = self,
                 target_attribute_list = cached_property_list
                 )
             
