@@ -18,7 +18,7 @@ class __SETTINGS:
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_VERSION: str = "0.0.1R"
     APP_STARTED: str = "2026.09.02"
-    APP_UPDATED: str = "2026.09.27"
+    APP_UPDATED: str = "2026.09.28"
     APP_AUTHOR: str = "Andrey Vostokov"
 
     # Root directory settings:    
@@ -78,7 +78,7 @@ class __SETTINGS:
     
     # Area (main) dimensions settings:
     __AREA_HAND_WIDTH: int = __AREA_MAIN_WIDTH
-    __AREA_HAND_HEIGHT: int = int(CARD_TEXTURE_HEIGHT * 1.20)
+    __AREA_HAND_HEIGHT: int = int(CARD_TEXTURE_HEIGHT * 1.35)
     AREA_PLAYER_WIDTH: int = __AREA_HAND_WIDTH
     AREA_PLAYER_HEIGHT: int = __AREA_HAND_HEIGHT
     AREA_TABLE_WIDTH: int = __AREA_HAND_WIDTH
