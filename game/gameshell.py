@@ -78,10 +78,8 @@ class Gameshell(arcade.Window):
         if SESSION.ENABLE_DEBUG:
             self.__surface_controller.display_debug()
             
-        for card in self.__deck.cards:
-            card.display()
-        for card in self.__hand.cards:
-            card.display()
+        self.__deck.display()
+        self.__hand.display()
 
         if self.__hit_card_list:
             self.__deck.display_info(
