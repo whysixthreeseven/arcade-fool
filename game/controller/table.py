@@ -142,6 +142,47 @@ class Table:
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
+            
+            
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        SETUP METHODS
+    
+    """
+    
+    
+    def __create_index(self) -> dict[int, Card | None]:
+        
+        # Creating new cards index dictionary:
+        cards_index: dict[int, Card | None] = {
+            card_location_index: None for card_location_index in range(0, 12)
+            }
+        
+        # Returning:
+        return cards_index
+        
+    
+    def setup(self) -> None:
+        
+        # Creating new cards index dictionary:
+        cards_index: dict[int, Card | None] = self.__create_index()
+        
+        # Updating attribute:
+        self.__cards_index = cards_index
+        
+        # Clearing cache:
+        self.clear_cached_attributes()
+        
+        
+    def reset(self) -> None:
+        
+        # Creating new cards index dictionary:
+        cards_index: dict[int, Card | None] = self.__create_index()
+        
+        # Updating attribute:
+        self.__cards_index = cards_index
+        
+        # Clearing cache:
+        self.clear_cached_attributes()
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
