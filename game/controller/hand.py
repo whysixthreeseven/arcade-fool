@@ -57,7 +57,8 @@ class Hand:
         cached_property_list: tuple[str, ...] = (
             "cards",
             "cards_count",
-            "cards_value"
+            "cards_value",
+            "cards_known",
             )
         
         # Returning:
@@ -175,6 +176,19 @@ class Hand:
         return cards_value
     
     
+    @cached_property
+    def cards_known(self) -> int:
+        
+        # Acquiring card objects:
+        cards_known: tuple[Card, ...] = tuple(
+            card_object for card_object in self.cards 
+            if card_object.state_known
+            )
+        
+        # Returning:
+        return cards_known
+    
+    
     def add_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
@@ -229,6 +243,14 @@ class Hand:
                 clear_cache = True
                 )
         
+        # Updating known state (before resetting other states):
+        if card_object.state_revealed and not card_object.state_known:
+            card_object.set_state_known(
+                set_value = True,
+                ignore_assertion = True,
+                clear_cache = True
+                )
+            
         # Updating card's states:
         card_object.set_state_location(
             clear_cache = True
@@ -239,8 +261,7 @@ class Hand:
             self.clear_cached_cards_attributes()
 
             
-    def remove_card(self, card_object: Card, sort_container: bool = True, 
-                          ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def remove_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -615,9 +636,25 @@ class Hand:
             
     
     def __sort_random(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
+
+        # Removing known cards from the cards list:
+        cards_removed: bool = False
+        if SESSION.GAME_MODE_REVEAL:
+            for card_object in self.cards_known:
+                    self.__card_list.remove(
+                        card_object
+                        )
+                    cards_removed = True
         
-        # Sorting cards:
+        # Shuffling cards:
         random.shuffle(self.__card_list)
+        
+        # Adding known cards back to the cards list:
+        if cards_removed:
+            for card_object in self.cards_known:
+                self.__card_list.append(
+                    card_object
+                    )
         
         # Clearing cache, if required:
         if clear_cache:
