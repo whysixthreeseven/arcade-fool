@@ -985,6 +985,7 @@ class Card:
                 "suit_ascii",
                 "color",
                 "trump",
+                "texture_filepath_front",
                 "render_text"
                 )
             cache.clear_cached_property_list(
