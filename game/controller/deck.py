@@ -169,6 +169,8 @@ class Deck:
         
         # Popping a card from the list:
         else:
+            
+            # Acquiring card from top and removing it from the deck:
             card: Card = self.cards[-1]
             self.__card_list.remove(card)
             
@@ -186,7 +188,12 @@ class Deck:
                     ignore_assertion = True,
                     clear_cache = True
                     )
-            
+                card_secret.set_state_known(
+                    set_value = True,
+                    ignore_assertion = True,
+                    clear_cache = True
+                    )
+
             # Clearing cache:
             if clear_cache:
                 self.clear_cached_cards_attributes()
@@ -381,6 +388,11 @@ class Deck:
         
         # Selecting a secret card:
         secret_card: Card = random.choice(card_list_gen)
+        secret_card.set_state_secret(
+            set_value = True,
+            ignore_assertion = True,
+            clear_cache = True,
+            )
         while secret_card == trump_card:
             secret_card: Card = random.choice(card_list_gen)
             
