@@ -2121,12 +2121,14 @@ class Card:
         # Checking if card is showcased:
         boundary_showcase: bool = bool(
             self.location == context.CARD_LOCATION.DECK and
-            self.location_index == 0 or
             bool(
-                SESSION.GAME_MODE_SECRET and 
-                self.__location_index == 1
+                self.location_index == 0 or
+                    bool(
+                        SESSION.GAME_MODE_SECRET and 
+                        self.__location_index == 1
+                        )
+                    )
                 )
-            )
         
         # Returning:
         return boundary_showcase
@@ -2282,7 +2284,7 @@ class Card:
         return hit_boundary
 
         
-    def hit_boundary_value(self, hit_coordinates: tuple[int, int], ignore_assertion: bool = False) -> int:
+    def hit_boundary_value(self, hit_coordinates: tuple[int, int], ignore_assertion: bool = False) -> float:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -2294,7 +2296,7 @@ class Card:
         hit_coordinate_x, hit_coordinate_y = hit_coordinates
         
         # Calculating coordinate x difference:
-        hit_boundary_value: int = int(hit_coordinate_x / self.boundary_left)
+        hit_boundary_value: int = float(hit_coordinate_x / self.boundary_left)
         
         # Returning:
         return hit_boundary_value
@@ -2994,7 +2996,7 @@ class Card:
                 )
             cache.clear_cached_property_list(
                 target_object = self,
-                target_attribute = cached_property_list
+                target_attribute_list = cached_property_list
                 )
             
 
@@ -3011,7 +3013,7 @@ class Card:
                 )
             cache.clear_cached_property_list(
                 target_object = self,
-                target_attribute = cached_property_list
+                target_attribute_list = cached_property_list
                 )
             
     
@@ -3928,9 +3930,9 @@ class Card:
         elif self.state_hovered and self.location in location_hover:
             
             # Checking if expected coordinates are set to hover coordinates:
-            if self.coordinates_expected != self.coordinates_hovered:
+            if self.coordinates_expected != self.coordinates_hover:
                 self.set_coordinates_expected(
-                    set_value = self.coordinates_hovered,
+                    set_value = self.coordinates_hover,
                     ignore_assertion = True,
                     clear_cache = clear_cache
                     )
