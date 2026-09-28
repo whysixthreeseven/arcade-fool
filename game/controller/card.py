@@ -94,6 +94,7 @@ class Card:
         self.__state_faded: bool = False
         self.__state_playable: bool = False
         self.__state_known: bool = False
+        self.__state_arrived: bool = False
         
         # Play location and index:
         self.__location: str = None
@@ -480,7 +481,10 @@ class Card:
     @cached_property
     def __cached_state_attributes(self) -> tuple[str, ...]:
         """
-        State attributes-related cached properties list.
+        State attributes-related cached properties list. 
+        
+        States `state_secret`, `state_known`, and `state_arrived` are not present and cannot be cleared in bulk! Use setter 
+        methods instead and individual cache clearing operations.
         
         Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
         Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
@@ -503,8 +507,6 @@ class Card:
             "state_faded",
             "state_idle",
             "state_playable",
-            "state_secret",
-            "state_known",
             )
         
         # Returning:
@@ -2891,6 +2893,13 @@ class Card:
         return self.__state_known
     
     
+    @cached_property
+    def state_arrived(self) -> bool:
+        
+        # Returning:
+        return self.__state_arrived
+    
+    
     def reset_state_global(self, clear_cache: bool = True) -> None:
         
         # Resetting:
@@ -3193,6 +3202,40 @@ class Card:
                 target_attribute = cached_property
                 )
             
+    
+    def set_state_arrived(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+            
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value,
+                )
+
+        # Updating attribute:
+        self.__state_arrived = set_value
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "state_arrived"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+            
+    
+    def switch_state_arrived(self, clear_cache: bool = True) -> None:
+        
+        # Updating attribute:
+        self.__state_arrived = not self.__state_arrived
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "state_arrived"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+            
             
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         LOCATION-BASED STATE CACHED PROPERTIES AND METHODS
@@ -3340,6 +3383,13 @@ class Card:
         # Updating attributes:
         self.__location = set_location
         self.__location_index = set_location_index
+        
+        # Updating arrived state:
+        self.set_state_arrived(
+            set_value = False,
+            ignore_assertion = True,
+            clear_cache = True
+            )
         
         # Clearing cache:
         if clear_cache:
@@ -3886,6 +3936,9 @@ class Card:
         card object is in "Default" (on in-position) state, updates `coordinates_expected` cached property to 
         `coordinates_position` value, expecting it to be in its place.
         
+        State "Arrived is always checked separately. It determines whether or not card object successfully arrived at its new 
+        location via sliding or other means of relocation. Used by event handlers and game controller.
+        
         This method takes priority in checking states, as "selected" state takes the highest priority due to user's mouse 
         movement. It is technically possible to have a card object selected on screen and have it being "hovered" over at the 
         same time, if cursor lingers. Thus, it first checks `self.state_selected`, then `self.state_hovered`, and only then 
@@ -3956,6 +4009,17 @@ class Card:
                 self.set_coordinates_expected(
                     set_value = self.coordinates_position,
                     ignore_assertion = True,
+                    clear_cache = clear_cache
+                    )
+                
+        # Arrived state:
+        if not self.state_arrived:
+            
+            # Checking if expected coordinates are set to default (in position) coordinates:
+            if self.coordinates_expected == self.coordinates_position:
+                self.set_state_arrive(
+                    set_value = True,
+                    ignore_assertion = False,
                     clear_cache = clear_cache
                     )
         
