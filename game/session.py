@@ -38,6 +38,9 @@ class __SESSION:
         self.__game_mode_reverse: bool = False
         self.__game_mode_reveal: bool = False
         
+        # Deck size selected:
+        self.__deck_size_selected: int = 36
+        
         # Hand sort modes:
         self.__hand_sort_seq_default: str = context.HAND_SORT_SEQ.SUIT
         self.__hand_sort_seq_selected: str = context.HAND_SORT_SEQ.SUIT
@@ -84,6 +87,18 @@ class __SESSION:
             "GAME_MODE_SECRET",
             "GAME_MODE_REVERSE",
             "GAME_MODE_REVEAL",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+    
+    @cached_property
+    def __cached_deck_attributes(self) -> tuple[str, ...]:
+        
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "DECK_SIZE_SELECTED",
             )
         
         # Returning:
@@ -459,6 +474,101 @@ class __SESSION:
         cache.clear_cached_property(
             target_object = self,
             target_attribute = cached_property
+            )
+        
+        
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        DECK CACHED PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @cached_property
+    def DECK_SIZE_DEFAULT(self) -> int:
+        
+        # Importing SETTINGS instance locally to avoid circular import error:
+        from game.settings import SETTINGS
+        
+        # Getting default value:
+        deck_size_default: int = SETTINGS.DECK_SIZE_DEFAULT
+
+        # Returning:
+        return deck_size_default
+
+
+    @cached_property
+    def DECK_SIZE_SELECTED(self) -> int:
+
+        # Returning:
+        return self.__deck_size_selected
+    
+    
+    @cached_property
+    def DECK_SIZE_MIN(self) -> int:
+        
+        # Importing SETTINGS instance locally to avoid circular import error:
+        from game.settings import SETTINGS
+        
+        # Getting min value:
+        deck_size_min: int = SETTINGS.DECK_SIZE_MIN
+
+        # Returning:
+        return deck_size_min
+
+
+    @cached_property
+    def DECK_SIZE_MAX(self) -> int:
+
+        # Importing SETTINGS instance locally to avoid circular import error:
+        from game.settings import SETTINGS
+
+        # Getting max value:
+        deck_size_max: int = SETTINGS.DECK_SIZE_MAX
+
+        # Returning:
+        return deck_size_max
+    
+    
+    def set_deck_size(self, set_value: int, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if not ignore_assertion:
+            validate.validate_deck_size(
+                validate_value = set_value
+                )
+
+        # Updating attribute:
+        self.__deck_size_selected = set_value
+
+        # Clearing cache:
+        cached_property: str = "DECK_SIZE_SELECTED"
+        cache.clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+    
+    def set_deck_size_default(self) -> None:
+        
+        # Updating attribute:
+        self.set_deck_size(
+            set_value = self.DECK_SIZE_DEFAULT,
+            ignore_assertion = True
+            )
+        
+    
+    def switch_deck_size(self) -> None:
+        
+        # Selecting deck size to switch to:
+        if self.DECK_SIZE_SELECTED == self.DECK_SIZE_MIN:
+            deck_size = self.DECK_SIZE_MAX
+        else:
+            deck_size = self.DECK_SIZE_MIN
+        
+        # Updating attribute:
+        self.set_deck_size(
+            set_value = deck_size,
+            ignore_assertion = True
             )
 
 
