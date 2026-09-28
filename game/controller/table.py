@@ -40,7 +40,7 @@ class Table:
         """
         Cards attributes-related cached properties list.
         
-        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Collects and returns all properties of this table object decorated with `functools` library's `cached_property` wrapper.
         Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
         setter.
         
@@ -65,12 +65,39 @@ class Table:
         return cached_property_list
     
     
+    @cached_property
+    def __cached_position_attributes(self) -> tuple[str, ...]:
+        """
+        Position-related cached properties list.
+        
+        Collects and returns all properties of this table object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
+        
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "position_attack_list",
+            "position_defence_list",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+    
     def clear_cached_cards_attributes(self) -> None:
         """
-        Clears all public cached core properties of this card object.
+        Clears all public cached card properties of this table object.
         
         Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
-        clear texturepack properties of this card object.
+        clear texturepack properties of this table object.
         """
     
         # Clearing cached properties:
@@ -80,17 +107,33 @@ class Table:
             )
         
     
+    def clear_cached_position_attributes(self) -> None:
+        """
+        Clears all public cached position properties of this table object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear texturepack properties of this table object.
+        """
+    
+        # Clearing cached properties:
+        cache.clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_position_attributes
+            )
+        
+    
     def clear_cached_attributes(self) -> None:
         """
-        Clears all public cached properties of this card object.
+        Clears all public cached properties of this table object.
         
         Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and all property lists available to
-        clear all cached properties of this card object in a single loop through lists collection.
+        clear all cached properties of this table object in a single loop through lists collection.
         """
             
         # Collecting cached properties:
         cached_property_list_collection: tuple[tuple[str, ...], ...] = (
             self.__cached_cards_attributes,
+            self.__cached_position_attributes,
             )
         
         # Looping throught the list and clearing cache:
@@ -112,7 +155,7 @@ class Table:
         
         # Converting list to tuple:
         card_list: tuple[Card, ...] = tuple(
-            card_object for card_object, card_location in self.cards_index.items()
+            card_object for card_location_index, card_object in self.cards_index.items()
             if card_object is not None
             )
 
@@ -171,7 +214,10 @@ class Table:
                 )
         
         # Raising error, if card already exists at position:
-        card_exists: bool = True if self.cards_index.get(location_index) is not None else False
+        card_exists: bool = bool(
+            self.__cards_index[location_index] is not None 
+                and card_object not in self.cards
+            )
         if card_exists:
             error_message: str = f"Card exists on table @{location_index}!"
             raise IndexError(error_message)
@@ -204,6 +250,14 @@ class Table:
             clear_cache = True
             )
         
+        # Updating known state (before resetting other states):
+        if card_object.state_revealed and not card_object.state_known:
+            card_object.set_state_known(
+                set_value = True,
+                ignore_assertion = True,
+                clear_cache = True
+                )
+            
         # Updating card's states:
         card_object.set_state_location(
             clear_cache = True
@@ -223,4 +277,96 @@ class Table:
         # Clearing cache:
         if clear_cache:
             self.clear_cached_cards_attributes()
+            self.clear_cached_position_attributes()
+            
+            
+    def remove_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_card_object(
+                validate_value = card_object
+                )
+            
+        # Locating and removing card:
+        for stack_index, card_stored in self.__cards_index.items():
+            if card_stored == card_object:
+                self.cards_index[stack_index] = None
+                break
+            
+        # Raising error, if card is not found:
+        else:
+            error_message: str = f"Card <{card_object}> not found on table!"
+            raise IndexError(error_message)
 
+        # Clearing cache, if required:
+        if clear_cache:
+            self.clear_cached_cards_attributes()
+            self.clear_cached_position_attributes()
+            
+    
+    def sweep(self, clear_cache: bool = True) -> tuple[Card, ...]:
+        
+        # Collecting all cards:
+        cards_list: tuple[Card, ...] = self.cards
+        for card_object in self.cards:
+            self.remove_card(
+                card_object = card_object,
+                clear_cache = False
+                )
+    
+        # Cleaning cache, if required:
+        if clear_cache:
+            self.clear_cached_cards_attributes()
+            self.clear_cached_position_attributes()
+        
+        # Returning:
+        return cards_list
+        
+            
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        POSITIONS CACHED PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @cached_property
+    def position_attack_list(self) -> tuple[int, ...]:
+        
+        # Searching for empty positions on bottom stack:
+        position_list: tuple[int, ...] = tuple(
+            position_index for position_index, card_object in self.cards_index.items()
+                if position_index % 2 == 0 and card_object is not None      # Bottom stack is empty
+            )
+        
+        # Returning:
+        return position_list
+    
+    
+    @cached_property
+    def position_defence_list(self) -> tuple[int, ...]:
+        
+        # Searching for empty positions on top stack:
+        position_list: tuple[int, ...] = tuple(
+            position_index for position_index, card_object in self.cards_index.items()
+                if position_index % 2 == 0 and card_object is not None      # Bottom stack has cards
+                    and self.cards_index[position_index + 1] is None        # Top stack is empty
+            )
+        
+        # Returning:
+        return position_list
+
+
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        DISPLAY METHODS
+    
+    """
+    
+    
+    def display(self) -> None:
+        
+        # Calling display() method on all card objects:
+        for card_object in self.cards:
+            card_object.display()
+            
+    
