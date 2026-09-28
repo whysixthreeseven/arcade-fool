@@ -641,10 +641,10 @@ class Hand:
         cards_removed: bool = False
         if SESSION.GAME_MODE_REVEAL:
             for card_object in self.cards_known:
-                    self.__card_list.remove(
-                        card_object
-                        )
-                    cards_removed = True
+                self.__card_list.remove(
+                    card_object
+                    )
+                cards_removed = True
         
         # Shuffling cards:
         random.shuffle(self.__card_list)
@@ -662,7 +662,7 @@ class Hand:
             cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property,
-            )
+                )
         
     
     def sort(self, sort_seq: str, sort_reverse: bool = False, update_coordinates: bool = True,
