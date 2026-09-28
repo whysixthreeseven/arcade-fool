@@ -75,6 +75,7 @@ class Gameshell(arcade.Window):
         # Boundary attributes:
         self.__hit_area: Area | None = None
         self.__hit_card_list: list[Card] = []
+        self.__card_hover: Card | None = None
         
         # Cursor coordinates:
         self.__cursor_coordinate_x: int = 0
@@ -122,6 +123,9 @@ class Gameshell(arcade.Window):
         if hit_area is None:
             pass
         else:
+            if hit_area != AREA_PLAYER and self.__card_hover is not None:
+                self.__card_hover.set_state_hovered(False, True, True)
+                self.__card_hover = None
             if hit_area == AREA_DECK:
                 card_hit_list: list[Card] = []
                 for card_object in self.__deck.cards:
@@ -137,6 +141,40 @@ class Gameshell(arcade.Window):
                 self.__hit_card_list = card_hit_list
                 self.__cursor_coordinate_x = coordinate_x
                 self.__cursor_coordinate_y = coordinate_y
+            elif hit_area == AREA_PLAYER:
+                hover_temp = []
+                for card_object in self.__hand.cards:
+                    card_object_hit: bool = card_object.hit_boundary(
+                        hit_coordinates = coordinates,
+                        ignore_assertion = True
+                        )
+                    if card_object_hit:
+                        print(card_object, card_object.hit_boundary_value(
+                            hit_coordinates = coordinates,
+                            ignore_assertion = True
+                            ))
+                        hover_temp.append(
+                            card_object
+                            )
+                if hover_temp:
+                    self.__hit_card_list = hover_temp
+                    self.__hit_card_list.sort(
+                        key = lambda card: card.hit_boundary_value(
+                            hit_coordinates = coordinates,
+                            ignore_assertion = True
+                            ),
+                        reverse = False,
+                        )
+                    if self.__card_hover is not None and self.__card_hover != self.__hit_card_list[0]:
+                        self.__card_hover.set_state_hovered(False, True, True)
+                    self.__card_hover = self.__hit_card_list[0]
+                    self.__card_hover.set_state_hovered(True, True, True)
+                else:
+                    self.__hit_card_list = []
+                    if self.__card_hover is not None:
+                        self.__card_hover.set_state_hovered(False, True, True)
+                    
+                    
             
 
     def on_mouse_press(self, coordinate_x, coordinate_y, button, modifiers):
@@ -257,5 +295,13 @@ class Gameshell(arcade.Window):
                     slide_speed_modifier = 1.50,
                     clear_cache = True
                     )
+        if self.__hit_area == AREA_PLAYER:
+            if self.__card_hover is not None:
+                self.__card_hover.slide(
+                    slide_speed_modifier = 1.00,
+                    clear_cache = True
+                    )
+                
+            
             
         
