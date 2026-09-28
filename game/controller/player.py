@@ -118,7 +118,7 @@ class Player:
         
         # Setting up related attributes to default values:
         self.set_play_style(
-            set_value = context.COMPUTER_STYLE.RANDOM,     # TODO: Add to SESSION variables!
+            set_value = context.COMPUTER_STYLE.RANDOM,          # TODO: Add to SESSION variables!
             ignore_assertion = True,
             clear_cache = True,
             )
