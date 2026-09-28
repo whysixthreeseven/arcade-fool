@@ -255,6 +255,9 @@ class Hand:
         card_object.set_state_location(
             clear_cache = True
             )
+        
+        # TODO: Remove testing code block!
+        card_object.set_state_playable(True, True, True)
 
         # Clearing cache:
         if clear_cache:
