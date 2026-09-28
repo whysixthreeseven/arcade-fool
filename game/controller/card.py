@@ -1154,7 +1154,7 @@ class Card:
     
     
     @cached_property
-    def coordinates(self) -> tuple[int, int]:
+    def coordinates(self) -> context.Coordinates:
         """
         Card object's current coordinates on screen.
         
@@ -1173,7 +1173,7 @@ class Card:
         """
         
         # Making container:
-        coordinates: tuple[int, int] = (
+        coordinates: context.Coordinates = (
             self.coordinate_x,
             self.coordinate_y
             )
@@ -1444,10 +1444,10 @@ class Card:
     
     
     @cached_property
-    def coordinates_position(self) -> tuple[int, int]:
+    def coordinates_position(self) -> context.Coordinates:
         
         # Packing container:
-        coordinates_position: tuple[int, int] = (
+        coordinates_position: context.Coordinates = (
             self.__coordinate_x_position,
             self.__coordinate_y_position
             )
@@ -1506,7 +1506,7 @@ class Card:
                 )
         
         
-    def set_coordinates_position(self, set_value: tuple[int, int], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_coordinates_position(self, set_value: context.Coordinates, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1566,10 +1566,10 @@ class Card:
 
 
     @cached_property
-    def coordinates_expected(self) -> tuple[int, int]:
+    def coordinates_expected(self) -> context.Coordinates:
 
         # Packing container:
-        coordinates_expected: tuple[int, int] = (
+        coordinates_expected: context.Coordinates = (
             self.coordinate_x_expected,
             self.coordinate_y_expected
             )
@@ -1624,7 +1624,7 @@ class Card:
                 )
             
     
-    def set_coordinates_expected(self, set_value: tuple[int, int], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_coordinates_expected(self, set_value: context.Coordinates, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1681,10 +1681,10 @@ class Card:
 
 
     @cached_property
-    def coordinates_hover(self) -> tuple[int, int]:
+    def coordinates_hover(self) -> context.Coordinates:
 
         # Packing container:
-        coordinates_hover: tuple[int, int] = (
+        coordinates_hover: context.Coordinates = (
             self.__coordinate_x_hover,
             self.__coordinate_y_hover
             )
@@ -1739,7 +1739,7 @@ class Card:
                 )
             
     
-    def set_coordinates_hover(self, set_value: tuple[int, int], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_coordinates_hover(self, set_value: context.Coordinates, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1796,10 +1796,10 @@ class Card:
 
 
     @cached_property
-    def coordinates_select(self) -> tuple[int, int]:
+    def coordinates_select(self) -> context.Coordinates:
 
         # Packing container:
-        coordinates_select: tuple[int, int] = (
+        coordinates_select: context.Coordinates = (
             self.__coordinate_x_select,
             self.__coordinate_y_select
             )
@@ -1854,7 +1854,7 @@ class Card:
                 )
             
     
-    def set_coordinates_select(self, set_value: tuple[int, int], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_coordinates_select(self, set_value: context.Coordinates, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1923,10 +1923,10 @@ class Card:
 
 
     @cached_property
-    def coordinates_unplayable(self) -> tuple[int, int]:
+    def coordinates_unplayable(self) -> context.Coordinates:
 
         # Packing container:
-        coordinates_unplayable: tuple[int, int] = (
+        coordinates_unplayable: context.Coordinates = (
             self.coordinate_x_unplayable,
             self.coordinate_y_unplayable
             )
@@ -2121,16 +2121,12 @@ class Card:
     def boundary_showcase(self) -> bool:
         
         # Checking if card is showcased:
-        boundary_showcase: bool = bool(
-            self.location == context.CARD_LOCATION.DECK and
-            bool(
-                self.location_index == 0 or
-                    bool(
-                        SESSION.GAME_MODE_SECRET and 
-                        self.__location_index == 1
-                        )
-                    )
-                )
+        boundary_showcase: bool = False
+        if self.location == context.CARD_LOCATION.DECK:
+            if self.location_index == 0:
+                boundary_showcase = True
+            elif SESSION.GAME_MODE_SECRET and self.location_index == 1:
+                boundary_showcase = True
         
         # Returning:
         return boundary_showcase
@@ -2265,7 +2261,7 @@ class Card:
         self.clear_cached_boundary_attributes()
         
     
-    def hit_boundary(self, hit_coordinates: tuple[int, int], ignore_assertion: bool = False) -> bool:
+    def hit_boundary(self, hit_coordinates: context.Coordinates, ignore_assertion: bool = False) -> bool:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -2286,7 +2282,7 @@ class Card:
         return hit_boundary
 
         
-    def hit_boundary_value(self, hit_coordinates: tuple[int, int], ignore_assertion: bool = False) -> float:
+    def hit_boundary_value(self, hit_coordinates: context.Coordinates, ignore_assertion: bool = False) -> float:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -3316,7 +3312,7 @@ class Card:
     
     
     @cached_property
-    def __location_precalc_coordinates(self) -> dict[str, dict[int, tuple[int, int]]]:
+    def __location_precalc_coordinates(self) -> dict[str, dict[int, context.Coordinates]]:
         """
         Card object's precalculated coordinates in dictionary format available for three locations: "Deck", "Discard", and 
         "Table". Used for quick coordinates update on location change.
@@ -3328,12 +3324,12 @@ class Card:
         
         Returns
         -------
-        location_coordinates : `dict[str, dict[int, tuple[int, int]]]`
-            Card object's precalculated coordinates in dictionary format: `{CARD_LOCATION.VALUE: {int: tuple[int, int]}}`.
+        location_coordinates : `dict[str, dict[int, context.Coordinates]]`
+            Card object's precalculated coordinates in dictionary format: `{CARD_LOCATION.VALUE: {int: context.Coordinates}}`.
         """
 
         # Compiling coordinates dictionary index:
-        location_coordinates: dict[str, dict[int, tuple[int, int]]] = {
+        location_coordinates: dict[str, dict[int, context.Coordinates]] = {
             context.CARD_LOCATION.TABLE: coordinates.LOCATION_TABLE_COORDINATES_INDEX,
             context.CARD_LOCATION.DECK: coordinates.LOCATION_DECK_COORDINATES_INDEX,
             context.CARD_LOCATION.DISCARD: coordinates.LOCATION_DISCARD_COORDINATES_INDEX,
@@ -3876,7 +3872,7 @@ class Card:
                 )
             
             
-    def update_coordinates_location(self, calculated_coordinates: tuple[int, int] | None, clear_cache: bool = True) -> None:
+    def update_coordinates_location(self, calculated_coordinates: context.Coordinates | None, clear_cache: bool = True) -> None:
         """
         Updated coordinates based on card's location and `calculated_coordinates` parameter provided.
         
@@ -3896,7 +3892,7 @@ class Card:
         
         Parameters
         ----------
-        calculated_coordinates : `tuple[int, int]` | `None`
+        calculated_coordinates : `context.Coordinates` | `None`
             Coordinates to update card's position with. If set to None, assumes that card's current location is either "Deck",
             "Discard", or "Table", allowing it to load precaclulcated coordinates values from `self.__location_precalc_coordinates`
         clear_cache : `bool` = True
@@ -3909,7 +3905,7 @@ class Card:
             if coordinates_precaculated:
                 
                 # Updating coordinates (position):
-                coordinates_position: tuple[int, int] = self.__location_precalc_coordinates[self.location][self.location_index]
+                coordinates_position: context.Coordinates = self.__location_precalc_coordinates[self.location][self.location_index]
                 self.set_coordinates_position(
                     set_value = coordinates_position,
                     ignore_assertion = True,
