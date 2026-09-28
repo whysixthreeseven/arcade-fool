@@ -254,7 +254,7 @@ class Gameshell(arcade.Window):
                     )
                 co = card_object
                 card_object.slide(
-                    slide_speed_modifier = 0.50,
+                    slide_speed_modifier = 1.50,
                     clear_cache = True
                     )
             
