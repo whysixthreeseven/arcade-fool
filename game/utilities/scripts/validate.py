@@ -17,15 +17,19 @@ def validate_card_name(validate_value: str) -> None:
     """
     Validates card object's name.
     
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not 
-    meet requirements. Returns nothing.
-    
-    Asserts value type, if value is empty, and if value is default (found in `game.context.CARD_NAME_LIST` collection).
+    Asserts value type, if value is empty, and if value is default (found in `context.CARD_NAME_LIST` collection). Uses 
+    `utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not meet 
+    requirements. Returns nothing.
     
     Parameters
     -------
     validate_value : `str`
         Card object's name to validate.
+        
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
     
     # Asserting value is valid type:
@@ -53,15 +57,18 @@ def validate_card_id(validate_value: int) -> None:
     """
     Validates card object's id.
     
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not 
-    meet requirements. Returns nothing.
-
-    Asserts value type, and if value is greater than zero.
+    Asserts value type, and if value is greater than zero. Uses `utilities.scripts.assertion` assertion functions to validate 
+    value and raises `AssertionError` if value does not meet requirements. Returns nothing.
     
     Parameters
     -------
     validate_value : `str`
         Card object's id to validate.
+        
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
     
     # Asserting value is valid type:
@@ -82,15 +89,18 @@ def validate_card_added_index(validate_value: int) -> None:
     """
     Validates card object's added index.
 
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not 
-    meet requirements. Returns nothing.
-
-    Asserts value type, and if value is greater than or equal to zero.
+    Asserts value type, and if value is greater than or equal to zero. Uses `utilities.scripts.assertion` assertion 
+    functions to validate value and raises `AssertionError` if value does not meet requirements. Returns nothing.
     
     Parameters
     -------
     validate_value : `int`
         Card object's added index to validate.
+        
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
 
     # Asserting value is valid type:
@@ -111,15 +121,19 @@ def validate_card_suit(validate_value: str) -> None:
     """
     Validates card object's suit.
 
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not
-    meet requirements. Returns nothing.
+    Asserts value type, if value is empty, and if value is default (found in `context.CARD_SUIT_LIST` collection). Uses 
+    `utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not meet 
+    requirements. Returns nothing.
 
-    Asserts value type, if value is empty, and if value is default (found in `game.context.CARD_SUIT_LIST` collection).
-    
     Parameters
     -------
     validate_value : `str`
         Card object's suit to validate.
+        
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
     
     # Asserting value is valid type:
@@ -147,15 +161,18 @@ def validate_flag(validate_value: bool) -> None:
     """
     Validates a boolean flag.
     
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not
+    Asserts value type. Uses `utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not
     meet requirements. Returns nothing.
-    
-    Asserts value type.
     
     Parameters
     -------
     validate_value : `bool`
         Boolean flag to validate.
+        
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
     
     # Asserting value is valid type:
@@ -170,15 +187,18 @@ def validate_coordinate(validate_value: int | float) -> None:
     """
     Validates a coordinate value.
     
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not
-    meet requirements. Returns nothing.
-
-    Asserts value type, and if value is greater than or equal to zero.
+    Asserts value type, and if value is greater than or equal to zero. Uses `utilities.scripts.assertion` assertion functions 
+    to validate value and raises `AssertionError` if value does not meet requirements. Returns nothing.
     
     Parameters
     -------
     validate_value : `int` | `float`
         Coordinate value to validate.
+        
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
     
     # Asserting value is valid type:
@@ -199,10 +219,9 @@ def validate_coordinate_container(validate_value: tuple[int, int], enable_bounda
     """
     Validates a coordinate container.
 
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not
+    Asserts value type, item count, and each item. If boundary enabled, asserts coordinates are within game surface boundary. 
+    Uses `utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not
     meet requirements. Returns nothing.
-
-    Asserts value type, item count, and each item. If boundary enabled, asserts coordinates are within game surface boundary.
     
     Parameters
     -------
@@ -210,6 +229,11 @@ def validate_coordinate_container(validate_value: tuple[int, int], enable_bounda
         Coordinate container to validate.
     enable_boundary : `bool` = `False`
         If `True`, validates coordinates are within game surface boundary.
+        
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
     
     # Asserting value is valid type:
@@ -254,15 +278,19 @@ def validate_texturepack(validate_value: texturepack.TexturePack) -> None:
     """
     Validates a texture pack object.
     
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not
-    meet requirements. Returns nothing.
-
-    Asserts value type, and if value is default (found in `game.utilities.texturepack` texture pack collections).
+    Asserts value type, and if value is default (found in `utilities.texturepack` texture pack collections). Uses 
+    `utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not meet 
+    requirements. Returns nothing.
     
     Parameters
     -------
     validate_value : `texturepack.TexturePack`
         Texture pack object to validate.
+    
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
     
     # Asserting value is valid type:
@@ -294,15 +322,18 @@ def validate_card_render_scale(validate_value: float) -> None:
     """
     Validates card object's render scale value.
     
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not
-    meet requirements. Returns nothing.
-    
-    Asserts value type, and if value is greater or equal to zero.
+    Asserts value type, and if value is greater or equal to zero. Uses `utilities.scripts.assertion` assertion functions to 
+    validate value and raises `AssertionError` if value does not meet requirements. Returns nothing.
     
     Parameters
     -------
     validate_value : `float`
         Card object's render scale value to validate.
+    
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
     
     # Asserting value type:
@@ -323,15 +354,18 @@ def validate_card_render_alpha(validate_value: int) -> None:
     """
     Validates card object's render alpha value.
     
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not
-    meet requirements. Returns nothing.
-
-    Asserts value type, and if value is greater or equal to zero.
+    Asserts value type, and if value is greater or equal to zero. Uses `utilities.scripts.assertion` assertion functions to 
+    validate value and raises `AssertionError` if value does not meet requirements. Returns nothing.
 
     Parameters
     -------
     validate_value : `int`
         Card object's render alpha value to validate.
+    
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
     
     # Asserting value type:
@@ -352,15 +386,19 @@ def validate_card_render_tilt(validate_value: int) -> None:
     """
     Validates card object's render tilt value.
 
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not
-    meet requirements. Returns nothing.
-
-    Asserts value type, and if value is within range of `SETTINGS.CARD_RENDER_TILT_MIN` and `SETTINGS.CARD_RENDER_TILT_MAX`.
+    Asserts value type, and if value is within range of `SETTINGS.CARD_RENDER_TILT_MIN` and `SETTINGS.CARD_RENDER_TILT_MAX`. Uses 
+    `utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not meet 
+    requirements. Returns nothing.
 
     Parameters
     -------
     validate_value : `int`
         Card object's render tilt value to validate.
+    
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
     
     # Asserting value type:
@@ -385,15 +423,19 @@ def validate_card_location(validate_value: str) -> None:
     """
     Validates card object's location value.
 
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not
-    meet requirements. Returns nothing.
-
-    Asserts value type, and if value is default (found in `game.context.CARD_LOCATION_LIST` collection).
+    Asserts value type, and if value is default (found in `context.CARD_LOCATION_LIST` collection). Uses 
+    `utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not meet 
+    requirements. Returns nothing.
 
     Parameters
     -------
     validate_value : `str`
         Card object's location value to validate.
+    
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
     
     # Asserting value type:
@@ -416,15 +458,18 @@ def validate_card_location_index(validate_value: int) -> None:
     """
     Validates card object's location index value.
 
-    Uses `game.utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not
-    meet requirements. Returns nothing.
-
-    Asserts value type, and if value is within range of 0 and `SETTINGS.CARD_SIZE_MAX`.
+    Asserts value type, and if value is within range of 0 and `SETTINGS.CARD_SIZE_MAX`. Uses `utilities.scripts.assertion` 
+    assertion functions to validate value and raises `AssertionError` if value does not meet requirements. Returns nothing.
 
     Parameters
     -------
     validate_value : `int`
         Card object's location index value to validate.
+
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
     """
     
     # Asserting value type:
@@ -443,6 +488,22 @@ def validate_card_location_index(validate_value: int) -> None:
     
 
 def validate_card_object(validate_value: object) -> None:
+    """
+    Validates card object.
+    
+    Asserts if `validate_object` is a Card-type object. Uses `utilities.scripts.assertion` assertion functions to validate 
+    value and raises `AssertionError` if value does not meet requirements. Returns nothing.
+    
+    Parameters
+    -------
+    validate_value : `object`
+        Card object to validate.
+    
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
+    """
     
     # Card class object:
     from game.controller.card import Card
@@ -456,6 +517,23 @@ def validate_card_object(validate_value: object) -> None:
     
 
 def validate_deck_size(validate_value: int) -> None:
+    """
+    Validates deck size value.
+    
+    Asserts value type, and if value is either `SETTINGS.DECK_SIZE_MIN` or `SETTINGS.DECK_SIZE_MAX`. Uses 
+    `utilities.scripts.assertion` assertion functions to validate value and raises `AssertionError` if value does not meet 
+    requirements. Returns nothing.
+    
+    Parameters
+    -------
+    validate_value : `int`
+        Deck size value to validate.
+        
+    Raises
+    ------
+    `AssertionError`
+        If value does not meet requirements.
+    """
     
     # Asserting value is valid type:
     assertion.assert_value_type(
