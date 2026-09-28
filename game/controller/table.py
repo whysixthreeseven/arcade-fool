@@ -213,10 +213,14 @@ class Table:
                 validate_value = location_index
                 )
         
-        # Raising error, if card already exists at position:
+        # Raising error, if card already exists on table:
+        cards_list: tuple[Card, ...] = tuple(
+            card_object for card_location_index, card_object in self.__cards_index.items()
+                if card_object is not None
+            )
         card_exists: bool = bool(
             self.__cards_index[location_index] is not None 
-                and card_object not in self.cards
+                and card_object not in cards_list
             )
         if card_exists:
             error_message: str = f"Card exists on table @{location_index}!"
@@ -308,8 +312,8 @@ class Table:
     def sweep(self, clear_cache: bool = True) -> tuple[Card, ...]:
         
         # Collecting all cards:
-        cards_list: tuple[Card, ...] = self.cards
-        for card_object in self.cards:
+        cards_pending_removal: tuple[Card, ...] = self.cards
+        for card_object in cards_pending_removal:
             self.remove_card(
                 card_object = card_object,
                 clear_cache = False
@@ -321,7 +325,7 @@ class Table:
             self.clear_cached_position_attributes()
         
         # Returning:
-        return cards_list
+        return cards_pending_removal
         
             
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
