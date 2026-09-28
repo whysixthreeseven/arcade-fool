@@ -27,7 +27,7 @@ class Hand:
         self.__owner: str = context.PLAYER_TYPE.HUMAN       # TODO: TEST CODE, REMOVE!
         
         # Container attributes:
-        self.__card_list: list[Card] = []
+        self.__cards_list: list[Card] = []
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -102,6 +102,50 @@ class Hand:
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        SETUP METHODS
+    
+    """
+    
+    
+    def __create_list(self) -> list[Card]:
+        
+        # Creating new cards list:
+        cards_list: list[Card] = []
+        
+        # Returning:
+        return cards_list
+
+
+    def setup(self, set_owner: str, ignore_assertion: bool = False) -> None:
+        
+        # Creating new cards list:
+        cards_list: list[Card] = self.__create_list()
+        
+        # Updating attributes:
+        self.__cards_list = cards_list
+        self.set_owner(
+            set_value = set_owner,
+            ignore_assertion = ignore_assertion,
+            clear_cache = True,
+            )
+
+        # Clearing cache:
+        self.clear_cached_attributes()
+        
+        
+    def reset(self) -> None:
+        
+        # Creating new cards list:
+        cards_list: list[Card] = self.__create_list()
+        
+        # Updating attribute:
+        self.__cards_list = cards_list
+        
+        # Clearing cache:
+        self.clear_cached_attributes()
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         OWNER CACHED PROPERTIES AND METHODS
     
     """      
@@ -146,7 +190,7 @@ class Hand:
         # Converting list to tuple:
         card_list: tuple[Card, ...] = tuple(
             card_object for card_object 
-            in self.__card_list
+            in self.__cards_list
             )
 
         # Returning:
@@ -203,10 +247,10 @@ class Hand:
             raise IndexError(error_message)
             
         # Adding card to the list:
-        self.__card_list.append(card_object)
+        self.__cards_list.append(card_object)
         
         # Updating card added index:
-        added_index: int = len(self.__card_list)
+        added_index: int = len(self.__cards_list)
         card_object.set_added_index(
             set_value = added_index,
             ignore_assertion = True,
@@ -217,7 +261,7 @@ class Hand:
         location: str = context.CARD_LOCATION.PLAYER 
         if self.owner == context.PLAYER_TYPE.COMPUTER:
             location = context.CARD_LOCATION.OPPONENT
-        location_index: int = self.__card_list.index(card_object)
+        location_index: int = self.__cards_list.index(card_object)
         
         # Packing up location container and setting up:
         location_container: context.Location = (
@@ -256,9 +300,6 @@ class Hand:
             clear_cache = True
             )
         
-        # TODO: Remove testing code block!
-        card_object.set_state_playable(True, True, True)
-
         # Clearing cache:
         if clear_cache:
             self.clear_cached_cards_attributes()
@@ -278,7 +319,7 @@ class Hand:
             raise IndexError(error_message)
 
         # Removing card from the list:
-        self.__card_list.remove(card_object)
+        self.__cards_list.remove(card_object)
         
         # Clearing cache:
         if clear_cache:
@@ -350,10 +391,10 @@ class Hand:
     def update_location_index(self, clear_cache: bool = True) -> None:
             
         # Updating location index for all cards:
-        card_count: int = len(self.__card_list)
+        card_count: int = len(self.__cards_list)
         if card_count > 0:
-            for card_object in self.__card_list:
-                location_index: int = self.__card_list.index(card_object)
+            for card_object in self.__cards_list:
+                location_index: int = self.__cards_list.index(card_object)
                 card_object.set_location_index(
                     set_value = location_index,
                     ignore_assertion = True,
@@ -443,7 +484,7 @@ class Hand:
         
         # Locating coordinates:
         coordinates_index: dict[int, dict[int, context.Coordinates]] = self.precalc_coordinates
-        card_count: int = len(self.__card_list)
+        card_count: int = len(self.__cards_list)
         calculated_cordinates: context.Coordinates = coordinates_index[card_count][card_object.location_index]
         
         # Returning:
@@ -555,7 +596,7 @@ class Hand:
     def __sort_added(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
         
         # Sorting cards:
-        self.__card_list.sort(
+        self.__cards_list.sort(
             key = lambda card: card.added_index,
             reverse = sort_reverse,
             )
@@ -572,7 +613,7 @@ class Hand:
     def __sort_value(self, sort_reverse: bool = False, clear_cache: bool = True) -> None:
         
         # Sorting cards:
-        self.__card_list.sort(
+        self.__cards_list.sort(
             key = lambda card: card.value,
             reverse = not sort_reverse,             # not sort_reverse, otherwise sorts ascending!
             )
@@ -595,7 +636,7 @@ class Hand:
             }
 
         # Sorting cards:
-        self.__card_list.sort(
+        self.__cards_list.sort(
             key = lambda card: (
                 suit_order[card.suit],
                 - card.value,
@@ -621,7 +662,7 @@ class Hand:
             }
 
         # Sorting cards:
-        self.__card_list.sort(
+        self.__cards_list.sort(
             key = lambda card: (
                 color_order[card.color],
                 - card.value,
@@ -644,18 +685,18 @@ class Hand:
         cards_removed: bool = False
         if SESSION.GAME_MODE_REVEAL:
             for card_object in self.cards_known:
-                self.__card_list.remove(
+                self.__cards_list.remove(
                     card_object
                     )
                 cards_removed = True
         
         # Shuffling cards:
-        random.shuffle(self.__card_list)
+        random.shuffle(self.__cards_list)
         
         # Adding known cards back to the cards list:
         if cards_removed:
             for card_object in self.cards_known:
-                self.__card_list.append(
+                self.__cards_list.append(
                     card_object
                     )
         
