@@ -24,6 +24,12 @@ class CARD_SUIT:
     DIAMONDS: str = "Diamonds"
     CLUBS: str = "Clubs"
     SPADES: str = "Spades"
+
+
+CARD_SUIT_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_SUIT.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
     
     
 class CARD_SUIT_ASCII:
@@ -31,6 +37,23 @@ class CARD_SUIT_ASCII:
     DIAMONDS: str = "♦"
     CLUBS: str = "♣"
     SPADES: str = "♠"
+
+
+CARD_SUIT_ASCII_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_SUIT_ASCII.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
+
+class CARD_SUIT_COLOR:
+    RED: str = "Red"
+    BLACK: str = "Black"
+    
+
+CARD_SUIT_COLOR_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_SUIT_COLOR.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
 
 
 class CARD_NAME:
@@ -47,6 +70,12 @@ class CARD_NAME:
     QUEEN: str = "Queen"
     KING: str = "King"
     ACE: str = "Ace"
+
+
+CARD_NAME_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_NAME.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
     
     
 class CARD_NAME_ASCII:
@@ -63,6 +92,12 @@ class CARD_NAME_ASCII:
     QUEEN: str = "Q"
     KING: str = "K"
     ACE: str = "A"
+
+
+CARD_NAME_ASCII_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_NAME_ASCII.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
     
 
 class CARD_VALUE:
@@ -81,9 +116,24 @@ class CARD_VALUE:
     ACE: int = 14
 
 
-class CARD_SUIT_COLOR:
-    RED: str = "Red"
-    BLACK: str = "Black"
+CARD_VALUE_LIST: tuple[int, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_VALUE.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, int)
+    )
+
+
+class CARD_LOCATION:
+    DECK: str = "Deck"
+    DISCARD: str = "Discard"
+    TABLE: str = "Table"
+    PLAYER: str = "Player"
+    OPPONENT: str = "Opponent"
+
+
+CARD_LOCATION_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_LOCATION.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
 
 
 class CARD_TEXTURE_FRONT_INDEX:
@@ -100,6 +150,18 @@ class CARD_TEXTURE_FRONT_INDEX:
         "1_1",                  # Mono colors
         "2_1",                  # Dual colors
         )
+
+
+CARD_TEXTURE_FRONT_NAME_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_TEXTURE_FRONT_INDEX.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
+
+
+CARD_TEXTURE_FRONT_INDEX_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in CARD_TEXTURE_FRONT_INDEX.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, tuple)
+    )
 
 
 class CARD_TEXTURE_BACK_INDEX:
@@ -119,55 +181,8 @@ class CARD_TEXTURE_BACK_INDEX:
         "Sun"
         )
 
-
-class CARD_LOCATION:
-    DECK: str = "Deck"
-    DISCARD: str = "Discard"
-    TABLE: str = "Table"
-    PLAYER: str = "Player"
-    OPPONENT: str = "Opponent"
-    
-    
-CARD_SUIT_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in CARD_SUIT.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
-    )
-
-
-CARD_SUIT_ASCII_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in CARD_SUIT_ASCII.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
-    )
-
-
-CARD_SUIT_COLOR_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in CARD_SUIT_COLOR.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
-    )
-    
-    
-CARD_NAME_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in CARD_NAME.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
-    )
-
-
-CARD_NAME_ASCII_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in CARD_NAME_ASCII.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
-    )
-
-
-CARD_VALUE_LIST: tuple[int, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in CARD_VALUE.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, int)
-    )
-    
-
-CARD_LOCATION_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in CARD_LOCATION.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
-    )
+CARD_TEXTURE_BACK_COLOR_LIST: tuple[str, ...] = CARD_TEXTURE_BACK_INDEX.COLOR_LIST
+CARD_TEXTURE_BACK_STYLE_LIST: tuple[str, ...] = CARD_TEXTURE_BACK_INDEX.STYLE_LIST
     
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -202,16 +217,16 @@ class PLAYER_TYPE:
     HUMAN: str = "Human"
     COMPUTER: str = "Computer"
     
-    
-class PLAYER_ROLE:
-    ATTACKING: str = "Attacking"
-    DEFENDING: str = "Defending"
-    
 
 PLAYER_TYPE_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in PLAYER_TYPE.__dict__.items()
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
     )
+    
+    
+class PLAYER_ROLE:
+    ATTACKING: str = "Attacking"
+    DEFENDING: str = "Defending"
 
 
 PLAYER_ROLE_LIST: tuple[str, ...] = tuple(
@@ -232,21 +247,21 @@ class COMPUTER_DIFFICULTY:
     HARD: str = "Hard"
 
 
-class COMPUTER_PLAY_STYLE:
-    RECKLESS: str = "Reckless"
-    DEFENSIVE: str = "Defensive"
-    HOARDING: str = "Hoarding"
-    RANDOM: str = "Random"
-    
-
-COMPUTER_DIFFICULTY_LEVEL_LIST: tuple[str, ...] = tuple(
+COMPUTER_DIFFICULTY_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in COMPUTER_DIFFICULTY.__dict__.items()
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
     )
 
 
-COMPUTER_PLAY_STYLE_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in COMPUTER_PLAY_STYLE.__dict__.items()
+class COMPUTER_STYLE:
+    RECKLESS: str = "Reckless"
+    DEFENSIVE: str = "Defensive"
+    HOARDING: str = "Hoarding"
+    RANDOM: str = "Random"
+
+
+COMPUTER_STYLE_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in COMPUTER_STYLE.__dict__.items()
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
     )
 
@@ -318,18 +333,18 @@ class ACTION_GAME:
     PASS: str = "Pass"
     SORT: str = "Sort"
     CANCEL: str = "Cancel"
+
+
+ACTION_GAME_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in ACTION_GAME.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
     
     
 class ACTION_MENU:
     CONFIRM: str = "Confirm"
     BACK: str = "Back"
     RETURN: str = "Return"
-    
-
-ACTION_GAME_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in ACTION_GAME.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
-    )
 
 
 ACTION_MENU_LIST: tuple[str, ...] = tuple(
@@ -349,10 +364,22 @@ class GAME_PHASE:
     DEFENDING: str = "Defending"
     CLEANING: str = "Cleaning"
     PREPARING: str = "Preparing"
+    
+    
+GAME_PHASE_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in GAME_PHASE.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
 
 
 class GAME_RESULT:
     WIN: str = "Win"
     LOSS: str = "Loss"
     DRAW: str = "Draw"
+    
+
+GAME_RESULT_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in GAME_RESULT.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    )
     
