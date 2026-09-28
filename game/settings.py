@@ -63,7 +63,7 @@ class __SETTINGS:
     CARD_TEXTURE_HEIGHT: int = int(CARD_TEXTURE_HEIGHT_FILE * CARD_TEXTURE_SCALE_DEFAULT)
     
     # Card slide settings:
-    CARD_SLIDE_SPEED_MIN: int = int(CARD_TEXTURE_HEIGHT / 3)
+    CARD_SLIDE_SPEED_MIN: int = int(CARD_TEXTURE_HEIGHT / 6)
     
     # Deck settings:
     DECK_SIZE_MIN: int = 36
