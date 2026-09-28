@@ -93,6 +93,7 @@ class Card:
         self.__state_selected: bool = False
         self.__state_faded: bool = False
         self.__state_playable: bool = False
+        self.__state_known: bool = False
         
         # Play location and index:
         self.__location: str = None
@@ -503,6 +504,7 @@ class Card:
             "state_idle",
             "state_playable",
             "state_secret",
+            "state_known",
             )
         
         # Returning:
@@ -985,7 +987,6 @@ class Card:
                 "suit_ascii",
                 "color",
                 "trump",
-                "texture_filepath_front",
                 "render_text"
                 )
             cache.clear_cached_property_list(
@@ -2024,7 +2025,6 @@ class Card:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "texturepack_front",
-                "texture_filepath_front",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -2054,7 +2054,6 @@ class Card:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "texturepack_back",
-                "texture_filepath_back",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -2883,6 +2882,13 @@ class Card:
         return self.__state_playable
     
     
+    @cached_property
+    def state_known(self) -> bool:
+        
+        # Returning:
+        return self.__state_known
+    
+    
     def reset_state_global(self, clear_cache: bool = True) -> None:
         
         # Resetting:
@@ -3117,6 +3123,74 @@ class Card:
                 target_attribute = cached_property
                 )
             
+    
+    def set_state_secret(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value,
+                )
+
+        # Updating attribute:
+        self.__state_secret = set_value
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "state_secret"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+            
+    
+    def switch_state_secret(self, clear_cache: bool = True) -> None:
+        
+        # Updating attribute:
+        self.__state_secret = not self.__state_secret
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "state_secret"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+    
+    
+    def set_state_known(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value,
+                )
+
+        # Updating attribute:
+        self.__state_known = set_value
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "state_known"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+            
+    
+    def switch_state_known(self, clear_cache: bool = True) -> None:
+        
+        # Updating attribute:
+        self.__state_known = not self.__state_known
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "state_known"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+            
             
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         LOCATION-BASED STATE CACHED PROPERTIES AND METHODS
@@ -3132,16 +3206,29 @@ class Card:
             )
         
         # Checking state revealed:
-        state_revealed: bool = True if bool(
-            self.location == context.CARD_LOCATION.PLAYER or            # Always revealed
-            self.location == context.CARD_LOCATION.DISCARD or           # Always revealed
-            self.location == context.CARD_LOCATION.TABLE or             # Always revealed
-            self.location == context.CARD_LOCATION.DECK and             # Lower positions revealed
-            bool(
-                self.location_index == 0 or
-                self.location_index == 1 and SESSION.GAME_MODE_SECRET
-                )
-            ) else False
+        location_revealed: tuple[str, ...] = (
+            context.CARD_LOCATION.PLAYER,
+            context.CARD_LOCATION.DISCARD,
+            context.CARD_LOCATION.TABLE
+            )
+        
+        # Setting state revaled to default:
+        state_revealed: bool = False
+        
+        # Checking always revealed locations:
+        if self.location in location_revealed:
+            state_revealed = True
+            
+        # Checking other cases:
+        else:
+            if self.location == context.CARD_LOCATION.OPPONENT:
+                if self.state_known and SESSION.GAME_MODE_REVEAL:
+                    state_revealed = True
+            elif self.location == context.CARD_LOCATION.DECK:
+                if self.location_index == 0 or (self.location_index == 1 and SESSION.GAME_MODE_SECRET):
+                    state_revealed = True
+                    
+        # Setting state revealed:
         self.set_state_revealed(
             set_value = state_revealed,
             ignore_assertion = True,
