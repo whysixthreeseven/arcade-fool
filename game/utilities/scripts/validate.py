@@ -637,6 +637,23 @@ def validate_player_score(validate_value: int) -> None:
         raise_error = True
         )
     
+
+def validate_player_state(validate_value: str) -> None:
+    
+    # Asserting value is valid type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = str,
+        raise_error = True,
+        )
+    
+    # Asserting value is default:
+    assertion.assert_value_default(
+        check_value = validate_value,
+        check_list = context.PLAYER_STATE_LIST,
+        raise_error = True,
+        )
+    
     
 def validate_computer_style(validate_value: int) -> None:
     
