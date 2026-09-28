@@ -18,7 +18,7 @@ class __SETTINGS:
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_VERSION: str = "0.0.1R"
     APP_STARTED: str = "2026.09.02"
-    APP_UPDATED: str = "2026.09.28"
+    APP_UPDATED: str = "2026.09.29"
     APP_AUTHOR: str = "Andrey Vostokov"
 
     # Root directory settings:    
@@ -63,7 +63,7 @@ class __SETTINGS:
     CARD_TEXTURE_HEIGHT: int = int(CARD_TEXTURE_HEIGHT_FILE * CARD_TEXTURE_SCALE_DEFAULT)
     
     # Card slide settings:
-    CARD_SLIDE_SPEED_MIN: int = int(CARD_TEXTURE_HEIGHT / 6)
+    CARD_SLIDE_SPEED_MIN: int = int(CARD_TEXTURE_HEIGHT / 12)
     
     # Deck settings:
     DECK_SIZE_MIN: int = 36
