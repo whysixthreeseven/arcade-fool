@@ -104,12 +104,12 @@ class Deck:
     """
     
     
-    def setup(self, trump_suit: str | None, deck_size: int | None) -> None:
+    def setup(self, trump_suit: str | None = None) -> None:
         
         # Generating new deck:        
         deck = self.__generate(
             trump_suit = trump_suit,
-            deck_size = deck_size
+            deck_size = SESSION.DECK_SIZE_SELECTED,
             )
         
         # Updating attributes:
@@ -305,7 +305,7 @@ class Deck:
 
         # Collecting restricted cards:
         restricted_card_list: tuple[str, ...] = ()
-        if deck_size == SETTINGS.DECK_SIZE_MIN:        
+        if deck_size == SETTINGS.DECK_SIZE_MIN:
             restricted_card_list: tuple[str, ...] = (
                 context.CARD_NAME.TWO,
                 context.CARD_NAME.THREE,
