@@ -24,7 +24,7 @@ class Discard:
     def __init__(self) -> None:
         
         # Core attributes:
-        self.__card_list: list[Card] = []       # Current deck container
+        self.__cards_list: list[Card] = []       # Current deck container
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -95,6 +95,45 @@ class Discard:
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        SETUP METHODS
+    
+    """
+    
+    
+    def __create_list(self) -> list[Card]:
+        
+        # Creating new cards list:
+        cards_list: list[Card] = []
+        
+        # Returning:
+        return cards_list
+
+
+    def setup(self, ignore_assertion: bool = False) -> None:
+        
+        # Creating new cards list:
+        cards_list: list[Card] = self.__create_list()
+        
+        # Updating attributes:
+        self.__cards_list = cards_list
+
+        # Clearing cache:
+        self.clear_cached_attributes()
+        
+        
+    def reset(self) -> None:
+        
+        # Creating new cards list:
+        cards_list: list[Card] = self.__create_list()
+        
+        # Updating attribute:
+        self.__cards_list = cards_list
+        
+        # Clearing cache:
+        self.clear_cached_attributes()
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -109,7 +148,7 @@ class Discard:
         # Converting list to tuple:
         card_list: tuple[Card, ...] = tuple(
             card_object for card_object 
-            in self.__card_list
+            in self.__cards_list
             )
 
         # Returning:
@@ -139,8 +178,7 @@ class Discard:
         return cards_value
     
     
-    def add_card(self, card_object: Card, update_location_index: bool = True, update_card: bool = True,
-                       ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def add_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -150,54 +188,46 @@ class Discard:
             
         # Checking if card is already added to the list:
         if card_object in self.cards:
-            error_message: str = f"Card {card_object} appears to be in the deck card container!"
+            error_message: str = f"Card {card_object} appears to be in the discard container!"
             raise IndexError(error_message)
             
         # Adding card to the list:
-        self.__card_list.append(card_object)
+        self.__cards_list.append(card_object)
         
-        # Updating card's attributes:
-        if update_card:
-            
-            # Updating location and location index attributes:
-            location_index: int = self.__card_list.index(card_object)
-            set_location: context.Location = (
-                context.CARD_LOCATION.DISCARD, 
-                location_index,
-                )
-            card_object.set_location(
-                set_value = set_location,
-                ignore_assertion = True,
-                clear_cache = True
-                )
-            
-            # Setting random tilt angle for pile effect:
-            card_object.set_render_tilt_random(
-                clear_cache = True,
-                )
-            
-            # Updating card's states:
-            card_object.set_state_location(
-                clear_cache = True
-                )
-            
-            # Updating coordinates based on precalculated position:
-            card_object.update_coordinates_location(
-                calculated_coordinates = None,
-                clear_cache = True,
-                )
+        # Updating location and location index attributes:
+        location_index: int = self.__cards_list.index(card_object)
+        set_location: context.Location = (
+            context.CARD_LOCATION.DISCARD, 
+            location_index,
+            )
+        card_object.set_location(
+            set_value = set_location,
+            ignore_assertion = True,
+            clear_cache = True
+            )
         
-        # Updating index:
-        if update_location_index:
-            self.update_location_index()
+        # Setting random tilt angle for pile effect:
+        card_object.set_render_tilt_random(
+            clear_cache = True,
+            )
+        
+        # Updating card's states:
+        card_object.set_state_location(
+            clear_cache = True
+            )
+        
+        # Updating coordinates based on precalculated position:
+        card_object.update_coordinates_location(
+            calculated_coordinates = None,
+            clear_cache = True,
+            )
         
         # Clearing cache:
         if clear_cache:
             self.clear_cached_cards_attributes()
             
             
-    def remove_card(self, card_object: Card, update_location_index: bool = True, 
-                          ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def remove_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -211,12 +241,8 @@ class Discard:
             raise IndexError(error_message)
 
         # Removing card from the list:
-        self.__card_list.remove(card_object)
+        self.__cards_list.remove(card_object)
         
-        # Updating index:
-        if update_location_index:
-            self.update_location_index()
-
         # Clearing cache:
         if clear_cache:
             self.clear_cached_cards_attributes()
@@ -287,10 +313,10 @@ class Discard:
     def update_location_index(self, clear_cache: bool = True) -> None:
         
         # Updating location index for all cards:
-        card_count: int = len(self.__card_list)
+        card_count: int = len(self.__cards_list)
         if card_count > 0:
-            for card_object in self.__card_list:
-                location_index: int = self.__card_list.index(card_object)
+            for card_object in self.__cards_list:
+                location_index: int = self.__cards_list.index(card_object)
                 card_object.set_location_index(
                     set_value = location_index,
                     ignore_assertion = True,
