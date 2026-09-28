@@ -1105,6 +1105,23 @@ class Card:
     
     @cached_property
     def coordinate_x(self) -> int:
+        """
+        Card object's current coordinate x on screen.
+        
+        Used to track and render card texture on screen, as well as calculate its boundaries, and other related coordinates 
+        (hover, selected, unplayable) when in certain locations and set at certain states. Updated with its related setter 
+        methods (individual coordinate and coordinates container setters).
+        
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in `set_suit()` setter method.
+        
+        Returns
+        ------
+        self.__coordinate_x : `int` 
+            Current coordinate x.
+        """
+        
         
         # Returning:
         return self.__coordinate_x
@@ -1112,6 +1129,22 @@ class Card:
 
     @cached_property
     def coordinate_y(self) -> int:
+        """
+        Card object's current coordinate y on screen.
+        
+        Used to track and render card texture on screen, as well as calculate its boundaries, and other related coordinates 
+        (hover, selected, unplayable) when in certain locations and set at certain states. Updated with its related setter 
+        methods (individual coordinate and coordinates container setters).
+        
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in `set_suit()` setter method.
+        
+        Returns
+        ------
+        self.__coordinate_y : `int` 
+            Current coordinate y.
+        """
 
         # Returning:
         return self.__coordinate_y
@@ -1119,6 +1152,22 @@ class Card:
     
     @cached_property
     def coordinates(self) -> tuple[int, int]:
+        """
+        Card object's current coordinates on screen.
+        
+        Used to track and render card texture on screen, as well as calculate its boundaries, and other related coordinates 
+        (hover, selected, unplayable) when in certain locations and set at certain states. Updated with its related setter 
+        methods (individual coordinate and coordinates container).
+        
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in `set_suit()` setter method.
+        
+        Returns
+        ------
+        self.__coordinate_x : `int` 
+            Current coordinate x.
+        """
         
         # Making container:
         coordinates: tuple[int, int] = (
@@ -1131,6 +1180,29 @@ class Card:
         
         
     def set_coordinate_x(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        """
+        Sets card object's current coordinate x on screen.
+        
+        This method may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` value is set to `True` and parameter 
+        `ignore_assertion` is set to `False`, and its assertion control functions fail to validate `set_value`.
+        
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+                
+        Parameters
+        ----------
+        set_value : `int`
+            New current coordinate x value.
+        ignore_assertion : `bool` = `False`
+            Whether or not to ignore assertion checks.
+        clear_cache : `bool` = `True`
+            Whether or not to clear related cached properties.
+            
+        Raises
+        ----------
+        AssertionError
+            Raises error if parameter `set_value` cannot be asserted as a valid coordinate value.
+        """
+        
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1160,6 +1232,35 @@ class Card:
             
             
     def adjust_coordinate_x(self, adjust_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        """
+        Adjusts card object's current coordinate x on screen by `adjust_value`.
+        
+        Calculates new coordinate value and calls method `set_coordinate_x()` to update attribute.
+        
+        Used by `slide()` method to move card texture on screen. Called by `Gameshell` class object in its `on_update` method 
+        within game update loop logic.
+        
+        This method may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` value is set to `True` and parameter 
+        `ignore_assertion` is set to `False`, and its assertion control functions fail to validate `adjust_value`. This method 
+        uses other methods to set or update related attribute and may raise `AssertionError` if their assertion control 
+        functions fail to validate value.
+        
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+                
+        Parameters
+        ----------
+        adjust_value : `int`
+            Value to adjust coordinate x value.
+        ignore_assertion : `bool` = `False`
+            Whether or not to ignore assertion checks.
+        clear_cache : `bool` = `True`
+            Whether or not to clear related cached properties.
+            
+        Raises
+        ----------
+        AssertionError
+            Raises error if parameter `adjust_value` cannot be asserted as a valid adjust value.
+        """
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1179,6 +1280,28 @@ class Card:
 
 
     def set_coordinate_y(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        """
+        Sets card object's current coordinate y on screen.
+        
+        This method may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` value is set to `True` and parameter 
+        `ignore_assertion` is set to `False`, and its assertion control functions fail to validate `set_value`.
+        
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+                
+        Parameters
+        ----------
+        set_value : `int`
+            New current coordinate y value.
+        ignore_assertion : `bool` = `False`
+            Whether or not to ignore assertion checks.
+        clear_cache : `bool` = `True`
+            Whether or not to clear related cached properties.
+            
+        Raises
+        ----------
+        AssertionError
+            Raises error if parameter `set_value` cannot be asserted as a valid coordinate value.
+        """
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1208,6 +1331,35 @@ class Card:
             
             
     def adjust_coordinate_y(self, adjust_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        """
+        Adjusts card object's current coordinate y on screen by `adjust_value`.
+        
+        Calculates new coordinate value and calls method `set_coordinate_y()` to update attribute.
+        
+        Used by `slide()` method to move card texture on screen. Called by `Gameshell` class object in its `on_update` method 
+        within game update loop logic.
+        
+        This method may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` value is set to `True` and parameter 
+        `ignore_assertion` is set to `False`, and its assertion control functions fail to validate `adjust_value`. This method 
+        uses other methods to set or update related attribute and may raise `AssertionError` if their assertion control 
+        functions fail to validate value.
+        
+        Clears related cache, if parameter `clear_cache` is set to `True`.
+                
+        Parameters
+        ----------
+        adjust_value : `int`
+            Value to adjust coordinate y value.
+        ignore_assertion : `bool` = `False`
+            Whether or not to ignore assertion checks.
+        clear_cache : `bool` = `True`
+            Whether or not to clear related cached properties.
+            
+        Raises
+        ----------
+        AssertionError
+            Raises error if parameter `adjust_value` cannot be asserted as a valid adjust value.
+        """
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
