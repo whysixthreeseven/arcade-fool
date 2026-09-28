@@ -10,10 +10,10 @@ def clear_cached_property(target_object: object, target_attribute: str) -> None:
     
     Parameters
     --------
-        target_object : `object`
-            Class instance to remove attribute from.
-        target_attribute : `str`
-            Attribute to remove from class instance.
+    target_object : `object`
+        Class instance to remove attribute from.
+    target_attribute : `str`
+        Attribute to remove from class instance.
     """
     
     # Checking if attribute exists and removing it:
@@ -28,10 +28,10 @@ def clear_cached_property_list(target_object: object, target_attribute_list: tup
     
     Parameters
     --------
-        target_object : `object`
-            Class instance to remove attribute from.
-        target_attribute_list : `tuple[str, ...]`
-            Attributes list to remove from class instance.
+    target_object : `object`
+        Class instance to remove attribute from.
+    target_attribute_list : `tuple[str, ...]`
+        Attributes list to remove from class instance.
     """
     
     # Looping throught attributes list:
@@ -51,8 +51,8 @@ def refresh_object(target_object: object) -> None:
     
     Parameters
     --------
-        target_object : `object`
-            Class instance to refresh.
+    target_object : `object`
+        Class instance to refresh.
     """
     
     for attribute_name, attribute_value in inspect.getmembers(target_object.__class__):
