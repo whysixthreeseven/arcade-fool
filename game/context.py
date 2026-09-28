@@ -224,13 +224,13 @@ PLAYER_TYPE_LIST: tuple[str, ...] = tuple(
     )
     
     
-class PLAYER_ROLE:
+class PLAYER_STATE:
     ATTACKING: str = "Attacking"
     DEFENDING: str = "Defending"
 
 
-PLAYER_ROLE_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in PLAYER_ROLE.__dict__.items()
+PLAYER_STATE_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in PLAYER_STATE.__dict__.items()
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
     )
 
