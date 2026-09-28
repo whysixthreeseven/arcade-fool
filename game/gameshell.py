@@ -17,6 +17,7 @@ from game.controller.surface import Surface
 from game.controller.hand import Hand
 from game.controller.deck import Deck
 from game.controller.card import Card
+from game.controller.table import Table
 
 # Area instances:
 from game.utilities.area import (
@@ -58,19 +59,21 @@ class Gameshell(arcade.Window):
         
         # Test attributes:
         self.__deck = Deck()
-        self.__deck.generate(None, SETTINGS.DECK_SIZE_MIN)
+        self.__deck.setup(
+            trump_suit = None, 
+            )
         self.__hand = Hand()
-        self.__hand.set_owner(
-            set_value = context.PLAYER_TYPE.HUMAN,
+        self.__hand.setup(
+            set_owner = context.PLAYER_TYPE.HUMAN,
             ignore_assertion = True,
-            clear_cache = True
             )
         self.__hand_opp = Hand()
-        self.__hand_opp.set_owner(
-            set_value = context.PLAYER_TYPE.COMPUTER,
+        self.__hand_opp.setup(
+            set_owner = context.PLAYER_TYPE.COMPUTER,
             ignore_assertion = True,
-            clear_cache = True
             )
+        self.__table = Table()
+        self.__table.setup()
         
         # Boundary attributes:
         self.__hit_area: Area | None = None
@@ -149,10 +152,6 @@ class Gameshell(arcade.Window):
                         ignore_assertion = True
                         )
                     if card_object_hit:
-                        print(card_object, card_object.hit_boundary_value(
-                            hit_coordinates = coordinates,
-                            ignore_assertion = True
-                            ))
                         hover_temp.append(
                             card_object
                             )
@@ -227,20 +226,8 @@ class Gameshell(arcade.Window):
         
         # Resetting game state:
         if key_released == arcade.key.R:
-            self.__deck = Deck()
-            self.__deck.generate(None, SETTINGS.DECK_SIZE_MIN)
-            self.__hand = Hand()
-            self.__hand_opp.set_owner(
-                set_value = context.PLAYER_TYPE.HUMAN,
-                ignore_assertion = True,
-                clear_cache = True
-                )
-            self.__hand_opp = Hand()
-            self.__hand_opp.set_owner(
-                set_value = context.PLAYER_TYPE.COMPUTER,
-                ignore_assertion = True,
-                clear_cache = True
-                )
+            for controller in (self.__deck, self.__hand, self.__hand_opp, self.__table):
+                controller.reset()
             
         # Sorting player's hand:
         if key_released == arcade.key.Z:
@@ -292,7 +279,7 @@ class Gameshell(arcade.Window):
                     )
                 co = card_object
                 card_object.slide(
-                    slide_speed_modifier = 1.50,
+                    slide_speed_modifier = 1.00,
                     clear_cache = True
                     )
         if self.__hit_area == AREA_PLAYER:
