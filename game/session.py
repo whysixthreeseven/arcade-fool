@@ -35,7 +35,8 @@ class __SESSION:
         
         # Game modes:
         self.__game_mode_secret: bool = True
-        self.__game_mode_reverse: bool = True
+        self.__game_mode_reverse: bool = False
+        self.__game_mode_reveal: bool = False
         
         # Hand sort modes:
         self.__hand_sort_seq_default: str = context.HAND_SORT_SEQ.SUIT
@@ -81,7 +82,8 @@ class __SESSION:
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
             "GAME_MODE_SECRET",
-            "GAME_MODE_REVERSE"
+            "GAME_MODE_REVERSE",
+            "GAME_MODE_REVEAL",
             )
         
         # Returning:
@@ -350,10 +352,18 @@ class __SESSION:
         return self.__game_mode_secret
     
     
+    @cached_property
     def GAME_MODE_REVERSE(self) -> bool:
         
         # Returning:
         return self.__game_mode_reverse
+    
+    
+    @cached_property
+    def GAME_MODE_REVEAL(self) -> bool:
+        
+        # Returning:
+        return self.__game_mode_reveal
     
 
     def set_game_mode_secret(self, set_value: bool, ignore_assertion: bool = False) -> None:
@@ -367,6 +377,19 @@ class __SESSION:
         # Updating attribute:
         self.__game_mode_secret = set_value
         
+        # Clearing cache:
+        cached_property: str = "GAME_MODE_SECRET"
+        cache.clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+    
+    def switch_game_mode_secret(self) -> None:
+    
+        # Switching value:
+        self.__game_mode_secret = not self.__game_mode_secret
+
         # Clearing cache:
         cached_property: str = "GAME_MODE_SECRET"
         cache.clear_cached_property(
@@ -393,19 +416,6 @@ class __SESSION:
             target_attribute = cached_property
             )
         
-        
-    def switch_game_mode_secret(self) -> None:
-
-        # Switching value:
-        self.__game_mode_secret = not self.__game_mode_secret
-
-        # Clearing cache:
-        cached_property: str = "GAME_MODE_SECRET"
-        cache.clear_cached_property(
-            target_object = self,
-            target_attribute = cached_property
-            )
-        
 
     def switch_game_mode_reverse(self) -> None:
 
@@ -414,6 +424,38 @@ class __SESSION:
         
         # Clearing cache:
         cached_property: str = "GAME_MODE_REVERSE"
+        cache.clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+    
+    def set_game_mode_reveal(self, set_value: bool, ignore_assertion: bool = False) -> None:
+            
+        # Assertion control:
+        if not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value
+                )
+            
+        # Updating attribute:
+        self.__game_mode_reveal = set_value
+        
+        # Clearing cache:
+        cached_property: str = "GAME_MODE_REVEAL"
+        cache.clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+    
+    def switch_game_mode_reveal(self) -> None:
+    
+        # Switching value:
+        self.__game_mode_reveal = not self.__game_mode_reveal
+
+        # Clearing cache:
+        cached_property: str = "GAME_MODE_REVEAL"
         cache.clear_cached_property(
             target_object = self,
             target_attribute = cached_property
