@@ -382,4 +382,4 @@ GAME_RESULT_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in GAME_RESULT.__dict__.items()
     if not attribute_name.startswith("__") and isinstance(attribute_value, str)
     )
-    
+
