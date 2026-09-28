@@ -4013,7 +4013,7 @@ class Card:
             
             # Checking if expected coordinates are set to default (in position) coordinates:
             if self.coordinates_expected == self.coordinates_position:
-                self.set_state_arrive(
+                self.set_state_arrivedd(
                     set_value = True,
                     ignore_assertion = False,
                     clear_cache = clear_cache
