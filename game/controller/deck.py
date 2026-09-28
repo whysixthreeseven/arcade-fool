@@ -24,8 +24,8 @@ class Deck:
     def __init__(self) -> None:
         
         # Core attributes:
-        self.__card_list: list[Card] = []       # Current deck container
-        self.__card_gen_count: int = 0          # Cards generated count (global)
+        self.__cards_list: list[Card] = []       # Current deck container
+        self.__cards_gen_count: int = 0          # Cards generated count (global)
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -99,12 +99,12 @@ class Deck:
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        MAIN METHODS
+        SETUP METHODS
     
     """
     
     
-    def generate(self, trump_suit: str | None, deck_size: int | None) -> None:
+    def setup(self, trump_suit: str | None, deck_size: int | None) -> None:
         
         # Generating new deck:        
         deck = self.__generate(
@@ -113,10 +113,19 @@ class Deck:
             )
         
         # Updating attributes:
-        self.__card_list: list[Card] = deck
+        self.__cards_list: list[Card] = deck
         
         # Clearing cache:
         self.clear_cached_cards_attributes()
+        
+        
+    def reset(self) -> None:
+        
+        # Calling setup method:
+        self.setup(
+            trump_suit = None,
+            deck_size = SESSION.DECK_SIZE_SELECTED,
+            )
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -131,7 +140,7 @@ class Deck:
         # Converting list to tuple:
         card_list: tuple[Card, ...] = tuple(
             card_object for card_object 
-            in self.__card_list
+            in self.__cards_list
             )
 
         # Returning:
@@ -172,12 +181,12 @@ class Deck:
             
             # Acquiring card from top and removing it from the deck:
             card: Card = self.cards[-1]
-            self.__card_list.remove(card)
+            self.__cards_list.remove(card)
             
             # Updating secret card, if it exists:
-            card_count: int = len(self.__card_list)
+            card_count: int = len(self.__cards_list)
             if card_count == 1 and SESSION.GAME_MODE_SECRET:
-                card_secret = self.__card_list[0]
+                card_secret = self.__cards_list[0]
                 card_secret.set_trump(
                     set_value = True,
                     ignore_assertion = True,
@@ -267,10 +276,10 @@ class Deck:
     def update_location_index(self, clear_cache: bool = True) -> None:
         
         # Updating location index for all cards:
-        card_count: int = len(self.__card_list)
+        card_count: int = len(self.__cards_list)
         if card_count > 0:
-            for card_object in self.__card_list:
-                location_index: int = self.__card_list.index(card_object)
+            for card_object in self.__cards_list:
+                location_index: int = self.__cards_list.index(card_object)
                 card_object.set_location_index(
                     set_value = location_index,
                     ignore_assertion = True,
@@ -320,7 +329,7 @@ class Deck:
                 if card_name not in restricted_card_list:
                 
                     # Updating card generated list:
-                    self.__card_gen_count += 1          # TODO: Replace with method
+                    self.__cards_gen_count += 1          # TODO: Replace with method
                     
                     # Creating card object:
                     card_location_index: int = len(card_list_gen)
@@ -329,7 +338,7 @@ class Deck:
                         card_location_index,
                         )
                     card_object: Card = Card.generate(
-                        init_id = self.__card_gen_count,
+                        init_id = self.__cards_gen_count,
                         init_suit = card_suit,
                         init_name = card_name,
                         init_location = card_location
