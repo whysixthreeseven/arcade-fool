@@ -572,7 +572,7 @@ def validate_computer_style(validate_value: int) -> None:
     # Asserting value is default:
     assertion.assert_value_default(
         check_value = validate_value,
-        check_list = context.COMPUTER_PLAY_STYLE_LIST,
+        check_list = context.COMPUTER_STYLE_LIST,
         raise_error = True
         )
         
@@ -589,7 +589,7 @@ def validate_computer_difficulty(validate_value: str) -> None:
     # Asserting value is default:
     assertion.assert_value_default(
         check_value = validate_value,
-        check_list = context.COMPUTER_DIFFICULTY_LEVEL_LIST,
+        check_list = context.COMPUTER_DIFFICULTY_LIST,
         raise_error = True
         )
     

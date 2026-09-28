@@ -118,7 +118,7 @@ class Player:
         
         # Setting up related attributes to default values:
         self.set_play_style(
-            set_value = context.COMPUTER_PLAY_STYLE.RANDOM,     # TODO: Add to SESSION variables!
+            set_value = context.COMPUTER_STYLE.RANDOM,     # TODO: Add to SESSION variables!
             ignore_assertion = True,
             clear_cache = True,
             )
@@ -500,7 +500,7 @@ class Player:
     def set_difficulty_random(self, clear_cache: bool = True) -> None:
         
         # Selecting difficulty:
-        difficulty_random: str = random.choice(context.COMPUTER_DIFFICULTY_LEVEL_LIST)
+        difficulty_random: str = random.choice(context.COMPUTER_DIFFICULTY_LIST)
 
         # Updating attribute:
         self.set_difficulty(
@@ -513,12 +513,12 @@ class Player:
     def increase_difficulty(self, clear_cache: bool = True) -> None:
         
         # Selecting difficulty:
-        difficulty_index: int = context.COMPUTER_DIFFICULTY_LEVEL_LIST.index(self.difficulty)
+        difficulty_index: int = context.COMPUTER_DIFFICULTY_LIST.index(self.difficulty)
         difficulty_index += 1
-        if difficulty_index >= len(context.COMPUTER_DIFFICULTY_LEVEL_LIST):
+        if difficulty_index >= len(context.COMPUTER_DIFFICULTY_LIST):
             return 
         else:
-            difficulty: str = context.COMPUTER_DIFFICULTY_LEVEL_LIST[difficulty_index]
+            difficulty: str = context.COMPUTER_DIFFICULTY_LIST[difficulty_index]
         
         # Updating attribute:
         self.set_difficulty(
@@ -531,12 +531,12 @@ class Player:
     def decrease_difficulty(self, clear_cache: bool = True) -> None:
 
         # Selecting difficulty:
-        difficulty_index: int = context.COMPUTER_DIFFICULTY_LEVEL_LIST.index(self.difficulty)
+        difficulty_index: int = context.COMPUTER_DIFFICULTY_LIST.index(self.difficulty)
         difficulty_index -= 1
         if difficulty_index < 0:
             return 
         else:
-            difficulty: str = context.COMPUTER_DIFFICULTY_LEVEL_LIST[difficulty_index]
+            difficulty: str = context.COMPUTER_DIFFICULTY_LIST[difficulty_index]
 
         # Updating attribute:
         self.set_difficulty(
