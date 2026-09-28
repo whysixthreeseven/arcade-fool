@@ -359,6 +359,46 @@ class Table:
         
         # Returning:
         return position_list
+    
+    
+    def get_position_attack(self, card_object: Card, ignore_assertion: bool = False) -> int | None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_card_object(
+                validate_value = card_object
+                )
+
+        # Returning empty bottom stack position:
+        if self.position_defence_list:
+            return self.position_defence_list[0]
+        
+        # Returning None, if not available:
+        else:
+            return None
+        
+    
+    def get_position_defence(self, card_object: Card, ignore_assertion: bool = False) -> int | None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_card_object(
+                validate_value = card_object
+                )
+        
+        # Searching for position:
+        position_defence: int | None = None
+        if self.position_defence_list:
+            for card_location_index in self.position_defence_list:
+                card_attacking: Card | None = self.cards_index[card_location_index]
+                
+                # Checking if card is attacking and can be defended against:
+                if card_attacking is not None and card_object > card_attacking:
+                    position_defence: int = card_location_index
+                    break
+        
+        # Returning:
+        return position_defence
 
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
