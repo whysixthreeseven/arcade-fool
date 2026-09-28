@@ -40,6 +40,10 @@ class Player:
         self.__difficulty: str = None
         self.__play_style: str = None
         
+        # State attributes:
+        self.__state_attacking: bool = False
+        self.__state_defending: bool = False
+        
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         NATIVE METHODS
@@ -209,6 +213,20 @@ class Player:
         
         # Returning:
         return cached_property_list
+    
+    
+    @cached_property
+    def __cached_state_attributes(self) -> tuple[str, ...]:
+        
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "state_attacking",
+            "state_defending",
+            "state",
+            )
+        
+        # Returning:
+        return cached_property_list
 
 
     def clear_cached_core_attributes(self) -> None:
@@ -252,7 +270,16 @@ class Player:
         # Clearing cached properties:
         cache.clear_cached_property_list(
             target_object = self,
-            target_attribute_list = self.__cached_core_attributes
+            target_attribute_list = self.__cached_ai_attributes
+            )
+        
+    
+    def clear_cached_state_attributes(self) -> None:
+        
+        # Clearing cached properties:
+        cache.clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_state_attributes
             )
 
         
@@ -264,6 +291,7 @@ class Player:
             self.__cached_hand_attributes,
             self.__cached_game_attributes,
             self.__cached_score_attributes,
+            self.__cached_state_attributes,
             )
         
         # Looping throught the list and clearing cache:
@@ -891,5 +919,136 @@ class Player:
 
         # Returning:
         return score_string
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        STATE CACHED PROPERTIES AND METHODS
 
+    """
+    
+    
+    @cached_property
+    def state_attacking(self) -> bool:
+        
+        # Returning
+        return self.__state_attacking
+    
+    
+    @cached_property
+    def state_defending(self) -> bool:
+        
+        # Returning:
+        return self.__state_defending
+    
+    
+    @cached_property
+    def state(self) -> str:
+        
+        # Validating state attributes:
+        state_valid: bool = bool(
+            bool(self.state_attacking and not self.state_defending) or
+            bool(not self.state_attacking and self.state_defending)
+            )
+        
+        if state_valid:
+            if self.state_attacking:
+                return context.PLAYER_STATE.ATTACKING
+            else:
+                return context.PLAYER_STATE.DEFENDING
+        
+        # Raising error if both states are set to False:
+        else:
+            error_message: str = f"Both states are the same!"
+            raise AttributeError(error_message)
+        
+    
+    def set_state_attacking(self, set_value: bool, update_related: bool = True, 
+                                  ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value,
+                )
+            
+        # Updating attributes:
+        self.__state_attacking = set_value
+        if update_related:
+            self.__state_defending = not set_value
+            
+        # Clearing cache, if required:
+        if clear_cache:
+            self.clear_cached_state_attributes()
+        
+    
+    def set_state_defending(self, set_value: bool, update_related: bool = True, 
+                                  ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value,
+                )
+            
+        # Updating attributes:
+        self.__state_defending = set_value
+        if update_related:
+            self.__state_attacking = not set_value
+            
+        # Clearing cache, if required:
+        if clear_cache:
+            self.clear_cached_state_attributes()
+        
+    
+    def set_state(self, set_value: str, update_related: bool = True,
+                        ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_player_state(
+                validate_value = set_value
+                )
+        
+        # Updating attribute:
+        if set_value == context.PLAYER_STATE.ATTACKING:
+            self.set_state_attacking(
+                set_value = True,
+                update_related = update_related,
+                ignore_assertion = True,
+                clear_cache = False,
+                )
+        else:
+            self.set_state_defending(
+                set_value = True,
+                update_related = update_related,
+                ignore_assertion = True,
+                clear_cache = False,
+                )
+        
+        # Clearing cache:
+        if clear_cache:
+            self.clear_cached_state_attributes()
+
+
+    def switch_state(self, update_related: bool = True, clear_cache: bool = True) -> None:
+        
+        # Switching state based on current state:
+        if self.state == context.PLAYER_STATE.ATTACKING:
+            self.set_state_defending(
+                set_value = True,
+                update_related = update_related,
+                ignore_assertion = True,
+                clear_cache = False,
+                )
+        else:
+            self.set_state_attacking(
+                set_value = True,
+                update_related = update_related,
+                ignore_assertion = True,
+                clear_cache = False,
+                )
+        
+        # Clearing cache:
+        if clear_cache:
+            self.clear_cached_state_attributes()
 
