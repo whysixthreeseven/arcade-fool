@@ -1,39 +1,30 @@
-# Arcade library:
+# Controllers:
+from game.controller.player import PlayerController
+from game.controller.discard import DiscardController
+from game.controller.table import TableController
+from game.controller.deck import DeckController
+from game.controller.hand import HandController
+from game.controller.card import CardController as Card
+from game.controller.surface import SurfaceController
+from game.controller.game import Game
+
+# External libraries:
+import random
 import arcade
-from arcade import Rect, Text, Texture, XYWH
+import time
+
+# Settings, session and context:
+from game.settings import SETTINGS
+from game.session import SESSION
+from game import context
 
 # Cache management:
 from functools import cached_property
-from game.utilities.scripts.cache import (
-    clear_cached_property, 
-    clear_cached_property_list,
-    refresh_object,
-    )
+from game.utilities.scripts import cache
 
-# Settings and session instances:
-from game.settings import SETTINGS
-from game.session import SESSION
-
-# Assertion control:
-from game.utilities.scripts.assertion import (
-    assert_setter_entry,
-    assert_value_type,
-    assert_value_default,
-    assert_value_ge_zero,
-    assert_value_gt_zero,
-    assert_value_not_empty,
-    assert_value_in_range,
-    )
-
-# Area objects:
-from game.utilities.area import (
-    Area, 
-    AREA_PLAYER, 
-    AREA_OPPONENT, 
-    AREA_DECK, 
-    AREA_DISCARD, 
-    AREA_TABLE
-    )
+# Various utilities:
+from game.utilities import area, texturepack
+from game.utilities.scripts import assertion, validate
 
 
 class SurfaceController:
@@ -42,11 +33,11 @@ class SurfaceController:
     def __init__(self) -> None:
         
         # Area attributes:
-        self.__area_player: Area = AREA_PLAYER
-        self.__area_opponent: Area = AREA_OPPONENT
-        self.__area_deck: Area = AREA_DECK
-        self.__area_discard: Area = AREA_DISCARD
-        self.__area_table: Area = AREA_TABLE
+        self.__area_player: area.Area = area.AREA_PLAYER
+        self.__area_opponent: area.Area = area.AREA_OPPONENT
+        self.__area_deck: area.Area = area.AREA_DECK
+        self.__area_discard: area.Area = area.AREA_DISCARD
+        self.__area_table: area.Area = area.AREA_TABLE
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -70,7 +61,7 @@ class SurfaceController:
     def clear_cached_area_attributes(self) -> None:
         
         # Clearing cached area attributes:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self, 
             target_attribute_list = self.__cached_area_attributes
             )
@@ -85,38 +76,10 @@ class SurfaceController:
         
         # Clearing cached attributes:
         for cached_property_list in cached_property_collection:
-            clear_cached_property_list(
+            cache.clear_cached_property_list(
                 target_object = self, 
                 target_attribute_list = cached_property_list
                 )
-            
-    
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        VALIDATE METHODS
-    
-    """
-    
-    
-    def __validate_area(self, validate_value: Area) -> None:
-        """
-        Validates `Area` object.
-        
-        Uses `game.utilities.scripts.assertion` module's functions to validate. These functions raise `AssertionError` on failed
-        validation attempt.
-        
-        Parameters
-        ----------
-        validate_value : `Area`
-            `Area` object to validate.
-        """
-        
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = Area,
-            raise_error = True,
-            )
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -126,7 +89,7 @@ class SurfaceController:
         
         
     @cached_property
-    def __area_list(self) -> tuple[Area, ...]:
+    def __area_list(self) -> tuple[area.Area, ...]:
         """
         A list of all `Area` objects stored in the `Surface` class instance. Internal use only, inaccessible outside its class.
         
@@ -142,7 +105,7 @@ class SurfaceController:
         
         
         # Collecting areas:
-        area_list: tuple[Area, ...] = (
+        area_list: tuple[area.Area, ...] = (
             self.__area_player,
             self.__area_opponent,
             self.__area_deck,
@@ -155,7 +118,7 @@ class SurfaceController:
     
     
     @cached_property
-    def area_player(self) -> Area:
+    def area_player(self) -> area.Area:
         """
         Player `Area` object. Used to determine area boundaries for cards and cursor on render surface.
         
@@ -172,7 +135,7 @@ class SurfaceController:
 
 
     @cached_property
-    def area_opponent(self) -> Area:
+    def area_opponent(self) -> area.Area:
         """
         Opponent (hand) `Area` object. Used to determine area boundaries for cards and cursor on render surface.
         
@@ -189,7 +152,7 @@ class SurfaceController:
 
 
     @cached_property
-    def area_deck(self) -> Area:
+    def area_deck(self) -> area.Area:
         """
         Deck `Area` object. Used to determine area boundaries for cards and cursor on render surface.
         
@@ -201,13 +164,12 @@ class SurfaceController:
             Deck `Area` object.
         """
         
-
         # Returning:
         return self.__area_deck
 
 
     @cached_property
-    def area_discard(self) -> Area:
+    def area_discard(self) -> area.Area:
         """
         Discard `Area` object. Used to determine area boundaries for cards and cursor on render surface.
         
@@ -224,7 +186,7 @@ class SurfaceController:
 
 
     @cached_property
-    def area_table(self) -> Area:
+    def area_table(self) -> area.Area:
         """
         Table `Area` object. Used to determine area boundaries for cards and cursor on render surface.
         
@@ -241,7 +203,7 @@ class SurfaceController:
     
     
     @cached_property
-    def area_focus(self) -> Area | None:
+    def area_focus(self) -> area.Area | None:
         """
         `Area` object user's cursor is currently in, or `None` if cursor is outside game window.
         
@@ -254,12 +216,11 @@ class SurfaceController:
             `Area` object user's cursor is currently in. `None`, if cursor is outside game window.
         """
         
-        
         # Returning:
         return self.__area_focus
     
     
-    def set_focus_area(self, set_value: Area | None, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_focus_area(self, set_value: area.Area | None, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         """
         Sets a new focus `Area` object for the `Surface` class instance. Can be `None`, if user's cursor is outsde game window.
         Uses only default variables provided by `game.utilities.area` module: `AREA_PLAYER`, `AREA_OPPONENT`, `AREA_DECK`, 
@@ -280,11 +241,10 @@ class SurfaceController:
             If `True`, will ignore assertion checks. `False` by default.
         """
         
-        
         # Assertion control:
         if set_value is not None:
             if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-                self.__validate_area(
+                validate.validate_area(
                     validate_value = set_value,
                     )
             
@@ -294,7 +254,7 @@ class SurfaceController:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "area_focus"
-            clear_cached_property(
+            cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property,
                 )
@@ -315,7 +275,10 @@ class SurfaceController:
     """
     
     
-    def locate_area(self, coordinates: tuple[int, int], ignore_assertion: bool = False) -> Area | None:
+    def locate_area(self, coordinates: tuple[int, int], ignore_assertion: bool = False) -> area.Area | None:
+        
+        # Preparing variables:
+        area_located: area.Area | None = None
         
         # Unpacking coordinates:
         for area in self.__area_list:
@@ -326,19 +289,11 @@ class SurfaceController:
             
             # Returning area on hit and exiting:
             if area_hit:
-                return area
+                area_located: area.Area = area
+                break
         
-        # Nothing hit any of the boundaries:
-        else:
-            
-            # Raising error, if enabled:
-            if SESSION.ENABLE_DEBUG:
-                error_message: str = f"Coordinates {coordinates} do not belong to any area."
-                raise ValueError(error_message)
-            
-            # Otherwise returning None:
-            return None
-
+        # Returning:
+        return area_located
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -347,7 +302,7 @@ class SurfaceController:
     """
     
     
-    def display_area(self, area_object: Area) -> None:
+    def display_area(self, area_object: area.Area) -> None:
         
         # TODO: Implement:
         ...
