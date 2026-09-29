@@ -18,7 +18,7 @@ class __SETTINGS:
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_VERSION: str = "0.0.1R"
     APP_STARTED: str = "2026.09.02"
-    APP_UPDATED: str = "2026.09.29"
+    APP_UPDATED: str = "2026.09.30"
     APP_AUTHOR: str = "Andrey Vostokov"
 
     # Root directory settings:    
@@ -127,10 +127,10 @@ class __SETTINGS:
     LOCATION_DECK_SHIFT_COORDINATE_X: int = 2
     LOCATION_DECK_SHIFT_COORDINATE_Y: int = 1
     LOCATION_DECK_SHIFT_PER_CARD: int = __SHIFT_PER_CARD
-    LOCATION_DECK_SHIFT_LAST_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.050) * -1        # Shift left
-    LOCATION_DECK_SHIFT_LAST_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025) * -1       # Shift down
-    LOCATION_DECK_SHIFT_SECRET_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.050) * -1      # Shift left
-    LOCATION_DECK_SHIFT_SECRET_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025)          # Shift up
+    LOCATION_DECK_SHIFT_LAST_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.050) * -1               # Shift left
+    LOCATION_DECK_SHIFT_LAST_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025) * -1              # Shift down
+    LOCATION_DECK_SHIFT_SECRET_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.050) * -1             # Shift left
+    LOCATION_DECK_SHIFT_SECRET_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025)                 # Shift up
     
     # Location (discard) coordinates settings:
     LOCATION_DISCARD_COORDINATE_X: int = AREA_DISCARD_CENTER_COORDINATE_X
