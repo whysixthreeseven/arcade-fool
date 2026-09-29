@@ -1,35 +1,17 @@
-# Arcade library:
+# External libraries:
 import arcade
-from arcade import Rect, Text, Texture, XYWH
 
-# Settings and session instances:
+# Settings, session and context:
 from game.settings import SETTINGS
 from game.session import SESSION
+from game import context
 
 # Cache management:
 from functools import cached_property
-from game.utilities.scripts.cache import (
-    clear_cached_property, 
-    clear_cached_property_list,
-    refresh_object,
-    )
+from game.utilities.scripts import cache
 
-# Assertion scripts:
-from game.utilities.scripts.assertion import (
-    assert_setter_entry,
-    assert_value_type,
-    assert_value_default,
-    assert_value_ge_zero,
-    assert_value_not_empty,
-    assert_value_in_range,
-    )
-
-# Namespaces and context:
-from game.context import (
-    Coordinates, 
-    RGB_Color, 
-    AREA_TYPE
-    )
+# Various utilities:
+from game.utilities.scripts import assertion, validate
 
 
 class Area:
@@ -40,8 +22,8 @@ class Area:
         self.__type: str = None
         
         # Color attributes:
-        self.__color_background: RGB_Color = None
-        self.__color_text: RGB_Color = None
+        self.__color_background: context.RGB_Color = None
+        self.__color_text: context.RGB_Color = None
         
         # Size attributes:
         self.__width: int = None
@@ -167,7 +149,7 @@ class Area:
     def clear_cached_core_attributes(self) -> None:
     
         # Clearing cached properties:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_core_attributes
             )
@@ -176,7 +158,7 @@ class Area:
     def clear_cached_color_attributes(self) -> None:
         
         # Clearing cached properties:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_color_attributes
             )
@@ -185,7 +167,7 @@ class Area:
     def clear_cached_size_attributes(self) -> None:
             
         # Clearing cached properties:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_size_attributes
             )
@@ -194,7 +176,7 @@ class Area:
     def clear_cached_coordinate_attributes(self) -> None:
 
         # Clearing cached properties:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_coordinate_attributes
             )
@@ -203,7 +185,7 @@ class Area:
     def clear_cached_boundary_attributes(self) -> None:
 
         # Clearing cached properties:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_boundary_attributes
             )
@@ -212,7 +194,7 @@ class Area:
     def clear_cached_render_attributes(self) -> None:
         
         # Clearing cached properties:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_render_attributes
             )
@@ -232,134 +214,12 @@ class Area:
         
         # Looping throught the list and clearing cache:
         for cached_property_list in cached_property_list_collection:
-            clear_cached_property_list(
+            cache.clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
-            
-    
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        VALIDATE METHODS
-    
-    """
     
     
-    def __validate_type(self, validate_value: str) -> None:
-            
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = str,
-            raise_error = True
-            )
-        
-        # Asserting value is not empty:
-        assert_value_not_empty(
-            check_value = validate_value,
-            raise_error = True
-            )
-        
-        # Asserting value is default:
-        default_list: tuple[str, ...] = tuple(
-            attribute_name for attribute_name, attribute_value
-            in AREA_TYPE.__dict__.items()
-            if not attribute_name.startswith("_")
-            )
-        assert_value_default(
-            check_value = validate_value,
-            check_default = default_list,
-            raise_error = True
-            )
-        
-    
-    def __validate_color(self, validate_value: RGB_Color) -> None:
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = tuple,
-            raise_error = True
-            )
-
-        # Asserting value is valid container:
-        assert_eval: bool = len(validate_value) == 3
-        if not assert_eval:
-            error_message: str = f"Color container contains less than 3 items."
-            raise AssertionError(error_message)
-        
-        # Asserting each container item:
-        for item in validate_value:
-            
-            # Asserting item is valid type:
-            assert_value_type(
-                check_value = item,
-                check_type = int,
-                raise_error = True
-                )
-            
-            # Asserting item in range:
-            assert_value_in_range(
-                check_value = item,
-                check_range = (0, 255 + 1),
-                raise_error = True
-                )
-            
-    
-    def __validate_size(self, validate_value: int) -> None:
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = int,
-            raise_error = True
-            )
-
-        # Asserting value is not negative:
-        assert_value_ge_zero(
-            check_value = validate_value,
-            raise_error = True
-            )
-    
-    
-    def __validate_coordinate(self, validate_value: int | float) -> None:
-        
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = (int, float),
-            raise_error = True
-            )
-        
-        # Asserting value is not negative:
-        assert_value_ge_zero(
-            check_value = validate_value,
-            raise_error = True
-            )
-        
-    
-    def __validate_coordiante_container(self, validate_value: tuple[int, int]) -> None:
-            
-        # Asserting value is valid type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = tuple,
-            raise_error = True,
-            )
-        
-        # Asserting container item count:
-        assert_eval: bool = len(validate_value) == 2
-        if not assert_eval:
-            container_len: int = len(validate_value)
-            error_message: str = f"Invalid container item count. Expected 2, got {container_len}."
-            raise AssertionError(error_message)
-        
-        # Asserting each item:
-        for container_item in validate_value:
-            self.__validate_coordinate(
-                validate_value = container_item
-                )
-            
-            
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         BUILD METHODS
     
@@ -367,8 +227,9 @@ class Area:
     
     
     @classmethod
-    def build(cls, init_type: str, init_size: tuple[int, int], init_color_background: RGB_Color, init_color_text: RGB_Color,
-              init_coordinates: tuple[int, int], ignore_assertion: bool = False) -> None:
+    def build(cls, init_type: str, init_size: tuple[int, int], 
+                   init_color_background: context.RGB_Color, init_color_text: context.RGB_Color,
+                   init_coordinates: tuple[int, int], ignore_assertion: bool = False) -> None:
         
         # Creating area object:
         area_object: Area = Area()
@@ -440,13 +301,13 @@ class Area:
 
         # Validating value:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_type(
+            validate.validate_area_type(
                 validate_value = set_value
                 )
             
         # Debug verification:
         if SESSION.ENABLE_DEBUG:
-            assert_setter_entry(
+            assertion.assert_setter_entry(
                 check_object = self,
                 check_attribute = "type",
                 sentinel_value = None,
@@ -459,7 +320,7 @@ class Area:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "type"
-            clear_cached_property(
+            cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
@@ -472,24 +333,24 @@ class Area:
     
     
     @cached_property
-    def color_background(self) -> RGB_Color:
+    def color_background(self) -> context.RGB_Color:
         
         # Returning:
         return self.__color_background
     
     
     @cached_property
-    def color_text(self) -> RGB_Color:
+    def color_text(self) -> context.RGB_Color:
         
         # Returning:
         return self.__color_text
 
 
-    def set_color_background(self, set_value: RGB_Color, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_color_background(self, set_value: context.RGB_Color, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Validating value:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_color(
+            validate.validate_rgb_color(
                 validate_value = set_value
                 )
 
@@ -499,17 +360,17 @@ class Area:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "color_background"
-            clear_cached_property(
+            cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
             
     
-    def set_color_text(self, set_value: RGB_Color, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_color_text(self, set_value: context.RGB_Color, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Validating value:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_color(
+            validate.validate_rgb_color(
                 validate_value = set_value
                 )
 
@@ -518,7 +379,7 @@ class Area:
         
         # Clearing cache:
         cached_property: str = "color_text"
-        clear_cached_property(
+        cache.clear_cached_property(
             target_object = self,
             target_attribute = cached_property
             )
@@ -548,13 +409,13 @@ class Area:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_size(
+            validate.validate_area_size_value(
                 validate_value = set_value,
                 )
 
         # Debug verification:
         if SESSION.ENABLE_DEBUG:
-            assert_setter_entry(
+            assertion.assert_setter_entry(
                 check_object = self,
                 check_attribute = "width",
                 sentinel_value = None,
@@ -567,7 +428,7 @@ class Area:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "width"
-            clear_cached_property(
+            cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
@@ -577,13 +438,13 @@ class Area:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_size(
+            validate.validate_area_size_value(
                 validate_value = set_value,
                 )
 
         # Debug verification:
         if SESSION.ENABLE_DEBUG:
-            assert_setter_entry(
+            assertion.assert_setter_entry(
                 check_object = self,
                 check_attribute = "height",
                 sentinel_value = None,
@@ -596,7 +457,7 @@ class Area:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "height"
-            clear_cached_property(
+            cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
@@ -623,27 +484,30 @@ class Area:
 
 
     @cached_property
-    def coordinates(self) -> tuple[int, int]:
+    def coordinates(self) -> context.Coordinates:
 
         # Packing container:
-        coordinates: tuple[int, int] = (self.coordinate_x, self.coordinate_y)
+        coordinates: context.Coordinates = (
+            self.coordinate_x, 
+            self.coordinate_y
+            )
         
         # Returning:
         return coordinates
 
 
     def set_coordinate_x(self, set_value: int, update_boundary: bool = False, 
-                         ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+                               ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Validating value:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_coordinate(
+            validate.validate_coordinate(
                 validate_value = set_value,
                 )
             
         # Debug verification:
         if SESSION.ENABLE_DEBUG:
-            assert_setter_entry(
+            assertion.assert_setter_entry(
                 check_object = self,
                 check_attribute = "coordinate_x",
                 sentinel_value = None,
@@ -659,7 +523,7 @@ class Area:
                 "coordinate_x",
                 "coordinates"
                 )
-            clear_cached_property_list(
+            cache.clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
@@ -669,17 +533,17 @@ class Area:
             self.update_boundary()
             
     def set_coordinate_y(self, set_value: int, update_boundary: bool = False, 
-                         ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+                               ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Validating value:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            self.__validate_coordinate(
+            validate.validate_coordinate(
                 validate_value = set_value,
                 )
 
         # Debug verification:
         if SESSION.ENABLE_DEBUG:
-            assert_setter_entry(
+            assertion.assert_setter_entry(
                 check_object = self,
                 check_attribute = "coordinate_y",
                 sentinel_value = None,
@@ -695,7 +559,7 @@ class Area:
                 "coordinate_y",
                 "coordinates"
                 )
-            clear_cached_property_list(
+            cache.clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
@@ -709,9 +573,10 @@ class Area:
                         ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
-        self.__validate_coordiante_container(
-            validate_value = set_value
-            )
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate_container(
+                validate_value = set_value
+                )
 
         # Unpacking container:
         coordinate_x, coordinate_y = set_value
@@ -864,13 +729,8 @@ class Area:
         # Clearing cache:
         self.clear_cached_boundary_attributes()
         
-        # Forcing refresh:
-        refresh_object(
-            target_object = self,
-            )
-        
-    
-    def hit_boundary(self, hit_coordinates: Coordinates, ignore_assertion: bool = False) -> bool:
+
+    def hit_boundary(self, hit_coordinates: context.Coordinates, ignore_assertion: bool = False) -> bool:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -881,7 +741,7 @@ class Area:
                 )
             
             # Asserting coordinates:
-            self.__validate_coordiante_container(
+            validate.validate_coordinate_container(
                 validate_value = hit_coordinates
                 )
             
@@ -905,9 +765,9 @@ class Area:
     
     
     @cached_property
-    def render_rect(self) -> Rect:
+    def render_rect(self) -> arcade.Rect:
         
-        render_rect: Rect = XYWH(
+        render_rect: arcade.Rect = arcade.XYWH(
             x = self.coordinate_x,
             y = self.coordinate_y,
             width = self.width,
@@ -942,7 +802,7 @@ class Area:
 
 # Player area instance initialization:
 AREA_PLAYER: Area = Area.build(
-    init_type = AREA_TYPE.PLAYER,
+    init_type = context.AREA_TYPE.PLAYER,
     init_size = (
         SETTINGS.AREA_PLAYER_WIDTH,
         SETTINGS.AREA_PLAYER_HEIGHT
@@ -958,7 +818,7 @@ AREA_PLAYER: Area = Area.build(
 
 # Table area instance initialization:
 AREA_TABLE: Area = Area.build(
-    init_type = AREA_TYPE.TABLE,
+    init_type = context.AREA_TYPE.TABLE,
     init_size = (
         SETTINGS.AREA_TABLE_WIDTH,
         SETTINGS.AREA_TABLE_HEIGHT
@@ -974,7 +834,7 @@ AREA_TABLE: Area = Area.build(
 
 # Opponent area instance initialization:
 AREA_OPPONENT: Area = Area.build(
-    init_type = AREA_TYPE.OPPONENT,
+    init_type = context.AREA_TYPE.OPPONENT,
     init_size = (
         SETTINGS.AREA_OPPONENT_WIDTH,
         SETTINGS.AREA_OPPONENT_HEIGHT,
@@ -990,7 +850,7 @@ AREA_OPPONENT: Area = Area.build(
 
 # Deck area instance initialization: 
 AREA_DECK: Area = Area.build(
-    init_type = AREA_TYPE.DECK,
+    init_type = context.AREA_TYPE.DECK,
     init_size = (
         SETTINGS.AREA_DECK_WIDTH,
         SETTINGS.AREA_DECK_HEIGHT,
@@ -1006,7 +866,7 @@ AREA_DECK: Area = Area.build(
 
 # Discard area instance initialization:
 AREA_DISCARD: Area = Area.build(
-    init_type = AREA_TYPE.DISCARD,
+    init_type = context.AREA_TYPE.DISCARD,
     init_size = (
         SETTINGS.AREA_DISCARD_WIDTH,
         SETTINGS.AREA_DISCARD_HEIGHT,
