@@ -1,34 +1,17 @@
-# Annotations and typing:
-from __future__ import annotations
-
-# System management:
+# External libraries:
 import os
+
+# Settings, session and context:
+from game.settings import SETTINGS
+from game.session import SESSION
+from game import context
 
 # Cache management:
 from functools import cached_property
-from game.utilities.scripts.cache import (
-    clear_cached_property, 
-    clear_cached_property_list,
-    refresh_object,
-    )
+from game.utilities.scripts import cache
 
-# Settings and session instances:
-from game.settings import SETTINGS
-
-# Card-related variables:
-from game.context import (
-    CARD_SUIT,
-    CARD_NAME,
-    CARD_TEXTURE_FRONT_INDEX,
-    CARD_TEXTURE_BACK_INDEX,
-    )
-
-# Assertion scripts:
-from game.utilities.scripts.assertion import (
-    assert_value_type,
-    assert_value_default,
-    assert_value_not_empty,
-    )
+# Various utilities:
+from game.utilities.scripts import assertion
 
 
 class TexturePack:
@@ -78,9 +61,6 @@ class TexturePack:
         
         # Clearing cache:
         texture_pack.clear_cached_attributes()
-        refresh_object(
-            target_object = texture_pack
-            )
         
         # Returning:
         return texture_pack
@@ -124,7 +104,7 @@ class TexturePack:
     def clear_cached_core_attributes(self) -> None:
         
         # Clearing cache:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self, 
             target_attribute_list = self.__cached_core_attributes
             )
@@ -133,7 +113,7 @@ class TexturePack:
     def clear_cached_path_attributes(self) -> None:
             
         # Clearing cache:
-        clear_cached_property_list(
+        cache.clear_cached_property_list(
             target_object = self, 
             target_attribute_list = self.__cached_path_attributes
             )
@@ -149,7 +129,7 @@ class TexturePack:
         
         # Looping throught the list and clearing cache:
         for cached_property_list in cached_property_list_collection:
-            clear_cached_property_list(
+            cache.clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
@@ -166,31 +146,20 @@ class TexturePack:
         
         # Returning:
         return self.__name
-    
-    
-    def __valudate_name(self, validate_value: str) -> None:
-        
-        # Asserting value type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = str,
-            raise_error = True
-            )
-        
-        # Asserting value is not empty:
-        assert_value_not_empty(
-            check_value = validate_value,
-            raise_error = True
-            )
         
         
     def set_name(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
-        if not ignore_assertion:
-            self.__valudate_name(
-                validate_value = set_value,
-                
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = str,
+                raise_error = True
+                )
+            assertion.assert_value_not_empty(
+                check_value = set_value,
+                raise_error = True
                 )
             
         # Updating attribute:
@@ -199,7 +168,7 @@ class TexturePack:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "name"
-            clear_cached_property(
+            cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
@@ -212,41 +181,33 @@ class TexturePack:
         return self.__type
     
     
-    def __validate_type(self, validate_value: str) -> None:
-        
-        # Asserting style is not set prior:
-        if self.style is not None:
-            error_message: str = f"Attempting to overwrite current type <{self.type}> for TexturePack object!"
-            raise AttributeError(error_message)
-        
-        # Asserting value type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = str,
-            raise_error = True
-            )
-        
-        # Asserting value is not empty:
-        assert_value_not_empty(
-            check_value = validate_value,
-            raise_error = True
-            )
-
-        # Asserting value is default:
-        default_list: tuple[str, ...] = ("Back", "Front")
-        assert_value_default(
-            check_value = validate_value.capitalize(),
-            check_list = default_list,
-            raise_error = True
-            )
-
-        
     def set_type(self, set_value: str, ignore_assertion = False, clear_cache = True) -> None:
         
         # Assertion control:
-        if not ignore_assertion:
-            self.__validate_type(
-                validate_value = set_value,
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = str,
+                raise_error = True
+                )
+            assertion.assert_value_not_empty(
+                check_value = set_value,
+                raise_error = True
+                )
+            default_list: tuple[str, ...] = ("Back", "Front")
+            assertion.assert_value_default(
+                check_value = set_value.capitalize(),
+                check_list = default_list,
+                raise_error = True
+                )
+        
+        # Debug verification:
+        if SESSION.ENABLE_DEBUG:
+            assertion.assert_setter_entry(
+                check_object = self,
+                check_attribute = "type",
+                sentinel_value = None,
+                raise_error = True
                 )
         
         # Updating attribute:
@@ -255,7 +216,7 @@ class TexturePack:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "type"
-            clear_cached_property(
+            cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
@@ -271,22 +232,15 @@ class TexturePack:
     @cached_property
     def __colorcode_front_list(self) -> tuple[str, ...]:
         
-        # Generating list:
-        colorcode_list: tuple[str, ...] = tuple(
-            colorcode for colorcode, index_list
-            in CARD_TEXTURE_FRONT_INDEX.__dict__.items()
-            if not colorcode.startswith("_") and index_list
-            )
-
         # Returning:    
-        return colorcode_list
+        return context.CARD_TEXTURE_FRONT_NAME_LIST
     
     
     @cached_property
     def __colorcode_back_list(self) -> tuple[str, ...]:
 
         # Returning:
-        return CARD_TEXTURE_BACK_INDEX.COLOR_LIST
+        return context.CARD_TEXTURE_BACK_COLOR_LIST
     
     
     @cached_property
@@ -294,43 +248,35 @@ class TexturePack:
         
         # Returning:
         return self.__colorcode_front_list + self.__colorcode_back_list
-    
-    
-    def __validate_colorcode(self, validate_value: str) -> None:
-        
-        # Asserting style is not set prior:
-        if self.colorcode is not None:
-            error_message: str = f"Attempting to overwrite current colorcode <{self.colorcode}> for TexturePack object!"
-            raise AttributeError(error_message)
-        
-        # Asserting value type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = str,
-            raise_error = True,
-            )
-        
-        # Asserting value is not empty:
-        assert_value_not_empty(
-            check_value = validate_value,
-            raise_error = True
-            )
-        
-        # Asserting value is default:
-        default_list: tuple[str, ...] = (colorcode.lower() for colorcode in self.__colorcode_list)
-        assert_value_default(
-            check_value = validate_value.lower(),
-            check_list = default_list,
-            raise_error = True
-            )
         
 
     def set_colorcode(self, set_value: str, ignore_assertion = False, clear_cache = True) -> None:
         
         # Assertion control:
-        if not ignore_assertion:
-            self.__validate_colorcode(
-                validate_value = set_value,
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = str,
+                raise_error = True,
+                )
+            assertion.assert_value_not_empty(
+                check_value = set_value,
+                raise_error = True
+                )
+            default_list: tuple[str, ...] = (colorcode.lower() for colorcode in self.__colorcode_list)
+            assertion.assert_value_default(
+                check_value = set_value.lower(),
+                check_list = default_list,
+                raise_error = True
+                )
+            
+        # Debug verification:
+        if SESSION.ENABLE_DEBUG:
+            assertion.assert_setter_entry(
+                check_object = self,
+                check_attribute = "colorcode",
+                sentinel_value = None,
+                raise_error = True
                 )
 
         # Updating attribute:
@@ -339,12 +285,11 @@ class TexturePack:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "colorcode"
-            clear_cached_property(
+            cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
             
-        
     @cached_property
     def style(self) -> str:
         
@@ -356,7 +301,7 @@ class TexturePack:
     def __style_back_list(self) -> tuple[str, ...]:
         
         # Returning:
-        return CARD_TEXTURE_BACK_INDEX.STYLE_LIST
+        return context.CARD_TEXTURE_BACK_INDEX
     
     
     @cached_property
@@ -383,42 +328,34 @@ class TexturePack:
 
         # Returning:
         return style_list
-    
-
-    def __validate_style(self, validate_value: str) -> None:
-        
-        # Asserting style is not set prior:
-        if self.style is not None:
-            error_message: str = f"Attempting to overwrite current style <{self.style}> for TexturePack object!"
-            raise AttributeError(error_message)
-
-        # Asserting value type:
-        assert_value_type(
-            check_value = validate_value,
-            check_type = str,
-            raise_error = True,
-            )
-        
-        # Asserting value is not empty:
-        assert_value_not_empty(
-            check_value = validate_value,
-            raise_error = True
-            )
-
-        # Asserting value is default:
-        assert_value_default(
-            check_value = validate_value,
-            check_list = self.__style_list,
-            raise_error = True
-            )
         
         
     def set_style(self, set_value: str, ignore_assertion = False, clear_cache = True) -> None:
 
         # Assertion control:
-        if not ignore_assertion:
-            self.__validate_style(
-                validate_value = set_value,
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = str,
+                raise_error = True,
+                )
+            assertion.assert_value_not_empty(
+                check_value = set_value,
+                raise_error = True
+                )
+            assertion.assert_value_default(
+                check_value = set_value,
+                check_list = self.__style_list,
+                raise_error = True
+                )
+        
+        # Debug verification:
+        if SESSION.ENABLE_DEBUG:
+            assertion.assert_setter_entry(
+                check_object = self,
+                check_attribute = "style",
+                sentinel_value = None,
+                raise_error = True
                 )
             
         # Updating attribute:
@@ -427,7 +364,7 @@ class TexturePack:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "style"
-            clear_cached_property(
+            cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
                 )
@@ -460,22 +397,12 @@ class TexturePack:
 
         # Preparing variables:        
         texture_index: dict = {}
-        card_suit_list: tuple[str, ...] = tuple(
-            attribute_value for attribute_name, attribute_value
-            in CARD_SUIT.__dict__.items()
-            if not attribute_name.startswith("_")
-            )
-        card_name_list: tuple[str, ...] = tuple(
-            attribute_value for attribute_name, attribute_value
-            in CARD_NAME.__dict__.items()
-            if not attribute_name.startswith("_")
-            )
 
         # Generating index:
-        for card_suit in card_suit_list:
+        for card_suit in context.CARD_SUIT_LIST:
             if card_suit not in texture_index:
                 texture_index[card_suit] = {}
-            for card_name in card_name_list:
+            for card_name in context.CARD_NAME_LIST:
                 if card_name not in texture_index[card_suit]:
                     if self.type == "Front":
                         texture_filepath: str = os.path.join(
@@ -493,7 +420,6 @@ class TexturePack:
                         error_message: str = f"Unable to locate file <{texture_filepath}>."
                         raise FileNotFoundError(error_message)
                         
-        
         # Returning:
         return texture_index        
 
@@ -504,7 +430,7 @@ class TexturePack:
 """
 
 
-class TEXTURE_PACK_FRONT:
+class TEXTUREPACK_FRONT:
     
     # Dark texture packs:
     DARK_1_1 = TexturePack.create("Ghost", "Front", "Dark", "1_1")
@@ -521,10 +447,17 @@ class TEXTURE_PACK_FRONT:
     # Sepia texture packss
     SEPIA_1_1 = TexturePack.create("Washed", "Front", "Sepia", "1_1")
     SEPIA_2_1 = TexturePack.create("Faded", "Front", "Sepia", "2_1")
+
+
+TEXTUREPACK_FRONT_INDEX: tuple[TexturePack, ...] = tuple(
+    attribute_value for attribute_name, attribute_value 
+    in TEXTUREPACK_FRONT.__dict__.items()
+    if isinstance(attribute_value, TexturePack)
+    )
     
 
 # Texture pack collection (back):
-class TEXTURE_PACK_BACK:
+class TEXTUREPACK_BACK:
 
     # Cross style texture pack:
     CROSS_BLUE = TexturePack.create("Cross (Blue)", "Back", "Blue", "Cross")
@@ -563,22 +496,9 @@ class TEXTURE_PACK_BACK:
     SUN_WHITE = TexturePack.create("Sun (White)", "Back", "White", "Sun")
 
 
-""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    TEXTURE PACK LISTS (FRONT & BACK)
-
-"""
-
-
-TEXTURE_PACK_FRONT_INDEX: tuple[TexturePack, ...] = tuple(
+TEXTUREPACK_BACK_INDEX: tuple[TexturePack, ...] = tuple(
     attribute_value for attribute_name, attribute_value 
-    in TEXTURE_PACK_FRONT.__dict__.items()
-    if isinstance(attribute_value, TexturePack)
-    )
-
-
-TEXTURE_PACK_BACK_INDEX: tuple[TexturePack, ...] = tuple(
-    attribute_value for attribute_name, attribute_value 
-    in TEXTURE_PACK_BACK.__dict__.items()
+    in TEXTUREPACK_BACK.__dict__.items()
     if isinstance(attribute_value, TexturePack)
     )
 
