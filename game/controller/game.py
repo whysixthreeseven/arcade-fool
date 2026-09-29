@@ -41,7 +41,7 @@ class Game:
         
         # Surface and interface controllers:
         self.__surface_controller: SurfaceController = None
-        # self.__ui_controller: UI = None               # TODO: Implement!
+        # self.__ui_controller: UserInterfaceController = None               # TODO: Implement!
         
         # Game state attributes:
         self.__state_game_started: bool = False
