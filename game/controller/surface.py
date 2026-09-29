@@ -36,7 +36,7 @@ from game.utilities.area import (
     )
 
 
-class Surface:
+class SurfaceController:
     
     
     def __init__(self) -> None:

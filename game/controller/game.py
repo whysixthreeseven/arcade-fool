@@ -1,11 +1,11 @@
 # Controllers:
-from game.controller.player import Player
-from game.controller.discard import Discard
-from game.controller.table import Table
-from game.controller.deck import Deck
-from game.controller.hand import Hand
-from game.controller.card import Card
-from game.controller.surface import Surface
+from game.controller.player import PlayerController
+from game.controller.discard import DiscardController
+from game.controller.table import TableController
+from game.controller.deck import DeckController
+from game.controller.hand import HandController
+from game.controller.card import CardController as Card
+from game.controller.surface import SurfaceController
 
 # External libraries:
 import random
@@ -31,16 +31,16 @@ class Game:
     def __init__(self) -> None:
         
         # Player controllers:
-        self.__player_one_controller: Player = None
-        self.__player_two_controller: Player = None
+        self.__player_one_controller: PlayerController = None
+        self.__player_two_controller: PlayerController = None
         
         # Location controllers:
-        self.__deck_controller: Deck = None
-        self.__table_controller: Table = None
-        self.__discard_controller: Discard = None
+        self.__deck_controller: DeckController = None
+        self.__table_controller: TableController = None
+        self.__discard_controller: DiscardController = None
         
         # Surface and interface controllers:
-        self.__surface_controller: Surface = None
+        self.__surface_controller: SurfaceController = None
         # self.__ui_controller: UI = None               # TODO: Implement!
         
         # Game state attributes:
@@ -51,8 +51,8 @@ class Game:
         
         # Round and turn attributes:
         self.__turn_num: int = 0
-        self.__turn_player: Player = None
-        self.__turn_draw: Player = None
+        self.__turn_player: PlayerController = None
+        self.__turn_draw: PlayerController = None
         self.__round_num: int = 0
         
         # Cursor coordinates attributes:
@@ -80,16 +80,16 @@ class Game:
     def __setup_players(self) -> None:
         
         # Setting up player one (human):
-        player_one_controller: Player = Player()
+        player_one_controller: PlayerController = PlayerController()
         player_one_controller.setup_human()
 
         # Setting up player two (computer):
-        player_two_controller: Player = Player()
+        player_two_controller: PlayerController = PlayerController()
         player_two_controller.setup_computer()
         
         # Creating hand controllers and adding to player controllers:
         for player_controller in (player_one_controller, player_two_controller):
-            hand_controller: Hand = Hand()
+            hand_controller: HandController = HandController()
             hand_controller.setup(
                 set_owner = player_controller.type,
                 ignore_assertion = False,
@@ -101,37 +101,37 @@ class Game:
                 )
             
         # Updating attributes:
-        self.__player_one_controller: Player = player_one_controller
-        self.__player_two_controller: Player = player_two_controller
+        self.__player_one_controller: PlayerController = player_one_controller
+        self.__player_two_controller: PlayerController = player_two_controller
         
     
     def __setup_locations(self) -> None:
         
         # Creating locations controllers:
-        deck_controller: Deck = Deck()
-        discard_controller: Discard = Discard()
-        table_controller: Table = Table()
+        deck_controller: DeckController = DeckController()
+        discard_controller: DiscardController = DiscardController()
+        table_controller: TableController = TableController()
 
         # Setting up controllers for the first time:
         for location_controller in (deck_controller, discard_controller, table_controller):
             location_controller.setup()
             
         # Updating attributes:
-        self.__deck_controller: Deck = deck_controller
-        self.__discard_controller: Discard = discard_controller
-        self.__table_controller: Table = table_controller
+        self.__deck_controller: DeckController = deck_controller
+        self.__discard_controller: DiscardController = discard_controller
+        self.__table_controller: TableController = table_controller
 
 
     def __setup_surface(self) -> None:
 
         # Creating surface controller:
-        surface_controller: Surface = Surface()
+        surface_controller: SurfaceController = SurfaceController()
         
         # TODO: Edit Surface controller to create areas on call!
         ...
 
         # Updating attribute:
-        self.__surface_controller: Surface = surface_controller
+        self.__surface_controller: SurfaceController = surface_controller
         
 
     def setup(self) -> None:
@@ -240,24 +240,24 @@ class Game:
     
     
     @property
-    def player_human(self) -> Player:
+    def player_human(self) -> PlayerController:
         
         # Returning:
         return self.__player_one_controller
     
 
     @property
-    def player_computer(self) -> Player:
+    def player_computer(self) -> PlayerController:
         
         # Returning:
         return self.__player_two_controller
     
     
     @property
-    def __player_controllers(self) -> tuple[Player, ...]:
+    def __player_controllers(self) -> tuple[PlayerController, ...]:
         
         # Creating player controller list:
-        player_controller_list: tuple[Player, ...] = (
+        player_controller_list: tuple[PlayerController, ...] = (
             self.__player_one_controller,
             self.__player_two_controller,
             )
@@ -267,7 +267,7 @@ class Game:
     
     
     @cached_property
-    def player_attacking(self) -> Player:
+    def player_attacking(self) -> PlayerController:
         
         # Selecting correct player controller based on state:
         if self.player_human.state_attacking:
@@ -282,7 +282,7 @@ class Game:
         
     
     @cached_property
-    def player_defending(self) -> Player:
+    def player_defending(self) -> PlayerController:
         
         # Selecting correct player controller based on state:
         if self.player_human.state_defending:
@@ -303,17 +303,17 @@ class Game:
     
     
     @property
-    def deck(self) -> Deck:
+    def deck(self) -> DeckController:
         return self.__deck_controller
     
     
     @property
-    def discard(self) -> Discard:
+    def discard(self) -> DiscardController:
         return self.__discard_controller
 
 
     @property
-    def table(self) -> Table:
+    def table(self) -> TableController:
         return self.__table_controller
     
     
@@ -332,7 +332,7 @@ class Game:
     
     
     @property
-    def surface(self) -> Surface:
+    def surface(self) -> SurfaceController:
         return self.__surface_controller
     
     
@@ -499,7 +499,7 @@ class Game:
     
     
     @property
-    def turn_player(self) -> Player:
+    def turn_player(self) -> PlayerController:
         """
         Returns Player controller to play this turn, regardless of state (attacking or defending).
         
@@ -514,7 +514,7 @@ class Game:
     
     
     @property
-    def turn_draw(self) -> Player:
+    def turn_draw(self) -> PlayerController:
         """
         Returns Player controller who is first to draw cards on draw event.
         
@@ -574,13 +574,13 @@ class Game:
             )
         
     
-    def set_turn_player(self, set_value: Player, ignore_assertion: bool = False) -> None:
+    def set_turn_player(self, set_value: PlayerController, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
             assertion.assert_value_type(
                 check_value = set_value,
-                check_type = Player, 
+                check_type = PlayerController, 
                 raise_error = True,
                 )
 
@@ -1013,7 +1013,13 @@ class Game:
             
         # Updating attribute:
         self.__trump_suit = set_value
-        
+             
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        APPLY (ALL CARDS) METHODS
+    
+    """
+    
     
     def apply_trump_suit(self) -> None:
         
@@ -1028,11 +1034,65 @@ class Game:
                     clear_cache = True
                     )
                 
+                
+    def apply_state_faded(self, set_value: bool, ignore_card_list: list[Card], ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value,
+                )
+            assertion.assert_value_type(
+                check_value = ignore_card_list,
+                check_type = (list, tuple),
+                raise_error = True
+                )
+            if ignore_card_list:
+                for card_object in ignore_card_list:
+                    validate.validate_card_object(
+                        validate_value = ignore_card_list,
+                        )
+        
+        # Looping over all card objects:
+        for card_object in self.cards:
+            
+            # Updating state attribute if card is not card ignore:
+            if ignore_card_list != card_object:
+                card_object.set_state_faded(
+                    set_value = set_value,
+                    ignore_assertion = True,
+                    clear_cache = True,
+                    )
     
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        TEXTUREPACK METHODS
     
-    """
+    def apply_state_visible(self, set_value: bool, ignore_card_list: list[Card], ignore_assertion: bool = False) -> None:
+            
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value,
+                )
+            assertion.assert_value_type(
+                check_value = ignore_card_list,
+                check_type = (list, tuple),
+                raise_error = True
+                )
+            if ignore_card_list:
+                for card_object in ignore_card_list:
+                    validate.validate_card_object(
+                        validate_value = ignore_card_list,
+                        )
+        
+        # Looping over all card objects:
+        for card_object in self.cards:
+            
+            # Updating state attribute if card is not card ignore:
+            if ignore_card_list != card_object:
+                card_object.set_state_visible(
+                    set_value = set_value,
+                    ignore_assertion = True,
+                    clear_cache = True,
+                    )
     
     
     def apply_texturepack_front(self, texturepack_object: texturepack.Texturepack, update_texture: bool = True,

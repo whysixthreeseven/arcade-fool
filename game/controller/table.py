@@ -1,5 +1,5 @@
 # Card class object:
-from game.controller.card import Card
+from game.controller.card import CardController
 
 # External libraries:
 import random
@@ -19,12 +19,12 @@ from game.utilities import texturepack
 from game.utilities.scripts import validate
 
 
-class Table:
+class TableController:
     
     def __init__(self) -> None:
         
         # Core attributes:
-        self.__cards_index: dict[int, Card | None] = {
+        self.__cards_index: dict[int, CardController | None] = {
             location_index: None for location_index in range(0, 12)
             }
     
@@ -150,10 +150,10 @@ class Table:
     """
     
     
-    def __create_index(self) -> dict[int, Card | None]:
+    def __create_index(self) -> dict[int, CardController | None]:
         
         # Creating new cards index dictionary:
-        cards_index: dict[int, Card | None] = {
+        cards_index: dict[int, CardController | None] = {
             card_location_index: None for card_location_index in range(0, 12)
             }
         
@@ -164,7 +164,7 @@ class Table:
     def setup(self) -> None:
         
         # Creating new cards index dictionary:
-        cards_index: dict[int, Card | None] = self.__create_index()
+        cards_index: dict[int, CardController | None] = self.__create_index()
         
         # Updating attribute:
         self.__cards_index = cards_index
@@ -176,7 +176,7 @@ class Table:
     def reset(self) -> None:
         
         # Creating new cards index dictionary:
-        cards_index: dict[int, Card | None] = self.__create_index()
+        cards_index: dict[int, CardController | None] = self.__create_index()
         
         # Updating attribute:
         self.__cards_index = cards_index
@@ -192,10 +192,10 @@ class Table:
     
     
     @cached_property
-    def cards(self) -> tuple[Card, ...]:
+    def cards(self) -> tuple[CardController, ...]:
         
         # Converting list to tuple:
-        card_list: tuple[Card, ...] = tuple(
+        card_list: tuple[CardController, ...] = tuple(
             card_object for card_location_index, card_object in self.cards_index.items()
             if card_object is not None
             )
@@ -205,7 +205,7 @@ class Table:
     
     
     @cached_property
-    def cards_index(self) -> dict[int, Card | None]:
+    def cards_index(self) -> dict[int, CardController | None]:
         
         # Returning:
         return self.__cards_index
@@ -243,7 +243,7 @@ class Table:
         return card_name_list
     
     
-    def add_card(self, card_object: Card, location_index: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def add_card(self, card_object: CardController, location_index: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -255,7 +255,7 @@ class Table:
                 )
         
         # Raising error, if card already exists on table:
-        cards_list: tuple[Card, ...] = tuple(
+        cards_list: tuple[CardController, ...] = tuple(
             card_object for card_location_index, card_object in self.__cards_index.items()
                 if card_object is not None
             )
@@ -325,7 +325,7 @@ class Table:
             self.clear_cached_position_attributes()
             
             
-    def remove_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def remove_card(self, card_object: CardController, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -350,10 +350,10 @@ class Table:
             self.clear_cached_position_attributes()
             
     
-    def sweep(self, clear_cache: bool = True) -> tuple[Card, ...]:
+    def sweep(self, clear_cache: bool = True) -> tuple[CardController, ...]:
         
         # Collecting all cards:
-        cards_pending_removal: tuple[Card, ...] = self.cards
+        cards_pending_removal: tuple[CardController, ...] = self.cards
         for card_object in cards_pending_removal:
             self.remove_card(
                 card_object = card_object,
@@ -402,7 +402,7 @@ class Table:
         return position_list
     
     
-    def get_position_attack(self, card_object: Card, ignore_assertion: bool = False) -> int | None:
+    def get_position_attack(self, card_object: CardController, ignore_assertion: bool = False) -> int | None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -419,7 +419,7 @@ class Table:
             return None
         
     
-    def get_position_defence(self, card_object: Card, ignore_assertion: bool = False) -> int | None:
+    def get_position_defence(self, card_object: CardController, ignore_assertion: bool = False) -> int | None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -431,7 +431,7 @@ class Table:
         position_defence: int | None = None
         if self.position_defence_list:
             for card_location_index in self.position_defence_list:
-                card_attacking: Card | None = self.cards_index[card_location_index]
+                card_attacking: CardController | None = self.cards_index[card_location_index]
                 
                 # Checking if card is attacking and can be defended against:
                 if card_attacking is not None and card_object > card_attacking:

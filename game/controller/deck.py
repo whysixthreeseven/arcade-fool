@@ -1,5 +1,5 @@
 # Card class object:
-from game.controller.card import Card
+from game.controller.card import CardController
 
 # External libraries:
 import random
@@ -19,12 +19,12 @@ from game.utilities import texturepack
 from game.utilities.scripts import validate
 
 
-class Deck:
+class DeckController:
     
     def __init__(self) -> None:
         
         # Core attributes:
-        self.__cards_list: list[Card] = []       # Current deck container
+        self.__cards_list: list[CardController] = []       # Current deck container
         self.__cards_gen_count: int = 0          # Cards generated count (global)
     
     
@@ -113,7 +113,7 @@ class Deck:
             )
         
         # Updating attributes:
-        self.__cards_list: list[Card] = deck
+        self.__cards_list: list[CardController] = deck
         
         # Clearing cache:
         self.clear_cached_cards_attributes()
@@ -135,10 +135,10 @@ class Deck:
     
     
     @cached_property
-    def cards(self) -> tuple[Card, ...]:
+    def cards(self) -> tuple[CardController, ...]:
         
         # Converting list to tuple:
-        card_list: tuple[Card, ...] = tuple(
+        card_list: tuple[CardController, ...] = tuple(
             card_object for card_object 
             in self.__cards_list
             )
@@ -170,7 +170,7 @@ class Deck:
         return cards_value
     
     
-    def draw_card(self, clear_cache: bool = True) -> Card | None:
+    def draw_card(self, clear_cache: bool = True) -> CardController | None:
         
         # Returning None, if no more cards available:
         if self.cards_count == 0:
@@ -180,7 +180,7 @@ class Deck:
         else:
             
             # Acquiring card from top and removing it from the deck:
-            card: Card = self.cards[-1]
+            card: CardController = self.cards[-1]
             self.__cards_list.remove(card)
             
             # Updating secret card, if it exists:
@@ -301,7 +301,7 @@ class Deck:
     """
     
     
-    def __generate(self, deck_size: int, trump_suit: str | None) -> list[Card]:
+    def __generate(self, deck_size: int, trump_suit: str | None) -> list[CardController]:
 
         # Collecting restricted cards:
         restricted_card_list: tuple[str, ...] = ()
@@ -314,8 +314,8 @@ class Deck:
                 )
         
         # Creating container:
-        card_list_gen: list[Card] = []
-        card_list_adjusted: list[Card] = []
+        card_list_gen: list[CardController] = []
+        card_list_adjusted: list[CardController] = []
         
         # Selecting trump suit:
         if trump_suit is None:
@@ -337,7 +337,7 @@ class Deck:
                         context.CARD_LOCATION.DECK, 
                         card_location_index,
                         )
-                    card_object: Card = Card.generate(
+                    card_object: CardController = CardController.generate(
                         init_id = self.__cards_gen_count,
                         init_suit = card_suit,
                         init_name = card_name,
@@ -389,21 +389,21 @@ class Deck:
             )
         
         # Collecting all trump cards and choosing a random one:
-        trump_card_list: tuple[Card, ...] = tuple(
+        trump_card_list: tuple[CardController, ...] = tuple(
             card_object for card_object in card_list_gen
             if card_object.trump
             )
-        trump_card: Card = random.choice(trump_card_list)
+        trump_card: CardController = random.choice(trump_card_list)
         
         # Selecting a secret card:
-        secret_card: Card = random.choice(card_list_gen)
+        secret_card: CardController = random.choice(card_list_gen)
         secret_card.set_state_secret(
             set_value = True,
             ignore_assertion = True,
             clear_cache = True,
             )
         while secret_card == trump_card:
-            secret_card: Card = random.choice(card_list_gen)
+            secret_card: CardController = random.choice(card_list_gen)
             
         # Removing secret card from list:
         if SESSION.GAME_MODE_SECRET:
@@ -460,7 +460,7 @@ class Deck:
                 )
             
         # Sorting by index:
-        card_list_sorted: list[Card] = self.__sort(
+        card_list_sorted: list[CardController] = self.__sort(
             deck_object = card_list_adjusted
             )
 
@@ -468,10 +468,10 @@ class Deck:
         return card_list_sorted
     
     
-    def __shuffle(self, deck_object: tuple[Card, ...]) -> tuple[Card, ...]:
+    def __shuffle(self, deck_object: tuple[CardController, ...]) -> tuple[CardController, ...]:
             
         # Creating a copy
-        deck_copy: tuple[Card, ...] = deck_object
+        deck_copy: tuple[CardController, ...] = deck_object
         
         # Shuffling
         random.shuffle(deck_copy)
@@ -480,10 +480,10 @@ class Deck:
         return deck_copy
     
     
-    def __sort(self, deck_object: tuple[Card, ...] | list[Card]) -> list[Card]:
+    def __sort(self, deck_object: tuple[CardController, ...] | list[CardController]) -> list[CardController]:
         
         # Returning:
-        deck_sorted: list[Card] = list(
+        deck_sorted: list[CardController] = list(
             sorted(
                 deck_object,
                 key = lambda card_object: card_object.location_index

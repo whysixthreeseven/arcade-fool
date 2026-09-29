@@ -1,5 +1,5 @@
 # Card class object:
-from game.controller.card import Card
+from game.controller.card import CardController
 
 # External libraries:
 import random
@@ -19,12 +19,12 @@ from game.utilities import texturepack
 from game.utilities.scripts import validate
 
 
-class Discard:
+class DiscardController:
     
     def __init__(self) -> None:
         
         # Core attributes:
-        self.__cards_list: list[Card] = []       # Current deck container
+        self.__cards_list: list[CardController] = []       # Current deck container
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -103,10 +103,10 @@ class Discard:
     """
     
     
-    def __create_list(self) -> list[Card]:
+    def __create_list(self) -> list[CardController]:
         
         # Creating new cards list:
-        cards_list: list[Card] = []
+        cards_list: list[CardController] = []
         
         # Returning:
         return cards_list
@@ -115,7 +115,7 @@ class Discard:
     def setup(self, ignore_assertion: bool = False) -> None:
         
         # Creating new cards list:
-        cards_list: list[Card] = self.__create_list()
+        cards_list: list[CardController] = self.__create_list()
         
         # Updating attributes:
         self.__cards_list = cards_list
@@ -127,7 +127,7 @@ class Discard:
     def reset(self) -> None:
         
         # Creating new cards list:
-        cards_list: list[Card] = self.__create_list()
+        cards_list: list[CardController] = self.__create_list()
         
         # Updating attribute:
         self.__cards_list = cards_list
@@ -143,10 +143,10 @@ class Discard:
     
     
     @cached_property
-    def cards(self) -> tuple[Card, ...]:
+    def cards(self) -> tuple[CardController, ...]:
         
         # Converting list to tuple:
-        card_list: tuple[Card, ...] = tuple(
+        card_list: tuple[CardController, ...] = tuple(
             card_object for card_object 
             in self.__cards_list
             )
@@ -178,7 +178,7 @@ class Discard:
         return cards_value
     
     
-    def add_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def add_card(self, card_object: CardController, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -227,7 +227,7 @@ class Discard:
             self.clear_cached_cards_attributes()
             
             
-    def remove_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def remove_card(self, card_object: CardController, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -336,6 +336,14 @@ class Discard:
         DISPLAY INFO CACHED PROPERTIES AND METHODS
     
     """
+    
+    
+    def display(self) -> None:
+        
+        # Calling display() method on all card objects:
+        for card_object in self.cards:
+            card_object.display()
+        
     
     
     def display_info(self, display_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:

@@ -25,7 +25,7 @@ from game.utilities.scripts import assertion, validate
 """
 
 
-class Card:
+class CardController:
     """
     Card class object.
     
@@ -107,7 +107,7 @@ class Card:
     """
     
     
-    def __gt__(self, other: Card) -> bool:
+    def __gt__(self, other: CardController) -> bool:
         """
         Allows this card object compare itself to other cards based on its value. 
         
@@ -131,7 +131,7 @@ class Card:
         return assert_eval
 
 
-    def __lt__(self, other: Card) -> bool:
+    def __lt__(self, other: CardController) -> bool:
         """
         Allows this card object compare itself to other cards based on its value.
         
@@ -196,7 +196,7 @@ class Card:
     
     
     @classmethod
-    def generate(cls, init_id: int, init_suit: str, init_name: str, init_location: context.Location) -> Card:
+    def generate(cls, init_id: int, init_suit: str, init_name: str, init_location: context.Location) -> CardController:
         """
         Generates a new card object with the given attributes.
         
@@ -223,7 +223,7 @@ class Card:
         """
         
         # Creating basic card object:
-        card_object: Card = Card()
+        card_object: CardController = CardController()
         
         # Adding core attributes:
         card_object.set_id(

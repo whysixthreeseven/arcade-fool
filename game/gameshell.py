@@ -1,34 +1,30 @@
-# Arcade library
-import arcade
+# Controllers:
+from game.controller.player import PlayerController
+from game.controller.discard import DiscardController
+from game.controller.table import TableController
+from game.controller.deck import DeckController
+from game.controller.hand import HandController
+from game.controller.card import CardController
+from game.controller.surface import SurfaceController
+from game.controller.game import Game
 
-# Settings and session instance:
+# External libraries:
+import random
+import arcade
+import time
+
+# Settings, session and context:
 from game.settings import SETTINGS
 from game.session import SESSION
-
-# Context and namespace variables:
-from game.context import (
-    Coordinates, 
-    Location, 
-    RGB_Color
-    )
-
-# Controllers and other instances:
-from game.controller.surface import Surface
-from game.controller.hand import Hand
-from game.controller.deck import Deck
-from game.controller.card import Card
-from game.controller.table import Table
-
-# Area instances:
-from game.utilities.area import (
-    Area, 
-    AREA_TABLE,
-    AREA_DECK,
-    AREA_DISCARD,
-    AREA_PLAYER,
-    AREA_OPPONENT,
-    )
 from game import context
+
+# Cache management:
+from functools import cached_property
+from game.utilities.scripts import cache
+
+# Various utilities:
+from game.utilities import area, texturepack
+from game.utilities.scripts import assertion, validate
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -51,38 +47,15 @@ class Gameshell(arcade.Window):
             update_rate = SETTINGS.WINDOW_UPDATE_RATE,
             antialiasing = SETTINGS.WINDOW_ANTIALIASING,
             )
-
-        # Controller attributes:
-        self.__surface_controller: Surface = Surface()
-        self.__game_controller: object = None               # TODO: Implement!
-        self.__ui_controller: object = None                 # TODO: Implement!
         
-        # Test attributes:
-        self.__deck = Deck()
-        self.__deck.setup(
-            trump_suit = None, 
-            )
-        self.__hand = Hand()
-        self.__hand.setup(
-            set_owner = context.PLAYER_TYPE.HUMAN,
-            ignore_assertion = True,
-            )
-        self.__hand_opp = Hand()
-        self.__hand_opp.setup(
-            set_owner = context.PLAYER_TYPE.COMPUTER,
-            ignore_assertion = True,
-            )
-        self.__table = Table()
-        self.__table.setup()
+        # Game controller:
+        self.__game_controller: Game = Game()
+        self.__game_controller.setup()
         
-        # Boundary attributes:
-        self.__hit_area: Area | None = None
-        self.__hit_card_list: list[Card] = []
-        self.__card_hover: Card | None = None
-        
-        # Cursor coordinates:
-        self.__cursor_coordinate_x: int = 0
-        self.__cursor_coordinate_y: int = 0
+    
+    @property
+    def gc(self) -> Game:
+        return self.__game_controller
         
     
     def on_draw(self) -> None:
@@ -92,20 +65,15 @@ class Gameshell(arcade.Window):
         
         # Rendering area in debug mode:
         if SESSION.ENABLE_DEBUG:
-            self.__surface_controller.display_debug()
+            self.gc.surface.display_debug()
             
-        self.__deck.display()
-        self.__hand.display()
-        self.__hand_opp.display()
-
-        if self.__hit_card_list:
-            self.__deck.display_info(
-                display_coordinates = (
-                    self.__cursor_coordinate_x,
-                    self.__cursor_coordinate_y,
-                    ),
-                ignore_assertion = True,
-                )
+        # Rendering card containers in order:
+        self.gc.deck.display()
+        self.gc.discard.display()
+        self.gc.table.display()
+        self.gc.player_computer.hand.display()
+        self.gc.player_human.hand.display()
+            
             
             
     def on_mouse_motion(self, coordinate_x, coordinate_y, shift_x, shift_y):
@@ -122,7 +90,7 @@ class Gameshell(arcade.Window):
             self.__hit_area = hit_area
         
         # Updating card hit:
-        hit_card: Card | None = None
+        hit_card: CardController | None = None
         if hit_area is None:
             pass
         else:
@@ -130,7 +98,7 @@ class Gameshell(arcade.Window):
                 self.__card_hover.set_state_hovered(False, True, True)
                 self.__card_hover = None
             if hit_area == AREA_DECK:
-                card_hit_list: list[Card] = []
+                card_hit_list: list[CardController] = []
                 for card_object in self.__deck.cards:
                     card_object_hit: bool = card_object.hit_boundary(
                         hit_coordinates = coordinates,

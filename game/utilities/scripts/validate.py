@@ -506,12 +506,12 @@ def validate_card_object(validate_value: object) -> None:
     """
     
     # Card class object:
-    from game.controller.card import Card
+    from game.controller.card import CardController
     
     # Asserting value type:
     assertion.assert_value_type(
         check_value = validate_value,
-        check_type = Card,
+        check_type = CardController,
         raise_error = True
         )
     
@@ -692,12 +692,12 @@ def validate_computer_difficulty(validate_value: str) -> None:
 def validate_hand(validate_value: object) -> None:
     
     # Card class object:
-    from game.controller.hand import Hand
+    from game.controller.hand import HandController
     
     # Asserting value type:
     assertion.assert_value_type(
         check_value = validate_value,
-        check_type = Hand,
+        check_type = HandController,
         raise_error = True
         )
 

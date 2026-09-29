@@ -1,5 +1,5 @@
 # Hand controller class instance:
-from game.controller.hand import Hand
+from game.controller.hand import HandController
 
 # External libraries:
 import random
@@ -19,7 +19,7 @@ from game.utilities import texturepack
 from game.utilities.scripts import assertion, validate
 
 
-class Player:
+class PlayerController:
     
     def __init__(self) -> None:
         
@@ -28,7 +28,7 @@ class Player:
         self.__name: str = None
         
         # Hand-related attributes:
-        self.__hand: Hand = None
+        self.__hand: HandController = None
                 
         # Score attributes:
         self.__game_count: int = 0
@@ -581,13 +581,13 @@ class Player:
     
     
     @cached_property
-    def hand(self) -> Hand:
+    def hand(self) -> HandController:
         
         # Returning:
         return self.__hand
     
     
-    def set_hand(self, set_value: Hand, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_hand(self, set_value: HandController, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -606,7 +606,7 @@ class Player:
     def create_hand(self, clear_cache: bool = True) -> None:
         
         # Creating new hand:
-        hand_object: Hand = Hand()
+        hand_object: HandController = HandController()
         hand_object.set_owner(
             set_value = self.type,
             ignore_assertion = True,
