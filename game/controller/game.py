@@ -352,11 +352,11 @@ class Game:
         
         # Constructing card container index:
         card_container_index: dict[str, tuple[Card, ...]] = {
-            context.AREA_TYPE.DECK: self.deck.cards,
-            context.AREA_TYPE.DISCARD: self.discard.cards,
-            context.AREA_TYPE.TABLE: self.table.cards,
-            context.AREA_TYPE.PLAYER: self.player_human.hand.cards,
-            context.AREA_TYPE.OPPONENT: self.player_computer.hand.cards,
+            area.AREA_DECK: self.deck.cards,
+            area.AREA_DISCARD: self.discard.cards,
+            area.AREA_TABLE: self.table.cards,
+            area.AREA_PLAYER: self.player_human.hand.cards,
+            area.AREA_OPPONENT: self.player_computer.hand.cards,
             }
         
         # Returning:
@@ -842,13 +842,11 @@ class Game:
         if self.hit_area is not None:
             
             # Preparing variables:
-            hit_area_type: str = self.hit_area.type
-            hit_area_selected: tuple[Card, ...] = self.cards_area_index.get(hit_area_type, None)
-            print(hit_area_type, hit_area_selected)
+            hit_area_selected: tuple[Card, ...] = self.cards_area_index.get(self.hit_area, None)
             
             # Running loop:
             hit_cards_temp: list[Card] = []
-            if hit_area_selected is not None:
+            if self.hit_area is not None:
                 for card_object in hit_area_selected:
                     hit_card: bool = card_object.hit_boundary(
                         hit_coordinates = self.cursor_coordinates,
@@ -899,11 +897,12 @@ class Game:
         
             # Updating attribute:
             self.__card_hover = set_value
-            self.__card_hover.set_state_hovered(
-                set_value = True,
-                ignore_assertion = True,
-                clear_cache = True,
-                )
+            if set_value is not None:
+                self.__card_hover.set_state_hovered(
+                    set_value = True,
+                    ignore_assertion = True,
+                    clear_cache = True,
+                    )
             
 
     def remove_card_hover(self) -> None:
@@ -1051,18 +1050,15 @@ class Game:
     
     def display_hints(self) -> None:
         
-        # Asserting hit area is set:
-        if self.hit_area is not None:
+        # Deck controller hint display:
+        if self.hit_area == area.AREA_DECK:
             
-            # Deck controller hint display:
-            if self.hit_area.type == context.AREA_TYPE.DECK:
-                
-                # Displaying if a card is being hovered in location:
-                if self.card_hover is not None:
-                    self.deck.display_info(
-                        display_coordinates = self.cursor_coordinates,
-                        ignore_assertion = True,
-                        )
+            # Displaying if a card is being hovered in location:
+            if self.card_hover is not None:
+                self.deck.display_info(
+                    display_coordinates = self.cursor_coordinates,
+                    ignore_assertion = True,
+                    )
                 
                 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
