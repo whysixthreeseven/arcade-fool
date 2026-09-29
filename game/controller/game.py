@@ -1013,6 +1013,42 @@ class Game:
             
         # Updating attribute:
         self.__trump_suit = set_value
+        
+        
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        DISPLAY METHODS
+    
+    """
+    
+    
+    def display_surface(self) -> None:
+        
+        # Displaying surface:
+        self.surface.display_debug()        # TODO: Replace with non-debug method!
+        
+    
+    def display_cards(self) -> None:
+        
+        # Displaying all cards in location controllers:
+        for location_controller in self.__location_controllers:
+            location_controller.display()
+            
+        # Displaying all cards in players' hands:
+        for player_controller in reversed(self.__player_controllers):
+            player_controller.display()
+            
+    
+    def display_hints(self) -> None:
+        
+        # Deck controller hint display:
+        if self.hit_area.type == context.AREA_TYPE.DECK:
+            
+            # Displaying if a card is being hovered in location:
+            if self.card_hover is not None:
+                self.deck.display_info(
+                    display_coordinates = self.cursor_coordinates,
+                    ignore_assertion = True,
+                    )
              
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
