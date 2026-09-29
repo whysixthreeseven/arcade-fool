@@ -29,10 +29,10 @@ class __SESSION:
         self.__enable_hint: bool = True
         
         # Texture pack options:
-        self.__texturepack_front_default: texturepack.TexturePack = texturepack.TEXTURE_PACK_FRONT.LIGHT_2_1
-        self.__texturepack_front_selected: texturepack.TexturePack = texturepack.TEXTURE_PACK_FRONT.LIGHT_2_1
-        self.__texturepack_back_default: texturepack.TexturePack = texturepack.TEXTURE_PACK_BACK.PLAIN_WHITE
-        self.__texturepack_back_selected: texturepack.TexturePack = texturepack.TEXTURE_PACK_BACK.PLAIN_WHITE
+        self.__texturepack_front_default: texturepack.TexturePack = texturepack.TEXTUREPACK_FRONT.LIGHT_2_1
+        self.__texturepack_front_selected: texturepack.TexturePack = texturepack.TEXTUREPACK_FRONT.LIGHT_2_1
+        self.__texturepack_back_default: texturepack.TexturePack = texturepack.TEXTUREPACK_BACK.PLAIN_WHITE
+        self.__texturepack_back_selected: texturepack.TexturePack = texturepack.TEXTUREPACK_BACK.PLAIN_WHITE
         
         # Game modes:
         self.__game_mode_secret: bool = True
@@ -353,7 +353,7 @@ class __SESSION:
     def set_texturepack_front_random(self, clear_cache: bool = True) -> None:
         
         # Selecting random texture pack:
-        texture_pack_random: texturepack.TexturePack = random.choice(texturepack.TEXTURE_PACK_FRONT_INDEX)
+        texture_pack_random: texturepack.TexturePack = random.choice(texturepack.TEXTUREPACK_FRONT_INDEX)
         
         # Updating attribute:
         self.set_texturepack_front(
@@ -385,7 +385,7 @@ class __SESSION:
     def set_texturepack_back_random(self, clear_cache: bool = True) -> None:
 
         # Selecting random texture pack:
-        texturepack_random: texturepack.TexturePack = random.choice(texturepack.TEXTURE_PACK_BACK_INDEX)
+        texturepack_random: texturepack.TexturePack = random.choice(texturepack.TEXTUREPACK_BACK_INDEX)
 
         # Updating attribute:
         self.set_texturepack_back(
