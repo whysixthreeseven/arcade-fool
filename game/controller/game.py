@@ -22,7 +22,7 @@ from functools import cached_property
 from game.utilities.scripts import cache
 
 # Various utilities:
-from game.utilities import texturepack
+from game.utilities import area, texturepack
 from game.utilities.scripts import assertion, validate
 
 
@@ -44,18 +44,31 @@ class Game:
         # self.__ui_controller: UI = None               # TODO: Implement!
         
         # Game state attributes:
-        self.__game_started: bool = False
-        self.__game_paused: bool = False
-        self.__game_phase: str = None
-        self.__game_ended: bool = False
-        
-        # Phrases:
-        self.__player_attacker: Player = None
-        self.__player_defender: Player = None
+        self.__state_game_started: bool = False
+        self.__state_game_paused: bool = False
+        self.__state_game_ended: bool = False
+        self.__state_game_phase: str = None
         
         # Round and turn attributes:
         self.__turn_num: int = 0
+        self.__turn_player: Player = None
+        self.__turn_draw: Player = None
         self.__round_num: int = 0
+        
+        # Cursor coordinates attributes:
+        self.__cursor_coordinate_x: int = 0
+        self.__cursor_coordinate_y: int = 0
+        
+        # Hit attributes:
+        self.__hit_area: area.Area | None = None
+        self.__hit_cards: list[Card] = []
+        
+        # Card hover and select attributes:
+        self.__card_hover: Card | None = None
+        self.__card_select: Card | None = None
+        
+        # Trump value:
+        self.__trump_suit: str = None
         
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -140,8 +153,86 @@ class Game:
         # Resetting location controllers:
         for location_controller in self.__location_controllers:
             location_controller.reset()
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        CACHED PROPETIES AND CLEAN METHODS
+    
+    """
     
     
+    @cached_property
+    def __cached_player_attributes(self) -> tuple[str, ...]:
+        
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "player_attacking",
+            "player_defending",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+    
+    @cached_property
+    def __cached_cards_attributes(self) -> tuple[str, ...]:
+        
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "cards_area_index",
+            "cards",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+    
+    def clear_cached_player_attributes(self) -> None:
+        
+        # Clearing cached properties:
+        cache.clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_player_attributes
+            )
+        
+    
+    def clear_cached_cards_attributes(self) -> None:
+            
+        # Clearing cached properties:
+        cache.clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_cards_attributes
+            )
+        
+    
+    def clear_cached_attributes(self) -> None:
+                
+        # Collecting cached properties:
+        cached_property_list_collection: tuple[tuple[str, ...], ...] = (
+            self.__cached_player_attributes,
+            self.__cached_cards_attributes,
+            )
+        
+        # Looping throught the list and clearing cache:
+        for cached_property_list in cached_property_list_collection:
+            cache.clear_cached_property_list(
+                target_object = self,
+                target_attribute_list = cached_property_list
+                )
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        HELPER METHODS
+    
+    """
+    
+    
+    def __handle_card_manipulation(self) -> None:
+        
+        # Clearing cache:
+        self.clear_cached_cards_attributes()
+        
+
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         PLAYER CONTROLLERS PROPERTY LINKS
     
@@ -243,4 +334,786 @@ class Game:
     @property
     def surface(self) -> Surface:
         return self.__surface_controller
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        CARDS CACHED PROPERTIES
+    
+    """
+    
+    
+    @cached_property
+    def cards_area_index(self) -> dict[str, tuple[Card, ...]]:
+        
+        # Constructing card container index:
+        card_container_index: dict[str, tuple[Card, ...]] = {
+            context.AREA_TYPE.DECK: self.deck.cards,
+            context.AREA_TYPE.DISCARD: self.discard.cards,
+            context.AREA_TYPE.TABLE: self.table.cards,
+            context.AREA_TYPE.PLAYER: self.player_human.hand.cards,
+            context.AREA_TYPE.OPPONENT: self.player_computer.hand.cards,
+            }
+        
+        # Returning:
+        return card_container_index
+    
+    
+    @cached_property
+    def cards(self) -> tuple[Card, ...]:
+        
+        # Collecting cards containers:
+        cards_container_list: tuple[tuple[Card, ...], ...] = tuple(
+            self.deck.cards,
+            self.discard.cards,
+            self.table.cards,
+            self.player_human.hand.cards,
+            self.player_computer.hand.cards,
+            )
+
+        # Collecting cards:
+        cards: tuple[Card, ...] = tuple(
+            card_object
+            for cards_container in cards_container_list
+            for card_object in cards_container 
+                if cards_container is not None
+            )
+
+        # Returning:
+        return cards
+
+
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        STATE PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @property
+    def state_game_started(self) -> bool:
+        
+        # Returning:
+        return self.__state_game_started
+    
+    
+    @property
+    def state_game_paused(self) -> bool:
+        
+        # Returning:
+        return self.__state_game_paused
+    
+    
+    @property
+    def state_game_ended(self) -> bool:
+        
+        # Returning:
+        return self.__state_game_ended
+    
+    
+    @property
+    def state_game_phase(self) -> str:
+        
+        # Returning:
+        return self.__state_game_phase
+    
+    
+    def reset_state_global(self) -> None:
+        
+        # Resetting game state attributes:
+        self.__state_game_started = False
+        self.__state_game_paused = False
+        self.__state_game_ended = False
+        self.__state_game_phase = None
+        
+    
+    def set_state_game_started(self, set_value: bool, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value
+                )
+            
+        # Updating attribute:
+        self.__state_game_started = set_value
+        
+    
+    def set_state_game_paused(self, set_value: bool, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value
+                )
+
+        # Updating attribute:
+        self.__state_game_paused = set_value
+        
+    
+    def set_state_game_ended(self, set_value: bool, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value
+                )
+
+        # Updating attribute:
+        self.__state_game_ended = set_value
+
+
+    def set_state_game_phase(self, set_value: str, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_phase(
+                validate_value = set_value
+                )
+
+        # Updating attribute:
+        self.__state_game_phase = set_value
+        
+
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        TURN PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @property
+    def turn_num(self) -> int:
+        """
+        Returns number of turns this round (min 1, and max 12).
+        
+        Once turns reach maximum limit, they reset to 1 and round number is increased by 1. This is done to prevent overflowing
+        the `Table` controller's `cards_index` and to limit players to play only six cards total per round each.
+        
+        Returns
+        --------
+        self.__turn_num : `int`
+            Number of turns this round (min 1, and max 12).
+        """
+        
+        
+        # Returning:
+        return self.__turn_num
+    
+    
+    @property
+    def turn_player(self) -> Player:
+        """
+        Returns Player controller to play this turn, regardless of state (attacking or defending).
+        
+        Returns
+        --------
+        self.__turn_player : `Player`
+            Player controller to play this turn, regardless of state (attacking or defending).
+        """
+
+        # Returning:
+        return self.__turn_player
+    
+    
+    @property
+    def turn_draw(self) -> Player:
+        """
+        Returns Player controller who is first to draw cards on draw event.
+        
+        In case of round pass or win events, attacking player draws first, then defending player draws. This matters especially 
+        when drawing into last few cards, determining who gets the trump card and who draws more than the opponent. If a player 
+        draws all the remaining cards in the deck and opponent starts with no cards in hand - opponent wins.
+        
+        Returns
+        --------
+        self.__turn_draw : `Player`
+            Player controller who is first to draw cards on draw event.
+        """
+        
+        # Returning:
+        return self.__turn_draw
+    
+    
+    def set_turn_num(self, set_value: int, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = int, 
+                raise_error = True,
+                )
+            assertion.assert_value_ge_zero(
+                check_value = set_value,
+                raise_error = True,
+                )
+            
+        # Updating attribute:
+        self.__turn_num = set_value
+        
+    
+    def adjust_turn_num(self, adjust_value: int, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = adjust_value,
+                check_type = int, 
+                raise_error = True,
+                )
+            assertion.assert_value_ge_zero(
+                check_value = adjust_value,
+                raise_error = True,
+                )
+            
+        # Calculating:
+        turn_num_updated: int = self.turn_num + adjust_value
+        
+        # Updating attribute:
+        self.set_turn_num(
+            set_value = turn_num_updated,
+            ignore_assertion = True,
+            )
+        
+    
+    def set_turn_player(self, set_value: Player, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = Player, 
+                raise_error = True,
+                )
+
+        # Updating attribute:
+        self.__turn_player = set_value
+
+    
+    def switch_turn_player(self) -> None:
+        
+        # Switching to computer, if human player controller is active:
+        if self.turn_player == self.player_human:
+            self.set_turn_player(
+                set_value = self.player_computer
+                )
+        
+        # Switching to human, if computer player controller is active:
+        else:
+            self.set_turn_player(
+                set_value = self.player_human
+                )
+
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        ROUND PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @property
+    def round_num(self) -> int:
+        
+        # Returning:
+        return self.__round_num
+
+
+    def set_round_num(self, set_value: int, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = int, 
+                raise_error = True,
+                )
+            assertion.assert_value_ge_zero(
+                check_value = set_value,
+                raise_error = True,
+                )
+            
+        # Updating attribute:
+        self.__round_num = set_value
+    
+    
+    def adjust_round_num(self, adjust_value: int, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = adjust_value,
+                check_type = int, 
+                raise_error = True,
+                )
+            assertion.assert_value_ge_zero(
+                check_value = adjust_value,
+                raise_error = True,
+                )
+
+        # Calculating:
+        round_num_updated: int = self.round_num + adjust_value
+
+        # Updating attribute:
+        self.set_round_num(
+            set_value = round_num_updated,
+            ignore_assertion = True,
+            )
+        
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        CURSOR COORDINATES PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @property
+    def cursor_coordinate_x(self) -> int:
+        
+        # Returning:
+        return self.__cursor_coordinate_x
+    
+    
+    @property
+    def cursor_coordinate_y(self) -> int:
+
+        # Returning:
+        return self.__cursor_coordinate_y
+    
+    
+    @property
+    def cursor_coordinates(self) -> context.Coordinates:
+        
+        # Packing up coordinates container:
+        cursor_coordinates: context.Coordinates = (
+            self.__cursor_coordinate_x,
+            self.__cursor_coordinate_y,
+            )
+        
+        # Returning:
+        return cursor_coordinates
+
+
+    def set_cursor_coordinate_x(self, set_value: int, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate(
+                validate_value = set_value,
+                )
+            
+        # Updating attribute:
+        self.__cursor_coordinate_x = set_value
+
+
+    def set_cursor_coordinate_y(self, set_value: int, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate(
+                validate_value = set_value,
+                )
+
+        # Updating attribute:
+        self.__cursor_coordinate_y = set_value
+        
+    
+    def set_cursor_coordinates(self, set_value: context.Coordinates, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate_container(
+                validate_value = set_value,
+                )
+
+        # Unpacking coordinates container:
+        cursor_coordinate_x, cursor_coordinate_y = set_value
+        
+        # Updating attributes:
+        self.set_cursor_coordinate_x(
+            set_value = cursor_coordinate_x,
+            ignore_assertion = True,
+            )
+        self.set_cursor_coordinate_y(
+            set_value = cursor_coordinate_y,
+            ignore_assertion = True,
+            )
+
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        HIT AREA PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @property
+    def hit_area(self) -> area.Area:
+        
+        # Returning:
+        return self.__hit_area
+    
+    
+    def set_hit_area(self, set_value: area.Area, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = context.Area,
+                raise_error = True,
+                )
+
+        # Updating attribute:
+        self.__hit_area = set_value
+        
+    
+    def update_hit_area(self) -> None:
+        
+        # Locating hit area:
+        hit_area: area.Area = self.surface.locate_area(
+            coordinates = self.cursor_coordinates,
+            ignore_assertion = False,
+            )
+        
+        # Updating attribute:
+        if hit_area != self.hit_area:
+            self.set_hit_area(
+                set_value = hit_area,
+                ignore_assertion = True,
+                )
+        
+        
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        HIT CARDS PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @property
+    def hit_cards(self) -> list[Card]:
+        
+        # Returning:
+        return self.__hit_cards
+    
+    
+    @property
+    def hit_cards_count(self) -> int:
+        
+        # Calculating:
+        hit_card_count: int = len(self.hit_cards)
+        
+        # Returning:
+        return hit_card_count
+    
+    
+    def set_hit_cards(self, set_value: list[Card], ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            
+            # Asserting value is valid type:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = list,
+                raise_error = True,
+                )
+            
+            # Asserting container's items:
+            hit_cards_list: list[Card] = set_value
+            hit_cards_count: int = len(hit_cards_list)
+            if hit_cards_count > 0:
+                for card_object in hit_cards_list:
+                    validate.validate_card_object(
+                        validate_value = card_object,
+                        )
+
+        # Updating attribute:
+        self.__hit_cards: list[Card] = set_value
+        
+    
+    def update_hit_cards(self) -> None:
+        
+        if self.hit_area is not None:
+            
+            # Preparing variables:
+            hit_area_type: str = self.hit_area.type
+            hit_area_selected: tuple[Card, ...] = self.cards_area_index[hit_area_type]
+            
+            # Running loop:
+            hit_cards_temp: list[Card] = []
+            for card_object in hit_area_selected:
+                hit_card: bool = card_object.hit_boundary(
+                    hit_coordinates = self.cursor_coordinates,
+                    )
+                
+                # Adding card object to temporary list:
+                if hit_card:
+                    hit_cards_temp.append(
+                        card_object,
+                        )
+            
+            # Updating attribute:
+            self.__hit_cards = hit_cards_temp
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        CARD HOVER PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @property
+    def card_hover(self) -> Card | None:
+        
+        # Returning:
+        return self.__card_hover
+
+
+    def set_card_hover(self, set_value: Card | None, release_previous: bool = True, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if set_value is not None:
+            if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+                validate.validate_card_object(
+                    validate_value = set_value
+                    )
+
+        # If no card is currently set as hovered:
+        if self.card_hover is None:
+            self.__card_hover = set_value
+
+        # If card is currently set as hovered:
+        else:
+            
+            # Releasing previous card, if required:
+            if release_previous and self.card_hover is not None:
+                self.remove_card_hover()
+        
+            # Updating attribute:
+            self.__card_hover = set_value
+            self.__card_hover.set_state_hovered(
+                set_value = True,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
+            
+
+    def remove_card_hover(self) -> None:
+
+        # Asserting card hover is set:
+        if self.card_hover is not None:
+            
+            # Updating card's state and removing it from attribute:
+            self.card_hover.set_state_hovered(
+                set_value = False,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
+            self.__card_hover = None
+        
+    
+    def update_card_hover(self, release_previous: bool = True) -> None:
+        
+        # Preparing variables:
+        card_hover: Card | None = None
+        
+        # Sorting hit cards list by hit boundary value:
+        if self.hit_cards_count > 0:
+            self.hit_cards.sort(
+                key = lambda card_object: card_object.hit_boundary_value(
+                    hit_coordinates = self.cursor_coordinates,
+                    ignore_assertion = True,
+                    ),
+                reverse = False,
+                )
+            
+            # Selecting card:
+            card_hover: Card = self.hit_cards[0]
+        
+        # Updating attribute:
+        self.set_card_hover(
+            set_value = card_hover,
+            release_previous = release_previous,
+            )
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        CARD SELECT PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @property
+    def card_select(self) -> Card | None:
+
+        # Returning:
+        return self.__card_select
+
+
+    def set_card_select(self, set_value: Card | None, release_previous: bool = True, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            if set_value is not None:
+                validate.validate_card_object(
+                    validate_value = set_value,
+                    )
+
+        # If no card is currently set as selected:
+        if self.card_select is None:
+            self.__card_select = set_value
+
+        # If card is currently set as selected:
+        else:
+
+            # Releasing previous card, if required:
+            if release_previous and self.card_select is not None:
+                self.remove_card_select()
+
+            # Updating attribute:
+            self.__card_select = set_value
+            self.__card_select.set_state_selected(
+                set_value = True,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
+
+
+    def remove_card_select(self) -> None:
+        
+        # Asserting card select is set:
+        if self.card_select is not None:
+
+            # Updating card's state and removing it from attribute:
+            self.card_select.set_state_selected(
+                set_value = False,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
+            self.__card_select = None
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        TRUMP SUIT PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @property
+    def trump_suit(self) -> str:
+
+        # Returning:
+        return self.__trump_suit
+    
+    
+    def set_trump_suit(self, set_value: str, ignore_assertion = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_suit(
+                validate_value = set_value
+                )
+            
+        # Updating attribute:
+        self.__trump_suit = set_value
+        
+    
+    def apply_trump_suit(self) -> None:
+        
+        # Looping over all card objects:
+        for card_object in self.cards:
+            
+            # Updating trump state if suits match:
+            if card_object.suit == self.trump_suit:
+                card_object.set_trump(
+                    set_value = True,
+                    ignore_assertion = True,
+                    clear_cache = True
+                    )
+                
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        TEXTUREPACK METHODS
+    
+    """
+    
+    
+    def apply_texturepack_front(self, texturepack_object: texturepack.Texturepack, update_texture: bool = True,
+                                      ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_texturepack(
+                validate_value = texturepack_object,
+                )
+        
+        # Loopint over all card objects: 
+        for card_object in self.cards:
+
+            # Applying texturepack:
+            card_object.set_texturepack_front(
+                texturepack_object = texturepack_object,
+                update_texture = update_texture,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
+            
+            
+    def apply_texturepack_front_default(self, update_texture: bool = True) -> None:
+        
+        # Applying default texturepack:
+        self.apply_texturepack_front(
+            texturepack_object = SESSION.TEXTUREPACK_FRONT_DEFAULT,
+            update_texture = update_texture,
+            ignore_assertion = True,
+            )
+            
+    
+    def apply_texturepack_front_selected(self, update_texture: bool = True) -> None:
+        
+        # Applying selected texturepack:
+        self.apply_texturepack_front(
+            texturepack_object = SESSION.TEXTUREPACK_FRONT_SELECTED,
+            update_texture = update_texture,
+            ignore_assertion = True,
+            )
+    
+    
+    def apply_texturepack_back(self, texturepack_object: texturepack.TexturePack, update_texture: bool = True,
+                                     ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_texturepack(
+                validate_value = texturepack_object,
+                )
+
+        # Looping over all card objects:
+        for card_object in self.cards:
+
+            # Applying texturepack:
+            card_object.set_texturepack_back(
+                texturepack_object = texturepack_object,
+                update_texture = update_texture,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
+            
+    
+    def apply_texturepack_back_default(self, update_texture: bool = True) -> None:
+
+        # Applying default texturepack:
+        self.apply_texturepack_back(
+            texturepack_object = SESSION.TEXTUREPACK_BACK_DEFAULT,
+            update_texture = update_texture,
+            ignore_assertion = True,
+            )
+            
+    
+    def apply_texturepack_back_selected(self, update_texture: bool = True) -> None:
+
+        # Applying selected texturepack:
+        self.apply_texturepack_back(
+            texturepack_object = SESSION.TEXTUREPACK_BACK_DEFAULT,
+            update_texture = update_texture,
+            ignore_assertion = True,
+            )
+    
     
