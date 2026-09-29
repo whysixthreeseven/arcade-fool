@@ -54,7 +54,7 @@ class Gameshell(arcade.Window):
         
     
     @property
-    def gc(self) -> Game:
+    def __gc(self) -> Game:
         return self.__game_controller
     
     
@@ -63,31 +63,28 @@ class Gameshell(arcade.Window):
         # Cleaning up previous frame:
         self.clear()
         
-        # Rendering area in debug mode:
-        if SESSION.ENABLE_DEBUG:
-            self.gc.surface.display_debug()
-            
-        # Rendering card containers in order:
-        self.gc.deck.display()
-        self.gc.discard.display()
-        self.gc.table.display()
-        self.gc.player_computer.hand.display()
-        self.gc.player_human.hand.display()
-            
+        # Rendering surface and card containers in order:
+        self.__gc.display_surface()
+        self.__gc.display_cards()
+        
+        # Rendering hints, if available:
+        if SESSION.ENABLE_HINT:
+            self.__gc.display_hints()
             
             
     def on_mouse_motion(self, coordinate_x, coordinate_y, shift_x, shift_y):
         
         # Packing cursor coordinates:
-        cursor_coordinates: context.Coordinates = (coordinate_x, coordinate_y)
+        cursor_coordinates: context.Coordinates = (
+            int(coordinate_x), 
+            int(coordinate_y)
+            )
         
         # Updating current cursor coordinates:
-        self.gc.set_cursor_coordinates(
-            set_value = cursor_coordinates,
-            ignore_assertion = True,
+        self.__gc.handle_mouse_motion(
+            cursor_coordinates = cursor_coordinates,
+            ignore_assertion = False
             )
-        print(self.gc.cursor_coordinates)
-                    
             
 
     def on_mouse_press(self, coordinate_x, coordinate_y, button, modifiers):
@@ -118,5 +115,3 @@ class Gameshell(arcade.Window):
         ...     # TODO: Check documentation and implement!
                 
             
-            
-        
