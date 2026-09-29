@@ -26,6 +26,7 @@ class __SESSION:
         # Developer options:
         self.__enable_assertion: bool = True
         self.__enable_debug: bool = True
+        self.__enable_hint: bool = True
         
         # Texture pack options:
         self.__texturepack_front_default: texturepack.TexturePack = texturepack.TEXTURE_PACK_FRONT.LIGHT_2_1
@@ -59,7 +60,8 @@ class __SESSION:
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
             "ENABLE_ASSERTION",
-            "ENABLE_DEBUG"
+            "ENABLE_DEBUG",
+            "ENABLE_HINT",
             )
         
         # Returning:
@@ -192,6 +194,13 @@ class __SESSION:
         return self.__enable_debug
     
     
+    @cached_property
+    def ENABLE_HINT(self) -> bool:
+
+        # Returning:
+        return self.__enable_hint
+    
+    
     def set_enable_assertion(self, set_value: bool, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
@@ -203,6 +212,19 @@ class __SESSION:
         # Updating attribute:
         self.__enable_assertion = set_value
         
+        # Clearing cache:
+        cached_property: str = "ENABLE_ASSERTION"
+        cache.clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+    
+    def switch_enable_assertion(self) -> None:
+                
+        # Switching:
+        self.__enable_assertion = not self.__enable_assertion
+
         # Clearing cache:
         cached_property: str = "ENABLE_ASSERTION"
         cache.clear_cached_property(
@@ -228,19 +250,6 @@ class __SESSION:
             target_object = self,
             target_attribute = cached_property
             )
-        
-    
-    def switch_enable_assertion(self) -> None:
-            
-        # Switching:
-        self.__enable_assertion = not self.__enable_assertion
-
-        # Clearing cache:
-        cached_property: str = "ENABLE_ASSERTION"
-        cache.clear_cached_property(
-            target_object = self,
-            target_attribute = cached_property
-            )
 
 
     def switch_enable_debug(self) -> None:
@@ -250,6 +259,38 @@ class __SESSION:
         
         # Clearing cache:
         cached_property: str = "ENABLE_DEBUG"
+        cache.clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+        
+    def set_enable_hint(self, set_value, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value
+                )
+
+        # Updating attribute:
+        self.__enable_hint = set_value
+
+        # Clearing cache:
+        cached_property: str = "ENABLE_HINT"
+        cache.clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+    
+    def switch_enable_hint(self) -> None:
+
+        # Switching:
+        self.__enable_hint = not self.__enable_hint
+
+        # Clearing cache:
+        cached_property: str = "ENABLE_HINT"
         cache.clear_cached_property(
             target_object = self,
             target_attribute = cached_property
