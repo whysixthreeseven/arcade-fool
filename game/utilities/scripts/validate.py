@@ -506,12 +506,12 @@ def validate_card_object(validate_value: object) -> None:
     """
     
     # Card class object:
-    from game.controller.card import CardController
+    from game.controller.card import CardController as Card
     
     # Asserting value type:
     assertion.assert_value_type(
         check_value = validate_value,
-        check_type = CardController,
+        check_type = Card,
         raise_error = True
         )
     
@@ -758,5 +758,18 @@ def validate_key_id(validate_value: int) -> None:
     assertion.assert_value_gt_zero(
         check_value = validate_value,
         raise_error = True,
+        )
+
+
+def validate_area(validate_value: object) -> None:
+    
+    # Area class object:
+    from game.utilities.area import Area
+    
+    # Asserting value type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = Area,
+        raise_error = True
         )
 
