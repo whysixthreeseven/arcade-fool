@@ -278,18 +278,22 @@ class Gameshell(arcade.Window):
                     clear_cache = True
                     )
                 co = card_object
+                mod = 1
+                if not co.state_arrived:
+                    mod = 2
+                else:
+                    if co.coordinates_expected == co.coordinates_position:
+                        mod = 0.35
+                    else:
+                        mod = 1
                 card_object.slide(
-                    slide_speed_modifier = 2.00,
+                    slide_speed_modifier = mod,
                     clear_cache = True
                     )
         if self.__hit_area == AREA_PLAYER:
             if self.__card_hover is not None:
-                if self.__card_hover.coordinates_expected == self.__card_hover.coordinates_hover:
-                    mod = 2
-                else:
-                    mod = 0.85
                 self.__card_hover.slide(
-                    slide_speed_modifier = mod,
+                    slide_speed_modifier = 1.00,
                     clear_cache = True
                     )
                 
