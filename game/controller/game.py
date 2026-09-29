@@ -1049,6 +1049,46 @@ class Game:
                     display_coordinates = self.cursor_coordinates,
                     ignore_assertion = True,
                     )
+                
+                
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        HANDLE MOUSE METHODS
+    
+    """
+    
+    
+    def __handle_card_manipulation(self) -> None:
+            
+            # Clearing cache:
+            self.clear_cached_cards_attributes()
+    
+    
+    def handle_mouse_motion(self, cursor_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate_container(
+                validate_value = cursor_coordinates,
+                )
+
+        # Updating cursor coordinates:
+        if cursor_coordinates != self.cursor_coordinates:
+            self.set_cursor_coordinates(
+                set_value = cursor_coordinates,
+                ignore_assertion = ignore_assertion,
+                )
+
+            # Remembering previous card hover:            
+            card_hover_prev: Card | None = self.card_hover
+            
+            # Updating hit areas, cards and hover card attributes:
+            self.update_hit_area()
+            self.update_hit_cards()
+            self.update_card_hover()
+            
+            # Checking if card hover object has changed:
+            if card_hover_prev != self.card_hover:
+                self.__handle_card_manipulation()
              
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
