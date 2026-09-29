@@ -233,18 +233,6 @@ class Game:
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
-            
-    
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        HELPER METHODS
-    
-    """
-    
-    
-    def __handle_card_manipulation(self) -> None:
-        
-        # Clearing cache:
-        self.clear_cached_cards_attributes()
         
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1049,7 +1037,7 @@ class Game:
             
         # Displaying all cards in players' hands:
         for player_controller in reversed(self.__player_controllers):
-            player_controller.display()
+            player_controller.hand.display()
             
     
     def display_hints(self) -> None:
