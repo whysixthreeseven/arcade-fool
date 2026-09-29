@@ -726,6 +726,23 @@ def validate_action(validate_value: str) -> None:
         check_list = default_list,
         raise_error = True
         )
+    
+
+def validate_phase(validate_value: str) -> None:
+    
+    # Asserting value type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = str,
+        raise_error = True
+        )
+
+    # Asserting value is default:
+    assertion.assert_value_default(
+        check_value = validate_value,
+        check_list = context.GAME_PHASE_LIST,
+        raise_error = True
+        )
 
 
 def validate_key_id(validate_value: int) -> None:
