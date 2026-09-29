@@ -100,6 +100,20 @@ class Game:
                 clear_cache = True
                 )
             
+        # Updating attacking and defending states to avoid errors:
+        player_one_controller.set_state_attacking(
+            set_value = True,
+            update_related = True,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        player_two_controller.set_state_defending(
+            set_value = True,
+            update_related = True,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+            
         # Updating attributes:
         self.__player_one_controller: PlayerController = player_one_controller
         self.__player_two_controller: PlayerController = player_two_controller
