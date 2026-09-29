@@ -522,6 +522,19 @@ class DeckController:
         # Unpacking coordinates:
         coordinate_x, coordinate_y = display_coordinates
         
+        # Creating background:
+        render_background: arcade.Rect = arcade.XYWH(
+            x = coordinate_x, 
+            y = coordinate_y,
+            width = 85,
+            height = 25,
+            )
+        arcade.draw_rect_filled(
+            rect = render_background,
+            color = arcade.color.BLACK,
+            tilt_angle = 0
+            )
+        
         # Creating text object:
         render_text: arcade.Text = arcade.Text(
             text = "{num} {literal}".format(
@@ -531,7 +544,7 @@ class DeckController:
             x = coordinate_x,
             y = coordinate_y,
             color = arcade.color.WHITE,
-            font_size = 24,
+            font_size = 15,
             anchor_x = "center",
             anchor_y = "center"
             )
