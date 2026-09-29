@@ -264,15 +264,16 @@ class SurfaceController:
         area_located: area.Area | None = None
         
         # Unpacking coordinates:
-        for area in self.__area_list:
-            area_hit: bool = area.hit_boundary(
+        for area_stored in self.__area_list:
+            area_hit: bool = area_stored.hit_boundary(
                 hit_coordinates = coordinates,
                 ignore_assertion = ignore_assertion
                 )
             
             # Returning area on hit and exiting:
             if area_hit:
-                area_located: area.Area = area
+                print(area_stored.type)
+                area_located: area.Area = area_stored
                 break
         
         # Returning:
