@@ -272,7 +272,6 @@ class SurfaceController:
             
             # Returning area on hit and exiting:
             if area_hit:
-                print(area_stored.type)
                 area_located: area.Area = area_stored
                 break
         
