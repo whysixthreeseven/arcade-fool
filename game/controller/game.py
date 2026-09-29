@@ -157,6 +157,9 @@ class Game:
         
         # TODO: Setup interface and events!
         
+        # Clearing all cache:
+        self.clear_cached_attributes()
+        
         
     def reset(self) -> None:
         
@@ -364,7 +367,7 @@ class Game:
     def cards(self) -> tuple[Card, ...]:
         
         # Collecting cards containers:
-        cards_container_list: tuple[tuple[Card, ...], ...] = tuple(
+        cards_container_list: tuple[tuple[Card, ...], ...] = (
             self.deck.cards,
             self.discard.cards,
             self.table.cards,
@@ -832,27 +835,33 @@ class Game:
     
     def update_hit_cards(self) -> None:
         
+        # Preparing empty list:
+        hit_cards_temp: list[Card] = []
+    
+        # Running check if hit area is set:
         if self.hit_area is not None:
             
             # Preparing variables:
             hit_area_type: str = self.hit_area.type
-            hit_area_selected: tuple[Card, ...] = self.cards_area_index[hit_area_type]
+            hit_area_selected: tuple[Card, ...] = self.cards_area_index.get(hit_area_type, None)
+            print(hit_area_type, hit_area_selected)
             
             # Running loop:
             hit_cards_temp: list[Card] = []
-            for card_object in hit_area_selected:
-                hit_card: bool = card_object.hit_boundary(
-                    hit_coordinates = self.cursor_coordinates,
-                    )
-                
-                # Adding card object to temporary list:
-                if hit_card:
-                    hit_cards_temp.append(
-                        card_object,
+            if hit_area_selected is not None:
+                for card_object in hit_area_selected:
+                    hit_card: bool = card_object.hit_boundary(
+                        hit_coordinates = self.cursor_coordinates,
                         )
+                    
+                    # Adding card object to temporary list:
+                    if hit_card:
+                        hit_cards_temp.append(
+                            card_object,
+                            )
             
-            # Updating attribute:
-            self.__hit_cards = hit_cards_temp
+        # Updating attribute:
+        self.__hit_cards = hit_cards_temp
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1042,15 +1051,18 @@ class Game:
     
     def display_hints(self) -> None:
         
-        # Deck controller hint display:
-        if self.hit_area.type == context.AREA_TYPE.DECK:
+        # Asserting hit area is set:
+        if self.hit_area is not None:
             
-            # Displaying if a card is being hovered in location:
-            if self.card_hover is not None:
-                self.deck.display_info(
-                    display_coordinates = self.cursor_coordinates,
-                    ignore_assertion = True,
-                    )
+            # Deck controller hint display:
+            if self.hit_area.type == context.AREA_TYPE.DECK:
+                
+                # Displaying if a card is being hovered in location:
+                if self.card_hover is not None:
+                    self.deck.display_info(
+                        display_coordinates = self.cursor_coordinates,
+                        ignore_assertion = True,
+                        )
                 
                 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
