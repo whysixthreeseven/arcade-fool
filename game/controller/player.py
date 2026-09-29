@@ -84,12 +84,6 @@ class PlayerController:
             clear_cache = True,
             )
         
-        # Refreshing object:
-        cache.refresh_object(
-            target_object = self,
-            )
-    
-    
     def setup_human(self) -> None:
             
         # Setting up core attributes to default values:
