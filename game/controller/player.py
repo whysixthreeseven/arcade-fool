@@ -156,18 +156,6 @@ class PlayerController:
     
     
     @cached_property
-    def __cached_hand_attributes(self) -> tuple[str, ...]:
-        
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "hand",
-            )
-
-        # Returning:
-        return cached_property_list
-    
-    
-    @cached_property
     def __cached_game_attributes(self) -> tuple[str, ...]:
 
         # Collecting related cached properties:
@@ -236,15 +224,6 @@ class PlayerController:
             )
         
     
-    def clear_cached_hand_attributes(self) -> None:
-
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_hand_attributes
-            )
-        
-    
     def clear_cached_game_attributes(self) -> None:
         
         # Clearing cached properties:
@@ -286,7 +265,6 @@ class PlayerController:
         # Collecting cached properties:
         cached_property_list_collection: tuple[tuple[str, ...], ...] = (
             self.__cached_core_attributes,
-            self.__cached_hand_attributes,
             self.__cached_game_attributes,
             self.__cached_score_attributes,
             self.__cached_state_attributes,
@@ -578,14 +556,14 @@ class PlayerController:
     """
     
     
-    @cached_property
+    @property
     def hand(self) -> HandController:
         
         # Returning:
         return self.__hand
     
     
-    def set_hand(self, set_value: HandController, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_hand(self, set_value: HandController, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -596,10 +574,6 @@ class PlayerController:
         # Setting value:
         self.__hand = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_hand_attributes()
-            
 
     def create_hand(self, clear_cache: bool = True) -> None:
         
@@ -615,7 +589,6 @@ class PlayerController:
         self.set_hand(
             set_value = hand_object,
             ignore_assertion = True,
-            clear_cache = clear_cache
             )
         
     
