@@ -1,9 +1,8 @@
 # External libraries:
 import os
 
-# Settings, session and context:
+# Settings and context:
 from game.settings import SETTINGS
-from game.session import SESSION
 from game import context
 
 # Cache management:
@@ -157,7 +156,7 @@ class TexturePack:
     def set_name(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+        if not ignore_assertion:
             assertion.assert_value_type(
                 check_value = set_value,
                 check_type = str,
@@ -190,7 +189,13 @@ class TexturePack:
     def set_type(self, set_value: str, ignore_assertion = False, clear_cache = True) -> None:
         
         # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+        if not ignore_assertion:
+            assertion.assert_setter_entry(
+                check_object = self,
+                check_attribute = "type",
+                sentinel_value = None,
+                raise_error = True
+                )
             assertion.assert_value_type(
                 check_value = set_value,
                 check_type = str,
@@ -204,15 +209,6 @@ class TexturePack:
             assertion.assert_value_default(
                 check_value = set_value.capitalize(),
                 check_list = default_list,
-                raise_error = True
-                )
-        
-        # Debug verification:
-        if SESSION.ENABLE_DEBUG:
-            assertion.assert_setter_entry(
-                check_object = self,
-                check_attribute = "type",
-                sentinel_value = None,
                 raise_error = True
                 )
         
@@ -252,14 +248,23 @@ class TexturePack:
     @cached_property
     def __colorcode_list(self) -> tuple[str, ...]:
         
+        # Creating list:
+        colorcode_list: tuple[str, ...] = self.__colorcode_front_list + self.__colorcode_back_list
+        
         # Returning:
-        return self.__colorcode_front_list + self.__colorcode_back_list
+        return colorcode_list
         
 
     def set_colorcode(self, set_value: str, ignore_assertion = False, clear_cache = True) -> None:
         
         # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+        if not ignore_assertion:
+            assertion.assert_setter_entry(
+                check_object = self,
+                check_attribute = "colorcode",
+                sentinel_value = None,
+                raise_error = True
+                )
             assertion.assert_value_type(
                 check_value = set_value,
                 check_type = str,
@@ -269,19 +274,10 @@ class TexturePack:
                 check_value = set_value,
                 raise_error = True
                 )
-            default_list: tuple[str, ...] = (colorcode.lower() for colorcode in self.__colorcode_list)
+            default_list: tuple[str, ...] = tuple(colorcode.lower() for colorcode in self.__colorcode_list)
             assertion.assert_value_default(
                 check_value = set_value.lower(),
                 check_list = default_list,
-                raise_error = True
-                )
-            
-        # Debug verification:
-        if SESSION.ENABLE_DEBUG:
-            assertion.assert_setter_entry(
-                check_object = self,
-                check_attribute = "colorcode",
-                sentinel_value = None,
                 raise_error = True
                 )
 
@@ -307,7 +303,7 @@ class TexturePack:
     def __style_back_list(self) -> tuple[str, ...]:
         
         # Returning:
-        return context.CARD_TEXTURE_BACK_INDEX
+        return context.CARD_TEXTURE_BACK_STYLE_LIST
     
     
     @cached_property
@@ -339,7 +335,13 @@ class TexturePack:
     def set_style(self, set_value: str, ignore_assertion = False, clear_cache = True) -> None:
 
         # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+        if not ignore_assertion:
+            assertion.assert_setter_entry(
+                check_object = self,
+                check_attribute = "style",
+                sentinel_value = None,
+                raise_error = True
+                )
             assertion.assert_value_type(
                 check_value = set_value,
                 check_type = str,
@@ -352,15 +354,6 @@ class TexturePack:
             assertion.assert_value_default(
                 check_value = set_value,
                 check_list = self.__style_list,
-                raise_error = True
-                )
-        
-        # Debug verification:
-        if SESSION.ENABLE_DEBUG:
-            assertion.assert_setter_entry(
-                check_object = self,
-                check_attribute = "style",
-                sentinel_value = None,
                 raise_error = True
                 )
             
@@ -384,7 +377,7 @@ class TexturePack:
     
     @cached_property
     def texture_path(self) -> str:
-        
+                
         # Adding all folders in order:
         dir_list: list[str] = ["card", self.type, self.colorcode]
         if self.type == "Front":
