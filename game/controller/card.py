@@ -2077,6 +2077,7 @@ class CardController:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "texture_object_front",
+                "texture_object_selected",
                 "render_rect",
                 "render_width",
                 "render_height",
@@ -2101,6 +2102,7 @@ class CardController:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "texture_object_back",
+                "texture_object_selected",
                 "render_rect",
                 "render_width",
                 "render_height",
