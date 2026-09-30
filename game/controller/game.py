@@ -22,7 +22,7 @@ from functools import cached_property
 from game.utilities.scripts import cache
 
 # Various utilities:
-from game.utilities import area, texturepack
+from game.utilities import area, texturepack, keymap
 from game.utilities.scripts import assertion, validate
 
 
@@ -1105,6 +1105,23 @@ class Game:
             # Checking if card hover object has changed:
             if card_hover_prev != self.card_hover:
                 self.__handle_card_manipulation()
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        HANDLE KEYBOARD METHODS
+    
+    """
+    
+    
+    def handle_key_press(self, key_pressed: int, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_key(
+                validate_value = key_pressed,
+                )
+
+    
              
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
