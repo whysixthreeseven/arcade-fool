@@ -106,7 +106,6 @@ class Game:
             player_controller.set_hand(
                 set_value = hand_controller,
                 ignore_assertion = False,
-                clear_cache = True
                 )
             
         # Updating attacking and defending states to avoid errors:
@@ -1093,7 +1092,7 @@ class Game:
             
             # Clearing cache:
             self.clear_cached_cards_attributes()
-    
+            
     
     def handle_mouse_motion(self, cursor_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
 
@@ -1136,10 +1135,55 @@ class Game:
             validate.validate_key(
                 validate_value = key_pressed,
                 )
+        
+        # TODO: Replace with proper logic:
+        key_draw_list: tuple[int, ...] = (
+            keymap.KEYMAP.KEY_DEBUG_DRAW_PLAYER,
+            keymap.KEYMAP.KEY_DEBUG_DRAW_OPPONENT,
+            )
+        key_switch_tp_list: tuple[int, ...] = (
+            keymap.KEYMAP.KEY_DEBUG_TP_FRONT_NEXT, keymap.KEYMAP.KEY_DEBUG_TP_FRONT_PREV,
+            keymap.KEYMAP.KEY_DEBUG_TP_BACK_NEXT, keymap.KEYMAP.KEY_DEBUG_TP_BACK_PREV,
+            )
+        
+        # TODO: Replace with proper logic:
+        if key_pressed in key_draw_list:
+            if self.deck.cards_count > 0:
+                card_object: Card = self.deck.draw_card(
+                    clear_cache = True,
+                    )
+                self.__handle_card_manipulation()
+                player_controller_index: dict[int, PlayerController] = {
+                    keymap.KEYMAP.KEY_DEBUG_DRAW_PLAYER: self.player_human,
+                    keymap.KEYMAP.KEY_DEBUG_DRAW_OPPONENT: self.player_computer,
+                    }
+                player_controller: PlayerController = player_controller_index[key_pressed]
+                player_controller.hand.add_card(
+                    card_object = card_object,
+                    ignore_assertion = True,
+                    clear_cache = True,
+                    )
+                player_controller.hand.update_coordinates(
+                    clear_cache = True
+                    )
+        
+        # TODO: Replace with proper logic:
+        elif key_pressed in key_switch_tp_list:
+            if key_pressed == keymap.KEYMAP.KEY_DEBUG_TP_FRONT_NEXT:
+                SESSION.set_texturepack_front_next()
+                self.apply_texturepack_front_selected()
+            elif key_pressed == keymap.KEYMAP.KEY_DEBUG_TP_FRONT_PREV:
+                SESSION.set_texturepack_front_previous()
+                self.apply_texturepack_front_selected()
+            elif key_pressed == keymap.KEYMAP.KEY_DEBUG_TP_BACK_NEXT:
+                SESSION.set_texturepack_back_next()
+                self.apply_texturepack_back_selected()
+            elif key_pressed == keymap.KEYMAP.KEY_DEBUG_TP_BACK_PREV:
+                SESSION.set_texturepack_back_previous()
+                self.apply_texturepack_back_selected()
+            self.__handle_card_manipulation()
 
-    
-             
-    
+
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         APPLY (ALL CARDS) METHODS
     
@@ -1220,8 +1264,7 @@ class Game:
                     )
     
     
-    def apply_texturepack_front(self, texturepack_object: texturepack.Texturepack, update_texture: bool = True,
-                                      ignore_assertion: bool = False) -> None:
+    def apply_texturepack_front(self, texturepack_object: texturepack.Texturepack, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1229,40 +1272,40 @@ class Game:
                 validate_value = texturepack_object,
                 )
         
-        # Loopint over all card objects: 
-        for card_object in self.cards:
-
-            # Applying texturepack:
-            card_object.set_texturepack_front(
+        # Looping over all controllers:
+        for location_controller in self.__location_controllers:
+            location_controller.update_texturepack_front(
                 texturepack_object = texturepack_object,
-                update_texture = update_texture,
-                ignore_assertion = True,
+                ignore_assertion = ignore_assertion,
+                clear_cache = True,
+                )
+        for player_controller in self.__player_controllers:
+            player_controller.hand.update_texturepack_front(
+                texturepack_object = texturepack_object,
+                ignore_assertion = ignore_assertion,
                 clear_cache = True,
                 )
             
             
-    def apply_texturepack_front_default(self, update_texture: bool = True) -> None:
+    def apply_texturepack_front_default(self) -> None:
         
         # Applying default texturepack:
         self.apply_texturepack_front(
             texturepack_object = SESSION.TEXTUREPACK_FRONT_DEFAULT,
-            update_texture = update_texture,
             ignore_assertion = True,
             )
             
     
-    def apply_texturepack_front_selected(self, update_texture: bool = True) -> None:
+    def apply_texturepack_front_selected(self) -> None:
         
         # Applying selected texturepack:
         self.apply_texturepack_front(
             texturepack_object = SESSION.TEXTUREPACK_FRONT_SELECTED,
-            update_texture = update_texture,
             ignore_assertion = True,
             )
     
     
-    def apply_texturepack_back(self, texturepack_object: texturepack.TexturePack, update_texture: bool = True,
-                                     ignore_assertion: bool = False) -> None:
+    def apply_texturepack_back(self, texturepack_object: texturepack.TexturePack, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1270,34 +1313,35 @@ class Game:
                 validate_value = texturepack_object,
                 )
 
-        # Looping over all card objects:
-        for card_object in self.cards:
-
-            # Applying texturepack:
-            card_object.set_texturepack_back(
+        # Looping over all controllers:
+        for location_controller in self.__location_controllers:
+            location_controller.update_texturepack_back(
                 texturepack_object = texturepack_object,
-                update_texture = update_texture,
-                ignore_assertion = True,
+                ignore_assertion = ignore_assertion,
+                clear_cache = True,
+                )
+        for player_controller in self.__player_controllers:
+            player_controller.hand.update_texturepack_back(
+                texturepack_object = texturepack_object,
+                ignore_assertion = ignore_assertion,
                 clear_cache = True,
                 )
             
     
-    def apply_texturepack_back_default(self, update_texture: bool = True) -> None:
+    def apply_texturepack_back_default(self) -> None:
 
         # Applying default texturepack:
         self.apply_texturepack_back(
             texturepack_object = SESSION.TEXTUREPACK_BACK_DEFAULT,
-            update_texture = update_texture,
             ignore_assertion = True,
             )
             
     
-    def apply_texturepack_back_selected(self, update_texture: bool = True) -> None:
+    def apply_texturepack_back_selected(self) -> None:
 
         # Applying selected texturepack:
         self.apply_texturepack_back(
             texturepack_object = SESSION.TEXTUREPACK_BACK_DEFAULT,
-            update_texture = update_texture,
             ignore_assertion = True,
             )
     
