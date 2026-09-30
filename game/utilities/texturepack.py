@@ -44,7 +44,7 @@ class TexturePack:
         
         # Adjusting attributes:
         texture_pack.set_name(
-            set_value = init_type,
+            set_value = init_name,
             ignore_assertion = ignore_assertion,
             clear_cache = False,
             )
@@ -448,7 +448,7 @@ class TEXTUREPACK_FRONT:
     SEPIA_2_1 = TexturePack.create("Faded", "Front", "Sepia", "2_1")
 
 
-TEXTUREPACK_FRONT_INDEX: tuple[TexturePack, ...] = tuple(
+TEXTUREPACK_FRONT_LIST: tuple[TexturePack, ...] = tuple(
     attribute_value for attribute_name, attribute_value 
     in TEXTUREPACK_FRONT.__dict__.items()
     if isinstance(attribute_value, TexturePack)
@@ -495,7 +495,7 @@ class TEXTUREPACK_BACK:
     SUN_WHITE = TexturePack.create("Sun (White)", "Back", "White", "Sun")
 
 
-TEXTUREPACK_BACK_INDEX: tuple[TexturePack, ...] = tuple(
+TEXTUREPACK_BACK_LIST: tuple[TexturePack, ...] = tuple(
     attribute_value for attribute_name, attribute_value 
     in TEXTUREPACK_BACK.__dict__.items()
     if isinstance(attribute_value, TexturePack)
