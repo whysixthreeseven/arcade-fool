@@ -6,17 +6,17 @@ from functools import cached_property
 from game.utilities.scripts import cache
 
 # Various utilities:
-from game.utilities import area
+from game.utilities.screen import area
 from game.utilities.scripts import validate
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    SURFACE CONTROLLER CLASS OBJECT CONSTRUCTOR
+    SURFACE CLASS OBJECT CONSTRUCTOR
     
 """
 
 
-class SurfaceController:
+class Surface:
     
     
     def __init__(self) -> None:
