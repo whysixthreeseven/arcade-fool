@@ -153,8 +153,8 @@ class CARD_TEXTURE_FRONT_INDEX:
 
 
 CARD_TEXTURE_FRONT_NAME_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in CARD_TEXTURE_FRONT_INDEX.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+    attribute_name for attribute_name, attribute_value in CARD_TEXTURE_FRONT_INDEX.__dict__.items()
+    if not attribute_name.startswith("__") and isinstance(attribute_value, tuple)
     )
 
 
