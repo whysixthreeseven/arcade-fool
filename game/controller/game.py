@@ -1,11 +1,10 @@
 # Controllers:
+from game.controller.location.discard import DiscardController
+from game.controller.location.table import TableController
+from game.controller.location.deck import DeckController
+from game.controller.location.hand import HandController
 from game.controller.player import PlayerController
-from game.controller.discard import DiscardController
-from game.controller.table import TableController
-from game.controller.deck import DeckController
-from game.controller.hand import HandController
 from game.controller.card import CardController as Card
-from game.controller.surface import SurfaceController
 
 # External libraries:
 import random
@@ -22,7 +21,8 @@ from functools import cached_property
 from game.utilities.scripts import cache
 
 # Various utilities:
-from game.utilities import area, texturepack, keymap
+from game.utilities import keymap, texturepack
+from game.utilities.screen import area, scene, surface
 from game.utilities.scripts import assertion, validate
 
 
@@ -46,8 +46,11 @@ class Game:
         self.__discard_controller: DiscardController = None
         
         # Surface and interface controllers:
-        self.__surface_controller: SurfaceController = None
+        self.__surface_controller: surface.Surface = None
         # self.__ui_controller: UserInterfaceController = None               # TODO: Implement!
+        
+        # Screen attributes:
+        self.__screen: scene.Scene = None
         
         # Game state attributes:
         self.__state_game_started: bool = False
@@ -145,13 +148,13 @@ class Game:
     def __setup_surface(self) -> None:
 
         # Creating surface controller:
-        surface_controller: SurfaceController = SurfaceController()
+        surface_controller: surface.Surface = surface.Surface()
         
         # TODO: Edit Surface controller to create areas on call!
         ...
 
         # Updating attribute:
-        self.__surface_controller: SurfaceController = surface_controller
+        self.__surface_controller: surface.Surface = surface_controller
         
 
     def setup(self) -> None:
@@ -343,8 +346,21 @@ class Game:
     
     
     @property
-    def surface(self) -> SurfaceController:
+    def surface_controller(self) -> surface.Surface:
         return self.__surface_controller
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        SCREEN PROPERTY LINKS
+    
+    """
+    
+    
+    @property
+    def scene_current(self) -> scene.Scene:
+        
+        # Returning:
+        return self.scene_current
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -778,7 +794,7 @@ class Game:
     def update_hit_area(self) -> None:
         
         # Locating hit area:
-        hit_area: area.Area = self.surface.locate_area(
+        hit_area: area.Area = self.surface_controller.locate_area(
             coordinates = self.cursor_coordinates,
             ignore_assertion = False,
             )
@@ -1040,7 +1056,7 @@ class Game:
     def display_surface(self) -> None:
         
         # Displaying surface:
-        self.surface.display_debug()        # TODO: Replace with non-debug method!
+        self.surface_controller.display_debug()        # TODO: Replace with non-debug method!
         
     
     def display_cards(self) -> None:
