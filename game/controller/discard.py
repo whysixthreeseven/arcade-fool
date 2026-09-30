@@ -1,8 +1,7 @@
 # Card class object:
-from game.controller.card import CardController
+from game.controller.card import CardController as Card
 
 # External libraries:
-import random
 import arcade
 
 # Settings, session and context:
@@ -24,7 +23,7 @@ class DiscardController:
     def __init__(self) -> None:
         
         # Core attributes:
-        self.__cards_list: list[CardController] = []       # Current deck container
+        self.__cards_list: list[Card] = []       # Current deck container
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -103,10 +102,10 @@ class DiscardController:
     """
     
     
-    def __create_list(self) -> list[CardController]:
+    def __create_list(self) -> list[Card]:
         
         # Creating new cards list:
-        cards_list: list[CardController] = []
+        cards_list: list[Card] = []
         
         # Returning:
         return cards_list
@@ -115,7 +114,7 @@ class DiscardController:
     def setup(self, ignore_assertion: bool = False) -> None:
         
         # Creating new cards list:
-        cards_list: list[CardController] = self.__create_list()
+        cards_list: list[Card] = self.__create_list()
         
         # Updating attributes:
         self.__cards_list = cards_list
@@ -127,7 +126,7 @@ class DiscardController:
     def reset(self) -> None:
         
         # Creating new cards list:
-        cards_list: list[CardController] = self.__create_list()
+        cards_list: list[Card] = self.__create_list()
         
         # Updating attribute:
         self.__cards_list = cards_list
@@ -143,10 +142,10 @@ class DiscardController:
     
     
     @cached_property
-    def cards(self) -> tuple[CardController, ...]:
+    def cards(self) -> tuple[Card, ...]:
         
         # Converting list to tuple:
-        card_list: tuple[CardController, ...] = tuple(
+        card_list: tuple[Card, ...] = tuple(
             card_object for card_object 
             in self.__cards_list
             )
@@ -178,7 +177,7 @@ class DiscardController:
         return cards_value
     
     
-    def add_card(self, card_object: CardController, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def add_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -227,7 +226,7 @@ class DiscardController:
             self.clear_cached_cards_attributes()
             
             
-    def remove_card(self, card_object: CardController, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def remove_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:

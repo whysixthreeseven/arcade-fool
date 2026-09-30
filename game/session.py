@@ -10,7 +10,7 @@ from game.utilities.scripts import cache
 
 # Various utilities:
 from game.utilities import texturepack
-from game.utilities.scripts import assertion, validate
+from game.utilities.scripts import validate
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

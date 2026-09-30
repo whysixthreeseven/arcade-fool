@@ -3,7 +3,6 @@ from game.controller.card import CardController
 
 # External libraries:
 import random
-import arcade
 
 # Settings, session and context:
 from game.settings import SETTINGS

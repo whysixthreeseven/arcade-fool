@@ -3,7 +3,6 @@ from game.controller.hand import HandController
 
 # External libraries:
 import random
-import arcade
 
 # Settings, session and context:
 from game.settings import SETTINGS
@@ -15,7 +14,6 @@ from functools import cached_property
 from game.utilities.scripts import cache
 
 # Various utilities:
-from game.utilities import texturepack
 from game.utilities.scripts import assertion, validate
 
 

@@ -15,7 +15,6 @@ from functools import cached_property
 from game.utilities.scripts import cache
 
 # Various utilities:
-from game.utilities import texturepack
 from game.utilities.scripts import validate
 
 
