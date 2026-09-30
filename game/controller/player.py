@@ -1,5 +1,5 @@
 # Hand controller class instance:
-from game.controller.hand import HandController
+from game.controller.location.hand import HandController
 
 # External libraries:
 import random
