@@ -303,9 +303,9 @@ def validate_texturepack(validate_value: texturepack.TexturePack) -> None:
     # Selecting default value list:
     texture_pack = validate_value
     if texture_pack.type == "Front":
-        texture_pack_list: tuple[texturepack.TexturePack, ...] = texturepack.TEXTUREPACK_FRONT_INDEX
+        texture_pack_list: tuple[texturepack.TexturePack, ...] = texturepack.TEXTUREPACK_FRONT_LIST
     elif texture_pack.type == "Back":
-        texture_pack_list: tuple[texturepack.TexturePack, ...] = texturepack.TEXTUREPACK_BACK_INDEX
+        texture_pack_list: tuple[texturepack.TexturePack, ...] = texturepack.TEXTUREPACK_BACK_LIST
     else:
         error_message: str = f"Invalid texture pack type: {texture_pack.type}."
         raise AssertionError(error_message)
