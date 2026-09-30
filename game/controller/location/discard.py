@@ -261,7 +261,7 @@ class DiscardController:
     
     def update_texturepack_front(self, texturepack_object: texturepack.TexturePack, 
                                        ignore_assertion: bool = False, clear_cache: bool = True) -> None:
-
+    
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
             validate.validate_texturepack(
@@ -269,14 +269,13 @@ class DiscardController:
                 )
 
         # Updating texture pack for all cards:
-        if self.cards_count > 0:
-            for card_object in self.cards:
-                card_object.set_texturepack_front(
-                    set_value = texturepack_object,
-                    update_texture = True,
-                    ignore_assertion = True,
-                    clear_cache = True
-                    )
+        for card_object in self.__cards_list:
+            card_object.set_texturepack_front(
+                set_value = texturepack_object,
+                update_texture = True,
+                ignore_assertion = True,
+                clear_cache = True
+                )
                 
         # Clearing cache:
         if clear_cache:
@@ -297,14 +296,13 @@ class DiscardController:
                 )
 
         # Updating texture pack for all cards:
-        if self.cards_count > 0:
-            for card_object in self.cards:
-                card_object.set_texturepack_back(
-                    set_value = texturepack_object,
-                    update_texture = True,
-                    ignore_assertion = True,
-                    clear_cache = True
-                    )
+        for card_object in self.__cards_list:
+            card_object.set_texturepack_back(
+                set_value = texturepack_object,
+                update_texture = True,
+                ignore_assertion = True,
+                clear_cache = True
+                )
 
         # Clearing cache:   
         if clear_cache:

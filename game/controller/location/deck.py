@@ -233,14 +233,13 @@ class DeckController:
                 )
 
         # Updating texture pack for all cards:
-        if self.cards_count > 0:
-            for card_object in self.cards:
-                card_object.set_texturepack_front(
-                    set_value = texturepack_object,
-                    update_texture = True,
-                    ignore_assertion = True,
-                    clear_cache = True
-                    )
+        for card_object in self.__cards_list:
+            card_object.set_texturepack_front(
+                set_value = texturepack_object,
+                update_texture = True,
+                ignore_assertion = True,
+                clear_cache = True
+                )
                 
         # Clearing cache:
         if clear_cache:
@@ -261,14 +260,13 @@ class DeckController:
                 )
 
         # Updating texture pack for all cards:
-        if self.cards_count > 0:
-            for card_object in self.cards:
-                card_object.set_texturepack_back(
-                    set_value = texturepack_object,
-                    update_texture = True,
-                    ignore_assertion = True,
-                    clear_cache = True
-                    )
+        for card_object in self.__cards_list:
+            card_object.set_texturepack_back(
+                set_value = texturepack_object,
+                update_texture = True,
+                ignore_assertion = True,
+                clear_cache = True
+                )
 
         # Clearing cache:   
         if clear_cache:
@@ -464,6 +462,11 @@ class DeckController:
                 ignore_assertion = True,
                 clear_cache = True,
                 )
+            card_object.set_coordinates_expected(
+                set_value = card_object.coordinates_position,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
             
         # Sorting by index:
         card_list_sorted: list[Card] = self.__sort(
@@ -499,6 +502,66 @@ class DeckController:
         # Returning:
         return deck_sorted
     
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        UPDATE METHODS
+    
+    """
+    
+    
+    def update_texturepack_front(self, texturepack_object: texturepack.TexturePack, 
+                                       ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_texturepack(
+                validate_value = texturepack_object,
+                )
+        
+        # Updating cards in container:
+        for card_object in self.cards:
+            card_object.set_texturepack_front(
+                texturepack_object = texturepack_object,
+                update_texture = True,
+                ignore_assertion = True,
+                clear_cache = clear_cache,
+                )
+        
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "cards"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+            
+    
+    def update_texturepack_back(self, texturepack_object: texturepack.TexturePack, 
+                                           ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+            
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_texturepack(
+                validate_value = texturepack_object,
+                )
+        
+        # Updating cards in container:
+        for card_object in self.cards:
+            card_object.set_texturepack_back(
+                texturepack_object = texturepack_object,
+                update_texture = True,
+                ignore_assertion = True,
+                clear_cache = clear_cache,
+                )
+        
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "cards"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+        
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         DISPLAY INFO CACHED PROPERTIES AND METHODS

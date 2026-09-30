@@ -1,5 +1,5 @@
 # Card class object:
-from game.controller.card import CardController
+from game.controller.card import CardController as Card
 
 # External libraries:
 import random
@@ -15,6 +15,7 @@ from functools import cached_property
 from game.utilities.scripts import cache
 
 # Various utilities:
+from game.utilities import texturepack
 from game.utilities.scripts import validate
 
 
@@ -29,7 +30,7 @@ class TableController:
     def __init__(self) -> None:
         
         # Core attributes:
-        self.__cards_index: dict[int, CardController | None] = {
+        self.__cards_index: dict[int, Card | None] = {
             location_index: None for location_index in range(0, 12)
             }
     
@@ -155,10 +156,10 @@ class TableController:
     """
     
     
-    def __create_index(self) -> dict[int, CardController | None]:
+    def __create_index(self) -> dict[int, Card | None]:
         
         # Creating new cards index dictionary:
-        cards_index: dict[int, CardController | None] = {
+        cards_index: dict[int, Card | None] = {
             card_location_index: None for card_location_index in range(0, 12)
             }
         
@@ -169,7 +170,7 @@ class TableController:
     def setup(self) -> None:
         
         # Creating new cards index dictionary:
-        cards_index: dict[int, CardController | None] = self.__create_index()
+        cards_index: dict[int, Card | None] = self.__create_index()
         
         # Updating attribute:
         self.__cards_index = cards_index
@@ -181,7 +182,7 @@ class TableController:
     def reset(self) -> None:
         
         # Creating new cards index dictionary:
-        cards_index: dict[int, CardController | None] = self.__create_index()
+        cards_index: dict[int, Card | None] = self.__create_index()
         
         # Updating attribute:
         self.__cards_index = cards_index
@@ -197,10 +198,10 @@ class TableController:
     
     
     @cached_property
-    def cards(self) -> tuple[CardController, ...]:
+    def cards(self) -> tuple[Card, ...]:
         
         # Converting list to tuple:
-        card_list: tuple[CardController, ...] = tuple(
+        card_list: tuple[Card, ...] = tuple(
             card_object for card_location_index, card_object in self.cards_index.items()
             if card_object is not None
             )
@@ -210,7 +211,7 @@ class TableController:
     
     
     @cached_property
-    def cards_index(self) -> dict[int, CardController | None]:
+    def cards_index(self) -> dict[int, Card | None]:
         
         # Returning:
         return self.__cards_index
@@ -248,7 +249,7 @@ class TableController:
         return card_name_list
     
     
-    def add_card(self, card_object: CardController, location_index: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def add_card(self, card_object: Card, location_index: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -260,7 +261,7 @@ class TableController:
                 )
         
         # Raising error, if card already exists on table:
-        cards_list: tuple[CardController, ...] = tuple(
+        cards_list: tuple[Card, ...] = tuple(
             card_object for card_location_index, card_object in self.__cards_index.items()
                 if card_object is not None
             )
@@ -330,7 +331,7 @@ class TableController:
             self.clear_cached_position_attributes()
             
             
-    def remove_card(self, card_object: CardController, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def remove_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -355,10 +356,10 @@ class TableController:
             self.clear_cached_position_attributes()
             
     
-    def sweep(self, clear_cache: bool = True) -> tuple[CardController, ...]:
+    def sweep(self, clear_cache: bool = True) -> tuple[Card, ...]:
         
         # Collecting all cards:
-        cards_pending_removal: tuple[CardController, ...] = self.cards
+        cards_pending_removal: tuple[Card, ...] = self.cards
         for card_object in cards_pending_removal:
             self.remove_card(
                 card_object = card_object,
@@ -407,7 +408,7 @@ class TableController:
         return position_list
     
     
-    def get_position_attack(self, card_object: CardController, ignore_assertion: bool = False) -> int | None:
+    def get_position_attack(self, card_object: Card, ignore_assertion: bool = False) -> int | None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -424,7 +425,7 @@ class TableController:
             return None
         
     
-    def get_position_defence(self, card_object: CardController, ignore_assertion: bool = False) -> int | None:
+    def get_position_defence(self, card_object: Card, ignore_assertion: bool = False) -> int | None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -436,7 +437,7 @@ class TableController:
         position_defence: int | None = None
         if self.position_defence_list:
             for card_location_index in self.position_defence_list:
-                card_attacking: CardController | None = self.cards_index[card_location_index]
+                card_attacking: Card | None = self.cards_index[card_location_index]
                 
                 # Checking if card is attacking and can be defended against:
                 if card_attacking is not None and card_object > card_attacking:
@@ -445,6 +446,66 @@ class TableController:
         
         # Returning:
         return position_defence
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        UPDATE METHODS
+    
+    """
+    
+    
+    def update_texturepack_front(self, texturepack_object: texturepack.TexturePack, 
+                                       ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_texturepack(
+                validate_value = texturepack_object
+                )
+
+        # Updating texture pack for all cards:
+        for card_object in self.cards:
+            card_object.set_texturepack_front(
+                set_value = texturepack_object,
+                update_texture = True,
+                ignore_assertion = True,
+                clear_cache = True
+                )
+                
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "cards"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+            
+    
+    def update_texturepack_back(self, texturepack_object: texturepack.TexturePack, 
+                                        ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_texturepack(
+                validate_value = texturepack_object
+                )
+
+        # Updating texture pack for all cards:
+        for card_object in self.cards:
+            card_object.set_texturepack_back(
+                set_value = texturepack_object,
+                update_texture = True,
+                ignore_assertion = True,
+                clear_cache = True
+                )
+
+        # Clearing cache:   
+        if clear_cache:
+            cached_property: str = "cards"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
 
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

@@ -1,5 +1,5 @@
 # Card class object:
-from game.controller.card import CardController
+from game.controller.card import CardController as Card
 
 # External libraries:
 import random
@@ -32,7 +32,7 @@ class HandController:
         self.__owner: str = context.PLAYER_TYPE.HUMAN       # TODO: TEST CODE, REMOVE!
         
         # Container attributes:
-        self.__cards_list: list[CardController] = []
+        self.__cards_list: list[Card] = []
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -112,10 +112,10 @@ class HandController:
     """
     
     
-    def __create_list(self) -> list[CardController]:
+    def __create_list(self) -> list[Card]:
         
         # Creating new cards list:
-        cards_list: list[CardController] = []
+        cards_list: list[Card] = []
         
         # Returning:
         return cards_list
@@ -124,7 +124,7 @@ class HandController:
     def setup(self, set_owner: str, ignore_assertion: bool = False) -> None:
         
         # Creating new cards list:
-        cards_list: list[CardController] = self.__create_list()
+        cards_list: list[Card] = self.__create_list()
         
         # Updating attributes:
         self.__cards_list = cards_list
@@ -141,7 +141,7 @@ class HandController:
     def reset(self) -> None:
         
         # Creating new cards list:
-        cards_list: list[CardController] = self.__create_list()
+        cards_list: list[Card] = self.__create_list()
         
         # Updating attribute:
         self.__cards_list = cards_list
@@ -190,10 +190,10 @@ class HandController:
     
     
     @cached_property
-    def cards(self) -> tuple[CardController, ...]:
+    def cards(self) -> tuple[Card, ...]:
         
         # Converting list to tuple:
-        card_list: tuple[CardController, ...] = tuple(
+        card_list: tuple[Card, ...] = tuple(
             card_object for card_object 
             in self.__cards_list
             )
@@ -229,7 +229,7 @@ class HandController:
     def cards_known(self) -> int:
         
         # Acquiring card objects:
-        cards_known: tuple[CardController, ...] = tuple(
+        cards_known: tuple[Card, ...] = tuple(
             card_object for card_object in self.cards 
             if card_object.state_known
             )
@@ -238,7 +238,7 @@ class HandController:
         return cards_known
     
     
-    def add_card(self, card_object: CardController, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def add_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -310,7 +310,7 @@ class HandController:
             self.clear_cached_cards_attributes()
 
             
-    def remove_card(self, card_object: CardController, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def remove_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -339,7 +339,7 @@ class HandController:
     
     def update_texturepack_front(self, texturepack_object: texturepack.TexturePack, 
                                        ignore_assertion: bool = False, clear_cache: bool = True) -> None:
-
+    
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
             validate.validate_texturepack(
@@ -347,14 +347,13 @@ class HandController:
                 )
 
         # Updating texture pack for all cards:
-        if self.cards_count > 0:
-            for card_object in self.cards:
-                card_object.set_texturepack_front(
-                    set_value = texturepack_object,
-                    update_texture = True,
-                    ignore_assertion = True,
-                    clear_cache = True
-                    )
+        for card_object in self.__cards_list:
+            card_object.set_texturepack_front(
+                texturepack_object = texturepack_object,
+                update_texture = True,
+                ignore_assertion = True,
+                clear_cache = True
+                )
                 
         # Clearing cache:
         if clear_cache:
@@ -375,14 +374,13 @@ class HandController:
                 )
 
         # Updating texture pack for all cards:
-        if self.cards_count > 0:
-            for card_object in self.cards:
-                card_object.set_texturepack_back(
-                    set_value = texturepack_object,
-                    update_texture = True,
-                    ignore_assertion = True,
-                    clear_cache = True
-                    )
+        for card_object in self.__cards_list:
+            card_object.set_texturepack_back(
+                texturepack_object = texturepack_object,
+                update_texture = True,
+                ignore_assertion = True,
+                clear_cache = True
+                )
 
         # Clearing cache:   
         if clear_cache:
@@ -485,7 +483,7 @@ class HandController:
         return coordinates_index
     
     
-    def __get_precalc_coordinates(self, card_object: CardController) -> context.Coordinates:
+    def __get_precalc_coordinates(self, card_object: Card) -> context.Coordinates:
         
         # Locating coordinates:
         coordinates_index: dict[int, dict[int, context.Coordinates]] = self.precalc_coordinates
