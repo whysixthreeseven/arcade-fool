@@ -12,8 +12,12 @@ class KEYMAP:
     
     # Debug kemap:
     KEY_DEBUG_RESTART_GAME: int = arcade.key.F1
-    KEY_DEBUG_DRAW_PLAYER: int = arcade.key.NUM_1
-    KEY_DEBUG_DRAW_OPPONENT: int = arcade.key.NUM_2
+    KEY_DEBUG_DRAW_PLAYER: int = arcade.key.KEY_1
+    KEY_DEBUG_DRAW_OPPONENT: int = arcade.key.KEY_2
+    KEY_DEBUG_TP_FRONT_NEXT: int = arcade.key.O
+    KEY_DEBUG_TP_FRONT_PREV: int = arcade.key.P
+    KEY_DEBUG_TP_BACK_NEXT: int = arcade.key.K
+    KEY_DEBUG_TP_BACK_PREV: int = arcade.key.L
 
     # User keymap:
     KEY_SORT_HAND: int = arcade.key.S
