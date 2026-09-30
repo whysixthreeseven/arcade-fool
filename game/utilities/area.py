@@ -14,6 +14,12 @@ from game.utilities.scripts import cache
 from game.utilities.scripts import assertion, validate
 
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    AREA CLASS OBJECT CONSTRUCTOR
+    
+"""
+
+
 class Area:
     
     def __init__(self) -> None:

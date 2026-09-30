@@ -26,6 +26,12 @@ from game.utilities import area, texturepack
 from game.utilities.scripts import assertion, validate
 
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    GAME CONTROLLER CLASS OBJECT CONSTRUCTOR
+    
+"""
+
+
 class Game:
     
     def __init__(self) -> None:

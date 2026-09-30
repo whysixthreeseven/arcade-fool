@@ -2,6 +2,12 @@
 from typing import Any
 
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    ASSERTION FUNCTIONS
+    
+"""
+
+
 def assert_value_type(check_value: Any, check_type: type | tuple[type, ...], raise_error: bool = True) -> bool:
     """
     Asserts that the given value is of the given type or type list.

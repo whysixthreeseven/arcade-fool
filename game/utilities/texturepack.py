@@ -14,6 +14,12 @@ from game.utilities.scripts import cache
 from game.utilities.scripts import assertion
 
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    TEXTUREPACK CLASS OBJECT CONSTRUCTOR
+    
+"""
+
+
 class TexturePack:
     
     def __init__(self) -> None:
@@ -424,8 +430,8 @@ class TexturePack:
         return texture_index        
 
 
-""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    TEXTURE PACK COLLECTION (FRONT & BACK)
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    TEXTUREPACK COLLECTION (FRONT & BACK)
 
 """
 

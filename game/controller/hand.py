@@ -18,6 +18,12 @@ from game.utilities import texturepack
 from game.utilities.scripts import validate
 
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    HAND CONTROLLER CLASS OBJECT CONSTRUCTOR
+    
+"""
+
+
 class HandController:
     
     def __init__(self) -> None:

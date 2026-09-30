@@ -10,6 +10,12 @@ from game.utilities import area
 from game.utilities.scripts import validate
 
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    SURFACE CONTROLLER CLASS OBJECT CONSTRUCTOR
+    
+"""
+
+
 class SurfaceController:
     
     

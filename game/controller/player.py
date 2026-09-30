@@ -17,6 +17,12 @@ from game.utilities.scripts import cache
 from game.utilities.scripts import assertion, validate
 
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    PLAYER CONTROLLER CLASS OBJECT CONSTRUCTOR
+    
+"""
+
+
 class PlayerController:
     
     def __init__(self) -> None:

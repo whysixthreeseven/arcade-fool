@@ -19,6 +19,12 @@ from game.utilities import texturepack
 from game.utilities.scripts import validate
 
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    DECK CONTROLLER CLASS OBJECT CONSTRUCTOR
+    
+"""
+
+
 class DeckController:
     
     def __init__(self) -> None:

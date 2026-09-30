@@ -18,6 +18,12 @@ from game.utilities import texturepack
 from game.utilities.scripts import validate
 
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    DISCARD CONTROLLER CLASS OBJECT CONSTRUCTOR
+    
+"""
+
+
 class DiscardController:
     
     def __init__(self) -> None:

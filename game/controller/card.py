@@ -20,7 +20,7 @@ from game.utilities.scripts import assertion, validate
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    CARD CLASS OBJECT CONSTRUCTOR
+    CARD CONTROLLER CLASS OBJECT CONSTRUCTOR
     
 """
 

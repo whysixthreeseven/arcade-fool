@@ -3,6 +3,12 @@ from functools import cached_property
 import inspect
 
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    CACHED PROPERTIES MANAGEMENT FUNCTIONS
+    
+"""
+
+
 def clear_cached_property(target_object: object, target_attribute: str) -> None:
     """
     Removes attribute for a class object if it exists. Used to clear properties cached with `functools` library's 

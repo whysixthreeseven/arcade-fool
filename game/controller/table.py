@@ -18,6 +18,12 @@ from game.utilities.scripts import cache
 from game.utilities.scripts import validate
 
 
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    TABLE CONTROLLER CLASS OBJECT CONSTRUCTOR
+    
+"""
+
+
 class TableController:
     
     def __init__(self) -> None:
