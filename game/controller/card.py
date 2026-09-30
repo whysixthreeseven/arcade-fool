@@ -2027,6 +2027,7 @@ class CardController:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "texturepack_front",
+                "texture_filepath_front",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -2056,6 +2057,7 @@ class CardController:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "texturepack_back",
+                "texture_filepath_back",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
