@@ -1142,8 +1142,10 @@ class Game:
             keymap.KEYMAP.KEY_DEBUG_DRAW_OPPONENT,
             )
         key_switch_tp_list: tuple[int, ...] = (
-            keymap.KEYMAP.KEY_DEBUG_TP_FRONT_NEXT, keymap.KEYMAP.KEY_DEBUG_TP_FRONT_PREV,
-            keymap.KEYMAP.KEY_DEBUG_TP_BACK_NEXT, keymap.KEYMAP.KEY_DEBUG_TP_BACK_PREV,
+            keymap.KEYMAP.KEY_DEBUG_TP_FRONT_NEXT, 
+            keymap.KEYMAP.KEY_DEBUG_TP_FRONT_PREV,
+            keymap.KEYMAP.KEY_DEBUG_TP_BACK_NEXT, 
+            keymap.KEYMAP.KEY_DEBUG_TP_BACK_PREV,
             )
         
         # TODO: Replace with proper logic:
@@ -1341,7 +1343,7 @@ class Game:
 
         # Applying selected texturepack:
         self.apply_texturepack_back(
-            texturepack_object = SESSION.TEXTUREPACK_BACK_DEFAULT,
+            texturepack_object = SESSION.TEXTUREPACK_BACK_SELECTED,
             ignore_assertion = True,
             )
     
