@@ -654,6 +654,19 @@ def validate_player_state(validate_value: str) -> None:
         raise_error = True,
         )
     
+
+def validate_player_controller(validate_value: object) -> None:
+    
+    # Player controller class instance:
+    from game.controller.player import PlayerController
+    
+    # Asserting value type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = PlayerController,
+        raise_error = True
+        )
+    
     
 def validate_computer_style(validate_value: int) -> None:
     
