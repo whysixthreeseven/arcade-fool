@@ -692,7 +692,7 @@ def validate_computer_difficulty(validate_value: str) -> None:
 def validate_hand(validate_value: object) -> None:
     
     # Card class object:
-    from game.controller.hand import HandController
+    from game.controller.location.hand import HandController
     
     # Asserting value type:
     assertion.assert_value_type(
@@ -764,7 +764,7 @@ def validate_key_id(validate_value: int) -> None:
 def validate_area(validate_value: object) -> None:
     
     # Area class object:
-    from game.utilities.area import Area
+    from game.utilities.screen.area import Area
     
     # Asserting value type:
     assertion.assert_value_type(
