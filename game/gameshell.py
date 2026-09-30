@@ -63,7 +63,7 @@ class Gameshell(arcade.Window):
             int(coordinate_y)
             )
         
-        # Updating current cursor coordinates:
+        # Handling event:
         self.__gc.handle_mouse_motion(
             cursor_coordinates = cursor_coordinates,
             ignore_assertion = False
@@ -87,7 +87,12 @@ class Gameshell(arcade.Window):
     
         
     def on_key_press(self, key_pressed, modifiers):
-        ...     # TODO: Check documentation and implement!
+        
+        # Handling event:
+        self.__gc.handle_key_press(
+            key_pressed = key_pressed,
+            ignore_assertion = False,
+            )
     
     
     def on_key_release(self, key_released, modifiers):
@@ -95,6 +100,9 @@ class Gameshell(arcade.Window):
             
     
     def on_update(self, delta_time):
-        ...     # TODO: Check documentation and implement!
+        
+        # TODO: Replace with propert logic:
+        for card_object in self.__gc.cards:
+            card_object.slide(1.00, True)
                 
             
