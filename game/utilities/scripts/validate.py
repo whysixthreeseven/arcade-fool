@@ -4,7 +4,7 @@ from game import context
 
 # Various utilities:
 from game.utilities.scripts import assertion
-from game.utilities import texturepack
+from game.utilities import texturepack, keymap
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -844,4 +844,27 @@ def validate_rgb_color(validate_value: tuple[int, int, int]) -> None:
             check_range = (0, 255 + 1),
             raise_error = True
             )
+
+
+def validate_key(validate_value: int) -> None:
+    
+    # Asserting value type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = int,
+        raise_error = True
+        )
+
+    # Asserting value is greater than zero:
+    assertion.assert_value_gt_zero(
+        check_value = validate_value,
+        raise_error = True,
+        )
+    
+    # Asserting value is default:
+    assertion.assert_value_default(
+        check_value = validate_value,
+        check_list = keymap.KEYMAP_KEY_ALL_LIST,
+        raise_error = True,
+        )
 
