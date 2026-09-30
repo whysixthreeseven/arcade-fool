@@ -1128,38 +1128,27 @@ class Game:
     """
     
     
-    def handle_key_press(self, key_pressed: int, ignore_assertion: bool = False) -> None:
-        
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            validate.validate_key(
-                validate_value = key_pressed,
-                )
-        
-        # TODO: Replace with proper logic:
-        key_draw_list: tuple[int, ...] = (
-            keymap.KEYMAP.KEY_DEBUG_DRAW_PLAYER,
-            keymap.KEYMAP.KEY_DEBUG_DRAW_OPPONENT,
-            )
-        key_switch_tp_list: tuple[int, ...] = (
-            keymap.KEYMAP.KEY_DEBUG_TP_FRONT_NEXT, 
-            keymap.KEYMAP.KEY_DEBUG_TP_FRONT_PREV,
-            keymap.KEYMAP.KEY_DEBUG_TP_BACK_NEXT, 
-            keymap.KEYMAP.KEY_DEBUG_TP_BACK_PREV,
-            )
-        
-        # TODO: Replace with proper logic:
-        if key_pressed in key_draw_list:
+    def __handle_key_press_debug(self, key_pressed: int) -> None:
+
+        # Forcing player controller to draw a card:
+        if key_pressed in keymap.KEYMAP_KEY_DEBUG_FORCE_DRAW_LIST:
+            
+            # Checking if deck has enough cards:
             if self.deck.cards_count > 0:
+                
+                # Preparing variables:
+                player_controller_index: dict[int, PlayerController] = {
+                    keymap.KEYMAP.KEY_DEBUG_FORCE_DRAW_PLAYER: self.player_human,
+                    keymap.KEYMAP.KEY_DEBUG_FORCE_DRAW_OPPONENT: self.player_computer,
+                    }
+                
+                # Selecting correct player controller based on key pressed:
+                player_controller: PlayerController = player_controller_index[key_pressed]
+                
+                # Drawing card and adding it to player controller's hand:
                 card_object: Card = self.deck.draw_card(
                     clear_cache = True,
                     )
-                self.__handle_card_manipulation()
-                player_controller_index: dict[int, PlayerController] = {
-                    keymap.KEYMAP.KEY_DEBUG_DRAW_PLAYER: self.player_human,
-                    keymap.KEYMAP.KEY_DEBUG_DRAW_OPPONENT: self.player_computer,
-                    }
-                player_controller: PlayerController = player_controller_index[key_pressed]
                 player_controller.hand.add_card(
                     card_object = card_object,
                     ignore_assertion = True,
@@ -1168,22 +1157,65 @@ class Game:
                 player_controller.hand.update_coordinates(
                     clear_cache = True
                     )
-        
-        # TODO: Replace with proper logic:
-        elif key_pressed in key_switch_tp_list:
-            if key_pressed == keymap.KEYMAP.KEY_DEBUG_TP_FRONT_NEXT:
-                SESSION.set_texturepack_front_next()
+                
+                # Handling card manipulation:
+                self.__handle_card_manipulation()
+
+        # Selecting new texturepack:
+        elif key_pressed in keymap.KEYMAP_KEY_DEBUG_SELECT_TEXTUREPACK_LIST:
+            
+            # Preparing variables:
+            select_texturepack_front: bool = key_pressed in (
+                keymap.KEYMAP.KEY_DEBUG_SELECT_TEXTUREPACK_FRONT_NEXT,
+                keymap.KEYMAP.KEY_DEBUG_SELECT_TEXTUREPACK_FRONT_PREV,
+                )
+            select_texturepack_back: bool = key_pressed in (
+                keymap.KEYMAP.KEY_DEBUG_SELECT_TEXTUREPACK_BACK_NEXT,
+                keymap.KEYMAP.KEY_DEBUG_SELECT_TEXTUREPACK_BACK_PREV,
+                )
+            
+            # Selecting new texturepack (front) and applying changes:
+            if key_pressed in select_texturepack_front:
+                if key_pressed == keymap.KEYMAP.KEY_DEBUG_SELECT_TEXTUREPACK_FRONT_NEXT:
+                    SESSION.set_texturepack_front_next()
+                elif key_pressed == keymap.KEYMAP.KEY_DEBUG_SELECT_TEXTUREPACK_FRONT_PREV:
+                    SESSION.set_texturepack_front_previous()
                 self.apply_texturepack_front_selected()
-            elif key_pressed == keymap.KEYMAP.KEY_DEBUG_TP_FRONT_PREV:
-                SESSION.set_texturepack_front_previous()
-                self.apply_texturepack_front_selected()
-            elif key_pressed == keymap.KEYMAP.KEY_DEBUG_TP_BACK_NEXT:
-                SESSION.set_texturepack_back_next()
+                
+            # Selecting new texturepack (back) and applying changes:
+            elif key_pressed in select_texturepack_back:
+                if key_pressed == keymap.KEYMAP.KEY_DEBUG_SELECT_TEXTUREPACK_BACK_NEXT:
+                    SESSION.set_texturepack_back_next()
+                elif key_pressed == keymap.KEYMAP.KEY_DEBUG_SELECT_TEXTUREPACK_BACK_PREV:
+                    SESSION.set_texturepack_back_previous()
                 self.apply_texturepack_back_selected()
-            elif key_pressed == keymap.KEYMAP.KEY_DEBUG_TP_BACK_PREV:
-                SESSION.set_texturepack_back_previous()
-                self.apply_texturepack_back_selected()
+            
+            # Handling cards manipulation:
             self.__handle_card_manipulation()
+            
+        
+    def handle_key_press(self, key_pressed: int, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_key(
+                validate_value = key_pressed,
+                )
+            
+        # Using debug key pressed handler:
+        if key_pressed in keymap.KEYMAP_KEY_DEBUG_LIST:
+            self.__handle_key_press_debug(
+                key_pressed = key_pressed,
+                )
+            
+        # Using default input key pressed handler:
+        elif key_pressed in keymap.KEYMAP_KEY_USER_LIST:
+            error_message: str = "Key press <{key_pressed}> not implemented!"
+            raise NotImplemented(error_message)
+        
+        # Not doing anything on unregistered key:        
+        else:
+            pass
 
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
