@@ -63,7 +63,12 @@ class __SETTINGS:
     CARD_TEXTURE_HEIGHT: int = int(CARD_TEXTURE_HEIGHT_FILE * CARD_TEXTURE_SCALE_DEFAULT)
     
     # Card slide settings:
-    CARD_SLIDE_SPEED_MIN: int = int(CARD_TEXTURE_HEIGHT / 12)
+    CARD_SLIDE_SPEED_MIN: int = int(CARD_TEXTURE_HEIGHT / 20)       # (480 * 0.25) / 20 = 6
+    CARD_SLIDE_SPEED_MOD_DEFAULT: float = 1.00                      # Slide mod fallback value
+    CARD_SLIDE_SPEED_MOD_LOCATION: float = 2.00                     # Slide mod to new location
+    CARD_SLIDE_SPEED_MOD_HOVER: float = 1.50                        # Slide mod to hover position
+    CARD_SLIDE_SPEED_MOD_SELECT: float = 1.50                       # Slide mod to select position
+    CARD_SLIDE_SPEED_MOD_RETURN: float = 0.35                       # Slide mod to default position
     
     # Deck settings:
     DECK_SIZE_MIN: int = 36
