@@ -1165,11 +1165,11 @@ class Game:
         elif key_pressed in keymap.KEYMAP_KEY_DEBUG_SELECT_TEXTUREPACK_LIST:
             
             # Preparing variables:
-            select_texturepack_front: bool = key_pressed in (
+            select_texturepack_front: tuple[int, ...] = (
                 keymap.KEYMAP.KEY_DEBUG_SELECT_TEXTUREPACK_FRONT_NEXT,
                 keymap.KEYMAP.KEY_DEBUG_SELECT_TEXTUREPACK_FRONT_PREV,
                 )
-            select_texturepack_back: bool = key_pressed in (
+            select_texturepack_back: tuple[int, ...] = (
                 keymap.KEYMAP.KEY_DEBUG_SELECT_TEXTUREPACK_BACK_NEXT,
                 keymap.KEYMAP.KEY_DEBUG_SELECT_TEXTUREPACK_BACK_PREV,
                 )
