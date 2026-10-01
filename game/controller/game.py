@@ -1208,6 +1208,12 @@ class Game:
     """
     
     
+    def __handle_key_press_user(self, key_pressed: int) -> None:
+        
+        # TODO: Implement!
+        ...
+    
+    
     def __handle_key_press_debug(self, key_pressed: int) -> None:
 
         # Forcing player controller to draw a card:
@@ -1264,6 +1270,10 @@ class Game:
             # Handling cards manipulation:
             self.__handle_card_manipulation()
             
+        # Resetting game:
+        elif key_pressed == keymap.KEYMAP.KEY_DEBUG_FORCE_RESTART_GAME:
+            self.reset()
+            
         
     def handle_key_press(self, key_pressed: int, ignore_assertion: bool = False) -> None:
         
@@ -1281,13 +1291,14 @@ class Game:
             
         # Using default input key pressed handler:
         elif key_pressed in keymap.KEYMAP_KEY_USER_LIST:
-            error_message: str = "Key press <{key_pressed}> not implemented!"
-            raise NotImplemented(error_message)
+            self.__handle_key_press_user(
+                key_pressed = key_pressed,
+                )
         
         # Not doing anything on unregistered key:        
         else:
             pass
-
+        
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         APPLY (ALL CARDS) METHODS
