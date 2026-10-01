@@ -164,6 +164,7 @@ class Game:
         self.__setup_surface()
         
         # TODO: Setup interface and events!
+        ...
         
         # Clearing all cache:
         self.clear_cached_attributes()
@@ -924,6 +925,9 @@ class Game:
                     ignore_assertion = True,
                     clear_cache = True,
                     )
+                self.__card_hover.update_coordinates_state(
+                    clear_cache = True,
+                    )
             
 
     def remove_card_hover(self) -> None:
@@ -935,6 +939,9 @@ class Game:
             self.card_hover.set_state_hovered(
                 set_value = False,
                 ignore_assertion = True,
+                clear_cache = True,
+                )
+            self.card_hover.update_coordinates_state(
                 clear_cache = True,
                 )
             self.__card_hover = None
