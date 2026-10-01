@@ -1095,6 +1095,28 @@ class Game:
     """
     
     
+    def perform_deal_cards(self, player_controller: PlayerController, clear_cache: bool = True) -> None:
+        
+        # Checking if deck has cards available:
+        if self.deck.cards_count > 0:
+            
+            # Dealing cards until hand reaches cards minimum:
+            while player_controller.hand.cards_count < 6:
+                self.perform_player_draw(
+                    player_controller = player_controller,
+                    ignore_assertion = False,
+                    clear_cache = False
+                    )
+                
+                # Stopping if no more cards available:
+                if self.deck.cards_count == 0:
+                    break
+            
+            # Clearing cache:
+            if clear_cache:
+                self.__handle_card_manipulation()
+    
+    
     def perform_player_draw(self, player_controller: PlayerController, ignore_assertion: bool = False, 
                                   clear_cache: bool = True) -> None:
         
