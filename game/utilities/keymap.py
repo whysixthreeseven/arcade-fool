@@ -11,7 +11,7 @@ import arcade
 class KEYMAP:
     
     # Debug kemap:
-    KEY_DEBUG_FORCE_RESTART_GAME: int = arcade.key.F1
+    KEY_DEBUG_FORCE_RESTART_GAME: int = arcade.key.R
     KEY_DEBUG_FORCE_DRAW_PLAYER: int = arcade.key.KEY_1
     KEY_DEBUG_FORCE_DRAW_OPPONENT: int = arcade.key.KEY_2
     KEY_DEBUG_SELECT_TEXTUREPACK_FRONT_NEXT: int = arcade.key.O
