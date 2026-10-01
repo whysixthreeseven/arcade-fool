@@ -130,7 +130,6 @@ class DeckController:
         # Calling setup method:
         self.setup(
             trump_suit = None,
-            deck_size = SESSION.DECK_SIZE_SELECTED,
             )
     
     
