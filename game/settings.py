@@ -16,9 +16,9 @@ class __SETTINGS:
     # Application information:
     APP_NAME: str = "Arcade Fool"
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
-    APP_VERSION: str = "0.0.1R"
-    APP_STARTED: str = "2026.09.02"
-    APP_UPDATED: str = "2026.09.30"
+    APP_STARTED: str = "2026.09.02"                                     # Date of project start (reboot)
+    APP_UPDATED: str = "2026.10.01"                                     # Date of last edit
+    APP_VERSION: str = f"0.0.{APP_UPDATED[-6:].replace(".", "")}"       # Month and day in MMDD format
     APP_AUTHOR: str = "Andrey Vostokov"
 
     # Root directory settings:    
