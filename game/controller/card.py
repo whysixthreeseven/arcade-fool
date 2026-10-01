@@ -592,6 +592,33 @@ class CardController:
         # Returning:
         return cached_property_list
     
+    
+    def __cached_slide_attributes(self) -> tuple[str, ...]:
+        
+        """
+        Slide speed attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
+    
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "slide_speed",
+            "slide_speed_modifier"
+            )
+        
+        # Returning:
+        return cached_property_list
+    
 
     def clear_cached_core_attributes(self) -> None:
         """
@@ -743,6 +770,21 @@ class CardController:
             )
         
     
+    def clear_cached_slide_attributes(self) -> None:
+        """
+        Clears all public cached core properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear texturepack properties of this card object.
+        """
+
+        # Clearing cached properties:
+        cache.clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_slide_attributes
+            )
+        
+    
     def clear_cached_attributes(self) -> None:
         """
         Clears all public cached properties of this card object.
@@ -763,6 +805,7 @@ class CardController:
             self.__cached_location_attributes,
             self.__cached_id_attributes,
             self.__cached_added_index_attributes,
+            self.__cached_slide_attributes,
             )
         
         # Looping throught the list and clearing cache:
@@ -2999,6 +3042,8 @@ class CardController:
         
         # Clearing cache:
         if clear_cache:
+            
+            # Clearing target cached properties:
             cached_property_list: tuple[str, ...] = (
                 "state_hovered",
                 "state_idle"
@@ -3008,22 +3053,18 @@ class CardController:
                 target_attribute_list = cached_property_list
                 )
             
+            # Clearing related cached properties:
+            self.clear_cached_slide_attributes()
+            
 
     def switch_state_hovered(self, clear_cache: bool = True) -> None:
 
         # Updating attribute:
-        self.__state_hovered = not self.__state_hovered
-
-        # Clearing cache:
-        if clear_cache:
-            cached_property_list: tuple[str, ...] = (
-                "state_hovered",
-                "state_idle"
-                )
-            cache.clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
+        self.set_state_hovered(
+            set_value = not self.state_hovered,
+            ignore_assertion = True,
+            clear_cache = clear_cache
+            )
             
     
     def set_state_selected(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -3040,6 +3081,8 @@ class CardController:
         # Clearing cache:
         if clear_cache:
             if clear_cache:
+                
+                # Clearing target cached properties:
                 cached_property_list: tuple[str, ...] = (
                     "state_selected",
                     "state_idle"
@@ -3048,23 +3091,19 @@ class CardController:
                     target_object = self,
                     target_attribute = cached_property_list
                     )
+                
+                # Clearing related cached properties:
+                self.clear_cached_slide_attributes()
             
     
     def switch_state_selected(self, clear_cache: bool = True) -> None:
         
         # Updating attribute:
-        self.__state_selected = not self.__state_selected
-
-        # Clearing cache:
-        if clear_cache:
-            cached_property_list: tuple[str, ...] = (
-                "state_selected",
-                "state_idle"
-                )
-            cache.clear_cached_property_list(
-                target_object = self,
-                target_attribute = cached_property_list
-                )
+        self.set_state_selected(
+            set_value = not self.state_selected,
+            ignore_assertion = True,
+            clear_cache = clear_cache
+            )
             
             
     def set_state_faded(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -3216,25 +3255,29 @@ class CardController:
 
         # Clearing cache:
         if clear_cache:
-            cached_property: str = "state_arrived"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
+            
+            # Clearing target cached properties:
+            cached_property_list: tuple[str, ...] = (
+                "state_arrived",
+                "state_idle",
                 )
+            cache.clear_cached_property_list(
+                target_object = self,
+                target_attribute_list = cached_property_list
+                )
+            
+            # Clearing related cached properties:
+            self.clear_cached_slide_attributes()
             
     
     def switch_state_arrived(self, clear_cache: bool = True) -> None:
         
         # Updating attribute:
-        self.__state_arrived = not self.__state_arrived
-
-        # Clearing cache:
-        if clear_cache:
-            cached_property: str = "state_arrived"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
+        self.set_state_arrived(
+            set_value = not self.state_arrived,
+            ignore_assertion = True,
+            clear_cache = clear_cache
+            )
             
             
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3813,7 +3856,55 @@ class CardController:
     """
     
     
-    def slide(self, slide_speed_modifier: float, clear_cache: bool = True) -> None:
+    @cached_property
+    def slide_speed_modifier(self) -> float:
+        
+        # If card has not arrived to its new location:
+        if not self.state_arrived:
+            slide_speed_modifier: float = SETTINGS.CARD_SLIDE_SPEED_MOD_LOCATION
+            
+        # Checking in-position states:
+        else:
+            
+            # If card is selected:
+            if self.state_selected:
+                slide_speed_modifier: float = SETTINGS.CARD_SLIDE_SPEED_MOD_SELECTED
+                
+            # If card is hovered over:
+            elif self.state_hovered:
+                slide_speed_modifier: float = SETTINGS.CARD_SLIDE_SPEED_MOD_HOVERED
+                
+            # If card is not selected or hovered over, checking its position on screen:
+            else:
+                
+                # If card is returning back to default position:
+                if self.coordinates_expected != self.coordinates_position:
+                    slide_speed_modifier: float = SETTINGS.CARD_SLIDE_SPEED_MOD_RETURN
+                    
+                # Fallback value:
+                else:
+                    slide_speed_modifier: float = SETTINGS.CARD_SLIDE_SPEED_MOD_DEFAULT
+                    
+        # Returning:
+        return slide_speed_modifier
+    
+    
+    @cached_property
+    def slide_speed(self) -> None:
+        
+        # Setting default (min) slide speed:
+        slide_speed: int = SETTINGS.CARD_SLIDE_SPEED_MIN
+        
+        # Adjusting slide speed based on modifier:
+        slide_speed_set: int = slide_speed * self.slide_speed_modifier
+        if slide_speed_set < SETTINGS.CARD_SLIDE_SPEED_MIN:
+            slide_speed_set = SETTINGS.CARD_SLIDE_SPEED_MIN
+            
+        # Returning:
+        return slide_speed_set
+    
+    
+    def slide(self, clear_cache: bool = True) -> None:
         """
         Slides card object's position to expected coordinates.
         
@@ -3827,31 +3918,26 @@ class CardController:
         
         Parameters
         ----------
-        slide_speed_modifier : `float`
-            Speed modifier to determine how fast the card should slide to new coordinates.
         clear_cache : `bool` = `True`
             Flag to determine if related cache should be cleared. If set to `True`, related cache will be cleared.
         """
         
         # Preparing variables:
-        slide_speed: int = SETTINGS.CARD_SLIDE_SPEED_MIN
-        slide_speed_set: int = slide_speed * slide_speed_modifier
-        if slide_speed_set < SETTINGS.CARD_SLIDE_SPEED_MIN:
-            slide_speed_set = SETTINGS.CARD_SLIDE_SPEED_MIN
+        slide_speed: int = self.slide_speed
             
         # Adjusting coordinate x:
         if self.coordinate_x != self.coordinate_x_expected:
             
             # Adjusting speed on difference:
             difference_abs: int = abs(self.coordinate_x - self.coordinate_x_expected)
-            if difference_abs < slide_speed_set:
-                slide_speed_set: int = difference_abs
+            if difference_abs < slide_speed:
+                slide_speed: int = difference_abs
             
             # Choosing axis:
             axis_x = 1 if self.coordinate_x < self.coordinate_x_expected else -1
             
             # Calling adjust method:
-            slide_amount: int = int(slide_speed_set * axis_x)
+            slide_amount: int = int(slide_speed * axis_x)
             self.adjust_coordinate_x(
                 adjust_value = slide_amount,
                 clear_cache = True
@@ -3862,14 +3948,14 @@ class CardController:
             
             # Adjusting speed on difference:
             difference_abs: int = abs(self.coordinate_y - self.coordinate_y_expected)
-            if difference_abs < slide_speed_set:
-                slide_speed_set: int = difference_abs
+            if difference_abs < slide_speed:
+                slide_speed: int = difference_abs
             
             # Choosing axis:
             axis_y = 1 if self.coordinate_y < self.coordinate_y_expected else -1
             
             # Calling adjust method:
-            slide_amount: int = int(slide_speed_set * axis_y)
+            slide_amount: int = int(slide_speed * axis_y)
             self.adjust_coordinate_y(
                 adjust_value = slide_amount,
                 clear_cache = clear_cache
