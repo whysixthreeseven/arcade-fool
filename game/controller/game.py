@@ -1335,38 +1335,52 @@ class Game:
     """
     
     
+    def __handle_slide_card(self, card_object: Card, force_instant: bool = False) -> None:
+        
+        # Force slide:                
+        if force_instant:
+            card_object.set_coordinates_position(
+                set_value = card_object.coordinates_expected,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
+            
+        # Calling card slide method:
+        else:
+            card_object.slide(
+                clear_cache = True,
+                )
+    
+    
+    def __handle_slide_card_container(self, cards_container: tuple[Card, ...], force_instant: bool = False) -> None:
+        
+        # Sliding every card in card container:
+        for card_object in cards_container:
+            self.__handle_slide_card(
+                card_object = card_object,
+                force_instant = force_instant
+                )
+    
+    
     def handle_slide(self, force_instant: bool = False) -> None:
         
-        # Looping through cards in hand controllers:
-        for card_object in self.cards:
-
-            # Force change:                
-            if force_instant:
-                card_object.set_coordinates_position(
-                    set_value = card_object.coordinates_expected,
-                    ignore_assertion = True,
-                    clear_cache = True,
-                    )
-                
-            # Determining slide speed modifier:
-            else:
-                
-                # Location to location slide:
-                if not card_object.state_arrived:
-                    slide_speed_modifier: float = 2.00              # TODO: Create SETTINGS value!
-                    
-                # Sorting and hover:
-                else:
-                    if card_object.state_hovered or card_object.state_selected:
-                        slide_speed_modifier: float = 1.00          # TODO: Create SETTINGS value!
-                    else:
-                        slide_speed_modifier: float = 0.25          # TODO: Create SETTINGS value!
+        # Looping over location controllers and calling method:
+        for location_controller in self.__location_controllers:
+            self.__handle_slide_card_container(
+                cards_container = location_controller.cards,
+                force_instant = force_instant,
+                )
             
-                # Sliding card:
-                card_object.slide(
-                    slide_speed_modifier = slide_speed_modifier,
-                    clear_cache = True,
-                    )
+        # Looping over player controllers and calling method:
+        for player_controller in self.__player_controllers:
+            self.__handle_slide_card_container(
+                cards_container = player_controller.cards,
+                force_instant = force_instant,
+                )
+
+            
+        
+        
     
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
