@@ -1328,6 +1328,46 @@ class Game:
         else:
             pass
         
+        
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        HANDLE SLIDE METHODS
+    
+    """
+    
+    
+    def handle_slide(self, force_instant: bool = False) -> None:
+        
+        # Looping through cards in hand controllers:
+        for card_object in self.cards:
+
+            # Force change:                
+            if force_instant:
+                card_object.set_coordinates_position(
+                    set_value = card_object.coordinates_expected,
+                    ignore_assertion = True,
+                    clear_cache = True,
+                    )
+                
+            # Determining slide speed modifier:
+            else:
+                
+                # Location to location slide:
+                if not card_object.state_arrived:
+                    slide_speed_modifier: float = 2.00              # TODO: Create SETTINGS value!
+                    
+                # Sorting and hover:
+                else:
+                    if card_object.state_hovered or card_object.state_selected:
+                        slide_speed_modifier: float = 1.00          # TODO: Create SETTINGS value!
+                    else:
+                        slide_speed_modifier: float = 0.25          # TODO: Create SETTINGS value!
+            
+                # Sliding card:
+                card_object.slide(
+                    slide_speed_modifier = slide_speed_modifier,
+                    clear_cache = True,
+                    )
+    
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         APPLY (ALL CARDS) METHODS
