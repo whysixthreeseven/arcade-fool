@@ -74,10 +74,6 @@ class Gameshell(arcade.Window):
         ...     # TODO: Check documentation and implement!
         
     
-    def on_mouse_release(self, coordinate_x, coordinate_y, button, modifiers):
-        ...     # TODO: Check documentation and implement!
-        
-        
     def on_mouse_leave(self, coordinate_x, coordinate_y):
         ...     # TODO: Check documentation and implement!
         
@@ -95,14 +91,10 @@ class Gameshell(arcade.Window):
             )
     
     
-    def on_key_release(self, key_released, modifiers):
-        ...     # TODO: Check documentation and implement!
-            
-    
     def on_update(self, delta_time):
         
-        # TODO: Replace with propert logic:
-        for card_object in self.__gc.cards:
-            card_object.slide(1.00, True)
-                
+        # Handling card slide:
+        self.__gc.handle_slide(
+            force_instant = False
+            )                
             
