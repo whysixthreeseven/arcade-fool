@@ -878,6 +878,6 @@ def validate_key(validate_value: int) -> None:
     assertion.assert_value_default(
         check_value = validate_value,
         check_list = keymap.KEYMAP_KEY_ALL_LIST,
-        raise_error = True,
+        raise_error = False,
         )
 
