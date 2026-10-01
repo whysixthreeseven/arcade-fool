@@ -1083,15 +1083,95 @@ class Game:
                 
                 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        HANDLE MOUSE METHODS
+        PERFORM METHODS
     
     """
     
     
-    def __handle_card_manipulation(self) -> None:
+    def perform_player_draw(self, player_controller: PlayerController, ignore_assertion: bool = False, 
+                                  clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_player_controller(
+                validate_value = player_controller,
+                )
+
+        # Drawing card and adding it to player controller's hand:
+        card_object: Card = self.deck.draw_card(
+            clear_cache = True,
+            )
+        player_controller.hand.add_card(
+            card_object = card_object,
+            ignore_assertion = True,
+            clear_cache = True,
+            )
+        player_controller.hand.update_coordinates(
+            clear_cache = True
+            )
+        
+        # Handling card manipulation:
+        if clear_cache:
+            self.__handle_card_manipulation()
             
-            # Clearing cache:
-            self.clear_cached_cards_attributes()
+    
+    def perform_player_play(self, player_controller: PlayerController, card_object: Card, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_player_controller(
+                validate_value = player_controller,
+                )
+            validate.validate_card_object(
+                validate_value = card_object,
+                )
+            
+        # Performing action if player is attacking:
+        if player_controller.state_attacking:
+            location_index: int = self.table.get_position_attack(
+                card_object = card_object,
+                ignore_assertion = True,
+                )
+            
+        # Raising error if position is empty or invalid:
+        if location_index is None:
+            error_message: str = f"Unable to find position to play <{card_object}> while player is {player_controller.state.lower()}!"
+            raise IndexError(error_message)
+
+        # Removing card from player's hand and adding it to the table:
+        else:
+            player_controller.hand.remove_card(
+                card_object = card_object,
+                ignore_assertion = False,
+                clear_cache = True,
+                )
+            player_controller.hand.update_coordinates(
+                clear_cache = True
+                )
+            self.table.add_card(
+                card_object = card_object,
+                location_index = location_index,
+                ignore_assertion = False,
+                clear_cache = True,
+                )
+            
+            
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        MISC HANDLE METHODS
+        
+    """
+        
+        
+    def __handle_card_manipulation(self) -> None:
+                
+        # Clearing cache:
+        self.clear_cached_cards_attributes()        
+        
+                
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        HANDLE MOUSE METHODS
+    
+    """
             
     
     def handle_mouse_motion(self, cursor_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
@@ -1145,21 +1225,12 @@ class Game:
                 # Selecting correct player controller based on key pressed:
                 player_controller: PlayerController = player_controller_index[key_pressed]
                 
-                # Drawing card and adding it to player controller's hand:
-                card_object: Card = self.deck.draw_card(
-                    clear_cache = True,
-                    )
-                player_controller.hand.add_card(
-                    card_object = card_object,
+                # Drawing card:
+                self.perform_player_draw(
+                    player_controller = player_controller,
                     ignore_assertion = True,
                     clear_cache = True,
                     )
-                player_controller.hand.update_coordinates(
-                    clear_cache = True
-                    )
-                
-                # Handling card manipulation:
-                self.__handle_card_manipulation()
 
         # Selecting new texturepack:
         elif key_pressed in keymap.KEYMAP_KEY_DEBUG_SELECT_TEXTUREPACK_LIST:
