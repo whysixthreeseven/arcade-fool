@@ -3835,7 +3835,7 @@ class CardController:
     """
     
     
-    def display(self) -> None:
+    def display(self, debug_boundary: bool = False) -> None:
         """
         Renders the card object's texture on screen. Used by `Gameshell` object's `on_draw` method within loop logic. 
         
@@ -3845,11 +3845,12 @@ class CardController:
 
         # Rendering boundary rectangle:
         if SESSION.ENABLE_DEBUG:
-            arcade.draw_rect_filled(
-                rect = self.render_rect_boundary,
-                color = arcade.color.YELLOW_ORANGE,
-                tilt_angle = 0
-                )
+            if debug_boundary:
+                arcade.draw_rect_filled(
+                    rect = self.render_rect_boundary,
+                    color = arcade.color.YELLOW_ORANGE,
+                    tilt_angle = 0
+                    )
         
         # Rendering:
         arcade.draw_texture_rect(
