@@ -76,6 +76,13 @@ class Event:
             clear_cache = True,
             )
         
+        # Setting status attributes:
+        event_object.set_wait(
+            set_value = True,
+            ignore_assertion = ignore_assertion,
+            clear_cache = True,
+            )
+        
         # Returning:
         return event_object
     
@@ -509,8 +516,8 @@ class Event:
 """
 
 
-EVENT_DRAW_CARDS: Event = Event.generate_predefined(
-    event_name = context.EVENT_NAME.DRAW,
+EVENT_DEAL_CARDS: Event = Event.generate_predefined(
+    event_name = context.EVENT_NAME.DEAL,
     ignore_assertion = False,
     )
 

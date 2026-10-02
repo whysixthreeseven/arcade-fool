@@ -268,7 +268,7 @@ class Game:
             
         # Drawing cards and running event:
         self.add_event(
-            event_object = event.EVENT_DRAW_CARDS,
+            event_object = event.EVENT_DEAL_CARDS,
             autostart = True,
             ignore_assertion = False,
             clear_cache = True
