@@ -14,6 +14,7 @@ class KEYMAP:
     KEY_DEBUG_FORCE_RESTART_GAME: int = arcade.key.R
     KEY_DEBUG_FORCE_DRAW_PLAYER: int = arcade.key.KEY_1
     KEY_DEBUG_FORCE_DRAW_OPPONENT: int = arcade.key.KEY_2
+    KEY_DEBUG_SORT_OPPONENT: int = arcade.key.D
     KEY_DEBUG_SELECT_TEXTUREPACK_FRONT_NEXT: int = arcade.key.O
     KEY_DEBUG_SELECT_TEXTUREPACK_FRONT_PREV: int = arcade.key.P
     KEY_DEBUG_SELECT_TEXTUREPACK_BACK_NEXT: int = arcade.key.K
