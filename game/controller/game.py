@@ -21,7 +21,7 @@ from functools import cached_property
 from game.utilities.scripts import cache
 
 # Various utilities:
-from game.utilities import keymap, texturepack
+from game.utilities import event, keymap, texturepack
 from game.utilities.screen import area, scene, surface
 from game.utilities.scripts import assertion, validate
 
@@ -51,6 +51,9 @@ class Game:
         
         # Screen attributes:
         self.__screen: scene.Scene = None
+        
+        # Event attributes:
+        self.__event_list: list[event.Event] = []
         
         # Game state attributes:
         self.__state_game_started: bool = False
@@ -213,6 +216,25 @@ class Game:
         return cached_property_list
     
     
+    @cached_property
+    def __cached_events_attributes(self) -> tuple[str, ...]:
+        
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "events",
+            "events_count",
+            "events_ongoing",
+            "events_ongoing_count",
+            "events_wait",
+            "events_wait_count",
+            "events_finished",
+            "events_finished_count",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+    
     def clear_cached_player_attributes(self) -> None:
         
         # Clearing cached properties:
@@ -228,6 +250,15 @@ class Game:
         cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_cards_attributes
+            )
+        
+    
+    def clear_cached_events_attributes(self) -> None:
+                
+        # Clearing cached properties:
+        cache.clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_events_attributes
             )
         
     
@@ -348,6 +379,22 @@ class Game:
     @property
     def surface_controller(self) -> surface.Surface:
         return self.__surface_controller
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        CONTROL STATUS PROPERTIES
+    
+    """
+    
+    
+    @property
+    def user_mouse_enabled(self) -> bool:
+        ...
+        
+        
+    @property
+    def user_keyboard_enabled(self) -> bool:
+        ...
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
