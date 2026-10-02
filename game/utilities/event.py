@@ -539,3 +539,15 @@ EVENT_DEAL_CARDS: Event = Event.generate_predefined(
     ignore_assertion = False,
     )
 
+
+EVENT_PLAYER_DRAW_CARDS: Event = Event.generate_predefined(
+    event_name = context.EVENT_NAME.PLAYER_DRAW,
+    ignore_assertion = False,
+    )
+
+
+EVENT_OPPONENT_DRAW_CARDS: Event = Event.generate_predefined(
+    event_name = context.EVENT_NAME.PLAYER_DRAW,
+    ignore_assertion = False,
+    )
+
