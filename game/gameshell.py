@@ -96,5 +96,6 @@ class Gameshell(arcade.Window):
         # Handling card slide:
         self.__gc.handle_slide(
             force_instant = False
-            )                
+            )
+
             
