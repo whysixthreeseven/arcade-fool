@@ -14,7 +14,7 @@ Location = tuple[str, int]
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    CARD-RELATED CONTEXT VARIABLES (CLASS OBJECTS)
+    CARD-RELATED CONTEXT VARIABLES
 
 """
 
@@ -28,7 +28,8 @@ class CARD_SUIT:
 
 CARD_SUIT_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in CARD_SUIT.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
     
     
@@ -41,7 +42,8 @@ class CARD_SUIT_ASCII:
 
 CARD_SUIT_ASCII_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in CARD_SUIT_ASCII.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
 
 
@@ -52,7 +54,8 @@ class CARD_SUIT_COLOR:
 
 CARD_SUIT_COLOR_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in CARD_SUIT_COLOR.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
 
 
@@ -74,7 +77,8 @@ class CARD_NAME:
 
 CARD_NAME_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in CARD_NAME.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
     
     
@@ -96,7 +100,8 @@ class CARD_NAME_ASCII:
 
 CARD_NAME_ASCII_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in CARD_NAME_ASCII.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
     
 
@@ -118,7 +123,8 @@ class CARD_VALUE:
 
 CARD_VALUE_LIST: tuple[int, ...] = tuple(
     attribute_value for attribute_name, attribute_value in CARD_VALUE.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, int)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, int)
     )
 
 
@@ -132,7 +138,8 @@ class CARD_LOCATION:
 
 CARD_LOCATION_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in CARD_LOCATION.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
 
 
@@ -154,13 +161,15 @@ class CARD_TEXTURE_FRONT_INDEX:
 
 CARD_TEXTURE_FRONT_NAME_LIST: tuple[str, ...] = tuple(
     attribute_name for attribute_name, attribute_value in CARD_TEXTURE_FRONT_INDEX.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, tuple)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, tuple)
     )
 
 
 CARD_TEXTURE_FRONT_INDEX_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in CARD_TEXTURE_FRONT_INDEX.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, tuple)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, tuple)
     )
 
 
@@ -203,12 +212,13 @@ class AREA_TYPE:
     
 AREA_TYPE_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in AREA_TYPE.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
     
     
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    PLAYER-RELATED CONTEXT VARIABLES (CLASS OBJECTS)
+    PLAYER-RELATED CONTEXT VARIABLES
 
 """
 
@@ -220,7 +230,8 @@ class PLAYER_TYPE:
 
 PLAYER_TYPE_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in PLAYER_TYPE.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
     
     
@@ -231,7 +242,8 @@ class PLAYER_STATE:
 
 PLAYER_STATE_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in PLAYER_STATE.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
 
 
@@ -249,7 +261,8 @@ class COMPUTER_DIFFICULTY:
 
 COMPUTER_DIFFICULTY_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in COMPUTER_DIFFICULTY.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
 
 
@@ -262,7 +275,8 @@ class COMPUTER_STYLE:
 
 COMPUTER_STYLE_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in COMPUTER_STYLE.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
 
 
@@ -291,7 +305,8 @@ class HAND_SORT_SEQ:
 
 HAND_SORT_SEQ_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in HAND_SORT_SEQ.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
 
 
@@ -304,10 +319,10 @@ HAND_SORT_SEQ_LIST: tuple[str, ...] = tuple(
 KEY_MODULE_INDEX: dict[str, int] = {
     key_name: key_value
     for key_name, key_value in vars(arcade.key).items()
-    if key_name.isupper()
-    and isinstance(key_value, int)
-    and not key_name.startswith("MOD_")
-    and not key_name.startswith("MOTION_")
+        if key_name.isupper()
+        and isinstance(key_value, int)
+        and not key_name.startswith("MOD_")
+        and not key_name.startswith("MOTION_")
     }
 
 
@@ -337,7 +352,8 @@ class ACTION_GAME:
 
 ACTION_GAME_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in ACTION_GAME.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
     
     
@@ -349,12 +365,13 @@ class ACTION_MENU:
 
 ACTION_MENU_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in ACTION_MENU.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    GAME-RELATED CONTEXT VARIABLES (CLASS OBJECTS)
+    GAME-RELATED CONTEXT VARIABLES
 
 """
 
@@ -368,7 +385,8 @@ class GAME_PHASE:
     
 GAME_PHASE_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in GAME_PHASE.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
 
 
@@ -380,6 +398,65 @@ class GAME_RESULT:
 
 GAME_RESULT_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in GAME_RESULT.__dict__.items()
-    if not attribute_name.startswith("__") and isinstance(attribute_value, str)
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
+    )
+
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    EVENT CONTEXT VARIABLES
+
+"""
+
+
+class EVENT_NAME:
+    DRAW: str = "Draw"
+    
+
+EVENT_NAME_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in EVENT_NAME.__dict__.items()
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
+    )
+
+
+class EVENT_TYPE:
+    GAME: str = "Game"
+    MENU: str = "Menu"
+
+
+EVENT_TYPE_INDEX: dict[str, str] = {
+    EVENT_NAME.DRAW: EVENT_TYPE.GAME
+    }
+
+
+EVENT_TYPE_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in EVENT_TYPE.__dict__.items()
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
+    )
+
+
+EVENT_DESCRIPTION_INDEX: dict[str, str] = {
+    EVENT_NAME.DRAW: "There is nothing here yet.",
+    }
+
+
+EVENT_DESCRIPTION_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in EVENT_DESCRIPTION_INDEX.items()
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
+    )
+
+
+EVENT_CONDITION_INDEX: dict[str, str] ={
+    EVENT_NAME.DRAW: "There is nothing here yet."
+    }
+
+
+EVENT_CONDITION_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in EVENT_CONDITION_INDEX.items()
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
     )
 
