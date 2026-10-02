@@ -21,7 +21,7 @@ class KEYMAP:
 
     # User keymap:
     KEY_SORT_HAND: int = arcade.key.S
-    KEY_SWITCH_SORT_HAND_REVERSE: int = arcade.key.A
+    KEY_SORT_REVERSE: int = arcade.key.A
     KEY_ARROW_LEFT: int = arcade.key.LEFT
     KEY_ARROW_RIGHT: int = arcade.key.RIGHT
     KEY_ARROW_UP: int = arcade.key.UP
@@ -41,6 +41,14 @@ KEYMAP_KEY_USER_LIST: tuple[int, ...] = tuple(
     attribute_value for attribute_name, attribute_value in KEYMAP.__dict__.items() 
         if not attribute_name.startswith("__") 
         and "DEBUG" not in attribute_name 
+        and isinstance(attribute_value, int)
+    )
+
+KEYMAP_KEY_USER_SORT_LIST: tuple[int, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in KEYMAP.__dict__.items() 
+        if not attribute_name.startswith("__") 
+        and "DEBUG" not in attribute_name 
+        and "SORT" in attribute_name 
         and isinstance(attribute_value, int)
     )
 
