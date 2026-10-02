@@ -40,6 +40,24 @@ class Event:
         self.__wait: bool = False
         self.__finished: bool = False
         
+        
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        NATIVE METHODS
+    
+    """
+    
+    
+    def __repr__(self) -> str:
+        
+        # Constructing repr string:
+        repr_string: str = "Event {event_name} ({event_status})".format(
+            event_name = self.name,
+            event_status = f"{"O" if self.ongoing else "F"}{"+W" if self.wait else ""}"
+            )
+        
+        # Returning:
+        return repr_string
+        
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         CLASS METHODS
