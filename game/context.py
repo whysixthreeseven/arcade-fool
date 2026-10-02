@@ -376,6 +376,14 @@ ACTION_MENU_LIST: tuple[str, ...] = tuple(
 """
 
 
+class GAME_STATUS:
+    NOT_READY: str = "Not ready"
+    READY: str = "Ready"
+    IN_PROGRESS: str = "In progress"
+    PAUSED: str = "Paused"
+    ENDED: str = "Ended"
+
+
 class GAME_PHASE:
     ATTACKING: str = "Attacking"
     DEFENDING: str = "Defending"
@@ -410,6 +418,7 @@ GAME_RESULT_LIST: tuple[str, ...] = tuple(
 
 
 class EVENT_NAME:
+    DEAL: str = "Deal"
     DRAW: str = "Draw"
     
 
@@ -426,7 +435,7 @@ class EVENT_TYPE:
 
 
 EVENT_TYPE_INDEX: dict[str, str] = {
-    EVENT_NAME.DRAW: EVENT_TYPE.GAME
+    EVENT_NAME.DEAL: EVENT_TYPE.GAME
     }
 
 
@@ -438,7 +447,7 @@ EVENT_TYPE_LIST: tuple[str, ...] = tuple(
 
 
 EVENT_DESCRIPTION_INDEX: dict[str, str] = {
-    EVENT_NAME.DRAW: "There is nothing here yet.",
+    EVENT_NAME.DEAL: "There is nothing here yet.",
     }
 
 
@@ -450,7 +459,7 @@ EVENT_DESCRIPTION_LIST: tuple[str, ...] = tuple(
 
 
 EVENT_CONDITION_INDEX: dict[str, str] ={
-    EVENT_NAME.DRAW: "There is nothing here yet."
+    EVENT_NAME.DEAL: "There is nothing here yet."
     }
 
 
