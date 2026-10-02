@@ -274,7 +274,9 @@ class TexturePack:
                 check_value = set_value,
                 raise_error = True
                 )
-            default_list: tuple[str, ...] = tuple(colorcode.lower() for colorcode in self.__colorcode_list)
+            default_list: tuple[str, ...] = tuple(
+                colorcode.lower() for colorcode in self.__colorcode_list
+                )
             assertion.assert_value_default(
                 check_value = set_value.lower(),
                 check_list = default_list,
@@ -379,13 +381,15 @@ class TexturePack:
     def texture_path(self) -> str:
                 
         # Adding all folders in order:
-        dir_list: list[str] = ["card", self.type, self.colorcode]
+        directory_list: list[str] = ["card", self.type, self.colorcode]
         if self.type == "Front":
-            dir_list.append(self.style)
-        dir_list: tuple[str, ...] = (dir_name.lower() for dir_name in dir_list)
+            directory_list.append(self.style)
+        directory_list: tuple[str, ...] = (
+            directory_name.lower() for directory_name in directory_list
+            )
         
         # Creating path:
-        dir_path: str = os.path.join(SETTINGS.DIR_TEXTURES_PATH, *dir_list)
+        dir_path: str = os.path.join(SETTINGS.DIR_TEXTURES_PATH, *directory_list)
         
         # Returning:
         return dir_path
@@ -403,18 +407,26 @@ class TexturePack:
                 texture_index[card_suit] = {}
             for card_name in context.CARD_NAME_LIST:
                 if card_name not in texture_index[card_suit]:
+                    
+                    # Addressing front texture files:
                     if self.type == "Front":
                         texture_filepath: str = os.path.join(
                             self.texture_path,
                             f"{card_suit.lower()}_{card_name.lower()}.png"
                             )
+                        
+                    # Addressing back texture files:
                     else:
                         texture_filepath: str = os.path.join(
                             self.texture_path,
                             f"{self.style.lower()}.png"
                             )
+                        
+                    # Confirming path exists and adding to index list:
                     if os.path.exists(texture_filepath):
                         texture_index[card_suit][card_name] = texture_filepath
+                        
+                    # Raising error on missing file:
                     else:
                         error_message: str = f"Unable to locate file <{texture_filepath}>."
                         raise FileNotFoundError(error_message)
@@ -496,8 +508,7 @@ class TEXTUREPACK_BACK:
 
 
 TEXTUREPACK_BACK_LIST: tuple[TexturePack, ...] = tuple(
-    attribute_value for attribute_name, attribute_value 
-    in TEXTUREPACK_BACK.__dict__.items()
-    if isinstance(attribute_value, TexturePack)
+    attribute_value for attribute_name, attribute_value in TEXTUREPACK_BACK.__dict__.items()
+        if isinstance(attribute_value, TexturePack)
     )
 
