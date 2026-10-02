@@ -258,7 +258,7 @@ class Event:
                 )
             assertion.assert_value_default(
                 check_value = set_value,
-                check_list = context.EVENT_NAME_LIST,
+                check_list = context.EVENT_TYPE_LIST,
                 )
             
         # Debug verification:
