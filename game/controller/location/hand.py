@@ -304,6 +304,9 @@ class HandController:
         card_object.set_state_location(
             clear_cache = True
             )
+        card_object.update_coordinates_state(
+            clear_cache = True
+            )
         
         # Clearing cache:
         if clear_cache:
@@ -512,11 +515,18 @@ class HandController:
                     ignore_assertion = False,
                     clear_cache = True,
                     )
-                card_object.set_coordinates_expected(
-                    set_value = coordinates_position,
-                    ignore_assertion = False,
-                    clear_cache = True,
-                    )
+                if card_object.state_playable:
+                    card_object.set_coordinates_expected(
+                        set_value = coordinates_position,
+                        ignore_assertion = False,
+                        clear_cache = True,
+                        )
+                else:
+                    card_object.set_coordinates_expected(
+                        set_value = card_object.coordinates_unplayable,
+                        ignore_assertion = False,
+                        clear_cache = True,
+                        )
                 
                 # Calculating hover coordinate x:
                 coordinate_x_hover_shift: int = SETTINGS.LOCATION_HAND_HOVER_SHIFT_COORDINATE_X
@@ -527,7 +537,7 @@ class HandController:
                 # Calculating hover coordinate y:
                 coordinate_y_hover_shift: int = SETTINGS.LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y
                 if self.owner == context.PLAYER_TYPE.COMPUTER:
-                    coordinate_y_hover_shift = SETTINGS.LOCATION_OPP_HOVER_SHIFT_COORDINATE_Y * -1
+                    coordinate_y_hover_shift = SETTINGS.LOCATION_OPP_HOVER_SHIFT_COORDINATE_Y
                 coordinate_y_hover: int = coordinate_y_position + coordinate_y_hover_shift
                 
                 # Packing up coordinates hover and updating:
@@ -550,7 +560,7 @@ class HandController:
                 # Calculating select coordinate y 
                 coordinate_y_select_shift: int = SETTINGS.LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y
                 if self.owner == context.PLAYER_TYPE.COMPUTER:
-                    coordinate_y_select_shift = SETTINGS.LOCATION_OPP_SELECT_SHIFT_COORDINATE_Y * -1
+                    coordinate_y_select_shift = SETTINGS.LOCATION_OPP_SELECT_SHIFT_COORDINATE_Y
                 coordinate_y_select: int = coordinate_y_position + coordinate_y_select_shift
                 
                 # Packing up coordinates select and updating:
