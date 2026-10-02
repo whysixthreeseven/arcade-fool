@@ -268,16 +268,17 @@ class Game:
             
         # Drawing cards and running event:
         self.add_event(
-            event_object = event.EVENT_DEAL_CARDS,
+            event_object = event.EVENT_PLAYER_REFILL,
             autostart = True,
             ignore_assertion = False,
             clear_cache = True
             )
-        for player_controller in self.__player_controllers:
-            self.perform_deal_cards(
-                player_controller = player_controller,
-                clear_cache = True
-                )
+        self.add_event(
+            event_object = event.EVENT_OPPONENT_REFILL,
+            autostart = True,
+            ignore_assertion = False,
+            clear_cache = True
+            )
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -767,79 +768,42 @@ class Game:
                 self.clear_cached_events_attributes()
             
             
-    def __update_event_deal(self, event_object: event.Event, autoremove: bool = True) -> None:
-        
-        # Analyzing conditions:
-        event_ongoing: bool = False
-        event_finished: bool = True
-        
-        # Looping through player controllers list:
-        for player_controller in self.__player_controllers:
-            
-            # Checking if each player has six cards (or more):
-            if player_controller.hand.cards_count < 6:
-                event_ongoing = True
-                event_finished = False
-                break
-            
-            # Checking if cards are still moving to hand position:
-            for card_object in player_controller.hand.cards:
-                if not card_object.state_idle:
-                    event_ongoing = True
-                    event_finished = False
-                    break
-        
-        # Updating event object:
-        self.update_event(
-            event_object = event_object,
-            event_ongoing = event_ongoing,
-            event_finished = event_finished,
-            clear_cache = False
-            )
-        
-        # Removing event object:
-        if autoremove:
-            if event_finished:
-                self.remove_event(
-                    event_object = event_object,
-                    clear_cache = False
-                    )
-                
-                
     def __update_event_draw(self, event_object: event.Event, player_controller: PlayerController, autoremove: bool = True) -> None:
             
-        # Analyzing conditions:
-        event_ongoing: bool = False
-        event_finished: bool = True
-        
-        # Checking if each player has six cards (or more):
-        if player_controller.hand.cards_count < 6:
-            event_ongoing = True
-            event_finished = False
-        
-        # Checking if cards are still moving to hand position:
-        else:
-            for card_object in player_controller.hand.cards:
-                if not card_object.state_idle:
-                    event_ongoing = True
-                    event_finished = False
-        
-        # Updating event object:
-        self.update_event(
-            event_object = event_object,
-            event_ongoing = event_ongoing,
-            event_finished = event_finished,
-            clear_cache = False
+        # Checking if event needs to be stopped:
+        force_stop: bool = bool(
+            player_controller.hand.cards_count >= 6 or
+            self.deck.cards_count == 0
             )
+        if force_stop:
+            event_ongoing: bool = False
+            event_finished: bool = True
         
-        # Removing event object:
-        if autoremove:
-            if event_finished:
-                self.remove_event(
-                    event_object = event_object,
-                    clear_cache = False
-                    )
+            # Updating event object:
+            self.update_event(
+                event_object = event_object,
+                event_ongoing = event_ongoing,
+                event_finished = event_finished,
+                clear_cache = True
+                )
             
+            # Removing event object:
+            if autoremove:
+                if event_finished:
+                    self.remove_event(
+                        event_object = event_object,
+                        clear_cache = True
+                        )
+        
+        # Otherwise drawing a card:
+        else:
+            if self.deck.cards_count > 0:
+                self.perform_player_draw(
+                    player_controller = player_controller,
+                    ignore_assertion = True,
+                    clear_cache = True,
+                    )
+    
     
     def __update_event_player_draw(self, event_object: event.Event, autoremove: bool = True) -> None:
         
@@ -860,18 +824,25 @@ class Game:
             autoremove = autoremove
             )
         
-    def update_event_auto(self, autoremove: bool = True, clear_cache: bool = True) -> None:
+        
+    @cached_property
+    def __update_event_index(self) -> dict[str, function]:
         
         # Creating event update methods index:
         event_update_methods = {
-            context.EVENT_NAME.DEAL: self.__update_event_deal,
-            context.EVENT_NAME.PLAYER_DRAW: self.__update_event_player_draw,
-            context.EVENT_NAME.OPPONENT_DRAW: self.__update_event_opponent_draw,
+            context.EVENT_NAME.PLAYER_REFILL: self.__update_event_player_draw,
+            context.EVENT_NAME.OPPONENT_REFILL: self.__update_event_opponent_draw,
             }
-
+        
+        # Returning:
+        return event_update_methods
+        
+    def update_event_auto(self, autoremove: bool = True, clear_cache: bool = True) -> None:
+        
         # Scanning events available:
-        for event_object in self.events:
-            update_method = event_update_methods.get(event_object.name, None)
+        if self.events_count > 0:
+            event_object = self.events[0]
+            update_method = self.__update_event_index.get(event_object.name, None)
 
             # Asserting an event is found in update method index:
             if update_method is not None:
@@ -880,9 +851,9 @@ class Game:
                     autoremove = autoremove,
                     )
 
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_events_attributes()
+            # Clearing cache:
+            if clear_cache:
+                self.clear_cached_events_attributes()
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1574,28 +1545,6 @@ class Game:
         PERFORM METHODS
     
     """
-    
-    
-    def perform_deal_cards(self, player_controller: PlayerController, clear_cache: bool = True) -> None:
-        
-        # Checking if deck has cards available:
-        if self.deck.cards_count > 0:
-            
-            # Dealing cards until hand reaches cards minimum:
-            while player_controller.hand.cards_count < 6:
-                self.perform_player_draw(
-                    player_controller = player_controller,
-                    ignore_assertion = False,
-                    clear_cache = False
-                    )
-                
-                # Stopping if no more cards available:
-                if self.deck.cards_count == 0:
-                    break
-            
-            # Clearing cache:
-            if clear_cache:
-                self.__handle_card_manipulation()
     
     
     def perform_player_draw(self, player_controller: PlayerController, ignore_assertion: bool = False, 
