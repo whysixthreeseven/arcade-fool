@@ -1315,6 +1315,13 @@ class Game:
         elif key_pressed == keymap.KEYMAP.KEY_DEBUG_FORCE_RESTART_GAME:
             self.reset()
             
+        # Sorting opponent's hand:
+        elif key_pressed == keymap.KEYMAP.KEY_DEBUG_SORT_OPPONENT:
+            self.player_computer.hand.sort_random(
+                update_coordinates = True,
+                clear_cache = True,
+                )
+
         
     def handle_key_press(self, key_pressed: int, ignore_assertion: bool = False) -> None:
         
