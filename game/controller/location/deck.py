@@ -446,9 +446,12 @@ class DeckController:
             
         # Updating all cards' location index and coordinates:
         for card_object in card_list_adjusted:
-            location_index: int = card_list_adjusted.index(card_object)
-            card_object.set_location_index(
-                set_value = location_index,
+            location: context.Location = (
+                context.CARD_LOCATION.DECK, 
+                card_list_adjusted.index(card_object)
+                )
+            card_object.set_location(
+                set_value = location,
                 ignore_assertion = True,
                 clear_cache = True
                 )
