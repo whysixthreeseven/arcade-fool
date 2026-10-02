@@ -906,48 +906,32 @@ class Game:
                     validate_value = set_value
                     )
 
-        # If no card is currently set as hovered:
-        if self.card_hover is None:
-            self.__card_hover = set_value
-
-        # If card is currently set as hovered:
-        else:
-            
-            # Releasing previous card, if required:
-            if release_previous and self.card_hover is not None:
+        if release_previous:
+            if self.card_hover is not None and self.card_hover != set_value:
                 self.remove_card_hover()
         
-            # Updating attribute:
+        if self.card_hover != set_value:
             self.__card_hover = set_value
             if set_value is not None:
                 self.__card_hover.set_state_hovered(
                     set_value = True,
-                    ignore_assertion = True,
-                    clear_cache = True,
-                    )
-                self.__card_hover.update_coordinates_state(
-                    clear_cache = True,
-                    )
-            
+                    ignore_assertion = False,
+                    clear_cache = True
+                    )                
+                            
 
     def remove_card_hover(self) -> None:
 
-        # Asserting card hover is set:
-        if self.card_hover is not None:
-            
-            # Updating card's state and removing it from attribute:
-            self.card_hover.set_state_hovered(
-                set_value = False,
-                ignore_assertion = True,
-                clear_cache = True,
-                )
-            self.card_hover.update_coordinates_state(
-                clear_cache = True,
-                )
-            self.__card_hover = None
+        # Updating card's state and removing it from attribute:
+        self.card_hover.set_state_hovered(
+            set_value = False,
+            ignore_assertion = True,
+            clear_cache = True,
+            )
+        self.__card_hover = None
         
     
-    def update_card_hover(self, release_previous: bool = True) -> None:
+    def update_card_hover(self) -> None:
         
         # Preparing variables:
         card_hover: Card | None = None
@@ -964,13 +948,27 @@ class Game:
             
             # Selecting card:
             card_hover: Card = self.hit_cards[0]
+            
+        # Checking release state:
+        release_previous = False
+        if self.card_hover is not None and self.card_hover != card_hover:
+            release_previous = True
         
         # Updating attribute:
-        self.set_card_hover(
-            set_value = card_hover,
-            release_previous = release_previous,
-            )
-            
+        if card_hover is None:
+            self.set_card_hover(
+                set_value = card_hover,
+                release_previous = release_previous,
+                ignore_assertion = True,
+                )
+        else:
+            if card_hover != self.card_hover:          
+                self.set_card_hover(
+                    set_value = card_hover,
+                    release_previous = release_previous,
+                    ignore_assertion = True
+                    )
+                
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         CARD SELECT PROPERTIES AND METHODS
@@ -1238,9 +1236,23 @@ class Game:
     
     
     def __handle_key_press_user(self, key_pressed: int) -> None:
+
+        # Sorting player controller's hand:        
+        if key_pressed in keymap.KEYMAP_KEY_USER_SORT_LIST:
         
-        # TODO: Implement!
-        ...
+            # TODO: Implmenet proper switch:
+            sort_reverse: bool = False
+            if key_pressed == keymap.KEYMAP.KEY_SORT_REVERSE:
+                sort_reverse = True
+                
+            # TODO: Implement proper sort controller:
+            self.player_human.hand.sort(
+                sort_seq = context.HAND_SORT_SEQ.SUIT,
+                sort_reverse = sort_reverse,
+                update_coordinates = True,
+                clear_cache = True,
+                )
+                
     
     
     def __handle_key_press_debug(self, key_pressed: int) -> None:
@@ -1374,7 +1386,7 @@ class Game:
         # Looping over player controllers and calling method:
         for player_controller in self.__player_controllers:
             self.__handle_slide_card_container(
-                cards_container = player_controller.cards,
+                cards_container = player_controller.hand.cards,
                 force_instant = force_instant,
                 )
 
