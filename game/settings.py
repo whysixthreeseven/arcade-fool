@@ -17,7 +17,7 @@ class __SETTINGS:
     APP_NAME: str = "Arcade Fool"
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_STARTED: str = "2026.09.02"                                     # Date of project start (reboot)
-    APP_UPDATED: str = "2026.10.01"                                     # Date of last edit
+    APP_UPDATED: str = "2026.10.02"                                     # Date of last edit
     APP_VERSION: str = f"0.0.{APP_UPDATED[-6:].replace(".", "")}"       # Month and day in MMDD format
     APP_AUTHOR: str = "Andrey Vostokov"
 
@@ -62,14 +62,6 @@ class __SETTINGS:
     CARD_TEXTURE_HEIGHT_FILE: int = 480
     CARD_TEXTURE_HEIGHT: int = int(CARD_TEXTURE_HEIGHT_FILE * CARD_TEXTURE_SCALE_DEFAULT)
     
-    # Card slide settings:
-    CARD_SLIDE_SPEED_MIN: int = int(CARD_TEXTURE_HEIGHT / 20)       # (480 * 0.25) / 20 = 6
-    CARD_SLIDE_SPEED_MOD_DEFAULT: float = 1.00                      # Slide mod fallback value
-    CARD_SLIDE_SPEED_MOD_LOCATION: float = 2.00                     # Slide mod to new location
-    CARD_SLIDE_SPEED_MOD_HOVER: float = 1.50                        # Slide mod to hover position
-    CARD_SLIDE_SPEED_MOD_SELECT: float = 1.50                       # Slide mod to select position
-    CARD_SLIDE_SPEED_MOD_RETURN: float = 0.35                       # Slide mod to default position
-    
     # Deck settings:
     DECK_SIZE_MIN: int = 36
     DECK_SIZE_MAX: int = 52
@@ -83,7 +75,7 @@ class __SETTINGS:
     
     # Area (main) dimensions settings:
     __AREA_HAND_WIDTH: int = __AREA_MAIN_WIDTH
-    __AREA_HAND_HEIGHT: int = int(CARD_TEXTURE_HEIGHT * 1.35)
+    __AREA_HAND_HEIGHT: int = int(CARD_TEXTURE_HEIGHT * 1.55)
     AREA_PLAYER_WIDTH: int = __AREA_HAND_WIDTH
     AREA_PLAYER_HEIGHT: int = __AREA_HAND_HEIGHT
     AREA_TABLE_WIDTH: int = __AREA_HAND_WIDTH
@@ -156,9 +148,9 @@ class __SETTINGS:
     LOCATION_HAND_CENTER_COORDINATE_X: int = AREA_PLAYER_CENTER_COORDINATE_X
     LOCATION_HAND_CENTER_COORDINATE_Y: int = AREA_PLAYER_CENTER_COORDINATE_Y
     LOCATION_HAND_HOVER_SHIFT_COORDINATE_X: int = 0
-    LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.10)
+    LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.20)
     LOCATION_HAND_SELECT_SHIFT_COORDINATE_X: int = 0
-    LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.20)
+    LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.30)
     LOCATION_HAND_UNPLAYABLE_SHIFT_COORDINATE_X: int = 0
     LOCATION_HAND_UNPLAYABLE_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.10)
     
@@ -169,6 +161,14 @@ class __SETTINGS:
     LOCATION_OPP_HOVER_SHIFT_COORDINATE_Y: int = LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y * -1
     LOCATION_OPP_SELECT_SHIFT_COORDINATE_X: int = 0
     LOCATION_OPP_SELECT_SHIFT_COORDINATE_Y: int = LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y * -1
+    LOCATION_OPP_UNPLAYABLE_SHIFT_COORDINATE_X: int = 0
+    LOCATION_OPP_UNPLAYABLE_SHIFT_COORDINATE_Y: int = LOCATION_HAND_UNPLAYABLE_SHIFT_COORDINATE_Y * -1
+    
+    # Card slide settings:
+    CARD_SLIDE_SPEED_MIN: int = int(CARD_TEXTURE_HEIGHT / 40)       # (480 * 0.25) / 40 = 3
+    CARD_SLIDE_SPEED_MAX: int = int(CARD_TEXTURE_HEIGHT / 4)        # (480 * 0.25) / 4 = 60
+    CARD_SLIDE_DISTANCE_CLOSE: int = LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y
+    CARD_SLIDE_DISTANCE_FAR: int = int(__AREA_HAND_WIDTH / 2)
     
     # Player settings:
     PLAYER_NAME_LEN_MAX: int = 16
