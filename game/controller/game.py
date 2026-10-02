@@ -804,17 +804,81 @@ class Game:
                     event_object = event_object,
                     clear_cache = False
                     )
-        
+                
+                
+    def __update_event_draw(self, event_object: event.Event, player_controller: PlayerController, autoremove: bool = True) -> None:
             
+        # Analyzing conditions:
+        event_ongoing: bool = False
+        event_finished: bool = True
+        
+        # Checking if each player has six cards (or more):
+        if player_controller.hand.cards_count < 6:
+            event_ongoing = True
+            event_finished = False
+        
+        # Checking if cards are still moving to hand position:
+        else:
+            for card_object in player_controller.hand.cards:
+                if not card_object.state_idle:
+                    event_ongoing = True
+                    event_finished = False
+        
+        # Updating event object:
+        self.update_event(
+            event_object = event_object,
+            event_ongoing = event_ongoing,
+            event_finished = event_finished,
+            clear_cache = False
+            )
+        
+        # Removing event object:
+        if autoremove:
+            if event_finished:
+                self.remove_event(
+                    event_object = event_object,
+                    clear_cache = False
+                    )
+            
+    
+    def __update_event_player_draw(self, event_object: event.Event, autoremove: bool = True) -> None:
+        
+        # Calling update method:
+        self.__update_event_draw(
+            event_object = event_object,
+            player_controller = self.player_human,
+            autoremove = autoremove
+            )
+        
+    
+    def __update_event_opponent_draw(self, event_object: event.Event, autoremove: bool = True) -> None:
+            
+        # Calling update method:
+        self.__update_event_draw(
+            event_object = event_object,
+            player_controller = self.player_computer,
+            autoremove = autoremove
+            )
+        
     def update_event_auto(self, autoremove: bool = True, clear_cache: bool = True) -> None:
         
-        if self.events_count > 0:
-            for event_object in self.events:
-                if event_object.name == context.EVENT_NAME.DEAL:
-                    self.__update_event_deal(
-                        event_object = event_object,
-                        autoremove = autoremove
-                        )
+        # Creating event update methods index:
+        event_update_methods = {
+            context.EVENT_NAME.DEAL: self.__update_event_deal,
+            context.EVENT_NAME.PLAYER_DRAW: self.__update_event_player_draw,
+            context.EVENT_NAME.OPPONENT_DRAW: self.__update_event_opponent_draw,
+            }
+
+        # Scanning events available:
+        for event_object in self.events:
+            update_method = event_update_methods.get(event_object.name, None)
+
+            # Asserting an event is found in update method index:
+            if update_method is not None:
+                update_method(
+                    event_object = event_object,
+                    autoremove = autoremove,
+                    )
 
         # Clearing cache:
         if clear_cache:
