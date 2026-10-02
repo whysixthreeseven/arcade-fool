@@ -413,6 +413,7 @@ class CardController:
         # Collecting related cached properties:
         cached_property_list: tuple[str, ...] = (
             "render_rect",
+            "render_rect_boundary",
             "render_width",
             "render_height",
             "render_text",
@@ -1267,6 +1268,7 @@ class CardController:
                 "coordinate_x",
                 "coordinates",
                 "render_rect",
+                "render_rect_boundary",
                 "state_idle",
                 )
             cache.clear_cached_property_list(
@@ -1367,6 +1369,7 @@ class CardController:
                 "coordinate_y",
                 "coordinates",
                 "render_rect",
+                "render_rect_boundary",                 
                 "state_idle",
                 )
             cache.clear_cached_property_list(
@@ -1458,6 +1461,7 @@ class CardController:
                 "coordinate_y",
                 "coordinates",
                 "render_rect",
+                "render_rect_boundary",
                 "state_idle",
                 )
             cache.clear_cached_property_list(
@@ -2135,6 +2139,7 @@ class CardController:
                 "texture_object_front",
                 "texture_object_selected",
                 "render_rect",
+                "render_rect_boundary",
                 "render_width",
                 "render_height",
                 )
@@ -2160,6 +2165,7 @@ class CardController:
                 "texture_object_back",
                 "texture_object_selected",
                 "render_rect",
+                "render_rect_boundary",
                 "render_width",
                 "render_height",
                 )
@@ -2244,8 +2250,14 @@ class CardController:
 
         # Calculating default boundary:
         else:
+            coordinate_y_selected: int = self.coordinate_y
+            if self.location == context.CARD_LOCATION.OPPONENT:
+                if not self.state_playable:
+                    coordinate_y_selected = self.coordinate_y_unplayable
+                else:
+                    coordinate_y_selected = self.coordinate_y_position
             boundary: int = int(
-                self.coordinate_y + 
+                coordinate_y_selected + 
                 self.render_height / 2
                 )
 
@@ -2265,8 +2277,14 @@ class CardController:
 
         # Calculating default boundary:
         else:
+            coordinate_y_selected: int = self.coordinate_y
+            if self.location == context.CARD_LOCATION.PLAYER:
+                if not self.state_playable:
+                    coordinate_y_selected = self.coordinate_y_unplayable
+                else:
+                    coordinate_y_selected = self.coordinate_y_position
             boundary: int = int(
-                self.coordinate_y -
+                coordinate_y_selected -
                 self.render_height / 2
                 )
 
@@ -2832,7 +2850,29 @@ class CardController:
     
     
     @cached_property
+    def render_rect_boundary(self) -> arcade.Rect:
+        
+        # Creating a rectangle object:
+        rect_object: arcade.Rect = arcade.rect.LRBT(
+            left = self.boundary_left,
+            right = self.boundary_right,
+            bottom = self.boundary_bottom,
+            top = self.boundary_top
+            )
+        
+        # Returning:
+        return rect_object
+    
+    
+    @cached_property
     def render_rect_color(self) -> context.RGB_Color:
+        
+        # Returning:
+        return SETTINGS.CARD_RENDER_BG_COLOR
+    
+    
+    @cached_property
+    def render_rect_color_boundary(self) -> context.RGB_Color:
         
         # Returning:
         return SETTINGS.CARD_RENDER_BG_COLOR
@@ -3802,13 +3842,21 @@ class CardController:
         Uses predefined `arcade.Rect` object, card object's `self.texture_object_selected` texture based on its state and other
         render properties.
         """
+
+        # Rendering boundary rectangle:
+        if SESSION.ENABLE_DEBUG:
+            arcade.draw_rect_filled(
+                rect = self.render_rect_boundary,
+                color = arcade.color.YELLOW_ORANGE,
+                tilt_angle = 0
+                )
         
         # Rendering:
         arcade.draw_texture_rect(
             texture = self.texture_object_selected,
             rect = self.render_rect,
             angle = self.render_tilt,
-            alpha = self.render_alpha,
+            alpha = self.render_alpha
             )
 
 
@@ -4090,6 +4138,7 @@ class CardController:
                 cached_property_list: tuple[str, ...] = (
                     "render_scale",
                     "render_rect",
+                    "render_rect_boundary",
                     "render_text"
                     )
                 cache.clear_cached_property_list(
