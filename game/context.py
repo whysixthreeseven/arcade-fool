@@ -418,9 +418,8 @@ GAME_RESULT_LIST: tuple[str, ...] = tuple(
 
 
 class EVENT_NAME:
-    DEAL: str = "Deal"
-    PLAYER_DRAW: str = "Player draw"
-    OPPONENT_DRAW: str = "Opponent draw"
+    PLAYER_REFILL: str = "Player refill"
+    OPPONENT_REFILL: str = "Opponent refill"
     
 
 EVENT_NAME_LIST: tuple[str, ...] = tuple(
@@ -436,8 +435,8 @@ class EVENT_TYPE:
 
 
 EVENT_TYPE_INDEX: dict[str, str] = {
-    EVENT_NAME.DEAL: EVENT_TYPE.GAME,
-    EVENT_NAME.PLAYER_DRAW: EVENT_TYPE.GAME
+    EVENT_NAME.PLAYER_REFILL: EVENT_TYPE.GAME,
+    EVENT_NAME.OPPONENT_REFILL: EVENT_TYPE.GAME
     }
 
 
@@ -449,9 +448,8 @@ EVENT_TYPE_LIST: tuple[str, ...] = tuple(
 
 
 EVENT_DESCRIPTION_INDEX: dict[str, str] = {
-    EVENT_NAME.DEAL: "There is nothing here yet.",
-    EVENT_NAME.PLAYER_DRAW: "There is nothing here yet.",
-    EVENT_NAME.OPPONENT_DRAW: "There is nothing here yet.",
+    EVENT_NAME.PLAYER_REFILL: "There is nothing here yet.",
+    EVENT_NAME.OPPONENT_REFILL: "There is nothing here yet.",
     }
 
 
@@ -463,9 +461,8 @@ EVENT_DESCRIPTION_LIST: tuple[str, ...] = tuple(
 
 
 EVENT_CONDITION_INDEX: dict[str, str] ={
-    EVENT_NAME.DEAL: "There is nothing here yet.",
-    EVENT_NAME.PLAYER_DRAW: "There is nothing here yet.",
-    EVENT_NAME.OPPONENT_DRAW: "There is nothing here yet.",
+    EVENT_NAME.PLAYER_REFILL: "There is nothing here yet.",
+    EVENT_NAME.OPPONENT_REFILL: "There is nothing here yet.",
     }
 
 

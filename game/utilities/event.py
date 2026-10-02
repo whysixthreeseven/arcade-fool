@@ -534,20 +534,14 @@ class Event:
 """
 
 
-EVENT_DEAL_CARDS: Event = Event.generate_predefined(
-    event_name = context.EVENT_NAME.DEAL,
+EVENT_PLAYER_REFILL: Event = Event.generate_predefined(
+    event_name = context.EVENT_NAME.PLAYER_REFILL,
     ignore_assertion = False,
     )
 
 
-EVENT_PLAYER_DRAW_CARDS: Event = Event.generate_predefined(
-    event_name = context.EVENT_NAME.PLAYER_DRAW,
-    ignore_assertion = False,
-    )
-
-
-EVENT_OPPONENT_DRAW_CARDS: Event = Event.generate_predefined(
-    event_name = context.EVENT_NAME.PLAYER_DRAW,
+EVENT_OPPONENT_REFILL: Event = Event.generate_predefined(
+    event_name = context.EVENT_NAME.OPPONENT_REFILL,
     ignore_assertion = False,
     )
 
