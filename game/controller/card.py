@@ -1267,6 +1267,7 @@ class CardController:
                 "coordinate_x",
                 "coordinates",
                 "render_rect",
+                "state_idle",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -1365,7 +1366,8 @@ class CardController:
             cached_property_list: tuple[str, ...] = (
                 "coordinate_y",
                 "coordinates",
-                "render_rect"
+                "render_rect",
+                "state_idle",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -1455,7 +1457,8 @@ class CardController:
                 "coordinate_x",
                 "coordinate_y",
                 "coordinates",
-                "render_rect"
+                "render_rect",
+                "state_idle",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
