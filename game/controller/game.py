@@ -56,6 +56,7 @@ class Game:
         self.__event_list: list[event.Event] = []
         
         # Game state attributes:
+        self.__state_game_ready: bool = False
         self.__state_game_started: bool = False
         self.__state_game_paused: bool = False
         self.__state_game_ended: bool = False
@@ -172,8 +173,71 @@ class Game:
         # Clearing all cache:
         self.clear_cached_attributes()
         
+        # Setting up game ready:
+        self.__state_game_ready = True
+        
+        
+    def __reset_attributes(self) -> None:
+        
+        # Event attributes:
+        self.__event_list: list[event.Event] = []
+        
+        # Game state attributes:
+        self.__state_game_ready: bool = False
+        self.__state_game_started: bool = False
+        self.__state_game_paused: bool = False
+        self.__state_game_ended: bool = False
+        self.__state_game_phase: str = None
+        
+        # Round and turn attributes:
+        self.__turn_num: int = 0
+        self.__turn_player: PlayerController = None
+        self.__turn_draw: PlayerController = None
+        self.__round_num: int = 0
+        
+        # Cursor coordinates attributes:
+        self.__cursor_coordinate_x: int = 0
+        self.__cursor_coordinate_y: int = 0
+        
+        # Hit attributes:
+        self.__hit_area: area.Area | None = None
+        self.__hit_cards: list[Card] = []
+        
+        # Card hover and select attributes:
+        self.__card_hover: Card | None = None
+        self.__card_select: Card | None = None
+        
+        # Trump value:
+        self.__trump_suit: str = None
+        
+        
+    def __reset_player_state(self) -> None:
+        
+        # Asserting controllers are set:
+        for player_controller in self.__player_controllers:
+            if player_controller is None:
+                error_message: str = f"Player controller is not set, unable to reset attacking and defending states!"
+                raise AttributeError(error_message)
+    
+        # Updating attacking and defending states to avoid errors:
+        self.player_human.set_state_attacking(
+            set_value = True,
+            update_related = True,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        self.player_computer.set_state_defending(
+            set_value = True,
+            update_related = True,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        
         
     def reset(self) -> None:
+
+        # Resetting controller attributes:
+        self.__reset_attributes()
         
         # Resetting players' hand controllers:
         for player_controller in self.__player_controllers:
@@ -182,6 +246,38 @@ class Game:
         # Resetting location controllers:
         for location_controller in self.__location_controllers:
             location_controller.reset()
+            
+        # Updating attributes:
+        self.__reset_player_state()
+            
+        # Setting up game ready:
+        self.__state_game_ready = True
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        GAME CONTROL METHODS
+    
+    """
+    
+    
+    def game_start(self) -> None:
+        
+        # Running setup, if game is not ready:
+        if not self.state_game_ready:
+            self.setup()
+            
+        # Drawing cards and running event:
+        self.add_event(
+            event_object = event.EVENT_DRAW_CARDS,
+            autostart = True,
+            ignore_assertion = False,
+            clear_cache = True
+            )
+        for player_controller in self.__player_controllers:
+            self.perform_deal_cards(
+                player_controller = player_controller,
+                clear_cache = True
+                )
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -389,12 +485,22 @@ class Game:
     
     @property
     def user_mouse_enabled(self) -> bool:
-        ...
+        
+        # Checking if there are any events running with force wait:
+        user_mouse_enabled: bool = True if self.events_wait_count == 0 else False
+        
+        # Returning:
+        return user_mouse_enabled
         
         
     @property
     def user_keyboard_enabled(self) -> bool:
-        ...
+        
+        # Checking if there are any events running with force wait:
+        user_keyboard_enabled: bool = True if self.events_wait_count == 0 else False
+        
+        # Returning:
+        return user_keyboard_enabled
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -454,12 +560,278 @@ class Game:
 
         # Returning:
         return cards
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        EVENTS CACHED PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @cached_property
+    def events(self) -> tuple[event.Event, ...]:
+        
+        # Converting:
+        events: tuple[event.Event, ...] = tuple(self.__event_list)
+        
+        # Returning:
+        return events
+    
+    
+    @cached_property
+    def events_count(self) -> int:
+        
+        # Calculating:
+        events_count: int = len(self.events)
+        
+        # Returning:
+        return events_count
+    
+    
+    @cached_property
+    def events_ongoing(self) -> tuple[event.Event, ...]:
+        
+        # Extracting ongoing events:
+        events_ongoing: tuple[event.Event, ...] = tuple(
+            event_object for event_object in self.events
+                if event_object.ongoing
+            )
+        
+        # Returning:
+        return events_ongoing
+    
+
+    @cached_property
+    def events_ongoing_count(self) -> int:
+
+        # Calculating:
+        events_ongoing_count: int = len(self.events_ongoing)
+
+        # Returning:
+        return events_ongoing_count
+    
+    
+    @cached_property
+    def events_wait(self) -> tuple[event.Event, ...]:
+        
+        # Extracting wait events:
+        events_wait: tuple[event.Event, ...] = tuple(
+            event_object for event_object in self.events
+                if event_object.wait
+            )
+
+        # Returning:
+        return events_wait
 
 
+    @cached_property
+    def events_wait_count(self) -> int:
+
+        # Calculating:
+        events_wait_count: int = len(self.events_wait)
+        
+        # Returning:
+        return events_wait_count
+    
+    
+    @cached_property
+    def events_finished(self) -> tuple[event.Event, ...]:
+        
+        # Extracting finished events:
+        events_finished: tuple[event.Event, ...] = tuple(
+            event_object for event_object in self.events
+                if event_object.finished
+            )
+
+        # Returning:
+        return events_finished
+
+
+    @cached_property
+    def events_finished_count(self) -> int:
+
+        # Calculating:
+        events_finished_count: int = len(self.events_finished)
+
+        # Returning:
+        return events_finished_count
+    
+    
+    def add_event(self, event_object: event.Event, autostart: bool = True, 
+                        ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_event(
+                validate_value = event_object
+                )
+            
+        # Autostarting:
+        if autostart:
+            event_object.set_ongoing(
+                set_value = True,
+                ignore_assertion = True,
+                clear_cache = True
+                )
+
+        # Updating attribute:
+        self.__event_list.append(
+            event_object
+            )
+        
+        # Clearing cache:
+        if clear_cache:
+            self.clear_cached_events_attributes()
+            
+    
+    def remove_event(self, event_object: event.Event, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_event(
+                validate_value = event_object
+                )
+
+        # Removing event:
+        self.__event_list.remove(
+            event_object
+            )
+        
+        # Clearing cache:
+        if clear_cache:
+            self.clear_cached_events_attributes()
+
+
+    def remove_event_auto(self, clear_cache: bool = True) -> None:
+        
+        # Collecting events that finished running:
+        event_remove_list: list[event.Event] = []
+        for event_object in self.events_finished:
+            if event_object.finished:
+                event_remove_list.append(
+                    event_object
+                    )
+        
+        # Calling remove event method on each finished event:
+        for event_object in event_remove_list:
+            self.remove_event(
+                event_object = event_object,
+                clear_cache = False
+                )
+        
+        # Clearing cache:
+        if clear_cache:
+            event_remove_count: int = len(event_remove_list)
+            if event_remove_count > 0:
+                self.clear_cached_events_attributes()
+            
+    
+    def update_event(self, event_object: event.Event, event_ongoing: bool | None = None, event_finished: bool | None = None,
+                           ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_event(
+                validate_value = event_object
+                )
+
+        # Asserting event exists:
+        if event_object not in self.events:
+            error_message: str = f"Event {event_object.name} does not exist!"
+            raise ValueError(error_message)
+        
+        # Preparing variables:
+        event_updated: bool = False
+        
+        # Updating event object's attribute:
+        if event_ongoing is not None:
+            if event_object.ongoing != event_ongoing:
+                event_updated = True
+                event_object.set_ongoing(
+                    set_value = event_ongoing,
+                    ignore_assertion = True,
+                    clear_cache = True
+                    )
+        if event_finished is not None:
+            if event_object.finished != event_finished:
+                event_updated = True
+                event_object.set_finished(
+                    set_value = event_finished,
+                    ignore_assertion = True,
+                    clear_cache = True
+                    )
+            
+        # Clearing cache:
+        if clear_cache:
+            if event_updated:
+                self.clear_cached_events_attributes()
+            
+            
+    def __update_event_deal(self, event_object: event.Event, autoremove: bool = True) -> None:
+        
+        # Analyzing conditions:
+        event_ongoing: bool = False
+        event_finished: bool = True
+        
+        # Looping through player controllers list:
+        for player_controller in self.__player_controllers:
+            
+            # Checking if each player has six cards (or more):
+            if player_controller.hand.cards_count < 6:
+                event_ongoing = True
+                event_finished = False
+                break
+            
+            # Checking if cards are still moving to hand position:
+            for card_object in player_controller.hand.cards:
+                if not card_object.state_idle:
+                    event_ongoing = True
+                    event_finished = False
+                    break
+        
+        # Updating event object:
+        self.update_event(
+            event_object = event_object,
+            event_ongoing = event_ongoing,
+            event_finished = event_finished,
+            clear_cache = False
+            )
+        
+        # Removing event object:
+        if autoremove:
+            if event_finished:
+                self.remove_event(
+                    event_object = event_object,
+                    clear_cache = False
+                    )
+        
+            
+    def update_event_auto(self, autoremove: bool = True, clear_cache: bool = True) -> None:
+        
+        if self.events_count > 0:
+            for event_object in self.events:
+                if event_object.name == context.EVENT_NAME.DEAL:
+                    self.__update_event_deal(
+                        event_object = event_object,
+                        autoremove = autoremove
+                        )
+
+        # Clearing cache:
+        if clear_cache:
+            self.clear_cached_events_attributes()
+            
+    
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         STATE PROPERTIES AND METHODS
     
     """
+    
+    
+    @property
+    def state_game_ready(self) -> bool:
+        
+        # Returning:
+        return self.__state_game_ready
     
     
     @property
@@ -1361,6 +1733,7 @@ class Game:
         # Resetting game:
         elif key_pressed == keymap.KEYMAP.KEY_DEBUG_FORCE_RESTART_GAME:
             self.reset()
+            self.game_start()
             
         # Sorting opponent's hand:
         elif key_pressed == keymap.KEYMAP.KEY_DEBUG_SORT_OPPONENT:
