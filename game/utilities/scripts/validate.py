@@ -881,3 +881,16 @@ def validate_key(validate_value: int) -> None:
         raise_error = False,
         )
 
+
+def validate_event(validate_value: object) -> None:
+    
+    # Area class object:
+    from game.utilities.event import Event
+    
+    # Asserting value type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = Event,
+        raise_error = True
+        )
+
