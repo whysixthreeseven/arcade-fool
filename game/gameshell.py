@@ -34,6 +34,7 @@ class Gameshell(arcade.Window):
         # Game controller:
         self.__game_controller: Game = Game()
         self.__game_controller.setup()
+        self.__game_controller.game_start()
         
     
     @property
@@ -64,10 +65,11 @@ class Gameshell(arcade.Window):
             )
         
         # Handling event:
-        self.__gc.handle_mouse_motion(
-            cursor_coordinates = cursor_coordinates,
-            ignore_assertion = False
-            )
+        if self.__gc.user_mouse_enabled:
+            self.__gc.handle_mouse_motion(
+                cursor_coordinates = cursor_coordinates,
+                ignore_assertion = False
+                )
             
 
     def on_mouse_press(self, coordinate_x, coordinate_y, button, modifiers):
@@ -85,10 +87,11 @@ class Gameshell(arcade.Window):
     def on_key_press(self, key_pressed, modifiers):
         
         # Handling event:
-        self.__gc.handle_key_press(
-            key_pressed = key_pressed,
-            ignore_assertion = False,
-            )
+        if self.__gc.user_keyboard_enabled:
+            self.__gc.handle_key_press(
+                key_pressed = key_pressed,
+                ignore_assertion = False,
+                )
     
     
     def on_update(self, delta_time):
@@ -97,5 +100,11 @@ class Gameshell(arcade.Window):
         self.__gc.handle_slide(
             force_instant = False
             )
+        
+        self.__gc.update_event_auto(
+            autoremove = True,
+            clear_cache = True,
+            )
+        
 
             
