@@ -419,7 +419,8 @@ GAME_RESULT_LIST: tuple[str, ...] = tuple(
 
 class EVENT_NAME:
     DEAL: str = "Deal"
-    DRAW: str = "Draw"
+    PLAYER_DRAW: str = "Player draw"
+    OPPONENT_DRAW: str = "Opponent draw"
     
 
 EVENT_NAME_LIST: tuple[str, ...] = tuple(
@@ -435,7 +436,8 @@ class EVENT_TYPE:
 
 
 EVENT_TYPE_INDEX: dict[str, str] = {
-    EVENT_NAME.DEAL: EVENT_TYPE.GAME
+    EVENT_NAME.DEAL: EVENT_TYPE.GAME,
+    EVENT_NAME.PLAYER_DRAW: EVENT_TYPE.GAME
     }
 
 
@@ -448,6 +450,8 @@ EVENT_TYPE_LIST: tuple[str, ...] = tuple(
 
 EVENT_DESCRIPTION_INDEX: dict[str, str] = {
     EVENT_NAME.DEAL: "There is nothing here yet.",
+    EVENT_NAME.PLAYER_DRAW: "There is nothing here yet.",
+    EVENT_NAME.OPPONENT_DRAW: "There is nothing here yet.",
     }
 
 
@@ -459,7 +463,9 @@ EVENT_DESCRIPTION_LIST: tuple[str, ...] = tuple(
 
 
 EVENT_CONDITION_INDEX: dict[str, str] ={
-    EVENT_NAME.DEAL: "There is nothing here yet."
+    EVENT_NAME.DEAL: "There is nothing here yet.",
+    EVENT_NAME.PLAYER_DRAW: "There is nothing here yet.",
+    EVENT_NAME.OPPONENT_DRAW: "There is nothing here yet.",
     }
 
 
