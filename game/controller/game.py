@@ -703,7 +703,7 @@ class Game:
             self.clear_cached_events_attributes()
 
 
-    def remove_event_auto(self, clear_cache: bool = True) -> None:
+    def remove_event_scan(self, clear_cache: bool = True) -> None:
         
         # Collecting events that finished running:
         event_remove_list: list[event.Event] = []
@@ -837,7 +837,7 @@ class Game:
         # Returning:
         return event_update_methods
         
-    def update_event_auto(self, autoremove: bool = True, clear_cache: bool = True) -> None:
+    def update_event_pipe(self, autoremove: bool = True, clear_cache: bool = True) -> None:
         
         # Scanning events available:
         if self.events_count > 0:

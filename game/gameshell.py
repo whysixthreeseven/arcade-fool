@@ -101,7 +101,7 @@ class Gameshell(arcade.Window):
             force_instant = False
             )
         
-        self.__gc.update_event_auto(
+        self.__gc.update_event_pipe(
             autoremove = True,
             clear_cache = True,
             )
