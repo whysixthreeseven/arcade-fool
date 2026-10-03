@@ -29,6 +29,7 @@ class Gameshell(arcade.Window):
             resizable = SETTINGS.WINDOW_RESIZABLE,
             update_rate = SETTINGS.WINDOW_UPDATE_RATE,
             antialiasing = SETTINGS.WINDOW_ANTIALIASING,
+            draw_rate = SETTINGS.WINDOW_UPDATE_RATE,
             )
         
         # Game controller:
@@ -49,6 +50,10 @@ class Gameshell(arcade.Window):
         
         # Rendering surface and card containers in order:
         self.__gc.display_surface()
+        
+        # Cards main display and debug display in order:
+        if SESSION.ENABLE_DEBUG:
+            self.__gc.display_debug()
         self.__gc.display_cards()
         
         # Rendering hints, if available:
