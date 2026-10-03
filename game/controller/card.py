@@ -3820,14 +3820,6 @@ class CardController:
         Uses predefined `arcade.Rect` object, card object's `self.texture_object_selected` texture based on its state and other
         render properties.
         """
-
-        # Rendering boundary rectangle:
-        if SESSION.ENABLE_DEBUG:
-            arcade.draw_rect_filled(
-                rect = self.render_rect_boundary,
-                color = arcade.color.YELLOW_ORANGE,
-                tilt_angle = 0
-                )
         
         # Rendering:
         arcade.draw_texture_rect(
@@ -3836,6 +3828,20 @@ class CardController:
             angle = self.render_tilt,
             alpha = self.render_alpha
             )
+        
+    
+    def display_debug(self) -> None:
+        """
+        TODO: Add documentation!
+        """
+        
+        # Rendering:
+        arcade.draw_rect_filled(
+            rect = self.render_rect_boundary,
+            color = arcade.color.YELLOW_ORANGE,
+            tilt_angle = 0
+            )
+        
 
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
