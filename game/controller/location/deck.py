@@ -32,6 +32,9 @@ class DeckController:
         # Core attributes:
         self.__cards_list: list[Card] = []       # Current deck container
         self.__cards_gen_count: int = 0          # Cards generated count (global)
+        
+        # Trump suit selector:
+        self.__trump_suit: str = None
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -45,7 +48,7 @@ class DeckController:
         """
         Cards attributes-related cached properties list.
         
-        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Collects and returns all properties of this deck controller decorated with `functools` library's `cached_property` wrapper.
         Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
         setter.
         
@@ -68,12 +71,39 @@ class DeckController:
         return cached_property_list
     
     
+    @cached_property
+    def __cached_hints_attributes(self) -> tuple[str, ...]:
+        """
+        Hints attributes-related cached properties list.
+        
+        Collects and returns all properties of this deck controller decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
+        
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "hint_text_cards_count",
+            "hint_text_trump_suit",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
+    
     def clear_cached_cards_attributes(self) -> None:
         """
-        Clears all public cached core properties of this card object.
+        Clears all public cached core properties of this deck controller.
         
         Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
-        clear texturepack properties of this card object.
+        clear texturepack properties of this deck controller.
         """
     
         # Clearing cached properties:
@@ -83,17 +113,33 @@ class DeckController:
             )
         
     
+    def clear_cached_hints_attributes(self) -> None:
+        """
+        Clears all public cached core properties of this deck controller.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear texturepack properties of this deck controller.
+        """
+
+        # Clearing cached properties:
+        cache.clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_hints_attributes
+            )
+        
+    
     def clear_cached_attributes(self) -> None:
         """
-        Clears all public cached properties of this card object.
+        Clears all public cached properties of this deck controller.
         
         Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and all property lists available to
-        clear all cached properties of this card object in a single loop through lists collection.
+        clear all cached properties of this deck controller in a single loop through lists collection.
         """
             
         # Collecting cached properties:
         cached_property_list_collection: tuple[tuple[str, ...], ...] = (
             self.__cached_cards_attributes,
+            self.__cached_hints_attributes,
             )
         
         # Looping throught the list and clearing cache:
@@ -122,7 +168,7 @@ class DeckController:
         self.__cards_list: list[Card] = deck
         
         # Clearing cache:
-        self.clear_cached_cards_attributes()
+        self.clear_cached_attributes()
         
         
     def reset(self) -> None:
@@ -207,10 +253,18 @@ class DeckController:
                     ignore_assertion = True,
                     clear_cache = True
                     )
+                
+                # Updating trump suit selector:
+                trump_suit: str = card_secret.suit
+                self.set_trump_suit(
+                    set_value = card_secret.suit,
+                    ignore_assertion = False,
+                    clear_cache = True,
+                    )
 
             # Clearing cache:
             if clear_cache:
-                self.clear_cached_cards_attributes()
+                self.clear_cached_attributes()
             
             # Returning card object:
             return card
@@ -397,6 +451,12 @@ class DeckController:
             if card_object.trump
             )
         trump_card: Card = random.choice(trump_card_list)
+        trump_suit: str = trump_card.suit
+        self.set_trump_suit(
+            set_value = trump_card.suit,
+            ignore_assertion = False,
+            clear_cache = True,
+            )
         
         # Selecting a secret card:
         secret_card: Card = random.choice(card_list_gen)
@@ -506,6 +566,63 @@ class DeckController:
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        TRUMP SUIT SELECTOR CACHED PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @cached_property
+    def trump_suit(self) -> str:
+        
+        # Returning:
+        return self.__trump_suit
+    
+    
+    @cached_property
+    def trump_suit_ascii(self) -> str:
+        
+        # Generating a dictionary index:
+        suit_ascii_index = {
+            attr_name.capitalize(): getattr(context.CARD_SUIT_ASCII, attr_name)
+            for attr_name, attr_value in context.CARD_SUIT.__dict__.items()
+            if not attr_name.startswith("_") and hasattr(context.CARD_SUIT_ASCII, attr_name)
+            }
+        
+        # Getting correct value:
+        suit_ascii: str = suit_ascii_index.get(
+            self.trump_suit,
+            None
+            )
+        
+        # Returning:
+        return suit_ascii
+    
+    
+    def set_trump_suit(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+            
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_card_suit(
+                validate_value = set_value
+                )
+
+        # Updating attribute:
+        self.__trump_suit = set_value
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property_list: tuple[str, ...] = (
+                "trump_suit",
+                "trump_suit_ascii",
+                "hint_text_trump_suit"
+                )
+            cache.clear_cached_property_list(
+                target_object = self,
+                target_attribute_list = cached_property_list
+                )
+
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         UPDATE METHODS
     
     """
@@ -571,6 +688,45 @@ class DeckController:
     """
     
     
+    @cached_property
+    def hint_text_cards_count(self) -> arcade.Text:
+        
+        # Generating text object:
+        hint_cards_count: arcade.Text = arcade.Text(
+            text = "{num} {literal}".format(
+                num = self.cards_count,
+                literal = "cards" if self.cards_count > 1 or self.cards_count == 0 else "card",
+                ),
+            x = SETTINGS.LOCATION_DECK_HINT_COORDINATE_X,
+            y = SETTINGS.LOCATION_DECK_HINT_COORDINATE_Y_UPPER,
+            color = arcade.color.WHITE,
+            font_size = 15,
+            anchor_x = "center",
+            anchor_y = "center"
+            )
+        
+        # Returning:
+        return hint_cards_count
+    
+    
+    @cached_property
+    def hint_text_trump_suit(self) -> arcade.Text:
+        
+        # Generating text object:
+        hint_trump_suit: arcade.Text = arcade.Text(
+            text = self.trump_suit_ascii if self.trump_suit is not None else "?",
+            x = SETTINGS.LOCATION_DECK_HINT_COORDINATE_X,
+            y = SETTINGS.LOCATION_DECK_HINT_COORDINATE_Y_LOWER,
+            color = arcade.color.WHITE,
+            font_size = 10,
+            anchor_x = "center",
+            anchor_y = "center"
+            ) 
+        
+        # Returning:
+        return hint_trump_suit
+    
+    
     def display(self) -> None:
         
         # Calling display() method on all card objects:
@@ -578,49 +734,15 @@ class DeckController:
             card_object.display()
 
     
-    def display_info(self, display_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
+    def display_hint(self) -> None:
         """
         THIS METHOD HAS NOT BEEN PROPERLY IMPLEMENTED AND IS FOR TEST USES ONLY!        
         """
         
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            validate.validate_coordinate_container(
-                validate_value = display_coordinates,
-                enable_boundary = True
-                )
-            
-        # Unpacking coordinates:
-        coordinate_x, coordinate_y = display_coordinates
+        # Cards count remaining (if cards available):
+        if self.cards_count > 0:
+            self.hint_text_cards_count.draw()
         
-        # Creating background:
-        render_background: arcade.Rect = arcade.XYWH(
-            x = coordinate_x, 
-            y = coordinate_y,
-            width = 85,
-            height = 25,
-            )
-        arcade.draw_rect_filled(
-            rect = render_background,
-            color = arcade.color.BLACK,
-            tilt_angle = 0
-            )
-        
-        # Creating text object:
-        render_text: arcade.Text = arcade.Text(
-            text = "{num} {literal}".format(
-                num = self.cards_count,
-                literal = "cards" if self.cards_count > 1 or self.cards_count == 0 else "card"
-                ),
-            x = coordinate_x,
-            y = coordinate_y,
-            color = arcade.color.WHITE,
-            font_size = 15,
-            anchor_x = "center",
-            anchor_y = "center"
-            )
-        
-        # Displaying text:
-        render_text.draw()
-    
-    
+        # Current trump suit (always on display):
+        self.hint_text_trump_suit.draw()
+
