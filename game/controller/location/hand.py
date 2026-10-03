@@ -279,18 +279,10 @@ class HandController:
             clear_cache = True
             )
 
-        # Selecting correct tilt angle (expected):        
-        tilt_expected: int = card_object.render_tilt_default 
-        if self.owner == context.PLAYER_TYPE.COMPUTER:
-            tilt_expected: int = card_object.render_tilt_opp
-            
-        # Updating card's tilt:
-        if card_object.render_tilt != tilt_expected:
-            card_object.set_render_tilt(
-                set_value = tilt_expected,
-                ignore_assertion = True,
-                clear_cache = True
-                )
+        # Updating tilt value:        
+        card_object.set_render_tilt_default(
+            clear_cache = True
+            )
         
         # Updating known state (before resetting other states):
         if card_object.state_revealed and not card_object.state_known:
