@@ -3,6 +3,7 @@ from __future__ import annotations
 
 # External libraries:
 import random
+import time
 import arcade
 
 # Settings, session and context:
@@ -40,6 +41,11 @@ class Event:
         self.__wait: bool = False
         self.__finished: bool = False
         
+        # Time attributes:
+        self.__timeout_duration: float = 0.00
+        self.__timeout_start: float = 0.00
+        self.__timeout_elapsed: float = 0.00
+        
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         NATIVE METHODS
@@ -66,8 +72,8 @@ class Event:
     
     
     @classmethod
-    def generate(cls, init_name: str, init_type: str, init_description: str, init_condition: str,
-                      ignore_assertion: bool = False) -> Event:
+    def generate(cls, init_name: str, init_type: str, init_description: str, init_condition: str, 
+                      init_wait: bool, init_timeout: float, ignore_assertion: bool = False) -> Event:
         
         # Creating event class object:
         event_object: Event = Event()
@@ -96,11 +102,17 @@ class Event:
         
         # Setting status attributes:
         event_object.set_wait(
-            set_value = True,
+            set_value = init_wait,
             ignore_assertion = ignore_assertion,
             clear_cache = True,
             )
         
+        # Setting timeout attributes:
+        event_object.set_timeout_duration(
+            set_value = init_timeout,
+            ignore_assertion = ignore_assertion,
+            )
+
         # Returning:
         return event_object
     
@@ -124,6 +136,8 @@ class Event:
         event_type: str = context.EVENT_TYPE_INDEX[event_name]
         event_description: str = context.EVENT_DESCRIPTION_INDEX[event_name]
         event_condition: str = context.EVENT_CONDITION_INDEX[event_name]
+        event_wait: bool = context.EVENT_WAIT_INDEX[event_name]
+        event_timeout: float = context.EVENT_TIMEOUT_INDEX[event_name]
 
         # Generating event:
         event_object: Event = Event.generate(
@@ -131,6 +145,8 @@ class Event:
             init_type = event_type,
             init_description = event_description,
             init_condition = event_condition,
+            init_wait = event_wait,
+            init_timeout = event_timeout,
             ignore_assertion = ignore_assertion,
             )
         
@@ -526,7 +542,108 @@ class Event:
             set_value = not self.finished,
             clear_cache = clear_cache
             )
+        
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        TIMEOUT PROPERTIES AND METHODS
+
+    """
     
+    
+    @property
+    def timeout_duration(self) -> float:
+        
+        # Returning:
+        return self.__timeout_duration
+    
+    
+    @property
+    def timeout_enabled(self) -> bool:
+        
+        # Checking if timeout is enabled:
+        timeout_enabled: bool = self.__timeout_duration > 0.00
+        
+        # Returning:
+        return timeout_enabled
+
+
+    @property
+    def timeout_elapsed(self) -> float:
+        
+        # Returning:
+        return self.__timeout_elapsed
+    
+    
+    @property
+    def timeout_complete(self) -> bool:
+        
+        # Calculating:
+        timeout_complete: bool = True
+        if self.__timeout_duration > 0.00:
+            timeout_complete: bool = self.__timeout_elapsed >= self.__timeout_duration
+        
+        # Returning:
+        return timeout_complete
+
+
+    def set_timeout_duration(self, set_value: float, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = float,
+                raise_error = True
+                )
+            assertion.assert_value_ge_zero(
+                check_value = set_value,
+                raise_error = True
+                )
+
+        # Updating attribute:
+        self.__timeout_duration = set_value
+        
+    
+    def set_timeout_elapsed(self, set_value: float, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = float,
+                raise_error = True
+                )
+            assertion.assert_value_ge_zero(
+                check_value = set_value,
+                raise_error = True
+                )
+
+        # Updating attribute:
+        self.__timeout_elapsed = set_value
+
+    
+    def adjust_timeout_elapsed(self, adjust_value: float, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = adjust_value,
+                check_type = float,
+                raise_error = True
+                )
+            assertion.assert_value_ge_zero(
+                check_value = adjust_value,
+                raise_error = True
+                )
+            
+        # Calculating adjusted value:
+        timeout_value: float = self.__timeout_elapsed + adjust_value
+
+        # Updating attribute:
+        self.set_timeout_elapsed(
+            set_value = timeout_value,
+            ignore_assertion = ignore_assertion
+            )
+
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     EVENT CLASS OBJECTS COLLECTION
