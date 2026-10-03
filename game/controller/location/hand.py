@@ -821,4 +821,11 @@ class HandController:
         # Calling display() method on all card objects:
         for card_object in self.cards:
             card_object.display()
+            
+    
+    def display_debug(self) -> None:
+        
+        # Calling display_debug() method on all card objects:
+        for card_object in self.cards:
+            card_object.display_debug()
 
