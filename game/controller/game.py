@@ -6,11 +6,6 @@ from game.controller.location.hand import HandController
 from game.controller.player import PlayerController
 from game.controller.card import CardController as Card
 
-# External libraries:
-import random
-import arcade
-import time
-
 # Settings, session and context:
 from game.settings import SETTINGS
 from game.session import SESSION
@@ -266,15 +261,76 @@ class Game:
         if not self.state_game_ready:
             self.setup()
             
-        # Drawing cards and running event:
+        # Waiting for objects to load up:
         self.add_event(
-            event_object = event.EVENT_PLAYER_REFILL,
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.TIMEOUT_5,
+                ignore_assertion = False,
+                ),
+            autostart = True,
+            ignore_assertion = False,
+            clear_cache = True
+            )
+        
+        # Starting draw cards loop
+        hand_size_min: int = SETTINGS.HAND_SIZE_REFILL_MIN
+        for _ in range(hand_size_min):
+            
+            # Choosing correct player controller and event name:
+            for player_controller in self.__player_controllers:
+                if player_controller == self.player_human:
+                    event_name: str = context.EVENT_NAME.PLAYER_DRAW
+                else:
+                    event_name = context.EVENT_NAME.OPPONENT_DRAW
+                    
+                # Creating event and adding it to the pipeline:
+                self.add_event(
+                    event_object = event.Event.generate_predefined(
+                        event_name = event_name,
+                        ignore_assertion = True,
+                        ),
+                    autostart = True,
+                    ignore_assertion = False,
+                    clear_cache = True
+                    )
+        
+        # Waiting for cards to hit hand controllers:
+        self.add_event(
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.TIMEOUT_3,
+                ignore_assertion = False,
+                ),
+            autostart = True,
+            ignore_assertion = False,
+            clear_cache = True
+            )
+        
+        # Sorting hands:
+        self.add_event(
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.PLAYER_SORT,
+                ignore_assertion = False,
+                ),
             autostart = True,
             ignore_assertion = False,
             clear_cache = True
             )
         self.add_event(
-            event_object = event.EVENT_OPPONENT_REFILL,
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.OPPONENT_SORT,
+                ignore_assertion = False,
+                ),
+            autostart = True,
+            ignore_assertion = False,
+            clear_cache = True
+            )
+        
+        # Waiting for sort to finish:
+        self.add_event(
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.TIMEOUT_3,
+                ignore_assertion = False,
+                ),
             autostart = True,
             ignore_assertion = False,
             clear_cache = True
@@ -728,7 +784,7 @@ class Game:
             
     
     def update_event(self, event_object: event.Event, event_ongoing: bool | None = None, event_finished: bool | None = None,
-                           ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+                           delta_time: float = 1 / 60, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -744,7 +800,7 @@ class Game:
         # Preparing variables:
         event_updated: bool = False
         
-        # Updating event object's attribute:
+        # Updating event object's state attributes:
         if event_ongoing is not None:
             if event_object.ongoing != event_ongoing:
                 event_updated = True
@@ -762,13 +818,23 @@ class Game:
                     clear_cache = True
                     )
             
+        # Updating event object's timeout values, if applicable:
+        if event_object.timeout_enabled:
+            if not event_object.timeout_complete:
+                event_updated = True
+                event_object.adjust_timeout_elapsed(
+                    adjust_value = delta_time,
+                    ignore_assertion = False,
+                    )
+            
         # Clearing cache:
         if clear_cache:
             if event_updated:
                 self.clear_cached_events_attributes()
             
             
-    def __update_event_draw(self, event_object: event.Event, player_controller: PlayerController, autoremove: bool = True) -> None:
+    def __update_event_refill(self, event_object: event.Event, player_controller: PlayerController, 
+                                    delta_time: float = 1 / 60, autoremove: bool = True) -> None:
             
         # Checking if event needs to be stopped:
         force_stop: bool = bool(
@@ -805,22 +871,166 @@ class Game:
                     )
     
     
-    def __update_event_player_draw(self, event_object: event.Event, autoremove: bool = True) -> None:
+    def __update_event_player_refill(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
         
         # Calling update method:
-        self.__update_event_draw(
+        self.__update_event_refill(
             event_object = event_object,
             player_controller = self.player_human,
             autoremove = autoremove
             )
         
     
-    def __update_event_opponent_draw(self, event_object: event.Event, autoremove: bool = True) -> None:
+    def __update_event_opponent_refill(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+            
+        # Calling update method:
+        self.__update_event_refill(
+            event_object = event_object,
+            player_controller = self.player_computer,
+            autoremove = autoremove
+            )
+        
+    
+    def __update_event_draw(self, event_object: event.Event, player_controller: PlayerController, 
+                                  delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+        
+        
+        # Drawing a card for player controller:
+        self.perform_player_draw(
+            player_controller = player_controller,
+            ignore_assertion = False,
+            clear_cache = True,
+            )
+
+        # Preparing variables
+        event_ongoing: bool = False
+        event_finished: bool = True
+    
+        # Updating event object:
+        self.update_event(
+            event_object = event_object,
+            event_ongoing = event_ongoing,
+            event_finished = event_finished,
+            clear_cache = True
+            )
+        
+        # Removing event object:
+        if autoremove:
+            if event_finished:
+                self.remove_event(
+                    event_object = event_object,
+                    clear_cache = True
+                    )
+                
+    
+    def __update_event_player_draw(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
             
         # Calling update method:
         self.__update_event_draw(
             event_object = event_object,
+            player_controller = self.player_human,
+            delta_time = delta_time,
+            autoremove = autoremove
+            )
+        
+    
+    def __update_event_opponent_draw(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+                
+        # Calling update method:
+        self.__update_event_draw(
+            event_object = event_object,
             player_controller = self.player_computer,
+            delta_time = delta_time,
+            autoremove = autoremove
+            )
+        
+    
+    def __update_event_timeout(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+        
+        # Checking if event needs to be stopped:
+        force_stop: bool = event_object.timeout_complete
+        if force_stop:
+            event_ongoing: bool = False
+            event_finished: bool = True
+        
+            # Updating event object:
+            self.update_event(
+                event_object = event_object,
+                event_ongoing = event_ongoing,
+                event_finished = event_finished,
+                clear_cache = True
+                )
+            
+            # Removing event object:
+            if autoremove:
+                if event_finished:
+                    self.remove_event(
+                        event_object = event_object,
+                        clear_cache = True
+                        )
+        
+        # Otherwise updating delta time:
+        event_object.adjust_timeout_elapsed(
+            adjust_value = delta_time,
+            ignore_assertion = False,
+            )
+        
+    
+    def __update_event_sort(self, event_object: event.Event, player_controller: PlayerController, 
+                                  delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+                
+
+        # Sorting hand:
+        if player_controller.type == context.PLAYER_TYPE.HUMAN:
+            player_controller.hand.sort_selected(
+                update_coordinates = True,
+                clear_cache = True
+            )
+        else:
+            player_controller.hand.sort_random(
+                update_coordinates = True,
+                clear_cache = True
+                )
+
+        # Preparing variables
+        event_ongoing: bool = False
+        event_finished: bool = True
+    
+        # Updating event object:
+        self.update_event(
+            event_object = event_object,
+            event_ongoing = event_ongoing,
+            event_finished = event_finished,
+            clear_cache = True
+            )
+        
+        # Removing event object:
+        if autoremove:
+            if event_finished:
+                self.remove_event(
+                    event_object = event_object,
+                    clear_cache = True
+                    )
+                
+                
+    def __update_event_player_sort(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+        
+        # Calling update method:
+        self.__update_event_sort(
+            event_object = event_object,
+            player_controller = self.player_human,
+            delta_time = delta_time,
+            autoremove = autoremove
+            )
+        
+    
+    def __update_event_opponent_sort(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+
+        # Calling update method:
+        self.__update_event_sort(
+            event_object = event_object,
+            player_controller = self.player_computer,
+            delta_time = delta_time,
             autoremove = autoremove
             )
         
@@ -830,24 +1040,35 @@ class Game:
         
         # Creating event update methods index:
         event_update_methods = {
-            context.EVENT_NAME.PLAYER_REFILL: self.__update_event_player_draw,
-            context.EVENT_NAME.OPPONENT_REFILL: self.__update_event_opponent_draw,
+            context.EVENT_NAME.PLAYER_REFILL: self.__update_event_player_refill,
+            context.EVENT_NAME.PLAYER_SORT: self.__update_event_player_sort,
+            context.EVENT_NAME.PLAYER_DRAW: self.__update_event_player_draw,
+            context.EVENT_NAME.OPPONENT_REFILL: self.__update_event_opponent_refill,
+            context.EVENT_NAME.OPPONENT_SORT: self.__update_event_opponent_sort,
+            context.EVENT_NAME.OPPONENT_DRAW: self.__update_event_opponent_draw,
+            context.EVENT_NAME.TIMEOUT_1: self.__update_event_timeout,
+            context.EVENT_NAME.TIMEOUT_3: self.__update_event_timeout,
+            context.EVENT_NAME.TIMEOUT_5: self.__update_event_timeout,
             }
         
         # Returning:
         return event_update_methods
         
-    def update_event_pipe(self, autoremove: bool = True, clear_cache: bool = True) -> None:
+    def update_event_pipe(self, delta_time: float = 1 / 60, autoremove: bool = True, clear_cache: bool = True) -> None:
         
         # Scanning events available:
-        if self.events_count > 0:
-            event_object = self.events[0]
-            update_method = self.__update_event_index.get(event_object.name, None)
+        if self.events_ongoing_count > 0:
+            event_object = self.events_ongoing[0]
+            update_method = self.__update_event_index.get(
+                event_object.name, 
+                None
+                )
 
             # Asserting an event is found in update method index:
             if update_method is not None:
                 update_method(
                     event_object = event_object,
+                    delta_time = delta_time,
                     autoremove = autoremove,
                     )
 
@@ -1534,11 +1755,7 @@ class Game:
         if self.hit_area == area.AREA_DECK:
             
             # Displaying if a card is being hovered in location:
-            if self.card_hover is not None:
-                self.deck.display_info(
-                    display_coordinates = self.cursor_coordinates,
-                    ignore_assertion = True,
-                    )
+            self.deck.display_hint()
                 
                 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1995,5 +2212,4 @@ class Game:
             texturepack_object = SESSION.TEXTUREPACK_BACK_SELECTED,
             ignore_assertion = True,
             )
-    
-    
+
