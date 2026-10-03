@@ -17,7 +17,7 @@ class __SETTINGS:
     APP_NAME: str = "Arcade Fool"
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_STARTED: str = "2026.09.02"                                     # Date of project start (reboot)
-    APP_UPDATED: str = "2026.10.02"                                     # Date of last edit
+    APP_UPDATED: str = "2026.10.03"                                     # Date of last edit
     APP_VERSION: str = f"0.0.{APP_UPDATED[-6:].replace(".", "")}"       # Month and day in MMDD format
     APP_AUTHOR: str = "Andrey Vostokov"
 
@@ -128,6 +128,9 @@ class __SETTINGS:
     LOCATION_DECK_SHIFT_LAST_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025) * -1              # Shift down
     LOCATION_DECK_SHIFT_SECRET_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.050) * -1             # Shift left
     LOCATION_DECK_SHIFT_SECRET_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025)                 # Shift up
+    LOCATION_DECK_HINT_COORDINATE_X: int = LOCATION_DECK_COORDINATE_X
+    LOCATION_DECK_HINT_COORDINATE_Y_UPPER: int = 0 + int(CARD_TEXTURE_HEIGHT * 0.45)
+    LOCATION_DECK_HINT_COORDINATE_Y_LOWER: int = LOCATION_DECK_HINT_COORDINATE_Y_UPPER - 25
     
     # Location (discard) coordinates settings:
     LOCATION_DISCARD_COORDINATE_X: int = AREA_DISCARD_CENTER_COORDINATE_X
@@ -181,6 +184,7 @@ class __SETTINGS:
     HAND_CARD_OVERLAP_START: float = 0.90
     HAND_CARD_OVERLAP_STOP: float = 0.10
     HAND_CARD_OVERLAP_INCREMENT: float = 0.005
+    HAND_SIZE_REFILL_MIN: int = 6
     
     # Window settings:
     WINDOW_TITLE: str = f"{APP_NAME} (v{APP_VERSION})"
