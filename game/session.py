@@ -9,7 +9,7 @@ from functools import cached_property
 from game.utilities.scripts import cache
 
 # Various utilities:
-from game.utilities import texturepack
+from game.utilities import texturepack as tp
 from game.utilities.scripts import validate
 
 
@@ -29,10 +29,10 @@ class __SESSION:
         self.__enable_hint: bool = True
         
         # Texture pack options:
-        self.__texturepack_front_default: texturepack.TexturePack = texturepack.TEXTUREPACK_FRONT.LIGHT_2_1
-        self.__texturepack_front_selected: texturepack.TexturePack = texturepack.TEXTUREPACK_FRONT.LIGHT_2_1
-        self.__texturepack_back_default: texturepack.TexturePack = texturepack.TEXTUREPACK_BACK.PLAIN_WHITE
-        self.__texturepack_back_selected: texturepack.TexturePack = texturepack.TEXTUREPACK_BACK.PLAIN_WHITE
+        self.__texturepack_front_default: tp.TexturePack = tp.TEXTUREPACK_FRONT.LIGHT_2_1
+        self.__texturepack_front_selected: tp.TexturePack = tp.TEXTUREPACK_FRONT.LIGHT_2_1
+        self.__texturepack_back_default: tp.TexturePack = tp.TEXTUREPACK_BACK.PLAIN_WHITE
+        self.__texturepack_back_selected: tp.TexturePack = tp.TEXTUREPACK_BACK.PLAIN_WHITE
         
         # Game modes:
         self.__game_mode_secret: bool = True
@@ -321,7 +321,7 @@ class __SESSION:
     def TEXTUREPACK_FRONT_SELECTED_INDEX(self) -> int:
         
         # Locating index:
-        texturepack_index: int = texturepack.TEXTUREPACK_FRONT_LIST.index(
+        texturepack_index: int = tp.TEXTUREPACK_FRONT_LIST.index(
             self.__texturepack_front_selected
             )
 
@@ -347,7 +347,7 @@ class __SESSION:
     def TEXTUREPACK_BACK_SELECTED_INDEX(self) -> int:
         
         # Locating index:
-        texturepack_index: int = texturepack.TEXTUREPACK_BACK_LIST.index(
+        texturepack_index: int = tp.TEXTUREPACK_BACK_LIST.index(
             self.__texturepack_back_selected
             )
 
@@ -378,13 +378,13 @@ class __SESSION:
         
         # Retrieving next index:
         texturepack_next: int = self.TEXTUREPACK_FRONT_SELECTED_INDEX + 1
-        texturepack_count: int = len(texturepack.TEXTUREPACK_FRONT_LIST)
+        texturepack_count: int = len(tp.TEXTUREPACK_FRONT_LIST)
         if texturepack_next >= texturepack_count:
             texturepack_next = 0
             
         # Updating attribute:
         self.set_texturepack_front(
-            set_value = texturepack.TEXTUREPACK_FRONT_LIST[texturepack_next],
+            set_value = tp.TEXTUREPACK_FRONT_LIST[texturepack_next],
             ignore_assertion = True,
             )
         
@@ -393,13 +393,13 @@ class __SESSION:
             
         # Retrieving next index:
         texturepack_previous: int = self.TEXTUREPACK_FRONT_SELECTED_INDEX - 1
-        texturepack_count: int = len(texturepack.TEXTUREPACK_FRONT_LIST)
+        texturepack_count: int = len(tp.TEXTUREPACK_FRONT_LIST)
         if texturepack_previous < 0:
             texturepack_previous = texturepack_count - 1
             
         # Updating attribute:
         self.set_texturepack_front(
-            set_value = texturepack.TEXTUREPACK_FRONT_LIST[texturepack_previous],
+            set_value = tp.TEXTUREPACK_FRONT_LIST[texturepack_previous],
             ignore_assertion = True,
             )
         
@@ -407,7 +407,7 @@ class __SESSION:
     def set_texturepack_front_random(self, clear_cache: bool = True) -> None:
         
         # Selecting random texture pack:
-        texture_pack_random: texturepack.TexturePack = random.choice(texturepack.TEXTUREPACK_FRONT_LIST)
+        texture_pack_random: tp.TexturePack = random.choice(tp.TEXTUREPACK_FRONT_LIST)
         
         # Updating attribute:
         self.set_texturepack_front(
@@ -440,13 +440,13 @@ class __SESSION:
             
         # Retrieving next index:
         texturepack_next: int = self.TEXTUREPACK_BACK_SELECTED_INDEX + 1
-        texturepack_count: int = len(texturepack.TEXTUREPACK_BACK_LIST)
+        texturepack_count: int = len(tp.TEXTUREPACK_BACK_LIST)
         if texturepack_next >= texturepack_count:
             texturepack_next = 0
             
         # Updating attribute:
         self.set_texturepack_back(
-            set_value = texturepack.TEXTUREPACK_BACK_LIST[texturepack_next],
+            set_value = tp.TEXTUREPACK_BACK_LIST[texturepack_next],
             ignore_assertion = True,
             )
         
@@ -455,13 +455,13 @@ class __SESSION:
                 
         # Retrieving next index:
         texturepack_previous: int = self.TEXTUREPACK_BACK_SELECTED_INDEX - 1
-        texturepack_count: int = len(texturepack.TEXTUREPACK_BACK_LIST)
+        texturepack_count: int = len(tp.TEXTUREPACK_BACK_LIST)
         if texturepack_previous < 0:
             texturepack_previous = texturepack_count - 1
             
         # Updating attribute:
         self.set_texturepack_back(
-            set_value = texturepack.TEXTUREPACK_BACK_LIST[texturepack_previous],
+            set_value = tp.TEXTUREPACK_BACK_LIST[texturepack_previous],
             ignore_assertion = True,
             )
             
@@ -469,7 +469,7 @@ class __SESSION:
     def set_texturepack_back_random(self, clear_cache: bool = True) -> None:
 
         # Selecting random texture pack:
-        texturepack_random: texturepack.TexturePack = random.choice(texturepack.TEXTUREPACK_BACK_LIST)
+        texturepack_random: tp.TexturePack = random.choice(tp.TEXTUREPACK_BACK_LIST)
 
         # Updating attribute:
         self.set_texturepack_back(
