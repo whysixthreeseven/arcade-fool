@@ -2770,8 +2770,10 @@ class CardController:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            validate.validate_card_render_tilt(
-                validate_value = target_value,
+            assertion.assert_value_type(
+                check_value = target_value,
+                check_type = int,
+                raise_error = True
                 )
         
         if target_value == self.render_tilt_default:
@@ -2781,15 +2783,19 @@ class CardController:
             
         # Calculating new value:
         adjust_value: int = abs(self.render_tilt - int(self.render_tilt * step_amount))
-        if adjust_value == 0:
-            adjust_value = 1
+        tilt_difference: int = abs(self.render_tilt - target_value)
+        if tilt_difference < adjust_value:
+            adjust_value = tilt_difference
+        else:
+            if adjust_value == 0:
+                adjust_value = 1
         if self.render_tilt > target_value:
-            adjust_value = -adjust_value
+            adjust_value = adjust_value * -1
         
         # Updating attribute:
         self.adjust_render_tilt(
             adjust_value = adjust_value,
-            ignore_assertion = False,
+            ignore_assertion = True,
             clear_cache = False,
             )
         
@@ -3917,7 +3923,31 @@ class CardController:
                 clear_cache = clear_cache,
                 )
             
-            
+        # Adjusting tilt (from deck to opponent):
+        if self.location == context.CARD_LOCATION.OPPONENT:
+            if self.render_tilt != self.render_tilt_opp:
+                self.transition_render_tilt(
+                    target_value = self.render_tilt_opp,
+                    ignore_assertion = False,
+                    clear_cache = True
+                    )
+                
+        # Adjusting tilt (from opponent to table):
+        elif self.location == context.CARD_LOCATION.TABLE:
+            if self.render_tilt != self.render_tilt_default:
+                self.transition_render_tilt(
+                    target_value = self.render_tilt_default,
+                    ignore_assertion = False,
+                    clear_cache = True
+                    )
+                
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        UPDATE METHODS
+        
+    """
+    
+    
     def update_coordinates_location(self, calculated_coordinates: context.Coordinates | None, clear_cache: bool = True) -> None:
         """
         Updated coordinates based on card's location and `calculated_coordinates` parameter provided.
