@@ -263,10 +263,7 @@ class Game:
             
         # Waiting for objects to load up:
         self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_5,
-                ignore_assertion = False,
-                ),
+            event_object = event.EVENT_TIMEOUT_5,
             autostart = True,
             ignore_assertion = False,
             clear_cache = True
@@ -296,10 +293,7 @@ class Game:
         
         # Waiting for cards to hit hand controllers:
         self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_3,
-                ignore_assertion = False,
-                ),
+            event_object = event.EVENT_TIMEOUT_3,
             autostart = True,
             ignore_assertion = False,
             clear_cache = True
@@ -307,19 +301,13 @@ class Game:
         
         # Sorting hands:
         self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.PLAYER_SORT,
-                ignore_assertion = False,
-                ),
+            event_object = event.EVENT_PLAYER_SORT,
             autostart = True,
             ignore_assertion = False,
             clear_cache = True
             )
         self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.OPPONENT_SORT,
-                ignore_assertion = False,
-                ),
+            event_object = event.EVENT_OPPONENT_SORT,
             autostart = True,
             ignore_assertion = False,
             clear_cache = True
@@ -1738,7 +1726,7 @@ class Game:
         self.surface_controller.display_debug()        # TODO: Replace with non-debug method!
         
     
-    def display_cards(self) -> None:
+    def display_cards(self) -> None:        
         
         # Displaying all cards in location controllers:
         for location_controller in self.__location_controllers:
@@ -1749,12 +1737,21 @@ class Game:
             player_controller.hand.display()
             
     
+    def display_debug(self) -> None:
+        
+        # Player hand debug render:
+        if self.hit_area == area.AREA_PLAYER:
+            self.player_human.hand.display_debug()
+            
+        # Opponent hand debug render:
+        elif self.hit_area == area.AREA_OPPONENT:
+            self.player_computer.hand.display_debug()
+    
+    
     def display_hints(self) -> None:
         
         # Deck controller hint display:
         if self.hit_area == area.AREA_DECK:
-            
-            # Displaying if a card is being hovered in location:
             self.deck.display_hint()
                 
                 
