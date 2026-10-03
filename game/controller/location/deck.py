@@ -689,13 +689,14 @@ class DeckController:
     
     
     @cached_property
-    def hint_text_cards_count(self) -> arcade.Text:
+    def __hint_text_cards_count_index(self) -> dict[int, arcade.Text]:
         
-        # Generating text object:
-        hint_cards_count: arcade.Text = arcade.Text(
+        # Generating cards count index:
+        hint_text_cards_count_index: dict[int, arcade.Text] = {
+            cards_count: arcade.Text(
             text = "{num} {literal}".format(
-                num = self.cards_count,
-                literal = "cards" if self.cards_count > 1 or self.cards_count == 0 else "card",
+                num = cards_count,
+                literal = "cards" if cards_count > 1 or cards_count == 0 else "card",
                 ),
             x = SETTINGS.LOCATION_DECK_HINT_COORDINATE_X,
             y = SETTINGS.LOCATION_DECK_HINT_COORDINATE_Y_UPPER,
@@ -704,27 +705,60 @@ class DeckController:
             anchor_x = "center",
             anchor_y = "center"
             )
+            for cards_count in range(0, SETTINGS.DECK_SIZE_MAX + 1)
+            }
+        
+        # Returning:
+        return hint_text_cards_count_index
+    
+    
+    @cached_property
+    def hint_text_cards_count(self) -> arcade.Text:
+        
+        # Generating text object:
+        hint_cards_count: arcade.Text = self.__hint_text_cards_count_index[self.cards_count]
         
         # Returning:
         return hint_cards_count
     
     
     @cached_property
+    def __hint_trump_suit_index(self) -> dict[str, arcade.Text]:
+        
+        # Generating a dictionary index:
+        suit_ascii_index = {
+            attr_name.capitalize(): getattr(context.CARD_SUIT_ASCII, attr_name)
+            for attr_name, attr_value in context.CARD_SUIT.__dict__.items()
+            if not attr_name.startswith("_") and hasattr(context.CARD_SUIT_ASCII, attr_name)
+            }
+
+        # Generating card suit index:
+        hint_trump_suit_index: dict[str, arcade.Text] = {
+            card_suit: arcade.Text(
+                text = suit_ascii_index[card_suit],
+                x = SETTINGS.LOCATION_DECK_HINT_COORDINATE_X,
+                y = SETTINGS.LOCATION_DECK_HINT_COORDINATE_Y_LOWER,
+                color = arcade.color.WHITE,
+                font_size = 10,
+                anchor_x = "center",
+                anchor_y = "center"
+                ) 
+            for card_suit in context.CARD_SUIT_LIST
+            }
+
+        # Returning:
+        return hint_trump_suit_index
+
+
+    @cached_property
     def hint_text_trump_suit(self) -> arcade.Text:
         
-        # Generating text object:
-        hint_trump_suit: arcade.Text = arcade.Text(
-            text = self.trump_suit_ascii if self.trump_suit is not None else "?",
-            x = SETTINGS.LOCATION_DECK_HINT_COORDINATE_X,
-            y = SETTINGS.LOCATION_DECK_HINT_COORDINATE_Y_LOWER,
-            color = arcade.color.WHITE,
-            font_size = 10,
-            anchor_x = "center",
-            anchor_y = "center"
-            ) 
+        
+        # Getting correct arcade text:
+        hint_text: arcade.Text = self.__hint_trump_suit_index[self.trump_suit]
         
         # Returning:
-        return hint_trump_suit
+        return hint_text
     
     
     def display(self) -> None:
