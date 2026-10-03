@@ -416,7 +416,6 @@ class CardController:
             "render_rect_boundary",
             "render_width",
             "render_height",
-            "render_text",
             )
         
         # Returning:
@@ -936,7 +935,6 @@ class CardController:
                 "name",
                 "name_ascii",
                 "value",
-                "render_text"
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -1033,7 +1031,7 @@ class CardController:
                 "suit_ascii",
                 "color",
                 "trump",
-                "render_text"
+                
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -1119,7 +1117,6 @@ class CardController:
             cached_property_list: tuple[str, ...] = (
                 "trump",
                 "value",
-                "render_text",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -2898,25 +2895,6 @@ class CardController:
         return render_height
     
     
-    @cached_property
-    def render_text(self) -> arcade.Text:
-        
-        # Creating text object:
-        text: arcade.Text = arcade.Text(
-            text = self.__repr__(),
-            x = self.coordinate_x,
-            y = int(self.coordinate_y - self.render_height / 2 - self.render_height / 8),
-            color = SETTINGS.CARD_RENDER_TEXT_COLOR,
-            font_size = SETTINGS.CARD_RENDER_TEXT_FONT_SIZE,
-            font_name = SETTINGS.CARD_RENDER_TEXT_FONT_NAME,
-            anchor_x = "center",
-            anchor_y = "center",
-            )
-        
-        # Returning:
-        return text
-    
-    
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         STATE CACHED PROPERTIES AND METHODS
         
@@ -3835,7 +3813,7 @@ class CardController:
     """
     
     
-    def display(self, debug_boundary: bool = False) -> None:
+    def display(self) -> None:
         """
         Renders the card object's texture on screen. Used by `Gameshell` object's `on_draw` method within loop logic. 
         
@@ -3845,12 +3823,11 @@ class CardController:
 
         # Rendering boundary rectangle:
         if SESSION.ENABLE_DEBUG:
-            if debug_boundary:
-                arcade.draw_rect_filled(
-                    rect = self.render_rect_boundary,
-                    color = arcade.color.YELLOW_ORANGE,
-                    tilt_angle = 0
-                    )
+            arcade.draw_rect_filled(
+                rect = self.render_rect_boundary,
+                color = arcade.color.YELLOW_ORANGE,
+                tilt_angle = 0
+                )
         
         # Rendering:
         arcade.draw_texture_rect(
@@ -3861,18 +3838,6 @@ class CardController:
             )
 
 
-    def display_info(self) -> None:
-        """
-        Renders the card object's debug info on screen. Used by `Gameshell` object's `on_draw` method within loop logic. 
-        
-        Uses predefined `arcade.Text` object and other core attributes values available to the card. Calls 
-        `self.render_text.draw()` method to render text object on screen.
-        """
-        
-        # Calling text object's draw method:
-        self.render_text.draw()
-        
-    
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         SLIDE CACHED PROPERTIES AND METHODS
         
@@ -4140,7 +4105,7 @@ class CardController:
                     "render_scale",
                     "render_rect",
                     "render_rect_boundary",
-                    "render_text"
+                    
                     )
                 cache.clear_cached_property_list(
                     target_object = self,

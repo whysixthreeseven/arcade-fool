@@ -51,9 +51,6 @@ class __SETTINGS:
     CARD_RENDER_ALPHA_STEP_MOD_DEFAULT: float = 0.015
     CARD_RENDER_ALPHA_STEP_MOD_FADED: float = 0.045
     CARD_RENDER_BG_COLOR: context.context.RGB_Color = (215, 0, 0)                                           # Red
-    CARD_RENDER_TEXT_COLOR: context.context.RGB_Color = (255, 255, 255)                                     # White
-    CARD_RENDER_TEXT_FONT_SIZE: int = 12
-    CARD_RENDER_TEXT_FONT_NAME: str = "DengXian"
     
     # Card texture settings:
     CARD_TEXTURE_SCALE_DEFAULT: float = 0.25
