@@ -3825,12 +3825,13 @@ class CardController:
         """
         
         # Rendering:
-        arcade.draw_texture_rect(
-            texture = self.texture_object_selected,
-            rect = self.render_rect,
-            angle = self.render_tilt,
-            alpha = self.render_alpha
-            )
+        if self.state_visible:
+            arcade.draw_texture_rect(
+                texture = self.texture_object_selected,
+                rect = self.render_rect,
+                angle = self.render_tilt,
+                alpha = self.render_alpha
+                )
         
     
     def display_debug(self) -> None:
@@ -3839,11 +3840,12 @@ class CardController:
         """
         
         # Rendering:
-        arcade.draw_rect_filled(
-            rect = self.render_rect_boundary,
-            color = arcade.color.YELLOW_ORANGE,
-            tilt_angle = 0
-            )
+        if self.state_visible:
+            arcade.draw_rect_filled(
+                rect = self.render_rect_boundary,
+                color = arcade.color.YELLOW_ORANGE,
+                tilt_angle = 0
+                )
         
 
 
