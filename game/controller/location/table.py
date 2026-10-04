@@ -301,6 +301,14 @@ class TableController:
             clear_cache = True
             )
         
+        # Setting card's owner:
+        card_object.set_owner(
+            set_value = self.owner,
+            update_previous = True,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        
         # Updating known state (before resetting other states):
         if card_object.state_revealed and not card_object.state_known:
             card_object.set_state_known(

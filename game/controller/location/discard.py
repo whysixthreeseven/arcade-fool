@@ -211,9 +211,12 @@ class DiscardController:
             clear_cache = True
             )
         
-        # Setting random tilt angle for pile effect:
-        card_object.set_render_tilt_random(
-            clear_cache = True,
+        # Setting card owner:
+        card_object.set_owner(
+            set_value = None,
+            update_previous = True,
+            ignore_assertion = True,
+            clear_cache = True
             )
         
         # Updating card's states:

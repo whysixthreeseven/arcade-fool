@@ -279,8 +279,11 @@ class HandController:
             clear_cache = True
             )
 
-        # Updating tilt value:        
-        card_object.set_render_tilt_default(
+        # Setting card's owner:
+        card_object.set_owner(
+            set_value = self.owner,
+            update_previous = True,
+            ignore_assertion = True,
             clear_cache = True
             )
         
