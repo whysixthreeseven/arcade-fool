@@ -3115,28 +3115,29 @@ class CardController:
                 )
 
         # Updating attribute:
-        self.__state_hovered = set_value
-        
-        # Clearing cache:
-        if clear_cache:
+        if self.state_hovered != set_value:
+            self.__state_hovered = set_value
             
-            # Clearing target cached properties:
-            cached_property_list: tuple[str, ...] = (
-                "state_hovered",
-                "state_idle"
+            # Clearing cache:
+            if clear_cache:
+                
+                # Clearing target cached properties:
+                cached_property_list: tuple[str, ...] = (
+                    "state_hovered",
+                    "state_idle"
+                    )
+                cache.clear_cached_property_list(
+                    target_object = self,
+                    target_attribute_list = cached_property_list
+                    )
+                
+                # Clearing related cached properties:
+                self.clear_cached_slide_attributes()
+            
+            # Updating coordinates based on state:
+            self.update_coordinates_state(
+                clear_cache = clear_cache
                 )
-            cache.clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
-            
-            # Clearing related cached properties:
-            self.clear_cached_slide_attributes()
-            
-        # Updating coordinates based on state:
-        self.update_coordinates_state(
-            clear_cache = clear_cache
-            )
             
 
     def switch_state_hovered(self, clear_cache: bool = True) -> None:
@@ -3457,7 +3458,7 @@ class CardController:
             }
         
         # Returning:
-        return location_coordinates
+        return location_coordinates        
     
     
     def set_location(self, set_value: tuple[str, int], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -4134,6 +4135,17 @@ class CardController:
                     ignore_assertion = True,
                     clear_cache = clear_cache
                     )
+                
+                # Updating hover coordinates for deck:
+                if self.location == context.CARD_LOCATION.DECK:
+                    coordinates_index: dict[int, context.Coordinates] = coordinates.LOCATION_DECK_HOVER_COORDINATES_INDEX
+                    coordinates_hover: context.Coordinates = coordinates_index[self.location_index]
+                    self.set_coordinates_hover(
+                        set_value = coordinates_hover,
+                        ignore_assertion = True,
+                        clear_cache = clear_cache
+                        )
+                        
         
         # Updating coordinates based on provided value:
         else:
@@ -4181,7 +4193,8 @@ class CardController:
         location_hover: tuple[str, ...] = (
             context.CARD_LOCATION.PLAYER, 
             context.CARD_LOCATION.OPPONENT, 
-            context.CARD_LOCATION.TABLE
+            context.CARD_LOCATION.TABLE,
+            context.CARD_LOCATION.DECK,
             )
         location_playable: tuple[str, ...] = (
             context.CARD_LOCATION.PLAYER, 
