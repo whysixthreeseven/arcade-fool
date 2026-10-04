@@ -1720,6 +1720,16 @@ class Game:
             
         # Updating attribute:
         self.__hit_cards = hit_cards_temp
+        
+        # Handling deck hover state animation:
+        if self.hit_area == area.AREA_DECK:
+            deck_hover: bool = self.__hit_cards
+            for card_object in self.deck.cards:
+                card_object.set_state_hovered(
+                    set_value = deck_hover,
+                    ignore_assertion = True,
+                    clear_cache = True,
+                    )
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1744,18 +1754,26 @@ class Game:
                     validate_value = set_value
                     )
 
+        # Releasing previously registered hover card:
         if release_previous:
             if self.card_hover is not None and self.card_hover != set_value:
                 self.remove_card_hover()
         
-        if self.card_hover != set_value:
-            self.__card_hover = set_value
-            if set_value is not None:
-                self.__card_hover.set_state_hovered(
-                    set_value = True,
-                    ignore_assertion = False,
-                    clear_cache = True
-                    )                
+        # Generating list of areas where hover is allowed:
+        area_hover: tuple[area.Area, ...] = (
+            area.AREA_PLAYER,
+            area.AREA_OPPONENT,
+            area.AREA_TABLE
+            )
+        if self.hit_area in area_hover:
+            if self.card_hover != set_value:
+                self.__card_hover = set_value
+                if set_value is not None:
+                    self.__card_hover.set_state_hovered(
+                        set_value = True,
+                        ignore_assertion = False,
+                        clear_cache = True
+                        )                
                             
 
     def remove_card_hover(self) -> None:
