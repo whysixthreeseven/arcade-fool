@@ -17,8 +17,8 @@ class __SETTINGS:
     APP_NAME: str = "Arcade Fool"
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_STARTED: str = "2026.09.02"                                     # Date of project start (reboot)
-    APP_UPDATED: str = "2026.10.03"                                     # Date of last edit
-    APP_VERSION: str = f"0.0.{APP_UPDATED[-6:].replace(".", "")}"       # Month and day in MMDD format
+    APP_UPDATED: str = "2026.10.04"                                     # Date of last edit
+    APP_VERSION: str = f"0.0.{APP_UPDATED.replace(".", "")}"       # Month and day in MMDD format
     APP_AUTHOR: str = "Andrey Vostokov"
 
     # Root directory settings:    
@@ -71,7 +71,7 @@ class __SETTINGS:
     # Area (main) dimensions settings:
     __AREA_POS_MARGIN: int = int(CARD_TEXTURE_WIDTH * 0.30)
     __AREA_MAIN_WIDTH: int = int(CARD_TEXTURE_WIDTH * 7.00 + __AREA_POS_MARGIN * 5.00)
-    __AREA_SIDE_WIDTH: int = int(CARD_TEXTURE_WIDTH * 2.00)
+    __AREA_SIDE_WIDTH: int = int(CARD_TEXTURE_WIDTH * 3.00)
     
     # Area (main) dimensions settings:
     __AREA_HAND_WIDTH: int = __AREA_MAIN_WIDTH
@@ -128,9 +128,16 @@ class __SETTINGS:
     LOCATION_DECK_SHIFT_LAST_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025) * -1              # Shift down
     LOCATION_DECK_SHIFT_SECRET_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.050) * -1             # Shift left
     LOCATION_DECK_SHIFT_SECRET_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025)                 # Shift up
+    LOCATION_DECK_SHIFT_GLOBAL: int = int(CARD_TEXTURE_WIDTH / 5)
     LOCATION_DECK_HINT_COORDINATE_X: int = LOCATION_DECK_COORDINATE_X
     LOCATION_DECK_HINT_COORDINATE_Y_UPPER: int = 0 + int(CARD_TEXTURE_HEIGHT * 0.45)
     LOCATION_DECK_HINT_COORDINATE_Y_LOWER: int = LOCATION_DECK_HINT_COORDINATE_Y_UPPER - 25
+    LOCATION_DECK_HOVER_SHIFT_COORDINATE_X: int = 2
+    LOCATION_DECK_HOVER_SHIFT_COORDINATE_Y: int = 2
+    LOCATION_DECK_HOVER_LAST_SHIFT_COORDINATE_X: int = LOCATION_DECK_SHIFT_LAST_COORDINATE_X
+    LOCATION_DECK_HOVER_LAST_SHIFT_COORDINATE_Y: int = LOCATION_DECK_SHIFT_LAST_COORDINATE_Y
+    LOCATION_DECK_HOVER_SECRET_SHIFT_COORDINATE_X: int = LOCATION_DECK_SHIFT_SECRET_COORDINATE_X
+    LOCATION_DECK_HOVER_SECRET_SHIFT_COORDINATE_Y: int = LOCATION_DECK_SHIFT_SECRET_COORDINATE_Y
     
     # Location (discard) coordinates settings:
     LOCATION_DISCARD_COORDINATE_X: int = AREA_DISCARD_CENTER_COORDINATE_X
