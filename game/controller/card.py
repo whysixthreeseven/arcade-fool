@@ -1640,7 +1640,8 @@ class CardController:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "coordinate_x_expected",
-                "coordinates_expected"
+                "coordinates_expected",
+                "state_idle",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -1663,7 +1664,8 @@ class CardController:
         if clear_cache:
             cached_property_list: tuple[str, ...] = (
                 "coordinate_y_expected",
-                "coordinates_expected"
+                "coordinates_expected",
+                "state_idle",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -2946,12 +2948,7 @@ class CardController:
     def state_idle(self) -> bool:
         
         # Checking:
-        state_idle: bool = bool(
-            self.coordinate_x == self.coordinate_x_expected and 
-            self.coordinate_y == self.coordinate_y_expected and
-            not self.state_hovered and
-            not self.state_selected
-            )
+        state_idle: bool = bool(self.coordinates == self.coordinates_expected)
 
         # Returning:
         return state_idle
@@ -3295,7 +3292,7 @@ class CardController:
         
         # Resetting all states:
         self.reset_state_global(
-            clear_cache = False,
+            clear_cache = True,
             )
         
         # Checking state revealed:
