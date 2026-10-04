@@ -241,7 +241,7 @@ class Game:
         # Waiting for objects to load up:
         self.add_event(
             event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_1,
+                event_name = context.EVENT_NAME.TIMEOUT_3,
                 ignore_assertion = True,
                 ),
             autostart = True,
