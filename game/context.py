@@ -429,6 +429,7 @@ class EVENT_NAME:
     TIMEOUT_1: str = "Timeout (1 second)"
     TIMEOUT_3: str = "Timeout (3 seconds)"
     TIMEOUT_5: str = "Timeout (5 seconds)"
+    RESET: str = "Reset"
     
 
 EVENT_NAME_LIST: tuple[str, ...] = tuple(
@@ -456,6 +457,7 @@ EVENT_TYPE_INDEX: dict[str, str] = {
     EVENT_NAME.TIMEOUT_1: EVENT_TYPE.GLOBAL,
     EVENT_NAME.TIMEOUT_3: EVENT_TYPE.GLOBAL,
     EVENT_NAME.TIMEOUT_5: EVENT_TYPE.GLOBAL,
+    EVENT_NAME.RESET: EVENT_TYPE.GAME,
     }
 
 
@@ -478,6 +480,7 @@ EVENT_DESCRIPTION_INDEX: dict[str, str] = {
     EVENT_NAME.TIMEOUT_1: "There is nothing here yet.",
     EVENT_NAME.TIMEOUT_3: "There is nothing here yet.",
     EVENT_NAME.TIMEOUT_5: "There is nothing here yet.",
+    EVENT_NAME.RESET: "There is nothing here yet.",
     }
 
 
@@ -500,6 +503,7 @@ EVENT_CONDITION_INDEX: dict[str, str] ={
     EVENT_NAME.TIMEOUT_1: "One second elapsed",
     EVENT_NAME.TIMEOUT_3: "Three seconds elapsed",
     EVENT_NAME.TIMEOUT_5: "Five seconds elapsed",
+    EVENT_NAME.RESET: "All controllers reset",
     }
 
 
@@ -522,6 +526,7 @@ EVENT_WAIT_INDEX: dict[str, bool] = {
     EVENT_NAME.TIMEOUT_1: True,
     EVENT_NAME.TIMEOUT_3: True,
     EVENT_NAME.TIMEOUT_5: True,
+    EVENT_NAME.RESET: True,
     }
 
 
@@ -537,5 +542,6 @@ EVENT_TIMEOUT_INDEX: dict[str, float] = {
     EVENT_NAME.TIMEOUT_1: 1.00,
     EVENT_NAME.TIMEOUT_3: 3.00,
     EVENT_NAME.TIMEOUT_5: 5.00,
+    EVENT_NAME.RESET: 0.00
     }
 
