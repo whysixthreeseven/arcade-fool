@@ -105,7 +105,7 @@ class Gameshell(arcade.Window):
         if self.__gc.state_game_ready:
         
             # Handling card slide:
-            self.__gc.handle_slide(
+            self.__gc.handle_update(
                 force_instant = False
                 )
             
