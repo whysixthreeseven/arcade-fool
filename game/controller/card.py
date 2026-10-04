@@ -94,6 +94,7 @@ class CardController:
         self.__state_faded: bool = False
         self.__state_playable: bool = False
         self.__state_known: bool = False
+        self.__state_return: bool = False
         
         # Play location and index:
         self.__location: str = None
@@ -2707,20 +2708,6 @@ class CardController:
         return tilt_angle_random
     
     
-    @cached_property
-    def render_tilt_step_in(self) -> float:
-        
-        # Returning:
-        return SETTINGS.CARD_RENDER_TILT_STEP_IN
-    
-    
-    @cached_property
-    def render_tilt_step_out(self) -> float:
-
-        # Returning:
-        return SETTINGS.CARD_RENDER_TILT_STEP_OUT
-    
-    
     def set_render_tilt(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
         
         # Assertion control:
@@ -2729,8 +2716,16 @@ class CardController:
                 validate_value = set_value,
                 )
             
+        # Converting:
+        conv_value: int = set_value
+        if set_value == 360:
+            conv_value = 0
+        else:
+            if set_value >= 181:
+                conv_value = (360 - set_value) * -1
+            
         # Updating attribute:
-        self.__render_tilt = set_value
+        self.__render_tilt = conv_value
 
         # Clearing cache:
         if clear_cache:
@@ -2778,22 +2773,28 @@ class CardController:
                 raise_error = True
                 )
         
-        if target_value == self.render_tilt_default:
-            step_amount: float = self.render_tilt_step_out
-        else:
-            step_amount: float = self.render_tilt_step_in
-            
-        # Calculating new value:
-        adjust_value: int = abs(self.render_tilt - int(self.render_tilt * step_amount))
-        tilt_difference: int = abs(self.render_tilt - target_value)
-        if tilt_difference < adjust_value:
-            adjust_value = tilt_difference
-        else:
-            if adjust_value == 0:
-                adjust_value = 1
-        if self.render_tilt > target_value:
-            adjust_value = adjust_value * -1
+        # Preparing variables:    
+        adjust_axis: int = 1 if self.render_tilt < target_value else -1
+        tilt_difference: int = abs(target_value - self.render_tilt)
         
+        # Setting minimum adjust amount for smaller value:
+        if target_value == self.render_tilt_random:
+            adjust_value = SETTINGS.CARD_RENDER_TILT_ADJUST_SET * adjust_axis
+            adjust_over: bool = abs(self.render_tilt + adjust_value) > abs(self.render_tilt_random)
+            if adjust_over:
+                adjust_value = tilt_difference * adjust_axis
+            
+        # Calculating based on difference:
+        else: 
+            adjust_value_prep: int = self.__get_tilt_adjustment(
+                difference_value = tilt_difference
+                )
+            adjust_value: int = adjust_value_prep * adjust_axis
+        
+        # Making sure not to overadjust:
+        if tilt_difference < adjust_value:
+            adjust_value = tilt_difference * adjust_axis
+            
         # Updating attribute:
         self.adjust_render_tilt(
             adjust_value = adjust_value,
@@ -2966,6 +2967,13 @@ class CardController:
         
         # Returning:
         return self.__state_known
+    
+    
+    @cached_property
+    def state_return(self) -> bool:
+        
+        # Returning:
+        return self.__state_return
     
     
     def reset_state_global(self, clear_cache: bool = True) -> None:
@@ -3276,6 +3284,26 @@ class CardController:
         # Clearing cache:
         if clear_cache:
             cached_property: str = "state_known"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+            
+    
+    def set_state_return(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value,
+                )
+
+        # Updating attribute:
+        self.__state_return = set_value
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "state_return"
             cache.clear_cached_property(
                 target_object = self,
                 target_attribute = cached_property
@@ -3940,6 +3968,16 @@ class CardController:
                     clear_cache = True
                     )
                 
+        # Adjusting tilt (restock):
+        elif self.location == context.CARD_LOCATION.DECK:
+            if self.state_return:
+                if self.render_tilt != self.render_tilt_random:
+                    self.transition_render_tilt(
+                        target_value = self.render_tilt_random,
+                        ignore_assertion = False,
+                        clear_cache = True
+                        )
+                                
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         UPDATE METHODS
@@ -4146,6 +4184,36 @@ class CardController:
                     target_object = self,
                     target_attribute_list = cached_property_list
                     )
+                
+    
+    def __get_tilt_adjustment(self, difference_value: int) -> int:
+            
+            # Preparing variables:
+            adjust_diff_max: int = SETTINGS.CARD_RENDER_TILT_DIFF_MAX
+            adjust_diff_min: int = SETTINGS.CARD_RENDER_TILT_DIFF_MIN
+            adjust_mod_max: int = SETTINGS.CARD_RENDER_TILT_ADJUST_MAX
+            adjust_mod_min: int = SETTINGS.CARD_RENDER_TILT_ADJUST_MIN
+            adjust_value_set: int = SETTINGS.CARD_RENDER_TILT_ADJUST_SET
+            adjust_value_min: int = adjust_value_set * adjust_mod_min
+            adjust_value_max: int = adjust_value_set * adjust_mod_max
+            
+            
+            # Card is close enough to expected coordinate:
+            if difference_value <= adjust_diff_min:
+                adjust_value: int = int(adjust_value_set * adjust_mod_min)
+    
+            # Card is too far away from expected coordinate:
+            elif difference_value >= adjust_diff_max:
+                adjust_value: int = int(adjust_value_set * adjust_mod_max)
+    
+            # Calculating based on distance covered ratio:
+            else:
+                progress_ratio = adjust_diff_max - adjust_diff_min
+                progress = (difference_value - adjust_diff_min) / progress_ratio
+                adjust_value: int = int(adjust_value_min + (adjust_value_max - adjust_value_min) * progress)
+    
+            # Returning:
+            return adjust_value
                 
     
     def auto_tilt(self, instant_mode: bool = False) -> None:
