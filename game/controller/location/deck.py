@@ -235,50 +235,75 @@ class DeckController:
                 )
 
         # Updating attributes:
-        self.__cards_list: list[Card] = [card_object for card_object in cards_list]
+        card_list_gen: list[Card] = []
+        card_list_adjusted: list[Card] = []
         
-        # Shuffling and updating card object's location:
-        random.shuffle(self.__cards_list)
-        
-        # Updating location index for cards:
-        self.update_location_index(
-            clear_cache = True
-            )
-        
-        for card_object in self.__cards_list:
+        # Checking if card name is in restricted list:
+        for card_object in cards_list:
+
+            # Resetting states:
+            card_object.set_render_tilt_random(
+                clear_cache = True,
+                )
+            card_object.set_state_revealed(
+                set_value = False,
+                ignore_assertion = True,
+                clear_cache = True
+                )
+            card_object.set_state_visible(
+                set_value = True,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
             
-            # Updating location and added index:
+            # Adding to the list:
+            card_list_gen.append(
+                card_object
+                )
+
+        # Shuffling:
+        self.__shuffle(
+            deck_object = card_list_gen
+            )
+
+        # Adding the rest of the cards:
+        for card_remaining in card_list_gen:
+            card_list_adjusted.append(
+                card_remaining
+                )
+            
+        # Updating all cards' location index and coordinates:
+        for card_object in card_list_adjusted:
             location: context.Location = (
-                context.CARD_LOCATION.DECK,
-                card_object.location_index
+                context.CARD_LOCATION.DECK, 
+                card_list_adjusted.index(card_object)
                 )
             card_object.set_location(
                 set_value = location,
                 ignore_assertion = True,
                 clear_cache = True
                 )
-            
-            # Updating tilt value:        
-            card_object.set_render_tilt_default(
-                clear_cache = True
-                )
-            
-            # Updating card's states:
-            card_object.set_state_location(
-                clear_cache = True
-                )
-            card_object.update_coordinates_state(
-                clear_cache = True
-                )
             card_object.update_coordinates_location(
                 calculated_coordinates = None,
                 clear_cache = True
                 )
+            card_object.set_coordinates_expected(
+                set_value = card_object.coordinates_position,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
+            
+        # Sorting by index:
+        card_list_sorted: list[Card] = self.__sort(
+            deck_object = card_list_adjusted
+            )
+        
+        # Updating deck object:
+        self.__cards_list = card_list_sorted
         
         # Clearing cache:
-        if clear_cache:
-            self.clear_cached_attributes()
-    
+        self.clear_cached_attributes()
+        
     
     def draw_card(self, clear_cache: bool = True) -> Card | None:
         
@@ -314,7 +339,6 @@ class DeckController:
                     )
                 
                 # Updating trump suit selector:
-                trump_suit: str = card_secret.suit
                 self.set_trump_suit(
                     set_value = card_secret.suit,
                     ignore_assertion = False,
