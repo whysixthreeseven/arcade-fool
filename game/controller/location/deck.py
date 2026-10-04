@@ -258,6 +258,14 @@ class DeckController:
                 clear_cache = True
                 )
             
+            # Setting card owner:
+            card_object.set_owner(
+                set_value = None,
+                update_previous = True,
+                ignore_assertion = True,
+                clear_cache = True
+                )
+            
             # Adding to the list:
             card_list_gen.append(
                 card_object
