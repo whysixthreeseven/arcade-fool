@@ -704,3 +704,9 @@ EVENT_TIMEOUT_5: Event = Event.generate_predefined(
     ignore_assertion = False,
     )
 
+
+EVENT_RESET: Event = Event.generate_predefined(
+    event_name = context.EVENT_NAME.RESET,
+    ignore_assertion = False,
+    )
+
