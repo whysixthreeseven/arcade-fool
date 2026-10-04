@@ -242,9 +242,6 @@ class DeckController:
         for card_object in cards_list:
 
             # Resetting states:
-            card_object.set_render_tilt_random(
-                clear_cache = True,
-                )
             card_object.set_state_revealed(
                 set_value = False,
                 ignore_assertion = True,
@@ -254,6 +251,11 @@ class DeckController:
                 set_value = True,
                 ignore_assertion = True,
                 clear_cache = True,
+                )
+            card_object.set_state_return(
+                set_value = True,
+                ignore_assertion = True,
+                clear_cache = True
                 )
             
             # Adding to the list:
