@@ -240,13 +240,6 @@ class Game:
             for card_object in player_controller.hand.cards:
                 cards_list.append(card_object)
         
-        # Restocking cards:    
-        self.deck.restock(
-            cards_list = cards_list,
-            ignore_assertion = True,
-            clear_cache = True
-            )
-        
         # Adding reset event:
         self.add_event(
             event_object = event.Event.generate_predefined(
@@ -254,6 +247,13 @@ class Game:
                 ignore_assertion = True,
                 ),
             autostart = True,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        
+        # Restocking cards:    
+        self.deck.restock(
+            cards_list = cards_list,
             ignore_assertion = True,
             clear_cache = True
             )
@@ -1049,20 +1049,25 @@ class Game:
     def __update_event_reset(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
         
         # Checking if event needs to be stopped:
+        force_stop: bool = True
+
         for card_object in self.deck.cards:
-            if card_object.coordinates != card_object.coordinates_position:
-                if card_object.coordinates_expected != card_object.coordinates_position:
-                    card_object.set_coordinates_expected(
-                        set_value = card_object.coordinates_position,
-                        ignore_assertion = True,
-                        clear_cache = True
-                        )
-            else:
-                if not card_object.state_idle:
-                    force_stop: bool = False
-                    break
-        else:
-            force_stop = True
+
+            # Updating expected coordinates if needed:
+            if card_object.coordinates_expected != card_object.coordinates_position:
+                card_object.set_coordinates_expected(
+                    set_value = card_object.coordinates_position,
+                    ignore_assertion = True,
+                    clear_cache = True
+                    )
+
+            # Checking if card is still moving:
+            card_object_moving: bool = bool(
+                card_object.coordinates != card_object.coordinates_position
+                    or not card_object.state_idle
+                )
+            if card_object_moving:
+                force_stop = False
             
         # Forcing stop:
         if force_stop:
