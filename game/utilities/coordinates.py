@@ -1,9 +1,7 @@
-# Context and namespace variables:
-from game.context import Coordinates
-
-# Settings and session:
+# Settings, session and context variables:
 from game.settings import SETTINGS
 from game.session import SESSION
+from game import context
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -13,7 +11,7 @@ from game.session import SESSION
 
 
 # Generating coordinates dictionary index:
-LOCATION_TABLE_COORDINATES_INDEX: dict[int, Coordinates] = {}
+LOCATION_TABLE_COORDINATES_INDEX: dict[int, context.Coordinates] = {}
 
 # Preparing coordinates and shift values:
 __COORDINATE_X_START: int = int(SETTINGS.AREA_TABLE_CENTER_COORDINATE_X 
@@ -60,7 +58,7 @@ for location_index in __location_index_range:
 
 
 # Generating coordinates dictionary index:
-LOCATION_DECK_COORDINATES_INDEX: dict[int, Coordinates] = {}
+LOCATION_DECK_COORDINATES_INDEX: dict[int, context.Coordinates] = {}
 
 # Preparing coordinates and shift values:
 __COORDINATE_X_START: int = SETTINGS.AREA_DECK_CENTER_COORDINATE_X
@@ -116,7 +114,79 @@ for location_index in __location_index_range:
         __coordinate_x_calc: int = __COORDINATE_X_START + __COORDINATE_X_SHIFT_GLOBAL
         __coordinate_y_calc: int = __COORDINATE_Y_START + __COORDINATE_Y_SHIFT_GLOBAL
         __location_shifted_special = False
+   
+     
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    LOCATION (DECK PILE) HOVER COORDINATES 
+
+"""
+
+
+# Generating coordinates dictionary index:
+LOCATION_DECK_HOVER_COORDINATES_INDEX: dict[int, context.Coordinates] = {}
+
+
+# Preparing coordinates and shift values:
+__COORDINATE_X_START: int = SETTINGS.AREA_DECK_CENTER_COORDINATE_X
+__COORDINATE_X_SHIFT_INDEX: int = SETTINGS.LOCATION_DECK_HOVER_SHIFT_COORDINATE_X
+__COORDINATE_X_SHIFT_LAST: int = SETTINGS.LOCATION_DECK_HOVER_LAST_SHIFT_COORDINATE_X * 4
+__COORDINATE_X_SHIFT_SECRET: int = SETTINGS.LOCATION_DECK_HOVER_SECRET_SHIFT_COORDINATE_X * 2
+__COORDINATE_X_SHIFT_GLOBAL: int = SETTINGS.LOCATION_DECK_SHIFT_GLOBAL * 2
+__COORDINATE_Y_START: int = SETTINGS.AREA_DECK_CENTER_COORDINATE_Y
+__COORDINATE_Y_SHIFT_INDEX: int = SETTINGS.LOCATION_DECK_HOVER_SHIFT_COORDINATE_Y
+__COORDINATE_Y_SHIFT_LAST: int = SETTINGS.LOCATION_DECK_HOVER_LAST_SHIFT_COORDINATE_Y * 4
+__COORDINATE_Y_SHIFT_SECRET: int = SETTINGS.LOCATION_DECK_HOVER_SECRET_SHIFT_COORDINATE_Y * 4
+__COORDINATE_Y_SHIFT_GLOBAL: int = 1
+__SHIFT_PER_CARD: int = 1
+
+# Preparing loop variables:
+__coordinate_x_calc: int = __COORDINATE_X_START + __COORDINATE_X_SHIFT_GLOBAL
+__coordinate_y_calc: int = __COORDINATE_Y_START + __COORDINATE_Y_SHIFT_GLOBAL
+__location_index_range: range = range(0, SETTINGS.DECK_SIZE_MAX)        # 52 cards by default
+__location_index_special_list: tuple[int, int] = (0, 1)                 # 0 = last/hidden, 1 = last last if no hidden
+__location_shifted_special: bool = False                                # Reset flag
+
     
+# Calculating table position coordinates:
+for location_index in __location_index_range:
+    
+    # Shifting special cards position (trump, hidden trump):
+    if location_index in __location_index_special_list:
+        if location_index == 0:
+            if SESSION.GAME_MODE_SECRET:
+                __coordinate_x_calc = __COORDINATE_X_START + __COORDINATE_X_SHIFT_SECRET
+                __coordinate_y_calc = __COORDINATE_Y_START + __COORDINATE_Y_SHIFT_SECRET
+            else:
+                __coordinate_x_calc = __COORDINATE_X_START + __COORDINATE_X_SHIFT_LAST
+                __coordinate_y_calc = __COORDINATE_Y_START + __COORDINATE_Y_SHIFT_LAST
+        elif location_index == 1 and SESSION.GAME_MODE_SECRET:
+            __coordinate_x_calc = __COORDINATE_X_START + __COORDINATE_X_SHIFT_LAST
+            __coordinate_y_calc = __COORDINATE_Y_START + __COORDINATE_Y_SHIFT_LAST
+        __location_shifted_special = True
+        
+    # Shift all other cards in deck based on __SHIFT_PER_CARD skip value:
+    else:
+        if location_index % __SHIFT_PER_CARD == 0:
+            ignore_shift: bool = bool(
+                location_index == 1 and not SESSION.GAME_MODE_SECRET or 
+                location_index == 2 and SESSION.GAME_MODE_SECRET
+                )
+            if not ignore_shift:
+                __coordinate_x_calc += __COORDINATE_X_SHIFT_INDEX
+                __coordinate_y_calc += __COORDINATE_Y_SHIFT_INDEX
+
+    # Adding coordinates container to dictionary index:
+    LOCATION_DECK_HOVER_COORDINATES_INDEX[location_index] = (
+        __coordinate_x_calc, 
+        __coordinate_y_calc
+        )
+
+    # Resetting special cards position:
+    if __location_shifted_special:
+        __coordinate_x_calc: int = __COORDINATE_X_START + __COORDINATE_X_SHIFT_GLOBAL
+        __coordinate_y_calc: int = __COORDINATE_Y_START + __COORDINATE_Y_SHIFT_GLOBAL
+        __location_shifted_special = False
+
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     LOCATION (DISCARD PILE) COORDINATES 
@@ -125,7 +195,7 @@ for location_index in __location_index_range:
 
 
 # Generating coordinates dictionary index:
-LOCATION_DISCARD_COORDINATES_INDEX: dict[int, Coordinates] = {}
+LOCATION_DISCARD_COORDINATES_INDEX: dict[int, context.Coordinates] = {}
 
 # Preparing coordinates and shift values:
 __COORDINATE_X_START: int = SETTINGS.AREA_DISCARD_CENTER_COORDINATE_X
