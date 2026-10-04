@@ -710,3 +710,9 @@ EVENT_RESET: Event = Event.generate_predefined(
     ignore_assertion = False,
     )
 
+
+EVENT_RESTOCK: Event = Event.generate_predefined(
+    event_name = context.EVENT_NAME.RESTOCK,
+    ignore_assertion = False,
+    )
+
