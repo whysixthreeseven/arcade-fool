@@ -241,7 +241,29 @@ class Game:
         # Waiting for objects to load up:
         self.add_event(
             event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_3,
+                event_name = context.EVENT_NAME.TIMEOUT_1,
+                ignore_assertion = True,
+                ),
+            autostart = True,
+            ignore_assertion = False,
+            clear_cache = True
+            )
+        
+        # Adding restock event:
+        self.add_event(
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.RESTOCK,
+                ignore_assertion = True,
+                ),
+            autostart = True,
+            ignore_assertion = False,
+            clear_cache = True
+            )
+            
+        # Waiting for objects to load up:
+        self.add_event(
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.TIMEOUT_1,
                 ignore_assertion = True,
                 ),
             autostart = True,
@@ -323,25 +345,6 @@ class Game:
         # Adding reset event:
         self.add_event(
             event_object = event.EVENT_RESET,
-            autostart = True,
-            ignore_assertion = True,
-            clear_cache = True
-            )
-        
-        # Adding short timeout:
-        self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_1,
-                ignore_assertion = True,
-                ),
-            autostart = True,
-            ignore_assertion = True,
-            clear_cache = True
-            )
-        
-        # Adding reset event:
-        self.add_event(
-            event_object = event.EVENT_RESTOCK,
             autostart = True,
             ignore_assertion = True,
             clear_cache = True
@@ -1923,8 +1926,7 @@ class Game:
     def display_hints(self) -> None:
         
         # Deck controller hint display:
-        if self.hit_area == area.AREA_DECK:
-            self.deck.display_hint()
+        self.deck.display_hint()
                 
                 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -2070,7 +2072,6 @@ class Game:
                 update_coordinates = True,
                 clear_cache = True,
                 )
-                
     
     
     def __handle_key_press_debug(self, key_pressed: int) -> None:
@@ -2136,9 +2137,14 @@ class Game:
             
         # Sorting opponent's hand:
         elif key_pressed == keymap.KEYMAP.KEY_DEBUG_SORT_OPPONENT:
-            self.player_computer.hand.sort_random(
-                update_coordinates = True,
-                clear_cache = True,
+            self.add_event(
+                event_object = event.Event.generate_predefined(
+                    event_name = context.EVENT_NAME.OPPONENT_SORT,
+                    ignore_assertion = True,
+                    ),
+                autostart = True,
+                ignore_assertion = True,
+                clear_cache = True
                 )
 
         
@@ -2168,12 +2174,12 @@ class Game:
         
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        HANDLE SLIDE METHODS
+        HANDLE UPDATE METHODS
     
     """
     
     
-    def __handle_slide_card(self, card_object: Card, force_instant: bool = False) -> None:
+    def __handle_update_card(self, card_object: Card, force_instant: bool = False) -> None:
         
         # Force slide:                
         if force_instant:
@@ -2185,41 +2191,37 @@ class Game:
             
         # Calling card slide method:
         else:
-            card_object.slide(
+            card_object.update(
                 clear_cache = True,
                 )
     
     
-    def __handle_slide_card_container(self, cards_container: tuple[Card, ...], force_instant: bool = False) -> None:
+    def __handle_update_card_container(self, cards_container: tuple[Card, ...], force_instant: bool = False) -> None:
         
         # Sliding every card in card container:
         for card_object in cards_container:
-            self.__handle_slide_card(
+            self.__handle_update_card(
                 card_object = card_object,
                 force_instant = force_instant
                 )
     
     
-    def handle_slide(self, force_instant: bool = False) -> None:
+    def handle_update(self, force_instant: bool = False) -> None:
         
         # Looping over location controllers and calling method:
         for location_controller in self.__location_controllers:
-            self.__handle_slide_card_container(
+            self.__handle_update_card_container(
                 cards_container = location_controller.cards,
                 force_instant = force_instant,
                 )
             
         # Looping over player controllers and calling method:
         for player_controller in self.__player_controllers:
-            self.__handle_slide_card_container(
+            self.__handle_update_card_container(
                 cards_container = player_controller.hand.cards,
                 force_instant = force_instant,
                 )
-
             
-        
-        
-    
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         APPLY (ALL CARDS) METHODS
