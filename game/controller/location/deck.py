@@ -239,20 +239,21 @@ class DeckController:
         
         # Shuffling and updating card object's location:
         random.shuffle(self.__cards_list)
+        
+        # Updating location index for cards:
+        self.update_location_index(
+            clear_cache = True
+            )
+        
         for card_object in self.__cards_list:
             
             # Updating location and added index:
             location: context.Location = (
                 context.CARD_LOCATION.DECK,
-                self.__cards_list.index(card_object)
+                card_object.location_index
                 )
             card_object.set_location(
                 set_value = location,
-                ignore_assertion = True,
-                clear_cache = True
-                )
-            card_object.set_added_index(
-                set_value = self.__cards_list.index(card_object),
                 ignore_assertion = True,
                 clear_cache = True
                 )
@@ -273,11 +274,6 @@ class DeckController:
                 calculated_coordinates = None,
                 clear_cache = True
                 )
-            
-        # Updating location index for cards:
-        self.update_location_index(
-            clear_cache = True
-            )
         
         # Clearing cache:
         if clear_cache:
