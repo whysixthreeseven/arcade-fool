@@ -48,7 +48,7 @@ class Game:
         self.__screen: scene.Scene = None
         
         # Event attributes:
-        self.__event_list: list[event.Event] = []
+        self.__events: list[event.Event] = []
         
         # Game state attributes:
         self.__state_game_ready: bool = False
@@ -175,7 +175,7 @@ class Game:
     def __reset_attributes(self) -> None:
         
         # Event attributes:
-        self.__event_list: list[event.Event] = []
+        self.__events: list[event.Event] = []
         
         # Game state attributes:
         self.__state_game_ready: bool = False
@@ -230,23 +230,33 @@ class Game:
         
         
     def reset(self) -> None:
-
-        # Resetting controller attributes:
-        self.__reset_attributes()
         
-        # Resetting players' hand controllers:
-        for player_controller in self.__player_controllers:
-            player_controller.hand.reset()
-            
-        # Resetting location controllers:
+        # Collecting cards:
+        cards_list: list[Card] = []
         for location_controller in self.__location_controllers:
-            location_controller.reset()
-            
-        # Updating attributes:
-        self.__reset_player_state()
-            
-        # Setting up game ready:
-        self.__state_game_ready = True
+            for card_object in location_controller.cards:
+                cards_list.append(card_object)
+        for player_controller in self.__player_controllers:
+            for card_object in player_controller.hand.cards:
+                cards_list.append(card_object)
+        
+        # Restocking cards:    
+        self.deck.restock(
+            cards_list = cards_list,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        
+        # Adding reset event:
+        self.add_event(
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.RESET,
+                ignore_assertion = True,
+                ),
+            autostart = True,
+            ignore_assertion = True,
+            clear_cache = True
+            )
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -263,7 +273,10 @@ class Game:
             
         # Waiting for objects to load up:
         self.add_event(
-            event_object = event.EVENT_TIMEOUT_5,
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.TIMEOUT_3,
+                ignore_assertion = True,
+                ),
             autostart = True,
             ignore_assertion = False,
             clear_cache = True
@@ -293,7 +306,10 @@ class Game:
         
         # Waiting for cards to hit hand controllers:
         self.add_event(
-            event_object = event.EVENT_TIMEOUT_3,
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.TIMEOUT_3,
+                ignore_assertion = True,
+                ),
             autostart = True,
             ignore_assertion = False,
             clear_cache = True
@@ -301,13 +317,19 @@ class Game:
         
         # Sorting hands:
         self.add_event(
-            event_object = event.EVENT_PLAYER_SORT,
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.PLAYER_SORT,
+                ignore_assertion = True,
+                ),
             autostart = True,
             ignore_assertion = False,
             clear_cache = True
             )
         self.add_event(
-            event_object = event.EVENT_OPPONENT_SORT,
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.OPPONENT_SORT,
+                ignore_assertion = True,
+                ),
             autostart = True,
             ignore_assertion = False,
             clear_cache = True
@@ -617,7 +639,7 @@ class Game:
     def events(self) -> tuple[event.Event, ...]:
         
         # Converting:
-        events: tuple[event.Event, ...] = tuple(self.__event_list)
+        events: tuple[event.Event, ...] = tuple(self.__events)
         
         # Returning:
         return events
@@ -720,7 +742,7 @@ class Game:
                 )
 
         # Updating attribute:
-        self.__event_list.append(
+        self.__events.append(
             event_object
             )
         
@@ -738,9 +760,10 @@ class Game:
                 )
 
         # Removing event:
-        self.__event_list.remove(
-            event_object
-            )
+        if event_object in self.__events:
+            self.__events.remove(
+                event_object
+                )
         
         # Clearing cache:
         if clear_cache:
@@ -1023,6 +1046,60 @@ class Game:
             )
         
         
+    def __update_event_reset(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+        
+        # Checking if event needs to be stopped:
+        for card_object in self.deck.cards:
+            if card_object.coordinates != card_object.coordinates_position:
+                if card_object.coordinates_expected != card_object.coordinates_position:
+                    card_object.set_coordinates_expected(
+                        set_value = card_object.coordinates_position,
+                        ignore_assertion = True,
+                        clear_cache = True
+                        )
+            else:
+                if not card_object.state_idle:
+                    force_stop: bool = False
+                    break
+        else:
+            force_stop = True
+            
+        # Forcing stop:
+        if force_stop:
+            event_ongoing: bool = False
+            event_finished: bool = True
+            
+            # Resetting controller attributes:
+            self.__reset_attributes()
+            for player_controller in self.__player_controllers:
+                player_controller.hand.reset()
+            for location_controller in self.__location_controllers:
+                location_controller.reset()
+                
+            # Updating attributes:
+            self.__reset_player_state()
+            self.clear_cached_attributes()
+                
+            # Setting up game ready:
+            self.__state_game_ready = True
+        
+            # Updating event object:
+            self.update_event(
+                event_object = event_object,
+                event_ongoing = event_ongoing,
+                event_finished = event_finished,
+                clear_cache = True
+                )
+            
+            # Removing event object:
+            if autoremove:
+                if event_finished:
+                    self.remove_event(
+                        event_object = event_object,
+                        clear_cache = True
+                        )
+        
+        
     @cached_property
     def __update_event_index(self) -> dict[str, function]:
         
@@ -1037,12 +1114,13 @@ class Game:
             context.EVENT_NAME.TIMEOUT_1: self.__update_event_timeout,
             context.EVENT_NAME.TIMEOUT_3: self.__update_event_timeout,
             context.EVENT_NAME.TIMEOUT_5: self.__update_event_timeout,
+            context.EVENT_NAME.RESET: self.__update_event_reset,
             }
         
         # Returning:
         return event_update_methods
         
-    def update_event_pipe(self, delta_time: float = 1 / 60, autoremove: bool = True, clear_cache: bool = True) -> None:
+    def update_event_pipeline(self, delta_time: float = 1 / 60, autoremove: bool = True, clear_cache: bool = True) -> None:
         
         # Scanning events available:
         if self.events_ongoing_count > 0:
