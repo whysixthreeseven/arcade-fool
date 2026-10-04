@@ -174,9 +174,6 @@ class Game:
         
     def __reset_attributes(self) -> None:
         
-        # Event attributes:
-        self.__events: list[event.Event] = []
-        
         # Game state attributes:
         self.__state_game_ready: bool = False
         self.__state_game_started: bool = False
@@ -227,36 +224,6 @@ class Game:
             ignore_assertion = True,
             clear_cache = True
             )
-        
-        
-    def reset(self) -> None:
-        
-        # Collecting cards:
-        cards_list: list[Card] = []
-        for location_controller in self.__location_controllers:
-            for card_object in location_controller.cards:
-                cards_list.append(card_object)
-        for player_controller in self.__player_controllers:
-            for card_object in player_controller.hand.cards:
-                cards_list.append(card_object)
-        
-        # Adding reset event:
-        self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.RESET,
-                ignore_assertion = True,
-                ),
-            autostart = True,
-            ignore_assertion = True,
-            clear_cache = True
-            )
-        
-        # Restocking cards:    
-        self.deck.restock(
-            cards_list = cards_list,
-            ignore_assertion = True,
-            clear_cache = True
-            )
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -274,7 +241,7 @@ class Game:
         # Waiting for objects to load up:
         self.add_event(
             event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_3,
+                event_name = context.EVENT_NAME.TIMEOUT_1,
                 ignore_assertion = True,
                 ),
             autostart = True,
@@ -307,7 +274,7 @@ class Game:
         # Waiting for cards to hit hand controllers:
         self.add_event(
             event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_3,
+                event_name = context.EVENT_NAME.TIMEOUT_1,
                 ignore_assertion = True,
                 ),
             autostart = True,
@@ -338,11 +305,63 @@ class Game:
         # Waiting for sort to finish:
         self.add_event(
             event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_3,
+                event_name = context.EVENT_NAME.TIMEOUT_1,
                 ignore_assertion = False,
                 ),
             autostart = True,
             ignore_assertion = False,
+            clear_cache = True
+            )
+        
+    
+    def game_reset(self) -> None:
+            
+        # Removing all other events:
+        self.__events: list[event.Event] = []
+        self.clear_cached_events_attributes()
+        
+        # Adding reset event:
+        self.add_event(
+            event_object = event.EVENT_RESET,
+            autostart = True,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        
+        # Adding short timeout:
+        self.add_event(
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.TIMEOUT_1,
+                ignore_assertion = True,
+                ),
+            autostart = True,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        
+        # Adding reset event:
+        self.add_event(
+            event_object = event.EVENT_RESTOCK,
+            autostart = True,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        
+        # Adding short timeout:
+        self.add_event(
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.TIMEOUT_1,
+                ignore_assertion = True,
+                ),
+            autostart = True,
+            ignore_assertion = True,
+            clear_cache = True
+            )
+        
+        # Restocking cards:    
+        self.deck.restock(
+            cards_list = self.cards,
+            ignore_assertion = True,
             clear_cache = True
             )
             
@@ -1049,8 +1068,10 @@ class Game:
     def __update_event_reset(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
         
         # Checking if event needs to be stopped:
+        force_fade: bool = True
         force_stop: bool = True
-
+        
+        # Moving cards to the deck pile:
         for card_object in self.deck.cards:
 
             # Updating expected coordinates if needed:
@@ -1064,10 +1085,27 @@ class Game:
             # Checking if card is still moving:
             card_object_moving: bool = bool(
                 card_object.coordinates != card_object.coordinates_position
-                    or not card_object.state_idle
+                or not card_object.state_idle
                 )
+            
+            # Updating flags:
             if card_object_moving:
                 force_stop = False
+                force_fade = False
+        
+        # Fading cards away:
+        if force_fade:
+            for card_object in reversed(self.deck.cards):
+                if card_object.state_visible:
+                    card_object.set_state_visible(
+                        set_value = False,
+                        ignore_assertion = True,
+                        clear_cache = True
+                        )
+                    
+                    # Updating flag:
+                    force_stop = False
+                    break
             
         # Forcing stop:
         if force_stop:
@@ -1080,6 +1118,14 @@ class Game:
                 player_controller.hand.reset()
             for location_controller in self.__location_controllers:
                 location_controller.reset()
+            
+            # Making deck cards temporarily invisible:
+            for card_object in self.deck.cards:
+                card_object.set_state_visible(
+                    set_value = False,
+                    ignore_assertion = True,
+                    clear_cache = True
+                    )
                 
             # Updating attributes:
             self.__reset_player_state()
@@ -1088,6 +1134,47 @@ class Game:
             # Setting up game ready:
             self.__state_game_ready = True
         
+            # Updating event object:
+            self.update_event(
+                event_object = event_object,
+                event_ongoing = event_ongoing,
+                event_finished = event_finished,
+                clear_cache = True
+                )
+            
+            # Removing event object:
+            if autoremove:
+                if event_finished:
+                    self.remove_event(
+                        event_object = event_object,
+                        clear_cache = True
+                        )
+                    
+                    
+    def __update_event_restock(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+        
+        # Checking if all cards are visible:
+        force_stop = True
+        for card_object in self.deck.cards:
+            if not card_object.state_visible:
+                card_object.set_state_visible(
+                    set_value = True,
+                    ignore_assertion = True,
+                    clear_cache = True
+                    )
+                
+                # Updating flag:
+                force_stop = False
+                break
+        
+        # Forcing stop:
+        if force_stop:
+            event_ongoing: bool = False
+            event_finished: bool = True
+            
+            # Cards manipulation handler:
+            self.__handle_card_manipulation()
+
             # Updating event object:
             self.update_event(
                 event_object = event_object,
@@ -1120,10 +1207,12 @@ class Game:
             context.EVENT_NAME.TIMEOUT_3: self.__update_event_timeout,
             context.EVENT_NAME.TIMEOUT_5: self.__update_event_timeout,
             context.EVENT_NAME.RESET: self.__update_event_reset,
+            context.EVENT_NAME.RESTOCK: self.__update_event_restock,
             }
         
         # Returning:
         return event_update_methods
+        
         
     def update_event_pipeline(self, delta_time: float = 1 / 60, autoremove: bool = True, clear_cache: bool = True) -> None:
         
@@ -2042,7 +2131,7 @@ class Game:
             
         # Resetting game:
         elif key_pressed == keymap.KEYMAP.KEY_DEBUG_FORCE_RESTART_GAME:
-            self.reset()
+            self.game_reset()
             self.game_start()
             
         # Sorting opponent's hand:
