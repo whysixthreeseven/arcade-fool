@@ -101,17 +101,18 @@ class Gameshell(arcade.Window):
     
     def on_update(self, delta_time):
         
-        # Handling card slide:
-        self.__gc.handle_slide(
-            force_instant = False
-            )
+        # Asserting game controller is ready to handle updates:
+        if self.__gc.state_game_ready:
         
-        self.__gc.update_event_pipe(
-            delta_time = delta_time,
-            autoremove = True,
-            clear_cache = True,
-            )
-        
-        
-
+            # Handling card slide:
+            self.__gc.handle_slide(
+                force_instant = False
+                )
+            
+            # Updating events pipeline:
+            self.__gc.update_event_pipeline(
+                delta_time = delta_time,
+                autoremove = True,
+                clear_cache = True,
+                )
             
