@@ -99,6 +99,8 @@ class CardController:
         # Play location and index:
         self.__location: str = None
         self.__location_index: int = None
+        self.__owner: str | None = None
+        self.__owner_previous: str | None = None
         
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -592,6 +594,33 @@ class CardController:
         # Returning:
         return cached_property_list
     
+    
+    @cached_property
+    def __cached_added_owner_attributes(self) -> tuple[str, ...]:
+        """
+        Owner attributes-related cached properties list.
+        
+        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
+        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
+        setter.
+        
+        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
+        
+        Returns
+        -------
+        cached_property_list : `tuple[str, ...]`
+            A tuple collection of related cached properties.
+        """
+    
+        # Collecting related cached properties:
+        cached_property_list: tuple[str, ...] = (
+            "owner",
+            "owner_previous",
+            )
+        
+        # Returning:
+        return cached_property_list
+    
    
     @cached_property 
     def __cached_slide_attributes(self) -> tuple[str, ...]:
@@ -773,7 +802,7 @@ class CardController:
     
     def clear_cached_slide_attributes(self) -> None:
         """
-        Clears all public cached core properties of this card object.
+        Clears all public cached slide properties of this card object.
         
         Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
         clear texturepack properties of this card object.
@@ -783,6 +812,21 @@ class CardController:
         cache.clear_cached_property_list(
             target_object = self,
             target_attribute_list = self.__cached_slide_attributes
+            )
+        
+        
+    def clear_cached_owner_attributes(self) -> None:
+        """
+        Clears all public cached owner properties of this card object.
+        
+        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
+        clear texturepack properties of this card object.
+        """
+
+        # Clearing cached properties:
+        cache.clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = self.__cached_added_owner_attributes
             )
         
     
@@ -2786,7 +2830,7 @@ class CardController:
             
         # Calculating based on difference:
         else: 
-            adjust_value_prep: int = self.__get_tilt_adjustment(
+            adjust_value_prep: int = self.__calc_tilt_adjustment(
                 difference_value = tilt_difference
                 )
             adjust_value: int = adjust_value_prep * adjust_axis
@@ -3602,7 +3646,7 @@ class CardController:
         
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        INDEX CACHED PROPERTIES AND METHODS
+        LOCATION INDEX CACHED PROPERTIES AND METHODS
         
     """
     
@@ -3837,6 +3881,75 @@ class CardController:
             target_attribute = cached_property
             )
         
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        OWNER CACHED PROPERTIES AND METHODS
+        
+    """
+    
+    
+    @cached_property
+    def owner(self) -> str | None:
+        """
+        Card object's owner, a `PlayerController` type string or None, if neutral.
+
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in its setter method.
+ 
+        Returns
+        -------
+        self.__owner : str | None
+            Card object's owner, a `PlayerController` type string or None, if neutral. 
+            Example: `context.PLAYER_TYPE.HUMAN` -> `"Human"`
+        
+        """
+        
+        # Returning:
+        return self.__owner
+    
+    
+    @cached_property
+    def owner_previous(self) -> str | None:
+        """
+        Card object's previous owner, a `PlayerController` type string or None, if neutral.
+
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in its setter method.
+    
+        Returns
+        -------
+        self.__owner : str | None
+            Card object's previous owner, a `PlayerController` type string or None, if neutral. 
+            Example: `context.PLAYER_TYPE.HUMAN` -> `"Human"`
+        
+        """
+        
+        # Returning:
+        return self.__owner_previous
+    
+    
+    def set_owner(self, set_value: str | None, update_previous: bool = True, 
+                        ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if set_value is not None:
+            if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+                validate.validate_player_type(
+                    validate_value = set_value
+                    )
+                
+        # Updating attribute:
+        if self.owner != set_value:
+            if update_previous:
+                self.__owner_previous = self.__owner
+            self.__owner = set_value
+            
+            # Clearing cache:
+            if clear_cache:
+                self.clear_cached_owner_attributes()        
+        
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         DISPLAY METHODS
@@ -3875,49 +3988,21 @@ class CardController:
                 tilt_angle = 0
                 )
         
-
-
+    
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        SLIDE CACHED PROPERTIES AND METHODS
+        UPDATE METHODS
         
     """
-    
-    
-    def __get_slide_speed(self, distance_value: int) -> int:
-        
-        # Preparing variables:
-        slide_distance_close: int = SETTINGS.CARD_SLIDE_DISTANCE_CLOSE
-        slide_distance_far: int = SETTINGS.CARD_SLIDE_DISTANCE_FAR
-        slide_speed_min: int = SETTINGS.CARD_SLIDE_SPEED_MIN
-        slide_speed_max: int = SETTINGS.CARD_SLIDE_SPEED_MAX
-        slide_speed: int = slide_speed_max
-        
-        # Card is close enough to expected coordinate:
-        if distance_value <= slide_distance_close:
-            slide_speed = slide_speed_min
 
-        # Card is too far away from expected coordinate:
-        elif distance_value >= slide_distance_far:
-            slide_speed = slide_speed_max
-
-        # Calculating based on distance covered ratio:
-        else:
-            progress_ratio = slide_distance_far - slide_distance_close
-            progress = (distance_value - slide_distance_close) / progress_ratio
-            slide_speed: int = int(slide_speed_min + (slide_speed_max - slide_speed_min) * progress)
-
-        # Returning:
-        return slide_speed
     
-    
-    def slide(self, clear_cache: bool = True) -> None:
+    def update(self, clear_cache: bool = True) -> None:
 
         # Adjusting coordinate x:
         if self.coordinate_x != self.coordinate_x_expected:
             
             # Calculating distance and speed:
             difference_coordinate_x = abs(self.coordinate_x - self.coordinate_x_expected)
-            slide_speed = self.__get_slide_speed(
+            slide_speed = self.__calc_slide_speed(
                 distance_value = difference_coordinate_x
                 )
             
@@ -3936,7 +4021,7 @@ class CardController:
 
             # Calculating distance and speed:
             difference_coordinate_y = abs(self.coordinate_y - self.coordinate_y_expected)
-            slide_speed = self.__get_slide_speed(
+            slide_speed = self.__calc_slide_speed(
                 distance_value = difference_coordinate_y
                 )
             
@@ -3950,7 +4035,7 @@ class CardController:
                 clear_cache = clear_cache,
                 )
             
-        # Adjusting tilt (from deck to opponent):
+        # Adjusting tilt (Opponent):
         if self.location == context.CARD_LOCATION.OPPONENT:
             if self.render_tilt != self.render_tilt_opp:
                 self.transition_render_tilt(
@@ -3959,7 +4044,7 @@ class CardController:
                     clear_cache = True
                     )
                 
-        # Adjusting tilt (from opponent to table):
+        # Adjusting tilt (Table):
         elif self.location == context.CARD_LOCATION.TABLE:
             if self.render_tilt != self.render_tilt_default:
                 self.transition_render_tilt(
@@ -3968,22 +4053,47 @@ class CardController:
                     clear_cache = True
                     )
                 
-        # Adjusting tilt (restock):
-        elif self.location == context.CARD_LOCATION.DECK:
-            if self.state_return:
+        # Adjusting tilt (Player)
+        elif self.location == context.CARD_LOCATION.PLAYER:
+            
+            # State selected:
+            if not self.state_selected:
+                if self.render_tilt != self.render_tilt_default:
+                    self.transition_render_tilt(
+                        target_value = self.render_tilt_default,
+                        ignore_assertion = False,
+                        clear_cache = True
+                        )
+                    
+            # Default state:
+            else:
                 if self.render_tilt != self.render_tilt_random:
                     self.transition_render_tilt(
                         target_value = self.render_tilt_random,
                         ignore_assertion = False,
                         clear_cache = True
                         )
-                                
-    
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        UPDATE METHODS
-        
-    """
-    
+                
+        # Adjusting tilt (restock):
+        elif self.location == context.CARD_LOCATION.DECK:
+            if self.state_return:
+                
+                # Turning cards around by 180 degrees for computer:
+                if self.owner_previous == context.PLAYER_TYPE.COMPUTER:
+                    tilt_value: int = self.render_tilt_random + 180
+                
+                # Selecting random tilt value:
+                else:
+                    tilt_value: int = self.render_tilt_random
+                    
+                # Transitioning render tilt value:
+                if self.render_tilt != tilt_value:
+                    self.transition_render_tilt(
+                        target_value = tilt_value,
+                        ignore_assertion = False,
+                        clear_cache = True
+                        )
+
     
     def update_coordinates_location(self, calculated_coordinates: context.Coordinates | None, clear_cache: bool = True) -> None:
         """
@@ -4124,223 +4234,64 @@ class CardController:
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        JOB METHODS
+        CALCULATE METHODS
         
     """
     
     
-    def auto_scale(self) -> None:
-        """
-        Scaler method. Automatically adjusts card object's scale values based on its state and available scale values.
+    def __calc_slide_speed(self, distance_value: int) -> int:
+            
+        # Preparing variables:
+        slide_distance_close: int = SETTINGS.CARD_SLIDE_DISTANCE_CLOSE
+        slide_distance_far: int = SETTINGS.CARD_SLIDE_DISTANCE_FAR
+        slide_speed_min: int = SETTINGS.CARD_SLIDE_SPEED_MIN
+        slide_speed_max: int = SETTINGS.CARD_SLIDE_SPEED_MAX
+        slide_speed: int = slide_speed_max
         
-        If card object is in "Selected" state, adjusts `render_scale` cached property to `render_scale_selected` value, and if
-        card object is in "Default" (on in-position) state, adjusts `render_scale` cached property to `render_scale_default` 
-        value.
-        
-        Used by `Gameshell` object via `on_update()` method to automatically adjust card object's scale values within game logic 
-        loop.
-        
-        Calls card object's native method `transition_render_scale()` to update card's scale values. This and other similar
-        methods may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` is set to `True` and scale value provided does not
-        pass validation and assertion checks. Precalculated scale values do not required assertion control, thus parameters
-        `ignore_assertion` are set to `True`. Adjust them for debug purposes only.
-        """
-        
-        # Preparing flag variables:
-        clear_cache: bool = False
-        job_required: bool = False
-        
-        # Checking selected states:
-        if self.state_selected:
-            if self.render_scale != self.render_scale_selected:
-                render_scale_target: float = self.render_scale_selected
-                job_required = True
-                
-        # Checking default state:
+        # Card is close enough to expected coordinate:
+        if distance_value <= slide_distance_close:
+            slide_speed = slide_speed_min
+
+        # Card is too far away from expected coordinate:
+        elif distance_value >= slide_distance_far:
+            slide_speed = slide_speed_max
+
+        # Calculating based on distance covered ratio:
         else:
-            if self.render_scale != self.render_scale_default:
-                render_scale_target: float = self.render_scale_default
-                job_required = True
-            
-        # Running job:
-        if job_required:
-            render_scale_prev: float = self.render_scale
-            self.transition_render_scale(
-                target_value = render_scale_target,
-                ignore_assertion = True,
-                clear_cache = False,
-                )
-            clear_cache = self.__render_scale != render_scale_prev
-                
-            # Clearing cache, if required:
-            if clear_cache:
-                cached_property_list: tuple[str, ...] = (
-                    "render_scale",
-                    "render_rect",
-                    "render_rect_boundary",
-                    
-                    )
-                cache.clear_cached_property_list(
-                    target_object = self,
-                    target_attribute_list = cached_property_list
-                    )
-                
-    
-    def __get_tilt_adjustment(self, difference_value: int) -> int:
-            
-            # Preparing variables:
-            adjust_diff_max: int = SETTINGS.CARD_RENDER_TILT_DIFF_MAX
-            adjust_diff_min: int = SETTINGS.CARD_RENDER_TILT_DIFF_MIN
-            adjust_mod_max: int = SETTINGS.CARD_RENDER_TILT_ADJUST_MAX
-            adjust_mod_min: int = SETTINGS.CARD_RENDER_TILT_ADJUST_MIN
-            adjust_value_set: int = SETTINGS.CARD_RENDER_TILT_ADJUST_SET
-            adjust_value_min: int = adjust_value_set * adjust_mod_min
-            adjust_value_max: int = adjust_value_set * adjust_mod_max
-            
-            
-            # Card is close enough to expected coordinate:
-            if difference_value <= adjust_diff_min:
-                adjust_value: int = int(adjust_value_set * adjust_mod_min)
-    
-            # Card is too far away from expected coordinate:
-            elif difference_value >= adjust_diff_max:
-                adjust_value: int = int(adjust_value_set * adjust_mod_max)
-    
-            # Calculating based on distance covered ratio:
-            else:
-                progress_ratio = adjust_diff_max - adjust_diff_min
-                progress = (difference_value - adjust_diff_min) / progress_ratio
-                adjust_value: int = int(adjust_value_min + (adjust_value_max - adjust_value_min) * progress)
-    
-            # Returning:
-            return adjust_value
-                
-    
-    def auto_tilt(self, instant_mode: bool = False) -> None:
-        """
-        Tilter method. Automatically adjusts card object's tilt values based on its state and available tilt values.
+            progress_ratio = slide_distance_far - slide_distance_close
+            progress = (distance_value - slide_distance_close) / progress_ratio
+            slide_speed: int = int(slide_speed_min + (slide_speed_max - slide_speed_min) * progress)
 
-        If card object is in "Idle" state, adjusts `render_tilt` cached property to `render_tilt_random` value, and if
-        card object is in "Default" (on in-position) state, adjusts `render_tilt` cached property to `render_tilt_default`
-        value. If card object is in "Opponent" state, adjusts `render_tilt` cached property to `render_tilt_opp` value.
+        # Returning:
+        return slide_speed
+    
+    
+    def __calc_tilt_adjustment(self, difference_value: int) -> int:
+            
+        # Preparing variables:
+        adjust_diff_max: int = SETTINGS.CARD_RENDER_TILT_DIFF_MAX
+        adjust_diff_min: int = SETTINGS.CARD_RENDER_TILT_DIFF_MIN
+        adjust_mod_max: int = SETTINGS.CARD_RENDER_TILT_ADJUST_MAX
+        adjust_mod_min: int = SETTINGS.CARD_RENDER_TILT_ADJUST_MIN
+        adjust_value_set: int = SETTINGS.CARD_RENDER_TILT_ADJUST_SET
+        adjust_value_min: int = adjust_value_set * adjust_mod_min
+        adjust_value_max: int = adjust_value_set * adjust_mod_max
+        
+        
+        # Card is close enough to expected coordinate:
+        if difference_value <= adjust_diff_min:
+            adjust_value: int = int(adjust_value_set * adjust_mod_min)
 
-        Used by `Gameshell` object via `on_update()` method to automatically adjust card object's tilt values within game logic 
-        loop.
-        
-        Calls card object's native method `transition_render_tilt()` to update card's tilt values. This and other similar
-        methods may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` is set to `True` and tilt value provided does not
-        pass validation and assertion checks. Precalculated tilt values do not required assertion control, thus parameters
-        `ignore_assertion` are set to `True`. Adjust them for debug purposes only.
-        """
-        
-        # Preparing flag variables:
-        clear_cache: bool = False
-        job_required: bool = False
-        
-        # Checking hovered or selected states:
-        if self.state_idle:
-            if self.render_tilt != self.render_tilt_random:
-                render_tilt_target: int = self.render_tilt_random
-                job_required = True
-                
-        # Checking default state:
+        # Card is too far away from expected coordinate:
+        elif difference_value >= adjust_diff_max:
+            adjust_value: int = int(adjust_value_set * adjust_mod_max)
+
+        # Calculating based on distance covered ratio:
         else:
-            if self.location == context.CARD_LOCATION.OPPONENT:
-                if self.render_tilt != self.render_tilt_opp:
-                    render_tilt_target: int = self.render_tilt_opp
-                    job_required = True
-            elif self.location == context.CARD_LOCATION.PLAYER:
-                if self.render_tilt != self.render_tilt_default:
-                    render_tilt_target: int = self.render_tilt_default
-                    job_required = True
+            progress_ratio = adjust_diff_max - adjust_diff_min
+            progress = (difference_value - adjust_diff_min) / progress_ratio
+            adjust_value: int = int(adjust_value_min + (adjust_value_max - adjust_value_min) * progress)
 
-        # Running job:
-        if job_required:
-            render_tilt_prev: int = self.render_tilt
-            if instant_mode:
-                self.set_render_tilt(
-                    set_value = render_tilt_target,
-                    ignore_assertion = True,
-                    clear_cache = False,
-                    )
-            else:
-                self.transition_render_tilt(
-                    target_value = render_tilt_target,
-                    ignore_assertion = True,
-                    clear_cache = False,
-                    )
-            clear_cache = self.__render_tilt != render_tilt_prev
+        # Returning:
+        return adjust_value
             
-            # Clearing cache, if required:
-            if clear_cache:
-                cached_property_list: tuple[str, ...] = (
-                    "render_tilt",
-                    )  
-                cache.clear_cached_property_list(
-                    target_object = self,
-                    target_attribute_list = cached_property_list
-                    )
-                
-                # Checking if old randomly generated tilt angle needs to be cleared:
-                if not self.state_selected and not self.state_hovered:
-                    if self.render_tilt == render_tilt_target:
-                        cached_property: str = "render_tilt_random"
-                        cache.clear_cached_property(
-                            target_object = self,
-                            target_attribute = cached_property
-                            )
-
-
-    def auto_alpha(self) -> None:
-        """
-        Alpha controller method. Automatically adjusts card object's alpha values based on its state.
-
-        If card object is in "Faded" state, adjusts `render_alpha` cached property to `render_alpha_faded` value. If card
-        object is in "Default" (on in-position) state, adjusts `render_alpha` cached property to `render_alpha_default`
-        value.
-        
-        Used by `Gameshell` object via `on_update()` method to automatically adjust card object's alpha values within game logic
-        loop.
-        
-        Calls card object's native method `transition_render_alpha()` to update card's alpha values. This and other similar
-        methods may raise `AssertionError` if `SESSION.ENABLE_ASSERTION` is set to `True` and alpha value provided does not
-        pass validation and assertion checks. Precalculated alpha values do not required assertion control, thus parameters
-        `ignore_assertion` are set to `True`. Adjust them for debug purposes only.
-        """
-
-        # Preparing flag variables:
-        clear_cache: bool = False
-        job_required: bool = False
-        
-        # Checking faded state:
-        if self.state_faded:
-            if self.render_alpha != self.render_alpha_faded:
-                render_alpha_target: int = self.render_alpha_faded
-                job_required = True
-
-        # Checking default state:
-        else:
-            if self.render_alpha != self.render_alpha_default:
-                render_alpha_target: int = self.render_alpha_default
-                job_required = True
-
-        # Running job:
-        if job_required:
-            render_alpha_prev: int = self.render_alpha
-            self.transition_render_alpha(
-                target_value = render_alpha_target,
-                ignore_assertion = True,
-                clear_cache = False,
-                )
-            clear_cache = self.__render_alpha != render_alpha_prev
-            
-            # Clearing cache, if required:
-            if clear_cache:
-                cached_property_list: tuple[str, ...] = (
-                    "render_alpha",
-                    )  
-                cache.clear_cached_property_list(
-                    target_object = self,
-                    target_attribute_list = cached_property_list
-                    )
-
