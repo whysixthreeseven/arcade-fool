@@ -7,7 +7,6 @@ from game.utilities.scripts import cache
 
 # Various utilities:
 from game.utilities.screen import area
-from game.utilities.scripts import validate
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -24,52 +23,11 @@ class Surface:
         # Area attributes:
         self.__area_player: area.Area = area.AREA_PLAYER
         self.__area_opponent: area.Area = area.AREA_OPPONENT
+        self.__area_deck_container: area.Area = area.AREA_DECK_CONTAINER
         self.__area_deck: area.Area = area.AREA_DECK
         self.__area_discard: area.Area = area.AREA_DISCARD
         self.__area_table: area.Area = area.AREA_TABLE
         
-    
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        CACHED PROPETIES AND CLEAN METHODS
-    
-    """
-    
-    
-    @cached_property
-    def __cached_area_attributes(self) -> tuple[str, ...]:
-        
-        # Collecting area attributes:
-        cached_area_attributes: tuple[str, ...] = (
-            "area_focus",
-            )
-        
-        # Returning:
-        return cached_area_attributes
-    
-    
-    def clear_cached_area_attributes(self) -> None:
-        
-        # Clearing cached area attributes:
-        cache.clear_cached_property_list(
-            target_object = self, 
-            target_attribute_list = self.__cached_area_attributes
-            )
-        
-    
-    def clear_cached_attributes(self) -> None:
-        
-        # Collecting cached attributes:
-        cached_property_collection: tuple[tuple[str, ...], ...] = (
-            self.__cached_area_attributes,
-            )
-        
-        # Clearing cached attributes:
-        for cached_property_list in cached_property_collection:
-            cache.clear_cached_property_list(
-                target_object = self, 
-                target_attribute_list = cached_property_list
-                )
-            
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         CACHED AREA PROPERTIES AND METHODS
@@ -97,7 +55,25 @@ class Surface:
         area_list: tuple[area.Area, ...] = (
             self.__area_player,
             self.__area_opponent,
+            self.__area_deck_container,
             self.__area_deck,
+            self.__area_discard,
+            self.__area_table,
+            )
+        
+        # Returning:
+        return area_list
+    
+    
+    @cached_property
+    def __area_render_order(self) -> tuple[area.Area, ...]:
+        
+        # Collecting areas:
+        area_list: tuple[area.Area, ...] = (
+            self.__area_player,
+            self.__area_opponent,
+            self.__area_deck,
+            self.__area_deck_container,
             self.__area_discard,
             self.__area_table,
             )
@@ -155,6 +131,23 @@ class Surface:
         
         # Returning:
         return self.__area_deck
+    
+    
+    @cached_property
+    def area_deck_container(self) -> area.Area:
+        """
+        Deck container `Area` object. Used to determine area boundaries for cards and cursor on render surface.
+        
+        Cached with `functools` module's `cached_property`. Static, cannot be cleared.
+        
+        Returns
+        ----------
+        self.__area_table : `Area`
+            Deck container `Area` object.
+        """
+
+        # Returning:
+        return self.__area_deck_container
 
 
     @cached_property
@@ -189,73 +182,6 @@ class Surface:
 
         # Returning:
         return self.__area_table
-    
-    
-    @cached_property
-    def area_focus(self) -> area.Area | None:
-        """
-        `Area` object user's cursor is currently in, or `None` if cursor is outside game window.
-        
-        Cached with `functools` module's `cached_property`. Can be cleared with `game.utilities.scripts.cache` module's function 
-        `clear_cached_property()`, or by calling a native method related to cached property group.
-        
-        Returns
-        ----------
-        self.__area_focus : `Area`
-            `Area` object user's cursor is currently in. `None`, if cursor is outside game window.
-        """
-        
-        # Returning:
-        return self.__area_focus
-    
-    
-    def set_focus_area(self, set_value: area.Area | None, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
-        """
-        Sets a new focus `Area` object for the `Surface` class instance. Can be `None`, if user's cursor is outsde game window.
-        Uses only default variables provided by `game.utilities.area` module: `AREA_PLAYER`, `AREA_OPPONENT`, `AREA_DECK`, 
-        `AREA_DISCARD`, and `AREA_TABLE`. Alternatively can point at existing attributes inside its class, e.g. 
-        `self.__area_player`.
-            
-        This method may raise `AssertionError` if its validate method `self.__validate_area()` is unable to assert 
-        parameter's validity. Its validation can be skipped if `SESSION.ENABLE_ASSERTION` is disabled or if parameter 
-        `ignore_assertion` is flagged as `False`.
-        
-        Clears cached property `area_focus` if `clear_cache` is `True`.
-
-        Parameters
-        ----------
-        set_value : `Area` | `None`
-            The new `Area` object to set as focus. `None`, if cursor is outside game window.
-        ignore_assertion : `bool` = `False`
-            If `True`, will ignore assertion checks. `False` by default.
-        """
-        
-        # Assertion control:
-        if set_value is not None:
-            if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-                validate.validate_area(
-                    validate_value = set_value,
-                    )
-            
-        # Updating attribute:
-        self.__area_focus = set_value
-        
-        # Clearing cache:
-        if clear_cache:
-            cached_property: str = "area_focus"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property,
-                )
-    
-    
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        SURFACE CACHED PROPERTIES AND METHODS
-    
-    """
-    
-    
-    # TODO: Implement!
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -306,6 +232,6 @@ class Surface:
         ...
         
         # Calling display method for all areas:
-        for area_object in self.__area_list:
+        for area_object in self.__area_render_order:
             area_object.display()
 
