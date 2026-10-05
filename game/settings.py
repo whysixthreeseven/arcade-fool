@@ -17,8 +17,8 @@ class __SETTINGS:
     APP_NAME: str = "Arcade Fool"
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_STARTED: str = "2026.09.02"                                     # Date of project start (reboot)
-    APP_UPDATED: str = "2026.10.04"                                     # Date of last edit
-    APP_VERSION: str = f"0.0.{APP_UPDATED.replace(".", "")}"       # Month and day in MMDD format
+    APP_UPDATED: str = "2026.10.05"                                     # Date of last edit
+    APP_VERSION: str = f"0.0.{APP_UPDATED.replace(".", "")}"            # Version in A.B.YYYYMMDD format
     APP_AUTHOR: str = "Andrey Vostokov"
 
     # Root directory settings:    
@@ -176,7 +176,7 @@ class __SETTINGS:
     
     # Card slide settings:
     CARD_SLIDE_SPEED_MIN: int = int(CARD_TEXTURE_HEIGHT / 40)       # (480 * 0.25) / 40 = 3
-    CARD_SLIDE_SPEED_MAX: int = int(CARD_TEXTURE_HEIGHT / 4)        # (480 * 0.25) / 4 = 60
+    CARD_SLIDE_SPEED_MAX: int = int(CARD_TEXTURE_HEIGHT / 3)        # (480 * 0.25) / 3 = 40
     CARD_SLIDE_DISTANCE_CLOSE: int = LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y
     CARD_SLIDE_DISTANCE_FAR: int = int(__AREA_HAND_WIDTH / 2)
     
