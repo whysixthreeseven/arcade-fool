@@ -207,6 +207,7 @@ class AREA_TYPE:
     OPPONENT: str = "Opponent"
     TABLE: str = "Table"
     DECK: str = "Deck"
+    DECK_CONTAINER: str = "Deck container"
     DISCARD: str = "Discard"
     
     
