@@ -71,7 +71,7 @@ class __SETTINGS:
     # Area (main) dimensions settings:
     __AREA_POS_MARGIN: int = int(CARD_TEXTURE_WIDTH * 0.30)
     __AREA_MAIN_WIDTH: int = int(CARD_TEXTURE_WIDTH * 7.00 + __AREA_POS_MARGIN * 5.00)
-    __AREA_SIDE_WIDTH: int = int(CARD_TEXTURE_WIDTH * 3.00)
+    __AREA_SIDE_WIDTH: int = int(CARD_TEXTURE_WIDTH * 4.00)
     
     # Area (main) dimensions settings:
     __AREA_HAND_WIDTH: int = __AREA_MAIN_WIDTH
