@@ -927,7 +927,6 @@ class Game:
     def __update_event_draw(self, event_object: event.Event, player_controller: PlayerController, 
                                   delta_time: float = 1 / 60, autoremove: bool = True) -> None:
         
-        
         # Drawing a card for player controller:
         self.perform_player_draw(
             player_controller = player_controller,
@@ -1723,13 +1722,12 @@ class Game:
         
         # Handling deck hover state animation:
         if self.hit_area == area.AREA_DECK:
-            deck_hover: bool = self.__hit_cards
-            for card_object in self.deck.cards:
-                card_object.set_state_hovered(
-                    set_value = deck_hover,
-                    ignore_assertion = True,
-                    clear_cache = True,
-                    )
+            deck_cards_count: int = len(self.__hit_cards)
+            deck_hover: bool = deck_cards_count > 1 
+            self.set_deck_hover(
+                set_value = deck_hover,
+                ignore_assertion = True,
+                )
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1775,6 +1773,25 @@ class Game:
                         clear_cache = True
                         )                
                             
+    
+    def set_deck_hover(self, set_value: bool, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = bool,
+                raise_error = True,
+                )
+            
+        # Updating every card object's hovered state:
+        for card_object in self.deck.cards:
+            card_object.set_state_hovered(
+                set_value = set_value,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
+    
 
     def remove_card_hover(self) -> None:
 
