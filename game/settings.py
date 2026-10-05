@@ -84,6 +84,8 @@ class __SETTINGS:
     AREA_OPPONENT_HEIGHT: int = __AREA_HAND_HEIGHT
     AREA_DECK_WIDTH: int = __AREA_SIDE_WIDTH
     AREA_DECK_HEIGHT: int = int((__AREA_HAND_HEIGHT * 2 + AREA_TABLE_HEIGHT) / 2 + 1)
+    AREA_DECK_CONTAINER_WIDTH: int = int(CARD_TEXTURE_WIDTH * 2)
+    AREA_DECK_CONTAINER_HEIGHT: int = int(CARD_TEXTURE_HEIGHT * 1.20)
     AREA_DISCARD_WIDTH: int = __AREA_SIDE_WIDTH
     AREA_DISCARD_HEIGHT: int = int((__AREA_HAND_HEIGHT * 2 + AREA_TABLE_HEIGHT) / 2)
     
@@ -106,6 +108,7 @@ class __SETTINGS:
     AREA_TABLE_COLOR_BACKGROUND: context.RGB_Color = (185, 210, 100)                                # Pale yellow
     AREA_OPPONENT_COLOR_BACKGROUND: context.RGB_Color = __AREA_HAND_COLOR_BACKGROUND                # Pale red
     AREA_DECK_COLOR_BACKGROUND: context.RGB_Color = (100, 210, 120)                                 # Pale green
+    AREA_DECK_CONTAINER_COLOR_BACKGROUND: context.RGB_Color = (145, 255, 165)                       # Greener green?
     AREA_DISCARD_COLOR_BACKGROUND: context.RGB_Color = (200, 100, 210)                              # Pale magenta
     
     # Surface settings:
