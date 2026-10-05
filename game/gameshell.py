@@ -113,6 +113,5 @@ class Gameshell(arcade.Window):
             self.__gc.update_event_pipeline(
                 delta_time = delta_time,
                 autoremove = True,
-                clear_cache = True,
                 )
             
