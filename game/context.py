@@ -431,6 +431,7 @@ class EVENT_NAME:
     TIMEOUT_5: str = "Timeout (5 seconds)"
     RESET: str = "Reset"
     RESTOCK: str = "Restock"
+    DECK_DEHOVER: str = "Deck dehover"
     
 
 EVENT_NAME_LIST: tuple[str, ...] = tuple(
@@ -460,6 +461,7 @@ EVENT_TYPE_INDEX: dict[str, str] = {
     EVENT_NAME.TIMEOUT_5: EVENT_TYPE.GLOBAL,
     EVENT_NAME.RESET: EVENT_TYPE.GAME,
     EVENT_NAME.RESTOCK: EVENT_TYPE.GAME,
+    EVENT_NAME.DECK_DEHOVER: EVENT_TYPE.GAME,
     }
 
 
@@ -484,6 +486,7 @@ EVENT_DESCRIPTION_INDEX: dict[str, str] = {
     EVENT_NAME.TIMEOUT_5: "There is nothing here yet.",
     EVENT_NAME.RESET: "There is nothing here yet.",
     EVENT_NAME.RESTOCK: "There is nothing here yet.",
+    EVENT_NAME.DECK_DEHOVER: "There is nothing here yet.",
     }
 
 
@@ -508,6 +511,7 @@ EVENT_CONDITION_INDEX: dict[str, str] ={
     EVENT_NAME.TIMEOUT_5: "Five seconds elapsed",
     EVENT_NAME.RESET: "All controllers reset",
     EVENT_NAME.RESTOCK: "All deck previous cards turn invisible, and then update deck cards turn visible one at a time",
+    EVENT_NAME.DECK_DEHOVER: "Manual disable",
     }
 
 
@@ -532,6 +536,7 @@ EVENT_WAIT_INDEX: dict[str, bool] = {
     EVENT_NAME.TIMEOUT_5: True,
     EVENT_NAME.RESET: True,
     EVENT_NAME.RESTOCK: True,
+    EVENT_NAME.DECK_DEHOVER: False,               # Only visual effect
     }
 
 
@@ -549,5 +554,6 @@ EVENT_TIMEOUT_INDEX: dict[str, float] = {
     EVENT_NAME.TIMEOUT_5: 5.00,
     EVENT_NAME.RESET: 0.00,
     EVENT_NAME.RESTOCK: 0.00,
+    EVENT_NAME.DECK_DEHOVER: 0.00,
     }
 
