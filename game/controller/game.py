@@ -66,6 +66,10 @@ class Game:
         # Cursor coordinates attributes:
         self.__cursor_coordinate_x: int = 0
         self.__cursor_coordinate_y: int = 0
+        self.__cursor_press_coordinate_x: int = 0
+        self.__cursor_press_coordinate_y: int = 0
+        self.__cursor_release_coordinate_x: int = 0
+        self.__cursor_release_coordinate_y: int = 0
         
         # Hit attributes:
         self.__hit_area: area.Area | None = None
@@ -74,9 +78,9 @@ class Game:
         # Card hover and select attributes:
         self.__card_hover: Card | None = None
         self.__card_select: Card | None = None
-        
-        # Trump value:
-        self.__trump_suit: str = None
+        self.__card_drag: Card | None = None
+        self.__card_press: Card | None = None
+        self.__card_release: Card | None = None
         
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -165,9 +169,6 @@ class Game:
         # TODO: Setup interface and events!
         ...
         
-        # Clearing all cache:
-        self.clear_cached_attributes()
-        
         # Setting up game ready:
         self.__state_game_ready = True
         
@@ -238,26 +239,10 @@ class Game:
         if not self.state_game_ready:
             self.setup()
             
-        # Waiting for objects to load up:
-        self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_1,
-                ignore_assertion = True,
-                ),
-            autostart = True,
-            ignore_assertion = False,
-            clear_cache = True
-            )
-        
-        # Adding restock event:
-        self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.RESTOCK,
-                ignore_assertion = True,
-                ),
-            autostart = True,
-            ignore_assertion = False,
-            clear_cache = True
+        # Hovering deck:
+        self.set_deck_hover(
+            set_value = True,
+            ignore_assertion = False
             )
             
         # Waiting for objects to load up:
@@ -268,7 +253,26 @@ class Game:
                 ),
             autostart = True,
             ignore_assertion = False,
-            clear_cache = True
+            )
+        
+        # Adding restock event:
+        self.add_event(
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.RESTOCK,
+                ignore_assertion = True,
+                ),
+            autostart = True,
+            ignore_assertion = False,
+            )
+            
+        # Waiting for objects to load up:
+        self.add_event(
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.TIMEOUT_1,
+                ignore_assertion = True,
+                ),
+            autostart = True,
+            ignore_assertion = False,
             )
         
         # Starting draw cards loop
@@ -290,7 +294,6 @@ class Game:
                         ),
                     autostart = True,
                     ignore_assertion = False,
-                    clear_cache = True
                     )
         
         # Waiting for cards to hit hand controllers:
@@ -301,7 +304,16 @@ class Game:
                 ),
             autostart = True,
             ignore_assertion = False,
-            clear_cache = True
+            )
+        
+        # Adding deck dehover event:
+        self.add_event(
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.DECK_DEHOVER,
+                ignore_assertion = True,
+                ),
+            autostart = True,
+            ignore_assertion = False,
             )
         
         # Sorting hands:
@@ -312,7 +324,6 @@ class Game:
                 ),
             autostart = True,
             ignore_assertion = False,
-            clear_cache = True
             )
         self.add_event(
             event_object = event.Event.generate_predefined(
@@ -321,7 +332,6 @@ class Game:
                 ),
             autostart = True,
             ignore_assertion = False,
-            clear_cache = True
             )
         
         # Waiting for sort to finish:
@@ -332,7 +342,6 @@ class Game:
                 ),
             autostart = True,
             ignore_assertion = False,
-            clear_cache = True
             )
         
     
@@ -340,14 +349,12 @@ class Game:
             
         # Removing all other events:
         self.__events: list[event.Event] = []
-        self.clear_cached_events_attributes()
         
         # Adding reset event:
         self.add_event(
             event_object = event.EVENT_RESET,
             autostart = True,
             ignore_assertion = True,
-            clear_cache = True
             )
         
         # Adding short timeout:
@@ -358,7 +365,6 @@ class Game:
                 ),
             autostart = True,
             ignore_assertion = True,
-            clear_cache = True
             )
         
         # Restocking cards:    
@@ -369,100 +375,6 @@ class Game:
             )
             
     
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        CACHED PROPETIES AND CLEAN METHODS
-    
-    """
-    
-    
-    @cached_property
-    def __cached_player_attributes(self) -> tuple[str, ...]:
-        
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "player_attacking",
-            "player_defending",
-            )
-        
-        # Returning:
-        return cached_property_list
-    
-    
-    @cached_property
-    def __cached_cards_attributes(self) -> tuple[str, ...]:
-        
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "cards_area_index",
-            "cards",
-            )
-        
-        # Returning:
-        return cached_property_list
-    
-    
-    @cached_property
-    def __cached_events_attributes(self) -> tuple[str, ...]:
-        
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "events",
-            "events_count",
-            "events_ongoing",
-            "events_ongoing_count",
-            "events_wait",
-            "events_wait_count",
-            "events_finished",
-            "events_finished_count",
-            )
-        
-        # Returning:
-        return cached_property_list
-    
-    
-    def clear_cached_player_attributes(self) -> None:
-        
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_player_attributes
-            )
-        
-    
-    def clear_cached_cards_attributes(self) -> None:
-            
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_cards_attributes
-            )
-        
-    
-    def clear_cached_events_attributes(self) -> None:
-                
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_events_attributes
-            )
-        
-    
-    def clear_cached_attributes(self) -> None:
-                
-        # Collecting cached properties:
-        cached_property_list_collection: tuple[tuple[str, ...], ...] = (
-            self.__cached_player_attributes,
-            self.__cached_cards_attributes,
-            )
-        
-        # Looping throught the list and clearing cache:
-        for cached_property_list in cached_property_list_collection:
-            cache.clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
-        
-
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         PLAYER CONTROLLERS PROPERTY LINKS
     
@@ -496,7 +408,7 @@ class Game:
         return player_controller_list
     
     
-    @cached_property
+    @property
     def player_attacking(self) -> PlayerController:
         
         # Selecting correct player controller based on state:
@@ -511,7 +423,7 @@ class Game:
             raise AttributeError(error_message)
         
     
-    @cached_property
+    @property
     def player_defending(self) -> PlayerController:
         
         # Selecting correct player controller based on state:
@@ -611,7 +523,7 @@ class Game:
     """
     
     
-    @cached_property
+    @property
     def cards_area_index(self) -> dict[str, tuple[Card, ...]]:
         
         # Constructing card container index:
@@ -627,7 +539,7 @@ class Game:
         return card_container_index
     
     
-    @cached_property
+    @property
     def cards(self) -> tuple[Card, ...]:
         
         # Collecting cards containers:
@@ -657,7 +569,7 @@ class Game:
     """
     
     
-    @cached_property
+    @property
     def events(self) -> tuple[event.Event, ...]:
         
         # Converting:
@@ -667,7 +579,7 @@ class Game:
         return events
     
     
-    @cached_property
+    @property
     def events_count(self) -> int:
         
         # Calculating:
@@ -677,7 +589,7 @@ class Game:
         return events_count
     
     
-    @cached_property
+    @property
     def events_ongoing(self) -> tuple[event.Event, ...]:
         
         # Extracting ongoing events:
@@ -690,7 +602,7 @@ class Game:
         return events_ongoing
     
 
-    @cached_property
+    @property
     def events_ongoing_count(self) -> int:
 
         # Calculating:
@@ -700,7 +612,7 @@ class Game:
         return events_ongoing_count
     
     
-    @cached_property
+    @property
     def events_wait(self) -> tuple[event.Event, ...]:
         
         # Extracting wait events:
@@ -713,7 +625,7 @@ class Game:
         return events_wait
 
 
-    @cached_property
+    @property
     def events_wait_count(self) -> int:
 
         # Calculating:
@@ -723,7 +635,7 @@ class Game:
         return events_wait_count
     
     
-    @cached_property
+    @property
     def events_finished(self) -> tuple[event.Event, ...]:
         
         # Extracting finished events:
@@ -736,7 +648,7 @@ class Game:
         return events_finished
 
 
-    @cached_property
+    @property
     def events_finished_count(self) -> int:
 
         # Calculating:
@@ -746,8 +658,7 @@ class Game:
         return events_finished_count
     
     
-    def add_event(self, event_object: event.Event, autostart: bool = True, 
-                        ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def add_event(self, event_object: event.Event, autostart: bool = True, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -760,7 +671,6 @@ class Game:
             event_object.set_ongoing(
                 set_value = True,
                 ignore_assertion = True,
-                clear_cache = True
                 )
 
         # Updating attribute:
@@ -768,12 +678,8 @@ class Game:
             event_object
             )
         
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_events_attributes()
-            
     
-    def remove_event(self, event_object: event.Event, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def remove_event(self, event_object: event.Event, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -787,12 +693,8 @@ class Game:
                 event_object
                 )
         
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_events_attributes()
 
-
-    def remove_event_scan(self, clear_cache: bool = True) -> None:
+    def remove_event_scan(self) -> None:
         
         # Collecting events that finished running:
         event_remove_list: list[event.Event] = []
@@ -805,19 +707,12 @@ class Game:
         # Calling remove event method on each finished event:
         for event_object in event_remove_list:
             self.remove_event(
-                event_object = event_object,
-                clear_cache = False
+                event_object = event_object
                 )
         
-        # Clearing cache:
-        if clear_cache:
-            event_remove_count: int = len(event_remove_list)
-            if event_remove_count > 0:
-                self.clear_cached_events_attributes()
-            
     
     def update_event(self, event_object: event.Event, event_ongoing: bool | None = None, event_finished: bool | None = None,
-                           delta_time: float = 1 / 60, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+                           delta_time: float = 1 / 60, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -840,7 +735,6 @@ class Game:
                 event_object.set_ongoing(
                     set_value = event_ongoing,
                     ignore_assertion = True,
-                    clear_cache = True
                     )
         if event_finished is not None:
             if event_object.finished != event_finished:
@@ -848,7 +742,6 @@ class Game:
                 event_object.set_finished(
                     set_value = event_finished,
                     ignore_assertion = True,
-                    clear_cache = True
                     )
             
         # Updating event object's timeout values, if applicable:
@@ -860,12 +753,7 @@ class Game:
                     ignore_assertion = False,
                     )
             
-        # Clearing cache:
-        if clear_cache:
-            if event_updated:
-                self.clear_cached_events_attributes()
-            
-            
+
     def __update_event_refill(self, event_object: event.Event, player_controller: PlayerController, 
                                     delta_time: float = 1 / 60, autoremove: bool = True) -> None:
             
@@ -883,7 +771,6 @@ class Game:
                 event_object = event_object,
                 event_ongoing = event_ongoing,
                 event_finished = event_finished,
-                clear_cache = True
                 )
             
             # Removing event object:
@@ -891,7 +778,6 @@ class Game:
                 if event_finished:
                     self.remove_event(
                         event_object = event_object,
-                        clear_cache = True
                         )
         
         # Otherwise drawing a card:
@@ -900,7 +786,6 @@ class Game:
                 self.perform_player_draw(
                     player_controller = player_controller,
                     ignore_assertion = True,
-                    clear_cache = True,
                     )
     
     
@@ -931,7 +816,6 @@ class Game:
         self.perform_player_draw(
             player_controller = player_controller,
             ignore_assertion = False,
-            clear_cache = True,
             )
 
         # Preparing variables
@@ -943,7 +827,6 @@ class Game:
             event_object = event_object,
             event_ongoing = event_ongoing,
             event_finished = event_finished,
-            clear_cache = True
             )
         
         # Removing event object:
@@ -951,7 +834,6 @@ class Game:
             if event_finished:
                 self.remove_event(
                     event_object = event_object,
-                    clear_cache = True
                     )
                 
     
@@ -990,7 +872,6 @@ class Game:
                 event_object = event_object,
                 event_ongoing = event_ongoing,
                 event_finished = event_finished,
-                clear_cache = True
                 )
             
             # Removing event object:
@@ -998,7 +879,6 @@ class Game:
                 if event_finished:
                     self.remove_event(
                         event_object = event_object,
-                        clear_cache = True
                         )
         
         # Otherwise updating delta time:
@@ -1033,7 +913,6 @@ class Game:
             event_object = event_object,
             event_ongoing = event_ongoing,
             event_finished = event_finished,
-            clear_cache = True
             )
         
         # Removing event object:
@@ -1041,7 +920,6 @@ class Game:
             if event_finished:
                 self.remove_event(
                     event_object = event_object,
-                    clear_cache = True
                     )
                 
                 
@@ -1131,7 +1009,6 @@ class Game:
                 
             # Updating attributes:
             self.__reset_player_state()
-            self.clear_cached_attributes()
                 
             # Setting up game ready:
             self.__state_game_ready = True
@@ -1141,7 +1018,6 @@ class Game:
                 event_object = event_object,
                 event_ongoing = event_ongoing,
                 event_finished = event_finished,
-                clear_cache = True
                 )
             
             # Removing event object:
@@ -1149,7 +1025,6 @@ class Game:
                 if event_finished:
                     self.remove_event(
                         event_object = event_object,
-                        clear_cache = True
                         )
                     
                     
@@ -1174,15 +1049,17 @@ class Game:
             event_ongoing: bool = False
             event_finished: bool = True
             
-            # Cards manipulation handler:
-            self.__handle_card_manipulation()
-
             # Updating event object:
             self.update_event(
                 event_object = event_object,
                 event_ongoing = event_ongoing,
                 event_finished = event_finished,
-                clear_cache = True
+                )
+            
+            # Hovering deck:
+            self.set_deck_hover(
+                set_value = True,
+                ignore_assertion = False
                 )
             
             # Removing event object:
@@ -1190,7 +1067,43 @@ class Game:
                 if event_finished:
                     self.remove_event(
                         event_object = event_object,
-                        clear_cache = True
+                        )
+                    
+    
+    def __update_event_deck_hover(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+        
+        # Checking if all cards are visible:
+        force_stop = True
+        for card_object in self.deck.cards:
+            if not card_object.state_idle:
+                
+                # Updating flag:
+                force_stop = False
+                break
+        
+        # Forcing stop:
+        if force_stop:
+            event_ongoing: bool = False
+            event_finished: bool = True
+            
+            # Updating event object:
+            self.update_event(
+                event_object = event_object,
+                event_ongoing = event_ongoing,
+                event_finished = event_finished,
+                )
+            
+            # Dehovering deck:
+            self.set_deck_hover(
+                set_value = False,
+                ignore_assertion = False
+                )
+    
+            # Removing event object:
+            if autoremove:
+                if event_finished:
+                    self.remove_event(
+                        event_object = event_object,
                         )
         
         
@@ -1210,13 +1123,14 @@ class Game:
             context.EVENT_NAME.TIMEOUT_5: self.__update_event_timeout,
             context.EVENT_NAME.RESET: self.__update_event_reset,
             context.EVENT_NAME.RESTOCK: self.__update_event_restock,
+            context.EVENT_NAME.DECK_DEHOVER: self.__update_event_deck_hover,
             }
         
         # Returning:
         return event_update_methods
         
         
-    def update_event_pipeline(self, delta_time: float = 1 / 60, autoremove: bool = True, clear_cache: bool = True) -> None:
+    def update_event_pipeline(self, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
         
         # Scanning events available:
         if self.events_ongoing_count > 0:
@@ -1234,10 +1148,6 @@ class Game:
                     autoremove = autoremove,
                     )
 
-            # Clearing cache:
-            if clear_cache:
-                self.clear_cached_events_attributes()
-            
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         STATE PROPERTIES AND METHODS
@@ -1599,6 +1509,164 @@ class Game:
             set_value = cursor_coordinate_y,
             ignore_assertion = True,
             )
+        
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        CURSOR PRESS COORDINATES PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @property
+    def cursor_press_coordinate_x(self) -> int:
+        
+        # Returning:
+        return self.__cursor_press_coordinate_x
+    
+    
+    @property
+    def cursor_press_coordinate_y(self) -> int:
+
+        # Returning:
+        return self.__cursor_press_coordinate_y
+    
+    
+    @property
+    def cursor_press_coordinates(self) -> context.Coordinates:
+        
+        # Packing up coordinates container:
+        cursor_press_coordinates: context.Coordinates = (
+            self.__cursor_press_coordinate_x,
+            self.__cursor_press_coordinate_y,
+            )
+        
+        # Returning:
+        return cursor_press_coordinates
+
+
+    def set_cursor_press_coordinate_x(self, set_value: int, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate(
+                validate_value = set_value,
+                )
+            
+        # Updating attribute:
+        self.__cursor_press_coordinate_x = set_value
+
+
+    def set_cursor_press_coordinate_y(self, set_value: int, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate(
+                validate_value = set_value,
+                )
+
+        # Updating attribute:
+        self.__cursor_press_coordinate_y = set_value
+        
+    
+    def set_cursor_press_coordinates(self, set_value: context.Coordinates, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate_container(
+                validate_value = set_value,
+                )
+
+        # Unpacking coordinates container:
+        cursor_press_coordinate_x, cursor_press_coordinate_y = set_value
+        
+        # Updating attributes:
+        self.set_cursor_press_coordinate_x(
+            set_value = cursor_press_coordinate_x,
+            ignore_assertion = True,
+            )
+        self.set_cursor_press_coordinate_y(
+            set_value = cursor_press_coordinate_y,
+            ignore_assertion = True,
+            )
+        
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        CURSOR RELEASE COORDINATES PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @property
+    def cursor_release_coordinate_x(self) -> int:
+        
+        # Returning:
+        return self.__cursor_release_coordinate_x
+    
+    
+    @property
+    def cursor_release_coordinate_y(self) -> int:
+
+        # Returning:
+        return self.__cursor_release_coordinate_y
+    
+    
+    @property
+    def cursor_release_coordinates(self) -> context.Coordinates:
+        
+        # Packing up coordinates container:
+        cursor_release_coordinates: context.Coordinates = (
+            self.__cursor_release_coordinate_x,
+            self.__cursor_release_coordinate_y,
+            )
+        
+        # Returning:
+        return cursor_release_coordinates
+
+
+    def set_cursor_release_coordinate_x(self, set_value: int, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate(
+                validate_value = set_value,
+                )
+            
+        # Updating attribute:
+        self.__cursor_release_coordinate_x = set_value
+
+
+    def set_cursor_release_coordinate_y(self, set_value: int, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate(
+                validate_value = set_value,
+                )
+
+        # Updating attribute:
+        self.__cursor_release_coordinate_y = set_value
+        
+    
+    def set_cursor_release_coordinates(self, set_value: context.Coordinates, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate_container(
+                validate_value = set_value,
+                )
+
+        # Unpacking coordinates container:
+        cursor_release_coordinate_x, cursor_release_coordinate_y = set_value
+        
+        # Updating attributes:
+        self.set_cursor_release_coordinate_x(
+            set_value = cursor_release_coordinate_x,
+            ignore_assertion = True,
+            )
+        self.set_cursor_release_coordinate_y(
+            set_value = cursor_release_coordinate_y,
+            ignore_assertion = True,
+            )
 
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1897,31 +1965,19 @@ class Game:
                 clear_cache = True,
                 )
             self.__card_select = None
-    
-    
+            
+            
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        TRUMP SUIT PROPERTIES AND METHODS
+        CARD DRAG PROPERTIES AND METHODS
     
     """
     
     
     @property
-    def trump_suit(self) -> str:
-
-        # Returning:
-        return self.__trump_suit
-    
-    
-    def set_trump_suit(self, set_value: str, ignore_assertion = True) -> None:
+    def card_drag(self) -> Card | None:
         
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            validate.validate_suit(
-                validate_value = set_value
-                )
-            
-        # Updating attribute:
-        self.__trump_suit = set_value
+        # Returning:
+        return self.__card_drag
         
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1971,12 +2027,24 @@ class Game:
     
     
     def perform_player_draw(self, player_controller: PlayerController, ignore_assertion: bool = False, 
-                                  clear_cache: bool = True) -> None:
+                                  ignore_event: bool = True) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
             validate.validate_player_controller(
                 validate_value = player_controller,
+                )
+            
+        # Hover deck event:
+        if not ignore_event:
+            self.set_deck_hover(
+                set_value = True,
+                ignore_assertion = False
+                )
+            self.add_event(
+                event_object = event.EVENT_DECK_DEHOVER,
+                auto_start = True,
+                ignore_assertion = False,
                 )
 
         # Drawing card and adding it to player controller's hand:
@@ -1992,10 +2060,6 @@ class Game:
             clear_cache = True
             )
         
-        # Handling card manipulation:
-        if clear_cache:
-            self.__handle_card_manipulation()
-            
     
     def perform_player_play(self, player_controller: PlayerController, card_object: Card, ignore_assertion: bool = False) -> None:
         
@@ -2039,18 +2103,6 @@ class Game:
             
             
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        MISC HANDLE METHODS
-        
-    """
-        
-        
-    def __handle_card_manipulation(self) -> None:
-                
-        # Clearing cache:
-        self.clear_cached_cards_attributes()        
-        
-                
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         HANDLE MOUSE METHODS
     
     """
@@ -2079,9 +2131,23 @@ class Game:
             self.update_hit_cards()
             self.update_card_hover()
             
-            # Checking if card hover object has changed:
-            if card_hover_prev != self.card_hover:
-                self.__handle_card_manipulation()
+    
+    def handle_mouse_press(self, cursor_press_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
+    
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate_container(
+                validate_value = cursor_press_coordinates,
+                )
+            
+        # Updating cursor coordinates:
+        if cursor_press_coordinates != self.cursor_press_coordinates:
+            self.set_cursor_press_coordinates(
+                set_value = cursor_press_coordinates,
+                ignore_assertion = ignore_assertion,
+                )
+            
+            
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -2129,8 +2195,8 @@ class Game:
                 # Drawing card:
                 self.perform_player_draw(
                     player_controller = player_controller,
+                    ignore_event = True,
                     ignore_assertion = True,
-                    clear_cache = True,
                     )
 
         # Selecting new texturepack:
@@ -2162,9 +2228,6 @@ class Game:
                     SESSION.set_texturepack_back_previous()
                 self.apply_texturepack_back_selected()
             
-            # Handling cards manipulation:
-            self.__handle_card_manipulation()
-            
         # Resetting game:
         elif key_pressed == keymap.KEYMAP.KEY_DEBUG_FORCE_RESTART_GAME:
             self.game_reset()
@@ -2179,7 +2242,6 @@ class Game:
                     ),
                 autostart = True,
                 ignore_assertion = True,
-                clear_cache = True
                 )
 
         
