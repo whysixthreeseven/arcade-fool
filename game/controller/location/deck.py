@@ -271,10 +271,6 @@ class DeckController:
                 card_object
                 )
 
-        # Shuffling:
-        self.__shuffle(
-            deck_object = card_list_gen
-            )
 
         # Adding the rest of the cards:
         for card_remaining in card_list_gen:
