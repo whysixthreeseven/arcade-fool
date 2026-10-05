@@ -529,6 +529,7 @@ class Game:
         # Constructing card container index:
         card_container_index: dict[str, tuple[Card, ...]] = {
             area.AREA_DECK: self.deck.cards,
+            area.AREA_DECK_CONTAINER: self.deck.cards,
             area.AREA_DISCARD: self.discard.cards,
             area.AREA_TABLE: self.table.cards,
             area.AREA_PLAYER: self.player_human.hand.cards,
@@ -815,6 +816,7 @@ class Game:
         # Drawing a card for player controller:
         self.perform_player_draw(
             player_controller = player_controller,
+            ignore_event = True,
             ignore_assertion = False,
             )
 
@@ -1070,16 +1072,20 @@ class Game:
                         )
                     
     
-    def __update_event_deck_hover(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+    def __update_event_deck_dehover(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
         
         # Checking if all cards are visible:
-        force_stop = True
-        for card_object in self.deck.cards:
-            if not card_object.state_idle:
-                
-                # Updating flag:
-                force_stop = False
-                break
+        force_stop: bool = True
+        if self.hit_area == area.AREA_DECK_CONTAINER:
+            force_stop = False
+        else:
+            for player_controller in self.__player_controllers:
+                for card_object in player_controller.hand.cards:
+                    if not card_object.state_idle:
+                        
+                        # Updating flag:
+                        force_stop = False
+                        break
         
         # Forcing stop:
         if force_stop:
@@ -1123,7 +1129,7 @@ class Game:
             context.EVENT_NAME.TIMEOUT_5: self.__update_event_timeout,
             context.EVENT_NAME.RESET: self.__update_event_reset,
             context.EVENT_NAME.RESTOCK: self.__update_event_restock,
-            context.EVENT_NAME.DECK_DEHOVER: self.__update_event_deck_hover,
+            context.EVENT_NAME.DECK_DEHOVER: self.__update_event_deck_dehover,
             }
         
         # Returning:
@@ -1788,10 +1794,19 @@ class Game:
         # Updating attribute:
         self.__hit_cards = hit_cards_temp
         
+        # Checking if deck container was reached:
+        deck_cards_count: int = len(self.__hit_cards)
+        deck_hover: bool = bool(
+            deck_cards_count > 1 and self.hit_area == area.AREA_DECK
+                or self.hit_area == area.AREA_DECK_CONTAINER
+            )
+        
         # Handling deck hover state animation:
-        if self.hit_area == area.AREA_DECK:
-            deck_cards_count: int = len(self.__hit_cards)
-            deck_hover: bool = deck_cards_count > 1 
+        deck_area_list: tuple[area.Area, ...] = (
+            area.AREA_DECK_CONTAINER, 
+            area.AREA_DECK
+            )
+        if self.hit_area in deck_area_list:
             self.set_deck_hover(
                 set_value = deck_hover,
                 ignore_assertion = True,
@@ -2043,7 +2058,7 @@ class Game:
                 )
             self.add_event(
                 event_object = event.EVENT_DECK_DEHOVER,
-                auto_start = True,
+                autostart = True,
                 ignore_assertion = False,
                 )
 
@@ -2195,7 +2210,7 @@ class Game:
                 # Drawing card:
                 self.perform_player_draw(
                     player_controller = player_controller,
-                    ignore_event = True,
+                    ignore_event = False,
                     ignore_assertion = True,
                     )
 
