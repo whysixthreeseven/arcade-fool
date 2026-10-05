@@ -870,6 +870,23 @@ AREA_DECK: Area = Area.build(
     ignore_assertion = True
     )
 
+
+# Deck area container instance initialization:
+AREA_DECK_CONTAINER: Area = Area.build(
+    init_type = context.AREA_TYPE.DECK_CONTAINER,
+    init_size = (
+        SETTINGS.AREA_DECK_CONTAINER_WIDTH,
+        SETTINGS.AREA_DECK_CONTAINER_HEIGHT,
+        ),
+    init_color_background = SETTINGS.AREA_DECK_CONTAINER_COLOR_BACKGROUND,
+    init_color_text = SETTINGS.AREA_TEXT_COLOR,
+    init_coordinates = (
+        SETTINGS.AREA_DECK_CENTER_COORDINATE_X,
+        SETTINGS.AREA_DECK_CENTER_COORDINATE_Y,
+        ),
+    ignore_assertion = True
+    )
+
 # Discard area instance initialization:
 AREA_DISCARD: Area = Area.build(
     init_type = context.AREA_TYPE.DISCARD,
