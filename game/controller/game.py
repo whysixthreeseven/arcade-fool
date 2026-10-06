@@ -1919,7 +1919,12 @@ class Game:
                 ignore_assertion = True,
                 clear_cache = True,
                 )
-                
+            self.perform_fade(
+                set_value = True,
+                player_controller = self.player_human,
+                ignore_assertion = ignore_assertion,
+                )
+            
                 
     def remove_card_select(self) -> None:
         
@@ -1933,6 +1938,12 @@ class Game:
                 clear_cache = True,
                 )
             self.__card_select = None
+            
+            self.perform_fade(
+                set_value = False,
+                player_controller = self.player_human,
+                ignore_assertion = True,
+                )
             
             
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -2003,6 +2014,12 @@ class Game:
                 validate_value = player_controller,
                 )
             
+        # Dehovering and deselecting, if any:
+        if self.card_hover is not None:
+            self.remove_card_hover()
+        if self.card_select is not None:
+            self.remove_card_select()
+            
         # Hover deck event:
         if not ignore_event:
             self.set_deck_hover(
@@ -2068,7 +2085,27 @@ class Game:
                 ignore_assertion = False,
                 clear_cache = True,
                 )
-            
+    
+    
+    def perform_fade(self, set_value: bool, player_controller: PlayerController, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value,
+                )
+            validate.validate_player_controller(
+                validate_value = player_controller,
+                )
+
+        for card_object in player_controller.hand.cards:
+            if card_object != self.card_select:
+                card_object.set_state_faded(
+                    set_value = set_value,
+                    ignore_assertion = ignore_assertion,
+                    clear_cache = True,
+                    )
+    
             
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         HANDLE MOUSE METHODS
@@ -2161,6 +2198,12 @@ class Game:
 
         # Sorting player controller's hand:        
         if key_pressed in keymap.KEYMAP_KEY_USER_SORT_LIST:
+            
+            # Dehoverign and deselecting cards:
+            if self.card_hover is not None:
+                self.remove_card_hover()
+            if self.card_select is not None:
+                self.remove_card_select()
         
             # TODO: Implmenet proper switch:
             sort_reverse: bool = False
@@ -2236,6 +2279,12 @@ class Game:
             
         # Sorting opponent's hand:
         elif key_pressed == keymap.KEYMAP.KEY_DEBUG_SORT_OPPONENT:
+            
+            # Dehoverign and deselecting cards:
+            if self.card_hover is not None:
+                self.remove_card_hover()
+                
+            # Adding sort event:
             self.add_event(
                 event_object = event.Event.generate_predefined(
                     event_name = context.EVENT_NAME.OPPONENT_SORT,
