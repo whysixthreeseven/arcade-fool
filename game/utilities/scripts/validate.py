@@ -412,8 +412,8 @@ def validate_card_render_tilt(validate_value: int) -> None:
     assertion.assert_value_in_range(
         check_value = abs(validate_value),
         check_range = (
-            SETTINGS.CARD_RENDER_TILT_MIN, 
-            SETTINGS.CARD_RENDER_TILT_MAX + 1
+            SETTINGS.CARD_RENDER_TILT_RANDOM_MIN, 
+            SETTINGS.CARD_RENDER_TILT_RANDOM_MAX + 1
             ),
         raise_error = True
         )
