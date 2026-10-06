@@ -623,10 +623,10 @@ class CardController:
     
    
     @cached_property 
-    def __cached_slide_attributes(self) -> tuple[str, ...]:
+    def __cached_update_attributes(self) -> tuple[str, ...]:
         
         """
-        Slide speed attributes-related cached properties list.
+        Update (slide speed) attributes-related cached properties list.
         
         Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
         Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
@@ -800,9 +800,9 @@ class CardController:
             )
         
     
-    def clear_cached_slide_attributes(self) -> None:
+    def clear_cached_update_attributes(self) -> None:
         """
-        Clears all public cached slide properties of this card object.
+        Clears all public cached update properties of this card object.
         
         Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
         clear texturepack properties of this card object.
@@ -811,7 +811,7 @@ class CardController:
         # Clearing cached properties:
         cache.clear_cached_property_list(
             target_object = self,
-            target_attribute_list = self.__cached_slide_attributes
+            target_attribute_list = self.__cached_update_attributes
             )
         
         
@@ -850,7 +850,7 @@ class CardController:
             self.__cached_location_attributes,
             self.__cached_id_attributes,
             self.__cached_added_index_attributes,
-            self.__cached_slide_attributes,
+            self.__cached_update_attributes,
             )
         
         # Looping throught the list and clearing cache:
@@ -3132,7 +3132,7 @@ class CardController:
                     )
                 
                 # Clearing related cached properties:
-                self.clear_cached_slide_attributes()
+                self.clear_cached_update_attributes()
             
             # Updating coordinates based on state:
             self.update_coordinates_state(
@@ -3163,20 +3163,20 @@ class CardController:
 
         # Clearing cache:
         if clear_cache:
-            if clear_cache:
-                
-                # Clearing target cached properties:
-                cached_property_list: tuple[str, ...] = (
-                    "state_selected",
-                    "state_idle"
-                    )
-                cache.clear_cached_property_list(
-                    target_object = self,
-                    target_attribute = cached_property_list
-                    )
-                
-                # Clearing related cached properties:
-                self.clear_cached_slide_attributes()
+            
+            # Clearing target cached properties:
+            cached_property_list: tuple[str, ...] = (
+                "state_selected",
+                "state_idle",
+                "render_tilt_random",
+                )
+            cache.clear_cached_property_list(
+                target_object = self,
+                target_attribute_list = cached_property_list
+                )
+            
+            # Clearing related cached properties:
+            self.clear_cached_update_attributes()
         
         # Updating coordinates based on state:
         self.update_coordinates_state(
@@ -4162,7 +4162,7 @@ class CardController:
         """
         Updates `coordinates_expected` cached properties based on card object's state.
         
-        If card object is in "Selected" state, updates `coordinates_expected` cached property to `coordinates_selected` value, if
+        If card object is in "Selected" state, updates `coordinates_expected` cached property to `coordinates_select` value, if
         card object is in "Hovered" state, updates `coordinates_expected` cached property to `coordinates_hovered` value, and if
         card object is in "Default" (on in-position) state, updates `coordinates_expected` cached property to 
         `coordinates_position` value, expecting it to be in its place.
@@ -4205,9 +4205,9 @@ class CardController:
         if self.state_selected and self.location in location_select:
             
             # Checking if expected coordinates are set to selected coordinates:
-            if self.coordinates_expected != self.coordinates_selected:
+            if self.coordinates_expected != self.coordinates_select:
                 self.set_coordinates_expected(
-                    set_value = self.coordinates_selected,
+                    set_value = self.coordinates_select,
                     ignore_assertion = True,
                     clear_cache = clear_cache
                     )
