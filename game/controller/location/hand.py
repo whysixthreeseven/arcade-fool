@@ -510,18 +510,14 @@ class HandController:
                     ignore_assertion = False,
                     clear_cache = True,
                     )
-                if card_object.state_playable:
-                    card_object.set_coordinates_expected(
-                        set_value = coordinates_position,
-                        ignore_assertion = False,
-                        clear_cache = True,
-                        )
-                else:
-                    card_object.set_coordinates_expected(
-                        set_value = card_object.coordinates_unplayable,
-                        ignore_assertion = False,
-                        clear_cache = True,
-                        )
+                card_object.set_coordinates_expected(
+                    set_value = coordinates_position,
+                    ignore_assertion = False,
+                    clear_cache = True,
+                    )
+                card_object.update_coordinates_state(
+                    clear_cache = True,
+                    )
                 
                 # Calculating hover coordinate x:
                 coordinate_x_hover_shift: int = SETTINGS.LOCATION_HAND_HOVER_SHIFT_COORDINATE_X
