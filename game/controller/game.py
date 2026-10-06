@@ -71,16 +71,13 @@ class Game:
         self.__cursor_release_coordinate_x: int = 0
         self.__cursor_release_coordinate_y: int = 0
         
-        # Hit attributes:
-        self.__hit_area: area.Area | None = None
-        self.__hit_cards: list[Card] = []
+        # Area attributes:
+        self.__area_hover: area.Area | None = None
         
         # Card hover and select attributes:
         self.__card_hover: Card | None = None
+        self.__card_hover_list: list[Card] = []
         self.__card_select: Card | None = None
-        self.__card_drag: Card | None = None
-        self.__card_press: Card | None = None
-        self.__card_release: Card | None = None
         
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -193,8 +190,8 @@ class Game:
         self.__cursor_coordinate_y: int = 0
         
         # Hit attributes:
-        self.__hit_area: area.Area | None = None
-        self.__hit_cards: list[Card] = []
+        self.__area_hover: area.Area | None = None
+        self.__card_hover_list: list[Card] = []
         
         # Card hover and select attributes:
         self.__card_hover: Card | None = None
@@ -473,6 +470,12 @@ class Game:
         return loc_controller_list
     
     
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        SURFACE CONTROLLERS PROPERTY LINKS
+    
+    """
+    
+    
     @property
     def surface_controller(self) -> surface.Surface:
         return self.__surface_controller
@@ -692,23 +695,6 @@ class Game:
         if event_object in self.__events:
             self.__events.remove(
                 event_object
-                )
-        
-
-    def remove_event_scan(self) -> None:
-        
-        # Collecting events that finished running:
-        event_remove_list: list[event.Event] = []
-        for event_object in self.events_finished:
-            if event_object.finished:
-                event_remove_list.append(
-                    event_object
-                    )
-        
-        # Calling remove event method on each finished event:
-        for event_object in event_remove_list:
-            self.remove_event(
-                event_object = event_object
                 )
         
     
@@ -1076,7 +1062,7 @@ class Game:
         
         # Checking if all cards are visible:
         force_stop: bool = True
-        if self.hit_area == area.AREA_DECK_CONTAINER:
+        if self.area_hover == area.AREA_DECK_CONTAINER:
             force_stop = False
         else:
             for player_controller in self.__player_controllers:
@@ -1676,19 +1662,19 @@ class Game:
 
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        HIT AREA PROPERTIES AND METHODS
+        AREA HOVER PROPERTIES AND METHODS
     
     """
     
     
     @property
-    def hit_area(self) -> area.Area:
+    def area_hover(self) -> area.Area:
         
         # Returning:
-        return self.__hit_area
+        return self.__area_hover
     
     
-    def set_hit_area(self, set_value: area.Area, ignore_assertion: bool = False) -> None:
+    def set_area_hover(self, set_value: area.Area, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -1699,116 +1685,21 @@ class Game:
                 )
 
         # Updating attribute:
-        self.__hit_area = set_value
+        self.__area_hover = set_value
         
     
-    def update_hit_area(self) -> None:
+    def __find_area_hover(self) -> None:
         
         # Locating hit area:
-        hit_area: area.Area = self.surface_controller.locate_area(
+        area_hover: area.Area = self.surface_controller.locate_area(
             coordinates = self.cursor_coordinates,
             ignore_assertion = False,
             )
         
         # Updating attribute:
-        if hit_area != self.hit_area:
-            self.set_hit_area(
-                set_value = hit_area,
-                ignore_assertion = True,
-                )
-        
-        
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        HIT CARDS PROPERTIES AND METHODS
-    
-    """
-    
-    
-    @property
-    def hit_cards(self) -> list[Card]:
-        
-        # Returning:
-        return self.__hit_cards
-    
-    
-    @property
-    def hit_cards_count(self) -> int:
-        
-        # Calculating:
-        hit_card_count: int = len(self.hit_cards)
-        
-        # Returning:
-        return hit_card_count
-    
-    
-    def set_hit_cards(self, set_value: list[Card], ignore_assertion: bool = False) -> None:
-
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            
-            # Asserting value is valid type:
-            assertion.assert_value_type(
-                check_value = set_value,
-                check_type = list,
-                raise_error = True,
-                )
-            
-            # Asserting container's items:
-            hit_cards_list: list[Card] = set_value
-            hit_cards_count: int = len(hit_cards_list)
-            if hit_cards_count > 0:
-                for card_object in hit_cards_list:
-                    validate.validate_card_object(
-                        validate_value = card_object,
-                        )
-
-        # Updating attribute:
-        self.__hit_cards: list[Card] = set_value
-        
-    
-    def update_hit_cards(self) -> None:
-        
-        # Preparing empty list:
-        hit_cards_temp: list[Card] = []
-    
-        # Running check if hit area is set:
-        if self.hit_area is not None:
-            
-            # Preparing variables:
-            hit_area_selected: tuple[Card, ...] = self.cards_area_index.get(self.hit_area, None)
-            
-            # Running loop:
-            hit_cards_temp: list[Card] = []
-            if self.hit_area is not None:
-                for card_object in hit_area_selected:
-                    hit_card: bool = card_object.hit_boundary(
-                        hit_coordinates = self.cursor_coordinates,
-                        )
-                    
-                    # Adding card object to temporary list:
-                    if hit_card:
-                        hit_cards_temp.append(
-                            card_object,
-                            )
-            
-        # Updating attribute:
-        self.__hit_cards = hit_cards_temp
-        
-        # Checking if deck container was reached:
-        deck_cards_count: int = len(self.__hit_cards)
-        deck_hover: bool = bool(
-            deck_cards_count > 1 and self.hit_area == area.AREA_DECK
-                or self.hit_area == area.AREA_DECK_CONTAINER
-            )
-        
-        # Handling deck hover state animation:
-        deck_area_list: tuple[area.Area, ...] = (
-            area.AREA_DECK_CONTAINER, 
-            area.AREA_DECK
-            )
-        if self.hit_area in deck_area_list:
-            self.set_deck_hover(
-                set_value = deck_hover,
+        if area_hover != self.area_hover:
+            self.set_area_hover(
+                set_value = area_hover,
                 ignore_assertion = True,
                 )
             
@@ -1825,6 +1716,70 @@ class Game:
         # Returning:
         return self.__card_hover
 
+        
+        
+    @property
+    def card_hover_list(self) -> list[Card]:
+        
+        # Returning:
+        return self.__card_hover_list
+    
+    
+    @property
+    def card_hover_count(self) -> int:
+        
+        # Calculating:
+        card_hover_count: int = len(self.card_hover_list)
+        
+        # Returning:
+        return card_hover_count
+    
+    
+    def __update_card_hover_list(self) -> None:
+        
+        # Preparing empty list:
+        card_hover_list_temp: list[Card] = []
+    
+        # Running check if hit area is set:
+        if self.area_hover is not None:
+            
+            # Preparing variables:
+            area_hover_selected: tuple[Card, ...] = self.cards_area_index.get(self.area_hover, None)
+            
+            # Running loop:
+            card_hover_list_temp: list[Card] = []
+            if self.area_hover is not None:
+                for card_object in area_hover_selected:
+                    card_hover: bool = card_object.hit_boundary(
+                        hit_coordinates = self.cursor_coordinates,
+                        )
+                    
+                    # Adding card object to temporary list:
+                    if card_hover:
+                        card_hover_list_temp.append(
+                            card_object,
+                            )
+            
+        # Updating attribute:
+        self.__card_hover_list = card_hover_list_temp
+        
+        # Checking if deck container was reached:
+        card_hover_count: int = len(self.__card_hover_list)
+        deck_hover: bool = bool(
+            card_hover_count > 1 and self.area_hover == area.AREA_DECK
+                or self.area_hover == area.AREA_DECK_CONTAINER
+            )
+        
+        # Handling deck hover state animation:
+        deck_area_list: tuple[area.Area, ...] = (
+            area.AREA_DECK_CONTAINER, 
+            area.AREA_DECK
+            )
+        if self.area_hover in deck_area_list:
+            self.set_deck_hover(
+                set_value = deck_hover,
+                ignore_assertion = True,
+                )
 
     def set_card_hover(self, set_value: Card | None, release_previous: bool = True, ignore_assertion: bool = False) -> None:
 
@@ -1846,7 +1801,7 @@ class Game:
             area.AREA_OPPONENT,
             area.AREA_TABLE
             )
-        if self.hit_area in area_hover:
+        if self.area_hover in area_hover:
             if self.card_hover != set_value:
                 self.__card_hover = set_value
                 if set_value is not None:
@@ -1893,8 +1848,8 @@ class Game:
         card_hover: Card | None = None
         
         # Sorting hit cards list by hit boundary value:
-        if self.hit_cards_count > 0:
-            self.hit_cards.sort(
+        if self.card_hover_count > 0:
+            self.card_hover_list.sort(
                 key = lambda card_object: card_object.hit_boundary_value(
                     hit_coordinates = self.cursor_coordinates,
                     ignore_assertion = True,
@@ -1903,14 +1858,14 @@ class Game:
                 )
             
             # Selecting card:
-            card_hover: Card = self.hit_cards[0]
+            card_hover: Card = self.card_hover_list[0]
             
         # Checking release state:
         release_previous = False
         if self.card_hover is not None and self.card_hover != card_hover:
             release_previous = True
         
-        # Updating attribute:
+        # Updating card hover attribute:
         if card_hover is None:
             self.set_card_hover(
                 set_value = card_hover,
@@ -1924,6 +1879,10 @@ class Game:
                     release_previous = release_previous,
                     ignore_assertion = True
                     )
+        
+        # Checking selected card:
+        if self.card_select is not None and self.card_select != card_hover:
+            self.remove_card_select()
                 
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1948,26 +1907,20 @@ class Game:
                     validate_value = set_value,
                     )
 
-        # If no card is currently set as selected:
-        if self.card_select is None:
-            self.__card_select = set_value
-
-        # If card is currently set as selected:
-        else:
-
-            # Releasing previous card, if required:
-            if release_previous and self.card_select is not None:
-                self.remove_card_select()
-
-            # Updating attribute:
-            self.__card_select = set_value
+        # Releasing previously set card:
+        if release_previous:
+            self.remove_card_select()
+            
+        # Updating attribute:
+        self.__card_select = set_value
+        if set_value is not None:
             self.__card_select.set_state_selected(
                 set_value = True,
                 ignore_assertion = True,
                 clear_cache = True,
                 )
-
-
+                
+                
     def remove_card_select(self) -> None:
         
         # Asserting card select is set:
@@ -2021,11 +1974,11 @@ class Game:
     def display_debug(self) -> None:
         
         # Player hand debug render:
-        if self.hit_area == area.AREA_PLAYER:
+        if self.area_hover == area.AREA_PLAYER:
             self.player_human.hand.display_debug()
             
         # Opponent hand debug render:
-        elif self.hit_area == area.AREA_OPPONENT:
+        elif self.area_hover == area.AREA_OPPONENT:
             self.player_computer.hand.display_debug()
     
     
@@ -2138,31 +2091,64 @@ class Game:
                 ignore_assertion = ignore_assertion,
                 )
 
-            # Remembering previous card hover:            
-            card_hover_prev: Card | None = self.card_hover
-            
-            # Updating hit areas, cards and hover card attributes:
-            self.update_hit_area()
-            self.update_hit_cards()
+            # Updating hover area and card attributes:
+            self.__find_area_hover()
+            self.__update_card_hover_list()
             self.update_card_hover()
             
     
-    def handle_mouse_press(self, cursor_press_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
+    def handle_mouse_press(self, cursor_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
     
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
             validate.validate_coordinate_container(
-                validate_value = cursor_press_coordinates,
+                validate_value = cursor_coordinates,
                 )
             
         # Updating cursor coordinates:
-        if cursor_press_coordinates != self.cursor_press_coordinates:
+        if cursor_coordinates != self.cursor_press_coordinates:
             self.set_cursor_press_coordinates(
-                set_value = cursor_press_coordinates,
+                set_value = cursor_coordinates,
                 ignore_assertion = ignore_assertion,
                 )
             
-            
+        # Checking if hovered card was clicked:
+        card_target_legal: bool = bool(
+            self.area_hover == area.AREA_PLAYER and
+            self.card_hover is not None and 
+            self.card_hover.hit_boundary(
+                hit_coordinates = cursor_coordinates,
+                ignore_assertion = False,
+                )
+            )
+        if card_target_legal:
+            card_select: Card = self.card_hover
+            if self.card_select is None:
+                self.set_card_select(
+                    set_value = card_select,
+                    release_previous = True,
+                    ignore_assertion = False,
+                    )
+            else:
+                if self.card_select == self.card_hover:
+                    self.remove_card_select()
+                
+    
+    
+    def handle_mouse_release(self, cursor_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_coordinate_container(
+                validate_value = cursor_coordinates,
+                )
+
+        # Updating cursor coordinates:
+        if cursor_coordinates != self.cursor_release_coordinates:
+            self.set_cursor_release_coordinates(
+                set_value = cursor_coordinates,
+                ignore_assertion = False,
+                )
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
