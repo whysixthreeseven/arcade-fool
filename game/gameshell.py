@@ -78,7 +78,19 @@ class Gameshell(arcade.Window):
             
 
     def on_mouse_press(self, coordinate_x, coordinate_y, button, modifiers):
-        ...     # TODO: Check documentation and implement!
+        
+        # Packing cursor coordinates:
+        cursor_coordinates: context.Coordinates = (
+            int(coordinate_x), 
+            int(coordinate_y)
+            )
+        
+        # Handling event:
+        if self.__gc.user_mouse_enabled:
+            self.__gc.handle_mouse_press(
+                cursor_coordinates = cursor_coordinates,
+                ignore_assertion = False
+                )
         
     
     def on_mouse_leave(self, coordinate_x, coordinate_y):
