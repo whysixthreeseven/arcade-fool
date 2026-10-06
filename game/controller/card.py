@@ -2751,9 +2751,17 @@ class CardController:
     @cached_property
     def render_tilt_random(self) -> int:
         
+        # Preparing variables:
+        tilt_angle_min: int = SETTINGS.CARD_RENDER_TILT_RANDOM_MIN
+        tilt_angle_max: int = SETTINGS.CARD_RENDER_TILT_RANDOM_MAX
+        tilt_angle_axis_list: tuple[int, int] = SETTINGS.CARD_RENDER_TILT_AXIS_LIST
+        
         # Generating a new random tilt angle:
-        tilt_axis: int = random.choice(SETTINGS.CARD_RENDER_TILT_AXIS_LIST)
-        tilt_angle_selected: int = random.randint(SETTINGS.CARD_RENDER_TILT_RANDOM_MIN, SETTINGS.CARD_RENDER_TILT_RANDOM_MAX)
+        tilt_axis: int = random.choice(tilt_angle_axis_list)
+        tilt_angle_selected: int = random.randint(
+            tilt_angle_min,
+            tilt_angle_max
+            )
         tilt_angle_random: int = tilt_axis * tilt_angle_selected
         
         # Returning:
@@ -2762,28 +2770,51 @@ class CardController:
     
     @cached_property
     def render_tilt_arch(self) -> int:
+        """
+        Generates a tilt angle based on card's position on screen in relation to the center of the main surface area (namely, hand).
+        Uses distance to coordinate center ratio to determine the angle between arch min and max values available in `SETTINGS` 
+        instance.
         
-        # Preparing links:
+        If generated value is less than `SETTINGS.CARD_RENDER_TILT_ARCH_THRESHOLD`, it is set to 
+        `SETTINGS.CARD_RENDER_TILT_ARCH_MIN` (defaults to 0) to ensure more cards in the middle of the hand are not affected by
+        this tilt.
+        
+        Used exclusively in hover states in Player's and Opponent's `HandController` container.
+        
+        Reset on coordinates position and current change.
+                
+        Cached with `functools` module's `cached_property` decorator. Can be flushed via `utilities.scripts.cache` module's
+        `clear_cached_property` function, or cache-management methods available to this class, or with `clear_cache` parameter
+        in its setter method.
+        
+        Returns
+        -------
+        render_tilt_arch : `int`
+            Card object's arch-style tilt angle.
+        """
+        
+        # Preparing links and variables:
         tilt_min: int = SETTINGS.CARD_RENDER_TILT_ARCH_MIN
         tilt_max: int = SETTINGS.CARD_RENDER_TILT_ARCH_MAX
         tilt_threshold: int = SETTINGS.CARD_RENDER_TILT_ARCH_THRESHOLD
-        
-        # Preparing calculation variables:
         area_coordinate_x_center: int = SETTINGS.LOCATION_HAND_CENTER_COORDINATE_X
         distance_max: int = int(SETTINGS.AREA_PLAYER_WIDTH / 2)
-        distance_min: int = 0
         
         # Calculating distance values:
         distance_from_center: int = abs(self.coordinate_x - area_coordinate_x_center)
         distance_ratio: float = float(distance_from_center / distance_max)
 
-        # Calculating tilt axis and magnitude:
+        # Calculating tilt axis and reverting it for opponent:
         tilt_axis: int = -1 if self.coordinate_x < area_coordinate_x_center else +1
-        if self.location == context.CARD_LOCATION.OPPONENT:
+        if self.location == context.CARD_LOCATION.OPPONENT: 
             tilt_axis *= -1
+            
+        # Calculating tilt magnitude and bringing it to minimum value if threshold was not reached:
         tilt_magnitude: int = int(tilt_min + (tilt_max - tilt_min) * distance_ratio)
         if tilt_magnitude <= tilt_threshold:
             tilt_magnitude = tilt_min
+            
+        # Adjusting tilt value with tilt axis and opponent's base tilt value:
         tilt_value: int = tilt_magnitude * tilt_axis
         if self.location == context.CARD_LOCATION.OPPONENT:
             tilt_value = self.render_tilt_opp + tilt_value
