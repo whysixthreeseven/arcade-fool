@@ -2301,10 +2301,7 @@ class CardController:
         else:
             coordinate_y_selected: int = self.coordinate_y
             if self.location == context.CARD_LOCATION.OPPONENT:
-                if not self.state_playable:
-                    coordinate_y_selected = self.coordinate_y_unplayable
-                else:
-                    coordinate_y_selected = self.coordinate_y_position
+                coordinate_y_selected = self.coordinate_y_position
             boundary: int = int(
                 coordinate_y_selected + 
                 self.render_height / 2
@@ -2769,6 +2766,7 @@ class CardController:
         # Preparing links:
         tilt_min: int = SETTINGS.CARD_RENDER_TILT_ARCH_MIN
         tilt_max: int = SETTINGS.CARD_RENDER_TILT_ARCH_MAX
+        tilt_threshold: int = SETTINGS.CARD_RENDER_TILT_ARCH_THRESHOLD
         
         # Preparing calculation variables:
         area_coordinate_x_center: int = SETTINGS.LOCATION_HAND_CENTER_COORDINATE_X
@@ -2784,6 +2782,8 @@ class CardController:
         if self.location == context.CARD_LOCATION.OPPONENT:
             tilt_axis *= -1
         tilt_magnitude: int = int(tilt_min + (tilt_max - tilt_min) * distance_ratio)
+        if tilt_magnitude <= tilt_threshold:
+            tilt_magnitude = tilt_min
         tilt_value: int = tilt_magnitude * tilt_axis
         if self.location == context.CARD_LOCATION.OPPONENT:
             tilt_value = self.render_tilt_opp + tilt_value
