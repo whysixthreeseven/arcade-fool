@@ -1312,6 +1312,7 @@ class CardController:
                 "render_rect",
                 "render_rect_boundary",
                 "state_idle",
+                "render_tilt_arch",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -1413,6 +1414,7 @@ class CardController:
                 "render_rect",
                 "render_rect_boundary",                 
                 "state_idle",
+                "render_tilt_arch",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -1505,6 +1507,7 @@ class CardController:
                 "render_rect",
                 "render_rect_boundary",
                 "state_idle",
+                "render_tilt_arch",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -1565,7 +1568,8 @@ class CardController:
                 "coordinate_x_position",
                 "coordinate_x_unplayable",
                 "coordinates_position",
-                "coordinates_unplayable"
+                "coordinates_unplayable",
+                "render_tilt_arch",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -1590,7 +1594,8 @@ class CardController:
                 "coordinate_y_position",
                 "coordinate_y_unplayable",
                 "coordinates_position",
-                "coordinates_unplayable"
+                "coordinates_unplayable",
+                "render_tilt_arch",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -2577,8 +2582,14 @@ class CardController:
     @cached_property
     def render_alpha(self) -> int:
         
+        # Choosing based on state:
+        if self.state_faded:
+            render_alpha: int = self.render_alpha_faded
+        else:
+            render_alpha: int = self.render_alpha_default
+        
         # Returning:
-        return self.__render_alpha
+        return render_alpha
     
     
     @cached_property
@@ -2745,11 +2756,40 @@ class CardController:
         
         # Generating a new random tilt angle:
         tilt_axis: int = random.choice(SETTINGS.CARD_RENDER_TILT_AXIS_LIST)
-        tilt_angle_selected: int = random.randint(SETTINGS.CARD_RENDER_TILT_MIN, SETTINGS.CARD_RENDER_TILT_MAX)
+        tilt_angle_selected: int = random.randint(SETTINGS.CARD_RENDER_TILT_RANDOM_MIN, SETTINGS.CARD_RENDER_TILT_RANDOM_MAX)
         tilt_angle_random: int = tilt_axis * tilt_angle_selected
         
         # Returning:
         return tilt_angle_random
+    
+    
+    @cached_property
+    def render_tilt_arch(self) -> int:
+        
+        # Preparing links:
+        tilt_min: int = SETTINGS.CARD_RENDER_TILT_ARCH_MIN
+        tilt_max: int = SETTINGS.CARD_RENDER_TILT_ARCH_MAX
+        
+        # Preparing calculation variables:
+        area_coordinate_x_center: int = SETTINGS.LOCATION_HAND_CENTER_COORDINATE_X
+        distance_max: int = int(SETTINGS.AREA_PLAYER_WIDTH / 2)
+        distance_min: int = 0
+        
+        # Calculating distance values:
+        distance_from_center: int = abs(self.coordinate_x - area_coordinate_x_center)
+        distance_ratio: float = float(distance_from_center / distance_max)
+
+        # Calculating tilt axis and magnitude:
+        tilt_axis: int = -1 if self.coordinate_x < area_coordinate_x_center else +1
+        if self.location == context.CARD_LOCATION.OPPONENT:
+            tilt_axis *= -1
+        tilt_magnitude: int = int(tilt_min + (tilt_max - tilt_min) * distance_ratio)
+        tilt_value: int = tilt_magnitude * tilt_axis
+        if self.location == context.CARD_LOCATION.OPPONENT:
+            tilt_value = self.render_tilt_opp + tilt_value
+
+        # Returning:
+        return tilt_value
     
     
     def set_render_tilt(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -3207,10 +3247,13 @@ class CardController:
         
         # Clearing cache:
         if clear_cache:
-            cached_property: str = "state_faded"
-            cache.clear_cached_property(
+            cached_property_list: tuple[str, ...] = (
+                "state_faded",
+                "render_alpha",
+                )
+            cache.clear_cached_property_list(
                 target_object = self,
-                target_attribute = cached_property
+                target_attribute_list = cached_property_list
                 )
             
     
@@ -4038,12 +4081,24 @@ class CardController:
             
         # Adjusting tilt (Opponent):
         if self.location == context.CARD_LOCATION.OPPONENT:
-            if self.render_tilt != self.render_tilt_opp:
-                self.transition_render_tilt(
-                    target_value = self.render_tilt_opp,
-                    ignore_assertion = False,
-                    clear_cache = True
-                    )
+            
+            # Hovered state:
+            if self.state_hovered:
+                if self.render_tilt != self.render_tilt_arch:
+                    self.transition_render_tilt(
+                        target_value = self.render_tilt_arch,
+                        ignore_assertion = False,
+                        clear_cache = True
+                        )
+                    
+            # Default state:
+            else:
+                if self.render_tilt != self.render_tilt_opp:
+                    self.transition_render_tilt(
+                        target_value = self.render_tilt_opp,
+                        ignore_assertion = False,
+                        clear_cache = True
+                        )
                 
         # Adjusting tilt (Table):
         elif self.location == context.CARD_LOCATION.TABLE:
@@ -4054,23 +4109,33 @@ class CardController:
                     clear_cache = True
                     )
                 
-        # Adjusting tilt (Player)
+        # Adjusting tilt (Opponent):
         elif self.location == context.CARD_LOCATION.PLAYER:
             
-            # State selected:
+            # Not selected:
             if not self.state_selected:
-                if self.render_tilt != self.render_tilt_default:
-                    self.transition_render_tilt(
-                        target_value = self.render_tilt_default,
-                        ignore_assertion = False,
-                        clear_cache = True
-                        )
+                
+                # Hovered state:
+                if self.state_hovered:
+                    if self.render_tilt != self.render_tilt_arch:
+                        self.transition_render_tilt(
+                            target_value = self.render_tilt_arch,
+                            ignore_assertion = False,
+                            clear_cache = True
+                            )
+                else:
+                    if self.render_tilt != self.render_tilt_default:
+                        self.transition_render_tilt(
+                            target_value = self.render_tilt_default,
+                            ignore_assertion = False,
+                            clear_cache = True
+                            )
                     
             # Default state:
             else:
-                if self.render_tilt != self.render_tilt_random:
+                if self.render_tilt != self.render_tilt_default:
                     self.transition_render_tilt(
-                        target_value = self.render_tilt_random,
+                        target_value = self.render_tilt_default,
                         ignore_assertion = False,
                         clear_cache = True
                         )
@@ -4198,7 +4263,6 @@ class CardController:
             )
         location_playable: tuple[str, ...] = (
             context.CARD_LOCATION.PLAYER, 
-            context.CARD_LOCATION.OPPONENT, 
             )
         
         # Selected state:
