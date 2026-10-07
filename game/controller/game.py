@@ -13,10 +13,9 @@ from game import context
 
 # Cache management:
 from functools import cached_property
-from game.utilities.scripts import cache
 
 # Various utilities:
-from game.utilities import event, keymap, texturepack
+from game.utilities import coordinates, event, keymap, texturepack
 from game.utilities.screen import area, scene, surface
 from game.utilities.scripts import assertion, validate
 
@@ -1097,6 +1096,56 @@ class Game:
                     self.remove_event(
                         event_object = event_object,
                         )
+                    
+                    
+    def __update_event_trump_compare_in(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+
+        # Preparing variables:
+        coordinates_index: dict[str, context.Coordinates] = coordinates.EVENT_TRUMP_SLIDE_COORDINATES 
+        card_highest_index: dict[str, Card | None] = {}
+        
+        # Looping through player controllers:
+        for player_controller in self.__player_controllers:
+            
+            # Adding controller type (Human or Computer) to dictionary index:
+            if player_controller.type not in card_highest_index:
+                card_highest_index[player_controller.type] = None
+                
+            # Searching for trump cards and comparing their value with stored:
+            for card_object in player_controller.hand.cards:
+                if card_object.trump:
+                    if card_highest_index[player_controller.type] is None:
+                        card_highest_index[player_controller.type] = card_object
+                    else:
+                        if card_highest_index[player_controller.type].value < card_object.value:
+                            card_highest_index[player_controller.type] = card_object
+            
+            # Updating card's attributes:
+            if card_highest_index[player_controller.type] is not None:
+                card_highest: Card = card_highest_index[player_controller.type]
+                
+                # Updating card's expected coordinates:
+                coordinates_slide: context.Coordinates = coordinates_index[player_controller.type]
+                if card_highest.coordinate_x_expected != coordinates_slide:
+                    card_highest.set_coordinates_expected(
+                        set_value = coordinates_slide,
+                        ignore_assertion = True,
+                        clear_cache = True
+                        )
+                
+                # Updating revealed and known states:
+                if not card_highest.state_revealed:
+                    card_highest.set_state_revealed(                # Relevant for the event
+                        set_value = True,
+                        ignore_assertion = False,
+                        clear_cache = True,
+                        )
+                if not card_highest.state_known:
+                    card_highest.set_state_known(                   # Relevant for SESSION's game mode
+                        set_value = True,
+                        ignore_assertion = False,
+                        clear_cache = True,
+                        )
         
         
     @cached_property
@@ -1829,7 +1878,7 @@ class Game:
                 ignore_assertion = True,
                 clear_cache = True,
                 )
-    
+            
 
     def remove_card_hover(self) -> None:
 
@@ -2105,8 +2154,80 @@ class Game:
                     ignore_assertion = ignore_assertion,
                     clear_cache = True,
                     )
+                
     
+    def perform_trump_compare(self) -> None:
+        
+        # Preparing variables:
+        coordinates_index: dict[str, context.Coordinates] = coordinates.EVENT_TRUMP_SLIDE_COORDINATES 
+        card_highest_index: dict[str, Card | None] = {}
+        
+        # Looping through player controllers:
+        for player_controller in self.__player_controllers:
             
+            # Adding controller type (Human or Computer) to dictionary index:
+            player_type: str = player_controller.type
+            if player_controller.type not in card_highest_index:
+                card_highest_index[player_type] = None
+                
+            # Searching for trump cards and comparing their value with stored:
+            for card_object in player_controller.hand.cards:
+                card_previous: Card | None = card_highest_index[player_type]
+                if card_object.trump:
+                    if card_previous is None:
+                        card_highest_index[player_type] = card_object
+                    else:
+                        if card_previous.value < card_object.value:
+                            card_highest_index[player_type] = card_object
+            
+            # Updating card's attributes:
+            if card_highest_index[player_type] is not None:
+                card_highest: Card = card_highest_index[player_type]
+                
+                # Updating card's expected coordinates:
+                coordinates_slide: context.Coordinates = coordinates_index[player_type]
+                if card_highest.coordinate_x_expected != coordinates_slide:
+                    card_highest.set_coordinates_expected(
+                        set_value = coordinates_slide,
+                        ignore_assertion = True,
+                        clear_cache = True
+                        )
+                
+                # Updating revealed and known states:
+                if not card_highest.state_revealed:
+                    card_highest.set_state_revealed(                # Relevant for the event
+                        set_value = True,
+                        ignore_assertion = False,
+                        clear_cache = True,
+                        )
+                if not card_highest.state_known:
+                    card_highest.set_state_known(                   # Relevant for SESSION's game mode
+                        set_value = True,
+                        ignore_assertion = False,
+                        clear_cache = True,
+                        )
+                    
+                # Removing player control:
+                if not card_highest.state_controlled:
+                    card_highest.state_controlled(
+                        set_value = False,
+                        ignore_assertion = False,
+                        clear_cache = True,
+                        )
+                    
+        # Preparing compare variables:
+        card_player: Card | None = card_highest_index[self.player_human.type]
+        card_opponent: Card | None = card_highest_index[self.player_computer.type]
+        player_attacking: PlayerController = None
+        player_defending: PlayerController = None
+        
+        # If both players have a trump card available:
+        if card_player is not None and card_opponent is not None:
+            if card_player.value > card_opponent.value:
+                ...
+                
+                
+                
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         HANDLE MOUSE METHODS
     
@@ -2158,18 +2279,42 @@ class Game:
                 ignore_assertion = False,
                 )
             )
+    
+        # Confirming legal selection:
         if card_target_legal:
             card_select: Card = self.card_hover
+            
+            # Selecting card:
             if self.card_select is None:
                 self.set_card_select(
                     set_value = card_select,
                     release_previous = True,
                     ignore_assertion = False,
                     )
+                
+            # Confirming selecting and playing card:
             else:
                 if self.card_select == self.card_hover:
-                    self.remove_card_select()
-                
+                    
+                    # Choosing location index for card played:
+                    if self.player_human.state_attacking:
+                        location_index = self.table.get_position_attack(
+                            card_object = self.card_select,
+                            ignore_assertion = ignore_assertion,
+                            )
+                    else:
+                        location_index = self.table.get_position_defence(
+                            card_object = self.card_select,
+                            ignore_assertion = ignore_assertion,
+                            )
+                        
+                    # Calling play method:
+                    self.perform_player_play(
+                        player_controller = self.player_human,
+                        card_object = self.card_select,
+                        location_index = location_index,
+                        ignore_assertion = ignore_assertion,
+                        )
     
     
     def handle_mouse_release(self, cursor_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
