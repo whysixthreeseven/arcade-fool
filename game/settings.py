@@ -17,7 +17,7 @@ class __SETTINGS:
     APP_NAME: str = "Arcade Fool"
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_STARTED: str = "2026.09.02"                                     # Date of project start (reboot)
-    APP_UPDATED: str = "2026.10.06"                                     # Date of last edit
+    APP_UPDATED: str = "2026.10.07"                                     # Date of last edit
     APP_VERSION: str = f"0.0.{APP_UPDATED.replace(".", "")}"            # Version in A.B.YYYYMMDD format
     APP_AUTHOR: str = "Andrey Vostokov"
 
