@@ -64,34 +64,6 @@ class TableController:
             "cards_index",
             "cards_count",
             "cards_value",
-            "cards_playable",
-            )
-        
-        # Returning:
-        return cached_property_list
-    
-    
-    @cached_property
-    def __cached_position_attributes(self) -> tuple[str, ...]:
-        """
-        Position-related cached properties list.
-        
-        Collects and returns all properties of this table object decorated with `functools` library's `cached_property` wrapper.
-        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
-        setter.
-        
-        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
-        
-        Returns
-        -------
-        cached_property_list : `tuple[str, ...]`
-            A tuple collection of related cached properties.
-        """
-        
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "position_attack_list",
-            "position_defence_list",
             )
         
         # Returning:
@@ -113,21 +85,6 @@ class TableController:
             )
         
     
-    def clear_cached_position_attributes(self) -> None:
-        """
-        Clears all public cached position properties of this table object.
-        
-        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
-        clear texturepack properties of this table object.
-        """
-    
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_position_attributes
-            )
-        
-    
     def clear_cached_attributes(self) -> None:
         """
         Clears all public cached properties of this table object.
@@ -139,7 +96,6 @@ class TableController:
         # Collecting cached properties:
         cached_property_list_collection: tuple[tuple[str, ...], ...] = (
             self.__cached_cards_attributes,
-            self.__cached_position_attributes,
             )
         
         # Looping throught the list and clearing cache:
@@ -235,18 +191,6 @@ class TableController:
 
         # Returning:
         return cards_value
-    
-    
-    @cached_property
-    def cards_playable(self) -> tuple[str, ...]:
-        
-        # Collecting all card names:
-        card_name_list: tuple[str, ...] = tuple(
-            card_object.name for card_object in self.cards
-            )
-        
-        # Returning:
-        return card_name_list
     
     
     def add_card(self, card_object: Card, location_index: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -383,79 +327,6 @@ class TableController:
         return cards_pending_removal
         
             
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        POSITIONS CACHED PROPERTIES AND METHODS
-    
-    """
-    
-    
-    @cached_property
-    def position_attack_list(self) -> tuple[int, ...]:
-        
-        # Searching for empty positions on bottom stack:
-        position_list: tuple[int, ...] = tuple(
-            position_index for position_index, card_object in self.cards_index.items()
-                if position_index % 2 == 0 and card_object is not None      # Bottom stack is empty
-            )
-        
-        # Returning:
-        return position_list
-    
-    
-    @cached_property
-    def position_defence_list(self) -> tuple[int, ...]:
-        
-        # Searching for empty positions on top stack:
-        position_list: tuple[int, ...] = tuple(
-            position_index for position_index, card_object in self.cards_index.items()
-                if position_index % 2 == 0 and card_object is not None      # Bottom stack has cards
-                    and self.cards_index[position_index + 1] is None        # Top stack is empty
-            )
-        
-        # Returning:
-        return position_list
-    
-    
-    def get_position_attack(self, card_object: Card, ignore_assertion: bool = False) -> int | None:
-
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            validate.validate_card_object(
-                validate_value = card_object
-                )
-
-        # Returning empty bottom stack position:
-        if self.position_defence_list:
-            return self.position_defence_list[0]
-        
-        # Returning None, if not available:
-        else:
-            return None
-        
-    
-    def get_position_defence(self, card_object: Card, ignore_assertion: bool = False) -> int | None:
-        
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            validate.validate_card_object(
-                validate_value = card_object
-                )
-        
-        # Searching for position:
-        position_defence: int | None = None
-        if self.position_defence_list:
-            for card_location_index in self.position_defence_list:
-                card_attacking: Card | None = self.cards_index[card_location_index]
-                
-                # Checking if card is attacking and can be defended against:
-                if card_attacking is not None and card_object > card_attacking:
-                    position_defence: int = card_location_index
-                    break
-        
-        # Returning:
-        return position_defence
-    
-    
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         UPDATE METHODS
     
