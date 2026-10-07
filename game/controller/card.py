@@ -95,6 +95,7 @@ class CardController:
         self.__state_playable: bool = False
         self.__state_known: bool = False
         self.__state_return: bool = False
+        self.__state_controlled: bool = False
         
         # Play location and index:
         self.__location: str = None
@@ -3064,7 +3065,7 @@ class CardController:
     def state_idle(self) -> bool:
         
         # Checking:
-        state_idle: bool = bool(self.coordinates == self.coordinates_expected)
+        state_idle: bool = True if self.coordinates == self.coordinates_expected else False
 
         # Returning:
         return state_idle
@@ -3089,6 +3090,13 @@ class CardController:
         
         # Returning:
         return self.__state_return
+    
+    
+    @cached_property
+    def state_controlled(self) -> bool:
+        
+        # Returning:
+        return self.__state_controlled
     
     
     def reset_state_global(self, clear_cache: bool = True) -> None:
@@ -3429,6 +3437,40 @@ class CardController:
                 )
             
     
+    def set_state_controlled(self, set_value: bool, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value,
+                )
+
+        # Updating attribute:
+        self.__state_controlled = set_value
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "state_controlled"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+    
+    
+    def switch_state_controlled(self, clear_cache: bool = True) -> None:
+        
+        # Updating attribute:
+        self.__state_controlled = not self.__state_controlled
+
+        # Clearing cache:
+        if clear_cache:
+            cached_property: str = "state_controlled"
+            cache.clear_cached_property(
+                target_object = self,
+                target_attribute = cached_property
+                )
+            
+    
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         LOCATION-BASED STATE CACHED PROPERTIES AND METHODS
         
@@ -3459,8 +3501,10 @@ class CardController:
         # Checking other cases:
         else:
             if self.location == context.CARD_LOCATION.OPPONENT:
-                if self.state_known and SESSION.GAME_MODE_REVEAL:
-                    state_revealed = True
+                state_revealed: bool = bool(
+                    all((self.state_known, SESSION.GAME_MODE_REVEAL)) 
+                    or SESSION.ENABLE_REVEAL
+                    )
             elif self.location == context.CARD_LOCATION.DECK:
                 if self.location_index == 0 or (self.location_index == 1 and SESSION.GAME_MODE_SECRET):
                     state_revealed = True
@@ -4281,6 +4325,7 @@ class CardController:
         clear_cache : `bool` = `True`
             If set to True, clears cached properties and attributes.
         """
+        
         
         # Preparing allowed states in location lists: 
         location_select: tuple[str, ...] = (
