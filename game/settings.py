@@ -17,7 +17,7 @@ class __SETTINGS:
     APP_NAME: str = "Arcade Fool"
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_STARTED: str = "2026.09.02"                                     # Date of project start (reboot)
-    APP_UPDATED: str = "2026.10.07"                                     # Date of last edit
+    APP_UPDATED: str = "2026.10.08"                                     # Date of last edit
     APP_VERSION: str = f"0.0.{APP_UPDATED.replace(".", "")}"            # Version in A.B.YYYYMMDD format
     APP_AUTHOR: str = "Andrey Vostokov"
 
@@ -78,7 +78,7 @@ class __SETTINGS:
     
     # Area (main) dimensions settings:
     __AREA_HAND_WIDTH: int = __AREA_MAIN_WIDTH
-    __AREA_HAND_HEIGHT: int = int(CARD_TEXTURE_HEIGHT * 1.55)
+    __AREA_HAND_HEIGHT: int = int(CARD_TEXTURE_HEIGHT * 1.75)
     AREA_PLAYER_WIDTH: int = __AREA_HAND_WIDTH
     AREA_PLAYER_HEIGHT: int = __AREA_HAND_HEIGHT
     AREA_TABLE_WIDTH: int = __AREA_HAND_WIDTH
@@ -164,9 +164,9 @@ class __SETTINGS:
     LOCATION_HAND_CENTER_COORDINATE_X: int = AREA_PLAYER_CENTER_COORDINATE_X
     LOCATION_HAND_CENTER_COORDINATE_Y: int = AREA_PLAYER_CENTER_COORDINATE_Y
     LOCATION_HAND_HOVER_SHIFT_COORDINATE_X: int = 0
-    LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.10)
+    LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.30)
     LOCATION_HAND_SELECT_SHIFT_COORDINATE_X: int = 0
-    LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.30)
+    LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.40)
     LOCATION_HAND_UNPLAYABLE_SHIFT_COORDINATE_X: int = 0
     LOCATION_HAND_UNPLAYABLE_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.10)
     
