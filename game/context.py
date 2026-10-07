@@ -425,8 +425,8 @@ class EVENT_NAME:
     OPPONENT_REFILL: str = "Opponent refill"
     OPPONENT_SORT: str = "Opponent sort"
     OPPONENT_DRAW: str = "Opponent draw"
-    SLIDE_TRUMP_IN: str = "Slide trump in"
-    SLIDE_TRUMP_OUT: str = "Slide trump out"
+    TRUMP_COMPARE_IN: str = "Slide trump in"
+    TRUMP_COMPARE_OUT: str = "Slide trump out"
     TIMEOUT_1: str = "Timeout (1 second)"
     TIMEOUT_3: str = "Timeout (3 seconds)"
     TIMEOUT_5: str = "Timeout (5 seconds)"
@@ -455,8 +455,8 @@ EVENT_TYPE_INDEX: dict[str, str] = {
     EVENT_NAME.OPPONENT_REFILL: EVENT_TYPE.GAME,
     EVENT_NAME.OPPONENT_SORT: EVENT_TYPE.GAME,
     EVENT_NAME.OPPONENT_DRAW: EVENT_TYPE.GAME,
-    EVENT_NAME.SLIDE_TRUMP_IN: EVENT_TYPE.GAME,
-    EVENT_NAME.SLIDE_TRUMP_OUT: EVENT_TYPE.GAME,
+    EVENT_NAME.TRUMP_COMPARE_IN: EVENT_TYPE.GAME,
+    EVENT_NAME.TRUMP_COMPARE_OUT: EVENT_TYPE.GAME,
     EVENT_NAME.TIMEOUT_1: EVENT_TYPE.GLOBAL,
     EVENT_NAME.TIMEOUT_3: EVENT_TYPE.GLOBAL,
     EVENT_NAME.TIMEOUT_5: EVENT_TYPE.GLOBAL,
@@ -480,8 +480,8 @@ EVENT_DESCRIPTION_INDEX: dict[str, str] = {
     EVENT_NAME.OPPONENT_REFILL: "There is nothing here yet.",
     EVENT_NAME.OPPONENT_SORT: "There is nothing here yet.",
     EVENT_NAME.OPPONENT_DRAW: "There is nothing here yet.",
-    EVENT_NAME.SLIDE_TRUMP_IN: "There is nothing here yet.",
-    EVENT_NAME.SLIDE_TRUMP_OUT: "There is nothing here yet.",
+    EVENT_NAME.TRUMP_COMPARE_IN: "There is nothing here yet.",
+    EVENT_NAME.TRUMP_COMPARE_OUT: "There is nothing here yet.",
     EVENT_NAME.TIMEOUT_1: "There is nothing here yet.",
     EVENT_NAME.TIMEOUT_3: "There is nothing here yet.",
     EVENT_NAME.TIMEOUT_5: "There is nothing here yet.",
@@ -505,8 +505,8 @@ EVENT_CONDITION_INDEX: dict[str, str] ={
     EVENT_NAME.OPPONENT_REFILL: "Opponents's HandController card count is equal or greater than six cards",
     EVENT_NAME.OPPONENT_SORT: "Player's HandController sorted cards with random sort sequence",
     EVENT_NAME.OPPONENT_DRAW: "Opponent's HandController received a new Card object",
-    EVENT_NAME.SLIDE_TRUMP_IN: "Both players had a trump slide into TableController",
-    EVENT_NAME.SLIDE_TRUMP_OUT: "Both players had a trump slide back from TableController",
+    EVENT_NAME.TRUMP_COMPARE_IN: "Both players had a trump slide into TableController",
+    EVENT_NAME.TRUMP_COMPARE_OUT: "Both players had a trump slide back from TableController",
     EVENT_NAME.TIMEOUT_1: "One second elapsed",
     EVENT_NAME.TIMEOUT_3: "Three seconds elapsed",
     EVENT_NAME.TIMEOUT_5: "Five seconds elapsed",
@@ -530,8 +530,8 @@ EVENT_WAIT_INDEX: dict[str, bool] = {
     EVENT_NAME.OPPONENT_REFILL: True,
     EVENT_NAME.OPPONENT_SORT: True,
     EVENT_NAME.OPPONENT_DRAW: True,
-    EVENT_NAME.SLIDE_TRUMP_IN: True,
-    EVENT_NAME.SLIDE_TRUMP_OUT: True,
+    EVENT_NAME.TRUMP_COMPARE_IN: True,
+    EVENT_NAME.TRUMP_COMPARE_OUT: True,
     EVENT_NAME.TIMEOUT_1: True,
     EVENT_NAME.TIMEOUT_3: True,
     EVENT_NAME.TIMEOUT_5: True,
@@ -548,8 +548,8 @@ EVENT_TIMEOUT_INDEX: dict[str, float] = {
     EVENT_NAME.OPPONENT_REFILL: 0.00,
     EVENT_NAME.OPPONENT_SORT: 0.00,
     EVENT_NAME.OPPONENT_DRAW: 0.00,
-    EVENT_NAME.SLIDE_TRUMP_IN: 0.00,
-    EVENT_NAME.SLIDE_TRUMP_OUT: 0.00,
+    EVENT_NAME.TRUMP_COMPARE_IN: 0.00,
+    EVENT_NAME.TRUMP_COMPARE_OUT: 0.00,
     EVENT_NAME.TIMEOUT_1: 1.00,
     EVENT_NAME.TIMEOUT_3: 3.00,
     EVENT_NAME.TIMEOUT_5: 5.00,
