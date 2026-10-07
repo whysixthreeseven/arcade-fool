@@ -27,6 +27,7 @@ class __SESSION:
         self.__enable_assertion: bool = True
         self.__enable_debug: bool = True
         self.__enable_hint: bool = True
+        self.__enable_reveal: bool = True
         
         # Texture pack options:
         self.__texturepack_front_default: tp.TexturePack = tp.TEXTUREPACK_FRONT.LIGHT_2_1
@@ -62,6 +63,7 @@ class __SESSION:
             "ENABLE_ASSERTION",
             "ENABLE_DEBUG",
             "ENABLE_HINT",
+            "ENABLE_REVEAL",
             )
         
         # Returning:
@@ -201,6 +203,13 @@ class __SESSION:
         return self.__enable_hint
     
     
+    @cached_property
+    def ENABLE_REVEAL(self) -> bool:
+
+        # Returning:
+        return self.__enable_reveal
+    
+    
     def set_enable_assertion(self, set_value: bool, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
@@ -291,6 +300,38 @@ class __SESSION:
 
         # Clearing cache:
         cached_property: str = "ENABLE_HINT"
+        cache.clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+    
+    def set_enable_reveal(self, set_value: bool, ignore_assertion: bool = False) -> None:
+            
+        # Assertion control:
+        if not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value
+                )
+            
+        # Updating attribute:
+        self.__enable_reveal = set_value
+        
+        # Clearing cache:
+        cached_property: str = "ENABLE_REVEAL"
+        cache.clear_cached_property(
+            target_object = self,
+            target_attribute = cached_property
+            )
+        
+    
+    def switch_enable_reveal(self) -> None:
+                
+        # Switching:
+        self.__enable_assertion = not self.__enable_reveal
+
+        # Clearing cache:
+        cached_property: str = "ENABLE_REVEAL"
         cache.clear_cached_property(
             target_object = self,
             target_attribute = cached_property
