@@ -222,3 +222,16 @@ for location_index in __location_index_range:
         __coordinate_y_calc
         )
 
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    EVENT TRUMP SLIDE COORDINATES 
+
+"""
+
+
+# Generating coordinates dictionary index:
+EVENT_TRUMP_SLIDE_COORDINATES: dict[str, context.Coordinates] = {
+    context.PLAYER_TYPE.HUMAN: LOCATION_TABLE_COORDINATES_INDEX[4],
+    context.PLAYER_TYPE.COMPUTER: LOCATION_TABLE_COORDINATES_INDEX[7]
+    }
+
