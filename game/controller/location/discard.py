@@ -336,6 +336,33 @@ class DiscardController:
                 target_object = self,
                 target_attribute = cached_property
                 )
+            
+            
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        RENDER CACHED PROPERTIES
+    
+    """
+    
+    
+    @cached_property
+    def __render_rect(self) -> arcade.Rect:
+        
+        # Fetching coordinates:
+        rect_coordinate_x: int = SETTINGS.AREA_DISCARD_CENTER_COORDINATE_X
+        rect_coordinate_y: int = SETTINGS.AREA_DISCARD_CENTER_COORDINATE_Y
+        rect_length: int = SETTINGS.CARD_TEXTURE_WIDTH
+        rect_width: int = 1
+
+        # Populating collection list:
+        rect_object: arcade.Rect = arcade.XYWH(
+            x = rect_coordinate_x,
+            y = rect_coordinate_y,
+            width = rect_length,
+            height = rect_width,
+            )
+        
+        # Returning:
+        return rect_object
 
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -349,7 +376,17 @@ class DiscardController:
         # Calling display() method on all card objects:
         for card_object in self.cards:
             card_object.display()
+            
+            
+    def display_debug(self) -> None:
         
+        tilt_angle_list: tuple[int, int] = (-45, 45)
+        for tilt_angle in tilt_angle_list:
+            arcade.draw_rect_filled(
+                rect = self.__render_rect,
+                color = SETTINGS.RECT_DISCARD_COLOR_POSITION,
+                tilt_angle = tilt_angle
+                )
     
     
     def display_info(self, display_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
@@ -357,28 +394,6 @@ class DiscardController:
         THIS METHOD HAS NOT BEEN PROPERLY IMPLEMENTED AND IS FOR TEST USES ONLY!        
         """
         
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            ...     # TODO: Implement
-            
-        # Unpacking coordinates:
-        coordinate_x, coordinate_y = display_coordinates
-        
-        # Creating text object:
-        render_text: arcade.Text = arcade.Text(
-            text = "{num} {literal}".format(
-                num = self.cards_count,
-                literal = "cards" if self.cards_count > 1 or self.cards_count == 0 else "card"
-                ),
-            x = coordinate_x,
-            y = coordinate_y,
-            color = arcade.color.WHITE,
-            font_size = 24,
-            anchor_x = "center",
-            anchor_y = "center"
-            )
-        
-        # Displaying text:
-        render_text.draw()
+        ...
     
     
