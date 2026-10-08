@@ -15,7 +15,7 @@ from functools import cached_property
 from game.utilities.scripts import cache
 
 # Various utilities:
-from game.utilities import texturepack
+from game.utilities import coordinates, texturepack
 from game.utilities.scripts import validate
 
 
@@ -385,6 +385,42 @@ class TableController:
                 target_object = self,
                 target_attribute = cached_property
                 )
+            
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        RENDER CACHED PROPERTIES
+    
+    """
+    
+    
+    @cached_property
+    def __render_rect_collection(self) -> tuple[arcade.Rect, ...]:
+        
+        # Preparing variables:
+        rect_width: int = SETTINGS.CARD_TEXTURE_WIDTH
+        rect_height: int = SETTINGS.CARD_TEXTURE_HEIGHT
+        
+        # Populating collection list:
+        render_rect_collection: list[arcade.Rect] = []
+        for location_index, rect_coordinates in coordinates.LOCATION_TABLE_COORDINATES_INDEX.items():
+            rect_coordinate_x, rect_coordinate_y = rect_coordinates
+            
+            # Creating arcade.Rect objects and adding to temp list:
+            rect_object = arcade.XYWH(
+                x = rect_coordinate_x,
+                y = rect_coordinate_y,
+                width = rect_width,
+                height = rect_height,
+                )
+            render_rect_collection.append(
+                rect_object,
+                )
+            
+        # Converting list to tuple:
+        render_rect_collection_conv: tuple[arcade.Rect, ...] = tuple(render_rect_collection)
+        
+        # Returning:
+        return render_rect_collection_conv
 
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -399,4 +435,13 @@ class TableController:
         for card_object in self.cards:
             card_object.display()
             
+    
+    def display_debug(self) -> None:
+        
+        for rect_object in self.__render_rect_collection:
+            arcade.draw_rect_outline(
+                rect = rect_object,
+                color = SETTINGS.RECT_TABLE_COLOR_POSITION,
+                border_width = 2
+                )            
     
