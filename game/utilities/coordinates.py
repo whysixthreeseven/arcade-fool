@@ -14,13 +14,17 @@ from game import context
 LOCATION_TABLE_COORDINATES_INDEX: dict[int, context.Coordinates] = {}
 
 # Preparing coordinates and shift values:
-__COORDINATE_X_START: int = int(SETTINGS.AREA_TABLE_CENTER_COORDINATE_X 
-    - SETTINGS.LOCATION_TABLE_USED_SURFACE / 2
-    + SETTINGS.CARD_TEXTURE_WIDTH / 2
+__COORDINATE_X_START: int = int(
+    SETTINGS.AREA_TABLE_CENTER_COORDINATE_X 
+        - SETTINGS.LOCATION_TABLE_USED_SURFACE / 2
+        + SETTINGS.CARD_TEXTURE_WIDTH / 2
     )
 __COORDINATE_X_SHIFT_POS: int = SETTINGS.CARD_TEXTURE_WIDTH + SETTINGS.LOCATION_TABLE_MARGIN
 __COORDINATE_X_SHIFT_INDEX: int = SETTINGS.LOCATION_TABLE_INDEX_SHIFT_COORDINATE_X
-__COORDINATE_Y: int = SETTINGS.AREA_TABLE_CENTER_COORDINATE_Y
+__COORDINATE_Y: int = int(
+    SETTINGS.AREA_TABLE_CENTER_COORDINATE_Y
+        -  SETTINGS.LOCATION_TABLE_INDEX_SHIFT_COORDINATE_Y / 2
+    )
 __COORDINATE_Y_SHIFT_INDEX: int = SETTINGS.LOCATION_TABLE_INDEX_SHIFT_COORDINATE_Y
 
 # Preparing loop variables:
@@ -125,7 +129,6 @@ for location_index in __location_index_range:
 # Generating coordinates dictionary index:
 LOCATION_DECK_HOVER_COORDINATES_INDEX: dict[int, context.Coordinates] = {}
 
-
 # Preparing coordinates and shift values:
 __COORDINATE_X_START: int = SETTINGS.AREA_DECK_CENTER_COORDINATE_X
 __COORDINATE_X_SHIFT_INDEX: int = SETTINGS.LOCATION_DECK_HOVER_SHIFT_COORDINATE_X
@@ -146,7 +149,6 @@ __location_index_range: range = range(0, SETTINGS.DECK_SIZE_MAX)        # 52 car
 __location_index_special_list: tuple[int, int] = (0, 1)                 # 0 = last/hidden, 1 = last last if no hidden
 __location_shifted_special: bool = False                                # Reset flag
 
-    
 # Calculating table position coordinates:
 for location_index in __location_index_range:
     
