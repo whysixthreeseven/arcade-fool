@@ -294,31 +294,9 @@ class Game:
                     ignore_assertion = False,
                     )
         
-        # Waiting for cards to hit hand controllers:
-        self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_1,
-                ignore_assertion = True,
-                ),
-            autostart = True,
-            ignore_assertion = False,
-            )
-        
         # Adding deck dehover event:
         self.add_event(
             event_object = event.EVENT_DECK_DEHOVER,
-            autostart = True,
-            ignore_assertion = False,
-            )
-        
-        # Sorting hands:
-        self.add_event(
-            event_object = event.EVENT_PLAYER_SORT,
-            autostart = True,
-            ignore_assertion = False,
-            )
-        self.add_event(
-            event_object = event.EVENT_OPPONENT_SORT,
             autostart = True,
             ignore_assertion = False,
             )
@@ -363,6 +341,13 @@ class Game:
             ignore_assertion = False,
             )
         
+        # Sorting player's hand:
+        self.add_event(
+            event_object = event.EVENT_PLAYER_SORT,
+            autostart = True,
+            ignore_assertion = False,
+            )
+        
         # Sorting opponent's hand:
         opponent_trump_available: bool = False
         for card_object in self.player_computer.hand.cards:
@@ -371,10 +356,7 @@ class Game:
                 break
         if opponent_trump_available:
             self.add_event(
-                event_object = event.Event.generate_predefined(
-                    event_name = context.EVENT_NAME.OPPONENT_SORT,
-                    ignore_assertion = False,
-                    ),
+                event_object = event.EVENT_OPPONENT_SORT,
                 autostart = True,
                 ignore_assertion = False,
                 )
