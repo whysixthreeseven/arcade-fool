@@ -842,18 +842,51 @@ def validate_rgb_color(validate_value: tuple[int, int, int]) -> None:
         raise AssertionError(error_message)
     
     # Asserting each container item:
-    for color_value in validate_value:
+    for value in validate_value:
         
         # Asserting item is valid type:
         assertion.assert_value_type(
-            check_value = color_value,
+            check_value = value,
             check_type = int,
             raise_error = True
             )
         
         # Asserting item in range:
         assertion.assert_value_in_range(
-            check_value = color_value,
+            check_value = value,
+            check_range = (0, 255 + 1),
+            raise_error = True
+            )
+        
+        
+def validate_rgba_color(validate_value: tuple[int, int, int, int]) -> None:
+    
+    # Asserting value is valid type:
+    assertion.assert_value_type(
+        check_value = validate_value,
+        check_type = tuple,
+        raise_error = True
+        )
+
+    # Asserting value is valid container:
+    assert_eval: bool = len(validate_value) == 4
+    if not assert_eval:
+        error_message: str = f"Color container contains less than 3 items."
+        raise AssertionError(error_message)
+    
+    # Asserting each container item:
+    for value in validate_value:
+        
+        # Asserting item is valid type:
+        assertion.assert_value_type(
+            check_value = value,
+            check_type = int,
+            raise_error = True
+            )
+        
+        # Asserting item in range:
+        assertion.assert_value_in_range(
+            check_value = value,
             check_range = (0, 255 + 1),
             raise_error = True
             )
