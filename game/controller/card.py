@@ -95,7 +95,6 @@ class CardController:
         self.__state_playable: bool = False
         self.__state_known: bool = False
         self.__state_return: bool = False
-        self.__state_controlled: bool = False
         
         # Play location and index:
         self.__location: str = None
@@ -1752,7 +1751,8 @@ class CardController:
             cached_property_list: tuple[str, ...] = (
                 "coordinate_x_expected",
                 "coordinate_y_expected",
-                "coordinates_expected"
+                "coordinates_expected",
+                "state_idle",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -4103,7 +4103,6 @@ class CardController:
         if self.state_visible:
             arcade.draw_rect_filled(
                 rect = self.render_rect_boundary,
-                color = arcade.color.YELLOW_ORANGE,
                 tilt_angle = 0
                 )
         
