@@ -27,7 +27,7 @@ class __SESSION:
         self.__enable_assertion: bool = True
         self.__enable_debug: bool = True
         self.__enable_hint: bool = True
-        self.__enable_reveal: bool = True
+        self.__enable_reveal: bool = False
         
         # Texture pack options:
         self.__texturepack_front_default: tp.TexturePack = tp.TEXTUREPACK_FRONT.LIGHT_2_1
