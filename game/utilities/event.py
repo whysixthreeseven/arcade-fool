@@ -669,6 +669,12 @@ EVENT_PLAYER_DRAW: Event = Event.generate_predefined(
     )
 
 
+EVENT_PLAYER_ANALYZE_HAND: Event = Event.generate_predefined(
+    event_name = context.EVENT_NAME.PLAYER_ANALYZE_HAND,
+    ignore_assertion = False,
+    )
+
+
 EVENT_OPPONENT_REFILL: Event = Event.generate_predefined(
     event_name = context.EVENT_NAME.OPPONENT_REFILL,
     ignore_assertion = False,
@@ -683,6 +689,12 @@ EVENT_OPPONENT_SORT: Event = Event.generate_predefined(
 
 EVENT_OPPONENT_DRAW: Event = Event.generate_predefined(
     event_name = context.EVENT_NAME.OPPONENT_DRAW,
+    ignore_assertion = False,
+    )
+
+
+EVENT_OPPONENT_ANALYZE_HAND: Event = Event.generate_predefined(
+    event_name = context.EVENT_NAME.OPPONENT_ANALYZE_HAND,
     ignore_assertion = False,
     )
 
