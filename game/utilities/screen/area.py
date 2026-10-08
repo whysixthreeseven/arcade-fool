@@ -790,12 +790,12 @@ class Area:
     """
     
     
-    def display(self) -> None:
+    def display(self, custom_color: context.RGBA_Color | None = None) -> None:
         
         # Rendering:
         arcade.draw_rect_filled(
             rect = self.render_rect,
-            color = self.color_background,
+            color = custom_color or self.color_background,
             tilt_angle = 0
             )
     
