@@ -723,6 +723,12 @@ EVENT_DECK_DEHOVER: Event = Event.generate_predefined(
     )
 
 
+EVENT_TRUMP_COMPARE: Event = Event.generate_predefined(
+    event_name = context.EVENT_NAME.TRUMP_COMPARE,
+    ignore_assertion = False,
+    )
+
+
 EVENT_TRUMP_COMPARE_IN: Event = Event.generate_predefined(
     event_name = context.EVENT_NAME.TRUMP_COMPARE_IN,
     ignore_assertion = False,
