@@ -95,6 +95,7 @@ class CardController:
         self.__state_playable: bool = False
         self.__state_known: bool = False
         self.__state_return: bool = False
+        self.__state_controlled: bool = True
         
         # Play location and index:
         self.__location: str = None
@@ -4103,6 +4104,7 @@ class CardController:
         if self.state_visible:
             arcade.draw_rect_filled(
                 rect = self.render_rect_boundary,
+                color = SETTINGS.RECT_COMMON_COLOR_CARD_BOUNDARY,
                 tilt_angle = 0
                 )
         
