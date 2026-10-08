@@ -18,7 +18,7 @@ class __SETTINGS:
     APP_NAME: str = "Arcade Fool"
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_STARTED: str = "2026.09.02"                                     # Date of project start (reboot)
-    APP_UPDATED: str = "2026.10.08"                                     # Date of last edit
+    APP_UPDATED: str = "2026.10.09"                                     # Date of last edit
     APP_VERSION: str = f"0.0.{APP_UPDATED.replace(".", "")}"            # Version in A.B.YYYYMMDD format
     APP_AUTHOR: str = "Andrey Vostokov"
 
@@ -196,6 +196,10 @@ class __SETTINGS:
     RECT_COMMON_COLOR_CARD_BOUNDARY: context.RGBA_Color = (255, 165, 0, 255)
     RECT_TABLE_COLOR_POSITION: context.RGBA_Color = (125, 125, 125, 255)
     RECT_DISCARD_COLOR_POSITION: context.RGBA_Color = (0, 0, 0, 255)
+    
+    # Debug color settings:
+    DEBUG_COLOR_PLAYER_TURN: context.RGBA_Color = (25, 255, 25, 255)
+    DEBUG_COLOR_COMPUTER_TURN: context.RGBA_Color = (25, 255, 25, 255)
     
     # Hand settings:
     HAND_WIDTH_MOD: int = int(CARD_TEXTURE_WIDTH * 0.55)
