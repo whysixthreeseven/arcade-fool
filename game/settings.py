@@ -1,4 +1,5 @@
-# System management:
+# External libraries:
+import arcade
 import os
 
 # Context variables:
@@ -59,7 +60,7 @@ class __SETTINGS:
     CARD_RENDER_BG_COLOR: context.context.RGB_Color = (215, 0, 0)                                           # Red
     
     # Card texture settings:
-    CARD_TEXTURE_SCALE_DEFAULT: float = 0.25
+    CARD_TEXTURE_SCALE_DEFAULT: float = 0.20
     CARD_TEXTURE_WIDTH_FILE: int = 320
     CARD_TEXTURE_WIDTH: int = int(CARD_TEXTURE_WIDTH_FILE * CARD_TEXTURE_SCALE_DEFAULT)
     CARD_TEXTURE_HEIGHT_FILE: int = 480
@@ -72,7 +73,7 @@ class __SETTINGS:
     DECK_SIZE_DEFAULT: int = DECK_SIZE_MIN
     
     # Area (main) dimensions settings:
-    __AREA_POS_MARGIN: int = int(CARD_TEXTURE_WIDTH * 0.30)
+    __AREA_POS_MARGIN: int = int(CARD_TEXTURE_WIDTH * 0.45)
     __AREA_MAIN_WIDTH: int = int(CARD_TEXTURE_WIDTH * 7.00 + __AREA_POS_MARGIN * 5.00)
     __AREA_SIDE_WIDTH: int = int(CARD_TEXTURE_WIDTH * 4.00)
     
@@ -105,21 +106,21 @@ class __SETTINGS:
     AREA_DISCARD_CENTER_COORDINATE_Y: int = int(AREA_DECK_HEIGHT + AREA_DECK_HEIGHT / 2)
 
     # Area debug color settings:
-    __AREA_HAND_COLOR_BACKGROUND: context.RGB_Color = (210, 100, 100)                               # Pale red
-    AREA_TEXT_COLOR: context.RGB_Color = (255, 255, 255)                                            # White
-    AREA_PLAYER_COLOR_BACKGROUND: context.RGB_Color = __AREA_HAND_COLOR_BACKGROUND                  # Pale red
-    AREA_TABLE_COLOR_BACKGROUND: context.RGB_Color = (185, 210, 100)                                # Pale yellow
-    AREA_OPPONENT_COLOR_BACKGROUND: context.RGB_Color = __AREA_HAND_COLOR_BACKGROUND                # Pale red
-    AREA_DECK_COLOR_BACKGROUND: context.RGB_Color = (100, 210, 120)                                 # Pale green
-    AREA_DECK_CONTAINER_COLOR_BACKGROUND: context.RGB_Color = (145, 255, 165)                       # Greener green?
-    AREA_DISCARD_COLOR_BACKGROUND: context.RGB_Color = (200, 100, 210)                              # Pale magenta
+    __AREA_HAND_COLOR_BACKGROUND: context.RGBA_Color = (210, 100, 100, 255)
+    AREA_TEXT_COLOR: context.RGBA_Color = (255, 255, 255, 255)
+    AREA_PLAYER_COLOR_BACKGROUND: context.RGBA_Color = __AREA_HAND_COLOR_BACKGROUND
+    AREA_TABLE_COLOR_BACKGROUND: context.RGBA_Color = (185, 210, 100, 255)
+    AREA_OPPONENT_COLOR_BACKGROUND: context.RGBA_Color = __AREA_HAND_COLOR_BACKGROUND
+    AREA_DECK_COLOR_BACKGROUND: context.RGBA_Color = (100, 210, 120, 255)
+    AREA_DECK_CONTAINER_COLOR_BACKGROUND: context.RGBA_Color = (145, 255, 165, 255)
+    AREA_DISCARD_COLOR_BACKGROUND: context.RGBA_Color = (200, 100, 210, 255)
     
     # Surface settings:
     SURFACE_WIDTH: int = int(__AREA_HAND_WIDTH + __AREA_SIDE_WIDTH)
     SURFACE_HEIGHT: int = int(__AREA_HAND_HEIGHT * 2 + AREA_TABLE_HEIGHT)
     SURFACE_CENTER_COORDINATE_X: int = int(SURFACE_WIDTH / 2)
     SURFACE_CENTER_COORDINATE_Y: int = int(SURFACE_HEIGHT / 2)
-    SURFACE_COLOR_BACKGROUND: context.RGB_Color = (0, 0, 0)                                         # Black
+    SURFACE_COLOR_BACKGROUND: context.RGBA_Color = (0, 0, 0, 255)
     
     # Location (deck and discard) common settings:
     __SHIFT_PER_CARD: int = 4
@@ -155,8 +156,8 @@ class __SETTINGS:
     # Location (table) coordinates settings:
     LOCATION_TABLE_CENTER_COORDINATE_X: int = AREA_TABLE_CENTER_COORDINATE_X
     LOCATION_TABLE_CENTER_COORDINATE_Y: int = AREA_TABLE_CENTER_COORDINATE_Y
-    LOCATION_TABLE_INDEX_SHIFT_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.4)
-    LOCATION_TABLE_INDEX_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.3)
+    LOCATION_TABLE_INDEX_SHIFT_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.25)
+    LOCATION_TABLE_INDEX_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.15)
     LOCATION_TABLE_MARGIN: int = __AREA_POS_MARGIN
     LOCATION_TABLE_USED_SURFACE: int = int(CARD_TEXTURE_WIDTH * 6 + LOCATION_TABLE_MARGIN * 5)
     
@@ -164,9 +165,9 @@ class __SETTINGS:
     LOCATION_HAND_CENTER_COORDINATE_X: int = AREA_PLAYER_CENTER_COORDINATE_X
     LOCATION_HAND_CENTER_COORDINATE_Y: int = AREA_PLAYER_CENTER_COORDINATE_Y
     LOCATION_HAND_HOVER_SHIFT_COORDINATE_X: int = 0
-    LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.30)
+    LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.15)
     LOCATION_HAND_SELECT_SHIFT_COORDINATE_X: int = 0
-    LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.40)
+    LOCATION_HAND_SELECT_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.25)
     LOCATION_HAND_UNPLAYABLE_SHIFT_COORDINATE_X: int = 0
     LOCATION_HAND_UNPLAYABLE_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.10)
     
@@ -181,7 +182,7 @@ class __SETTINGS:
     LOCATION_OPP_UNPLAYABLE_SHIFT_COORDINATE_Y: int = LOCATION_HAND_UNPLAYABLE_SHIFT_COORDINATE_Y * -1
     
     # Card slide settings:
-    CARD_SLIDE_SPEED_MIN: int = int(CARD_TEXTURE_HEIGHT / 60)       # (480 * 0.25) / 60 = 2
+    CARD_SLIDE_SPEED_MIN: int = int(CARD_TEXTURE_HEIGHT / 40)       # (480 * 0.25) / 40 = 3
     CARD_SLIDE_SPEED_MAX: int = int(CARD_TEXTURE_HEIGHT / 3)        # (480 * 0.25) / 3 = 40
     CARD_SLIDE_DISTANCE_CLOSE: int = LOCATION_HAND_HOVER_SHIFT_COORDINATE_Y
     CARD_SLIDE_DISTANCE_FAR: int = int(__AREA_HAND_WIDTH / 2)
@@ -190,6 +191,11 @@ class __SETTINGS:
     PLAYER_NAME_LEN_MAX: int = 16
     PLAYER_NAME_LEN_MIN: int = 2
     PLAYER_STAT_RATIO_NDIGITS: int = 2
+    
+    # Debug rect settings:
+    RECT_COMMON_COLOR_CARD_BOUNDARY: context.RGBA_Color = (255, 165, 0, 255)
+    RECT_TABLE_COLOR_POSITION: context.RGBA_Color = (125, 125, 125, 255)
+    RECT_DISCARD_COLOR_POSITION: context.RGBA_Color = (0, 0, 0, 255)
     
     # Hand settings:
     HAND_WIDTH_MOD: int = int(CARD_TEXTURE_WIDTH * 0.55)
