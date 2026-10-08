@@ -9,6 +9,7 @@ import arcade
 
 
 RGB_Color = tuple[int, int, int]
+RGBA_Color = tuple[int, int, int, int]
 Coordinates = tuple[int, int]
 Location = tuple[str, int]
 
@@ -425,6 +426,7 @@ class EVENT_NAME:
     OPPONENT_REFILL: str = "Opponent refill"
     OPPONENT_SORT: str = "Opponent sort"
     OPPONENT_DRAW: str = "Opponent draw"
+    TRUMP_COMPARE: str = "Trump cards compare sequence"
     TRUMP_COMPARE_IN: str = "Slide trump in"
     TRUMP_COMPARE_OUT: str = "Slide trump out"
     TIMEOUT_1: str = "Timeout (1 second)"
@@ -455,6 +457,7 @@ EVENT_TYPE_INDEX: dict[str, str] = {
     EVENT_NAME.OPPONENT_REFILL: EVENT_TYPE.GAME,
     EVENT_NAME.OPPONENT_SORT: EVENT_TYPE.GAME,
     EVENT_NAME.OPPONENT_DRAW: EVENT_TYPE.GAME,
+    EVENT_NAME.TRUMP_COMPARE: EVENT_TYPE.GAME,
     EVENT_NAME.TRUMP_COMPARE_IN: EVENT_TYPE.GAME,
     EVENT_NAME.TRUMP_COMPARE_OUT: EVENT_TYPE.GAME,
     EVENT_NAME.TIMEOUT_1: EVENT_TYPE.GLOBAL,
@@ -480,6 +483,7 @@ EVENT_DESCRIPTION_INDEX: dict[str, str] = {
     EVENT_NAME.OPPONENT_REFILL: "There is nothing here yet.",
     EVENT_NAME.OPPONENT_SORT: "There is nothing here yet.",
     EVENT_NAME.OPPONENT_DRAW: "There is nothing here yet.",
+    EVENT_NAME.TRUMP_COMPARE: "There is nothing here yet.",
     EVENT_NAME.TRUMP_COMPARE_IN: "There is nothing here yet.",
     EVENT_NAME.TRUMP_COMPARE_OUT: "There is nothing here yet.",
     EVENT_NAME.TIMEOUT_1: "There is nothing here yet.",
@@ -505,6 +509,7 @@ EVENT_CONDITION_INDEX: dict[str, str] ={
     EVENT_NAME.OPPONENT_REFILL: "Opponents's HandController card count is equal or greater than six cards",
     EVENT_NAME.OPPONENT_SORT: "Player's HandController sorted cards with random sort sequence",
     EVENT_NAME.OPPONENT_DRAW: "Opponent's HandController received a new Card object",
+    EVENT_NAME.TRUMP_COMPARE: "GameController compares cards in opnening hands",
     EVENT_NAME.TRUMP_COMPARE_IN: "Both players had a trump slide into TableController",
     EVENT_NAME.TRUMP_COMPARE_OUT: "Both players had a trump slide back from TableController",
     EVENT_NAME.TIMEOUT_1: "One second elapsed",
@@ -530,6 +535,7 @@ EVENT_WAIT_INDEX: dict[str, bool] = {
     EVENT_NAME.OPPONENT_REFILL: True,
     EVENT_NAME.OPPONENT_SORT: True,
     EVENT_NAME.OPPONENT_DRAW: True,
+    EVENT_NAME.TRUMP_COMPARE: True,
     EVENT_NAME.TRUMP_COMPARE_IN: True,
     EVENT_NAME.TRUMP_COMPARE_OUT: True,
     EVENT_NAME.TIMEOUT_1: True,
@@ -548,6 +554,7 @@ EVENT_TIMEOUT_INDEX: dict[str, float] = {
     EVENT_NAME.OPPONENT_REFILL: 0.00,
     EVENT_NAME.OPPONENT_SORT: 0.00,
     EVENT_NAME.OPPONENT_DRAW: 0.00,
+    EVENT_NAME.TRUMP_COMPARE: 0.00,
     EVENT_NAME.TRUMP_COMPARE_IN: 0.00,
     EVENT_NAME.TRUMP_COMPARE_OUT: 0.00,
     EVENT_NAME.TIMEOUT_1: 1.00,
