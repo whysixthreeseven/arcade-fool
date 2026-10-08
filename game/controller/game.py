@@ -360,6 +360,22 @@ class Game:
                 autostart = True,
                 ignore_assertion = False,
                 )
+            
+    
+    def __game_preset_cards(self) -> None:
+        
+        # TODO: Add events!
+        self.add_event(
+            event_object = event.EVENT_PLAYER_ANALYZE_HAND,
+            autostart = True,
+            ignore_assertion = False,
+            )
+        self.add_event(
+            event_object = event.EVENT_OPPONENT_ANALYZE_HAND,
+            autostart = True,
+            ignore_assertion = False,
+            )
+        
     
     def game_start(self) -> None:
         
@@ -371,6 +387,7 @@ class Game:
         self.__game_prepare_sequence()
         self.__game_deal_sequence()
         self.__game_trump_compare_sequence()
+        self.__game_preset_cards()
         
     
     def game_reset(self) -> None:
@@ -1451,6 +1468,67 @@ class Game:
                 self.remove_event(
                     event_object = event_object,
                     )
+                
+    
+    def __update_event_analyze_hand(self, player_controller: PlayerController, event_object: event.Event, 
+                                          delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+        
+        # Updating card states:
+        print(player_controller.type, player_controller.hand.cards)
+        for card_object in player_controller.hand.cards:
+            state_playable: bool = True if player_controller.state_attacking else False
+            print(card_object, f"{state_playable=}")
+            card_object.set_state_playable(
+                set_value = state_playable,
+                ignore_assertion = False,
+                clear_cache = True
+                )
+           
+        # Analyzing hand: 
+        self.perform_player_analyze_hand(
+            player_controller = player_controller,
+            ignore_assertion = False,
+            )
+        
+        # Updating hand:
+        player_controller.hand.update_coordinates(
+            clear_cache = True
+            )
+        
+        # Updating event object:
+        self.update_event(
+            event_object = event_object,
+            event_ongoing = False,
+            event_finished = True,
+            )
+
+        # Removing event object:
+        if autoremove:
+            self.remove_event(
+                event_object = event_object,
+                )
+            
+    
+    def __update_event_player_analyze_hand(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+        
+        # Calling update method:
+        self.__update_event_analyze_hand(
+            player_controller = self.player_human,
+            event_object = event_object,
+            delta_time = delta_time,
+            autoremove = autoremove,
+            )
+        
+    
+    def __update_event_opponent_analyze_hand(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+
+        # Calling update method:
+        self.__update_event_analyze_hand(
+            player_controller = self.player_computer,
+            event_object = event_object,
+            delta_time = delta_time,
+            autoremove = autoremove,
+            )
         
         
     @cached_property
@@ -1461,9 +1539,11 @@ class Game:
             context.EVENT_NAME.PLAYER_REFILL: self.__update_event_player_refill,
             context.EVENT_NAME.PLAYER_SORT: self.__update_event_player_sort,
             context.EVENT_NAME.PLAYER_DRAW: self.__update_event_player_draw,
+            context.EVENT_NAME.PLAYER_ANALYZE_HAND: self.__update_event_player_analyze_hand,
             context.EVENT_NAME.OPPONENT_REFILL: self.__update_event_opponent_refill,
             context.EVENT_NAME.OPPONENT_SORT: self.__update_event_opponent_sort,
             context.EVENT_NAME.OPPONENT_DRAW: self.__update_event_opponent_draw,
+            context.EVENT_NAME.OPPONENT_ANALYZE_HAND: self.__update_event_opponent_analyze_hand,
             context.EVENT_NAME.TRUMP_COMPARE: self.__update_event_trump_compare,
             context.EVENT_NAME.TRUMP_COMPARE_IN: self.__update_event_trump_compare_in,
             context.EVENT_NAME.TRUMP_COMPARE_OUT: self.__update_event_trump_compare_out,
@@ -2326,7 +2406,15 @@ class Game:
     def display_surface(self) -> None:
         
         # Displaying surface:
-        self.surface_controller.display_debug()        # TODO: Replace with non-debug method!
+        # self.surface_controller.display_debug()        # TODO: Replace with non-debug method!
+        if self.turn_player == self.player_human:
+            self.surface_controller.area_player.display(
+                custom_color = SETTINGS.DEBUG_COLOR_PLAYER_TURN,
+                )
+        elif self.turn_player == self.player_computer:
+            self.surface_controller.area_player.display(
+                custom_color = SETTINGS.DEBUG_COLOR_COMPUTER_TURN,
+                )
         
     
     def display_cards(self) -> None:        
@@ -2407,6 +2495,79 @@ class Game:
             clear_cache = True
             )
         
+        
+    def perform_player_analyze_hand(self, player_controller: PlayerController, ignore_assertion: bool = False) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_player_controller(
+                validate_value = player_controller,
+                )
+            
+        # Resetting playable state for all cards:
+        for card_object in player_controller.hand.cards:
+            card_object.set_state_playable(
+                set_value = False,
+                ignore_assertion = True,
+                clear_cache = True,
+                )
+            
+        # Analyzing attacking player's hand:
+        if player_controller.state_attacking:
+            
+            # Setting all cards as playable, if not card has been played yet:
+            if self.table.cards_count == 0:
+                for card_object in player_controller.hand.cards:
+                    card_object.set_state_playable(
+                        set_value = False,
+                        ignore_assertion = True,
+                        clear_cache = True,
+                        )
+            
+            # Checking what cards have been played so far:
+            else:
+                
+                # Collecting names and scanning hand:
+                name_list: tuple[str, ...] = tuple(set(card_object.name for card_object in self.table.cards))
+                for card_object in player_controller.hand.cards:
+                    
+                    # Setting card with the same name as playable:
+                    if card_object.name in name_list:
+                        card_object.set_state_playable(
+                            set_value = True,
+                            ignore_assertion = True,
+                            clear_cache = True,
+                            )
+
+        # Analyzing defending player's hand:
+        else:
+            for location_index, card_object in self.table.cards_index.items():
+                if location_index % 2 == 0:
+                    
+                    # Acquiring cards per each stack position:
+                    card_attack: Card | None = card_object
+                    card_defend: Card | None = self.table.cards_index[location_index + 1]
+                    if card_attack is None:
+                        break
+                    else:
+                        if card_defend is not None:
+                            break
+                        else:
+                            
+                            # Comparing cards available to card attacking value:
+                            for card_object in player_controller.hand.cards:
+                                if card_object > card_attack:
+                                    card_object.set_state_playable(
+                                        set_value = True,
+                                        ignore_assertion = True,
+                                        clear_cache = True,
+                                        )
+                                    
+        # Updating hand controller:
+        player_controller.hand.update_coordinates(
+            clear_cache = True
+            )
+                                    
     
     def perform_player_play(self, player_controller: PlayerController, card_object: Card, ignore_assertion: bool = False) -> None:
         
