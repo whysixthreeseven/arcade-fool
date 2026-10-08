@@ -378,6 +378,23 @@ class Game:
         # Removing all other events:
         self.__events: list[event.Event] = []
         
+        # Piling cards up:
+        self.add_event(
+            event_object = event.EVENT_PILE,
+            autostart = True,
+            ignore_assertion = True,
+            )
+        
+        # Adding short timeout:
+        self.add_event(
+            event_object = event.Event.generate_predefined(
+                event_name = context.EVENT_NAME.TIMEOUT_1,
+                ignore_assertion = True,
+                ),
+            autostart = True,
+            ignore_assertion = True,
+            )
+        
         # Adding reset event:
         self.add_event(
             event_object = event.EVENT_RESET,
@@ -966,45 +983,21 @@ class Game:
         
     def __update_event_reset(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
         
-        # Checking if event needs to be stopped:
-        force_fade: bool = True
+        # Preparing flag:
         force_stop: bool = True
         
-        # Moving cards to the deck pile:
-        for card_object in self.deck.cards:
-
-            # Updating expected coordinates if needed:
-            if card_object.coordinates_expected != card_object.coordinates_position:
-                card_object.set_coordinates_expected(
-                    set_value = card_object.coordinates_position,
+        # Fading cards away:
+        for card_object in reversed(self.deck.cards):
+            if card_object.state_visible:
+                card_object.set_state_visible(
+                    set_value = False,
                     ignore_assertion = True,
                     clear_cache = True
                     )
-
-            # Checking if card is still moving:
-            card_object_moving: bool = bool(
-                card_object.coordinates != card_object.coordinates_position
-                or not card_object.state_idle
-                )
-            
-            # Updating flags:
-            if card_object_moving:
+                
+                # Updating flag:
                 force_stop = False
-                force_fade = False
-        
-        # Fading cards away:
-        if force_fade:
-            for card_object in reversed(self.deck.cards):
-                if card_object.state_visible:
-                    card_object.set_state_visible(
-                        set_value = False,
-                        ignore_assertion = True,
-                        clear_cache = True
-                        )
-                    
-                    # Updating flag:
-                    force_stop = False
-                    break
+                break
             
         # Forcing stop:
         if force_stop:
@@ -1415,6 +1408,49 @@ class Game:
             self.remove_event(
                 event_object = event_object,
                 )
+            
+            
+    def __update_event_pile(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+        
+        # Checking if event needs to be stopped:
+        force_stop: bool = True
+        
+        # Moving cards to the deck pile:
+        for card_object in self.deck.cards:
+
+            # Updating expected coordinates if needed:
+            if card_object.coordinates_expected != card_object.coordinates_position:
+                card_object.set_coordinates_expected(
+                    set_value = card_object.coordinates_position,
+                    ignore_assertion = True,
+                    clear_cache = True
+                    )
+
+            # Checking if card is still moving:
+            card_object_moving: bool = bool(
+                card_object.coordinates != card_object.coordinates_position
+                or not card_object.state_idle
+                )
+            
+            # Updating flags:
+            if card_object_moving:
+                force_stop = False
+                
+        # Forcing stop:
+        if force_stop:
+        
+            # Updating event object:
+            self.update_event(
+                event_object = event_object,
+                event_ongoing = False,
+                event_finished = True,
+                )
+
+            # Removing event object:
+            if autoremove:
+                self.remove_event(
+                    event_object = event_object,
+                    )
         
         
     @cached_property
@@ -1434,6 +1470,7 @@ class Game:
             context.EVENT_NAME.TIMEOUT_1: self.__update_event_timeout,
             context.EVENT_NAME.TIMEOUT_3: self.__update_event_timeout,
             context.EVENT_NAME.TIMEOUT_5: self.__update_event_timeout,
+            context.EVENT_NAME.PILE: self.__update_event_pile,
             context.EVENT_NAME.RESET: self.__update_event_reset,
             context.EVENT_NAME.RESTOCK: self.__update_event_restock,
             context.EVENT_NAME.DECK_DEHOVER: self.__update_event_deck_dehover,
