@@ -2529,12 +2529,6 @@ class Game:
                 )
             self.__card_select = None
             
-            self.perform_fade(
-                set_value = False,
-                player_controller = self.player_human,
-                ignore_assertion = True,
-                )
-            
             
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         CARD DRAG PROPERTIES AND METHODS
@@ -2870,13 +2864,22 @@ class Game:
                         ignore_assertion = ignore_assertion,
                         )
                     
+                    # TODO: Create event to hand turn switching etc!
                     # Switching turns:
                     self.switch_turn_player()
                     for player_controller in self.__player_controllers:
-                        self.perform_player_analyze_hand(
-                            player_controller = player_controller,
-                            ignore_assertion = False,
-                            )
+                        if self.turn_player == player_controller:
+                            self.perform_player_analyze_hand(
+                                player_controller = player_controller,
+                                ignore_assertion = ignore_assertion,
+                                )
+                        else:
+                            for card_object in player_controller.hand.cards:
+                                card_object.set_state_playable(
+                                    set_value = False,
+                                    ignore_assertion = ignore_assertion,
+                                    clear_cache = True,
+                                    )
     
     
     def handle_mouse_release(self, cursor_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
