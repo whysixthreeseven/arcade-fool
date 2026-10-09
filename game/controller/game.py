@@ -1690,6 +1690,92 @@ class Game:
             )
         
         
+    def __update_event_play(self, player_controller: PlayerController, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+
+        # Checking if event needs to be stopped:
+        force_timeout: bool = True
+        
+        # Checking if card is still moving to the table position:
+        for card_object in self.table.cards:
+            if not card_object.state_idle:
+                force_timeout = False
+                break
+            
+        # Updating event object:
+        if force_timeout:
+            
+            # Otherwise updating delta time:
+            event_object.adjust_timeout_elapsed(
+                adjust_value = delta_time,
+                ignore_assertion = False,
+                )
+            force_stop: bool = event_object.timeout_complete
+
+            # Checking if event needs to be stopped:
+            if force_stop:
+                
+                # Disabling player controller's cards:
+                for card_object in player_controller.hand.cards:
+                    if card_object.state_playable:
+                        card_object.set_state_playable(
+                            set_value = False,
+                            ignore_assertion = True,
+                            clear_cache = True,
+                            )
+                
+                # Switching players:
+                self.switch_turn_player()
+                
+                # Adding event to analyze hand for other player controller:
+                event_name: str = str(
+                    context.EVENT_NAME.PLAYER_ANALYZE_HAND if player_controller == self.player_human
+                        else context.EVENT_NAME.OPPONENT_ANALYZE_HAND
+                    )
+                self.add_event(
+                    event_object = event.Event.generate_predefined(
+                        event_name = event_name,
+                        ignore_assertion = False,
+                        ),
+                    autostart = True,
+                    ignore_assertion = False,
+                    )
+                
+                # Updating event:
+                self.update_event(
+                    event_object = event_object,
+                    event_ongoing = False,
+                    event_finished = True,
+                    )
+
+                # Removing event object:
+                if autoremove:
+                    self.remove_event(
+                        event_object = event_object,
+                        )
+                    
+    
+    def __update_event_player_play(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+
+        # Calling update method:
+        self.__update_event_play(
+            player_controller = self.player_human,
+            event_object = event_object,
+            delta_time = delta_time,
+            autoremove = autoremove,
+            )
+        
+        
+    def __update_event_opponent_play(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
+        
+        # Calling update method:
+        self.__update_event_play(
+            player_controller = self.player_computer,
+            event_object = event_object,
+            delta_time = delta_time,
+            autoremove = autoremove,
+            )
+                
+        
     @cached_property
     def __update_event_index(self) -> dict[str, function]:
         
@@ -1698,10 +1784,12 @@ class Game:
             context.EVENT_NAME.PLAYER_REFILL: self.__update_event_player_refill,
             context.EVENT_NAME.PLAYER_SORT: self.__update_event_player_sort,
             context.EVENT_NAME.PLAYER_DRAW: self.__update_event_player_draw,
+            context.EVENT_NAME.PLAYER_PLAY: self.__update_event_player_play,
             context.EVENT_NAME.PLAYER_ANALYZE_HAND: self.__update_event_player_analyze_hand,
             context.EVENT_NAME.OPPONENT_REFILL: self.__update_event_opponent_refill,
             context.EVENT_NAME.OPPONENT_SORT: self.__update_event_opponent_sort,
             context.EVENT_NAME.OPPONENT_DRAW: self.__update_event_opponent_draw,
+            context.EVENT_NAME.OPPONENT_PLAY: self.__update_event_opponent_play,
             context.EVENT_NAME.OPPONENT_ANALYZE_HAND: self.__update_event_opponent_analyze_hand,
             context.EVENT_NAME.TRUMP_COMPARE: self.__update_event_trump_compare,
             context.EVENT_NAME.TRUMP_COMPARE_IN: self.__update_event_trump_compare_in,
@@ -2727,47 +2815,58 @@ class Game:
                 validate_value = card_object,
                 )
             
-        # Asserting card object is playable:
-        if card_object.state_playable:
-                
-            # Preparing variables:
-            location_index_selected: int | None = None
-                
-            # Performing action if player is attacking:
-            if player_controller.state_attacking:
-                for location_index, card_table in self.table.cards_index.items():
-                    if location_index == 0 or location_index % 2 == 0:
-                        if card_table is None:
-                            location_index_selected: int = location_index
-                            break
-            elif player_controller.state_defending:
-                for location_index, card_table in self.table.cards_index.items():
-                    if location_index >= 1 and location_index % 2 != 0:
-                        if card_table is None:
-                            location_index_selected: int = location_index
-                            break
-                
-            # Raising error if position is empty or invalid:
-            if location_index_selected is None:
-                error_message: str = f"Unable to find position to play <{card_object}> while player is {player_controller.state.lower()}!"
-                raise IndexError(error_message)
+        # Preparing variables:
+        location_index_selected: int | None = None
+            
+        # Performing action if player is attacking:
+        if player_controller.state_attacking:
+            for location_index, card_table in self.table.cards_index.items():
+                if location_index == 0 or location_index % 2 == 0:
+                    if card_table is None:
+                        location_index_selected: int = location_index
+                        break
+        elif player_controller.state_defending:
+            for location_index, card_table in self.table.cards_index.items():
+                if location_index >= 1 and location_index % 2 != 0:
+                    if card_table is None:
+                        location_index_selected: int = location_index
+                        break
+            
+        # Raising error if position is empty or invalid:
+        if location_index_selected is None:
+            error_message: str = f"Unable to find position to play <{card_object}> while player is {player_controller.state.lower()}!"
+            raise IndexError(error_message)
 
-            # Removing card from player's hand and adding it to the table:
-            else:
-                player_controller.hand.remove_card(
-                    card_object = card_object,
+        # Removing card from player's hand and adding it to the table:
+        else:
+            player_controller.hand.remove_card(
+                card_object = card_object,
+                ignore_assertion = False,
+                clear_cache = True,
+                )
+            player_controller.hand.update_coordinates(
+                clear_cache = True
+                )
+            self.table.add_card(
+                card_object = card_object,
+                location_index = location_index_selected,
+                ignore_assertion = False,
+                clear_cache = True,
+                )
+            
+            # Adding play event:
+            event_name: str = str(
+                context.EVENT_NAME.PLAYER_PLAY if player_controller == self.player_human
+                    else context.EVENT_NAME.OPPONENT_PLAY
+                )
+            self.add_event(
+                event_object = event.Event.generate_predefined(
+                    event_name = event_name,
                     ignore_assertion = False,
-                    clear_cache = True,
-                    )
-                player_controller.hand.update_coordinates(
-                    clear_cache = True
-                    )
-                self.table.add_card(
-                    card_object = card_object,
-                    location_index = location_index_selected,
-                    ignore_assertion = False,
-                    clear_cache = True,
-                    )
+                    ),
+                autostart = True,
+                ignore_assertion = False,
+                )
     
     
     def perform_fade(self, set_value: bool, player_controller: PlayerController, ignore_assertion: bool = False) -> None:
@@ -2865,23 +2964,6 @@ class Game:
                         card_object = self.card_select,
                         ignore_assertion = ignore_assertion,
                         )
-                    
-                    # TODO: Create event to hand turn switching etc!
-                    # Switching turns:
-                    self.switch_turn_player()
-                    for player_controller in self.__player_controllers:
-                        if self.turn_player == player_controller:
-                            self.perform_player_analyze_hand(
-                                player_controller = player_controller,
-                                ignore_assertion = ignore_assertion,
-                                )
-                        else:
-                            for card_object in player_controller.hand.cards:
-                                card_object.set_state_playable(
-                                    set_value = False,
-                                    ignore_assertion = ignore_assertion,
-                                    clear_cache = True,
-                                    )
     
     
     def handle_mouse_release(self, cursor_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
