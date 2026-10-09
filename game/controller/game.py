@@ -1302,7 +1302,6 @@ class Game:
     def __update_event_trump_compare_in(self, event_object: event.Event, delta_time: float = 1 / 60, autoremove: bool = True) -> None:
 
         # Preparing variables:
-        coordinates_index: dict[str, context.Coordinates] = coordinates.EVENT_TRUMP_SLIDE_COORDINATES 
         card_highest_list: list[Card] = []
         
         # Locating cards:
@@ -1320,7 +1319,6 @@ class Game:
                         
             # Updating card's expected coordinates:
             if card_highest is not None:
-                # coordinates_slide: context.Coordinates = coordinates_index[player_controller.type]
                 
                 # Calculating slide coordinates:
                 coordinate_x_slide: int = card_highest.coordinate_x_position
