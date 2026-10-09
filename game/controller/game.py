@@ -427,19 +427,11 @@ class Game:
             autostart = True,
             ignore_assertion = False,
             )
-        
-        # Sorting opponent's hand, if trump card was shown:
-        opponent_trump_available: bool = False
-        for card_object in self.player_computer.hand.cards:
-            if card_object.trump:
-                opponent_trump_available = True
-                break
-        if opponent_trump_available:
-            self.add_event(
-                event_object = event.EVENT_OPPONENT_SORT,               # Uses HandController's sort_random method!
-                autostart = True,
-                ignore_assertion = False,
-                )
+        self.add_event(
+            event_object = event.EVENT_OPPONENT_SORT,
+            autostart = True,
+            ignore_assertion = False,
+            )
         
         # Adding a short delay before cards slide up to position:
         self.__event_timeout(
