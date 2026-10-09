@@ -576,19 +576,19 @@ EVENT_TIMEOUT_INDEX: dict[str, float] = {
     EVENT_NAME.PLAYER_REFILL: 0.00,
     EVENT_NAME.PLAYER_SORT: 0.00,
     EVENT_NAME.PLAYER_DRAW: 0.00,
-    EVENT_NAME.PLAYER_PLAY: 1.00,
+    EVENT_NAME.PLAYER_PLAY: 1.00,                   # Brief timeout (1 second) for card slide to complete
     EVENT_NAME.PLAYER_ANALYZE_HAND: 0.00,
     EVENT_NAME.OPPONENT_REFILL: 0.00,
     EVENT_NAME.OPPONENT_SORT: 0.00,
     EVENT_NAME.OPPONENT_DRAW: 0.00,
-    EVENT_NAME.OPPONENT_PLAY: 1.00,
+    EVENT_NAME.OPPONENT_PLAY: 1.00,                 # Brief timeout (1 second) for card slide to complete    
     EVENT_NAME.OPPONENT_ANALYZE_HAND: 0.00,
     EVENT_NAME.TRUMP_COMPARE: 0.00,
     EVENT_NAME.TRUMP_COMPARE_IN: 0.00,
     EVENT_NAME.TRUMP_COMPARE_OUT: 0.00,
-    EVENT_NAME.TIMEOUT_1: 1.00,
-    EVENT_NAME.TIMEOUT_3: 3.00,
-    EVENT_NAME.TIMEOUT_5: 5.00,
+    EVENT_NAME.TIMEOUT_1: 1.00,                     # Pre-defined timeout (1 second)
+    EVENT_NAME.TIMEOUT_3: 3.00,                     # Pre-defined timeout (3 seconds)
+    EVENT_NAME.TIMEOUT_5: 5.00,                     # Pre-defined timeout (5 seconds)
     EVENT_NAME.PILE: 0.00,
     EVENT_NAME.RESET: 0.00,
     EVENT_NAME.RESTOCK: 0.00,
