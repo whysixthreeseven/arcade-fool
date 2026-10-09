@@ -4113,48 +4113,56 @@ class CardController:
         UPDATE METHODS
         
     """
-
     
-    def update(self, clear_cache: bool = True) -> None:
-
+    
+    def __update_coordinates(self, clear_cache: bool = True) -> None:
+        
         # Adjusting coordinate x:
         if self.coordinate_x != self.coordinate_x_expected:
             
             # Calculating distance and speed:
             difference_coordinate_x = abs(self.coordinate_x - self.coordinate_x_expected)
-            slide_speed = self.__calc_slide_speed(
-                distance_value = difference_coordinate_x
-                )
-            
-            # Choosing adjust amount and axis:
-            axis_x = 1 if self.coordinate_x < self.coordinate_x_expected else -1
-            slide_amount = min(difference_coordinate_x, int(slide_speed)) * axis_x
+            if difference_coordinate_x != 0:
+                slide_speed = self.__calc_slide_speed(
+                    distance_value = difference_coordinate_x
+                    )
+                
+                # Choosing adjust amount and axis:
+                axis_x = 1 if self.coordinate_x < self.coordinate_x_expected else -1
+                slide_amount = min(difference_coordinate_x, int(slide_speed)) * axis_x
 
-            # Adjusting coordinate x:
-            self.adjust_coordinate_x(
-                adjust_value = slide_amount,
-                clear_cache = clear_cache,
-                )
+                # Adjusting coordinate x:
+                self.adjust_coordinate_x(
+                    adjust_value = slide_amount,
+                    clear_cache = clear_cache,
+                    )
 
         # Adjusting coordinate y:
         if self.coordinate_y != self.coordinate_y_expected:
-
+            
+            if self.owner == context.PLAYER_TYPE.HUMAN:
+                print(self, self.coordinate_y, self.coordinate_y_expected, self.coordinate_y_unplayable, self.state_playable, )
+            
             # Calculating distance and speed:
             difference_coordinate_y = abs(self.coordinate_y - self.coordinate_y_expected)
-            slide_speed = self.__calc_slide_speed(
-                distance_value = difference_coordinate_y
-                )
-            
-            # Choosing adjust amount and axis:
-            axis_y = 1 if self.coordinate_y < self.coordinate_y_expected else -1
-            slide_amount = min(difference_coordinate_y, int(slide_speed)) * axis_y
+            if difference_coordinate_y != 0:
+                slide_speed = self.__calc_slide_speed(
+                    distance_value = difference_coordinate_y
+                            )
+                        
+                # Choosing adjust amount and axis:
+                axis_y = 1 if self.coordinate_y < self.coordinate_y_expected else -1
+                slide_amount = min(difference_coordinate_y, int(slide_speed)) * axis_y
 
-            # Adjusting coordinate x:
-            self.adjust_coordinate_y(
-                adjust_value = slide_amount,
-                clear_cache = clear_cache,
-                )
+                # Adjusting coordinate x:
+                self.adjust_coordinate_y(
+                    adjust_value = slide_amount,
+                    clear_cache = clear_cache,
+                    )
             
+    
+    def __update_tilt(self, clear_cache: bool = True) -> None:
+        
         # Adjusting tilt (Opponent):
         if self.location == context.CARD_LOCATION.OPPONENT:
             
@@ -4235,6 +4243,19 @@ class CardController:
                         ignore_assertion = False,
                         clear_cache = True
                         )
+
+    
+    def update(self, clear_cache: bool = True) -> None:
+
+        # Updating position (slide):
+        self.__update_coordinates(
+            clear_cache = clear_cache,
+            )
+        
+        # Updating tilt:
+        self.__update_tilt(
+            clear_cache = clear_cache,
+            )
 
     
     def update_coordinates_location(self, calculated_coordinates: context.Coordinates | None, clear_cache: bool = True) -> None:
@@ -4326,7 +4347,6 @@ class CardController:
         clear_cache : `bool` = `True`
             If set to True, clears cached properties and attributes.
         """
-        
         
         # Preparing allowed states in location lists: 
         location_select: tuple[str, ...] = (
