@@ -510,11 +510,6 @@ class HandController:
                     ignore_assertion = False,
                     clear_cache = True,
                     )
-                card_object.set_coordinates_expected(
-                    set_value = coordinates_position,
-                    ignore_assertion = False,
-                    clear_cache = True,
-                    )
                 card_object.update_coordinates_state(
                     clear_cache = True,
                     )
