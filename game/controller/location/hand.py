@@ -743,7 +743,7 @@ class HandController:
         
         # Updating location index:
         self.update_location_index(
-            clear_cache = False
+            clear_cache = True
             )
 
         # Clearing cache, if required:
