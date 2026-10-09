@@ -440,6 +440,13 @@ class Game:
                 autostart = True,
                 ignore_assertion = False,
                 )
+        
+        # Adding a short delay before cards slide up to position:
+        self.__event_timeout(
+            timeout_seconds = 1,
+            autostart = True,
+            ignore_assertion = False,
+            )
             
     
     def __event_analyze_hands(self) -> None:
@@ -1634,17 +1641,6 @@ class Game:
     def __update_event_analyze_hand(self, player_controller: PlayerController, event_object: event.Event, 
                                           delta_time: float = 1 / 60, autoremove: bool = True) -> None:
         
-        # Updating card states:
-        print(player_controller.type, player_controller.hand.cards)
-        for card_object in player_controller.hand.cards:
-            state_playable: bool = True if player_controller.state_attacking else False
-            print(card_object, f"{state_playable=}")
-            card_object.set_state_playable(
-                set_value = state_playable,
-                ignore_assertion = False,
-                clear_cache = True
-                )
-           
         # Analyzing hand: 
         self.perform_player_analyze_hand(
             player_controller = player_controller,
@@ -1951,7 +1947,7 @@ class Game:
 
         # Updating attribute:
         self.__turn_player = set_value
-
+        
     
     def switch_turn_player(self) -> None:
         
@@ -2567,13 +2563,12 @@ class Game:
     def display_surface(self) -> None:
         
         # Displaying surface:
-        # self.surface_controller.display_debug()        # TODO: Replace with non-debug method!
         if self.turn_player == self.player_human:
             self.surface_controller.area_player.display(
                 custom_color = SETTINGS.DEBUG_COLOR_PLAYER_TURN,
                 )
         elif self.turn_player == self.player_computer:
-            self.surface_controller.area_player.display(
+            self.surface_controller.area_opponent.display(
                 custom_color = SETTINGS.DEBUG_COLOR_COMPUTER_TURN,
                 )
         
@@ -2680,7 +2675,7 @@ class Game:
             if self.table.cards_count == 0:
                 for card_object in player_controller.hand.cards:
                     card_object.set_state_playable(
-                        set_value = False,
+                        set_value = True,
                         ignore_assertion = True,
                         clear_cache = True,
                         )
@@ -3061,7 +3056,7 @@ class Game:
                 )
     
     
-    def handle_update(self, force_instant: bool = False) -> None:
+    def handle_card_update(self, force_instant: bool = False) -> None:
         
         # Looping over location controllers and calling method:
         for location_controller in self.__location_controllers:
