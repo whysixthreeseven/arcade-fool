@@ -58,7 +58,7 @@ class PlayerController:
     def __str__(self) -> str:
         
         # Generating string:
-        repr_string: str = f"{self.name_repr} ({self.type_repr})"
+        repr_string: str = f"{self.name_repr} ({self.type})"
         
         # Returning:
         return repr_string
@@ -67,7 +67,7 @@ class PlayerController:
     def __repr__(self) -> str:
         
         # Generating string:
-        repr_string: str = f"{self.name_repr} ({self.type_repr})"
+        repr_string: str = f"{self.name_repr} ({self.type})"
         
         # TODO: Implement repr string with more information!
         
