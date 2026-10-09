@@ -53,6 +53,41 @@ for location_index in __location_index_range:
     if location_index % 2 != 0:
         __coordinate_x_calc -= __COORDINATE_X_SHIFT_INDEX
         __coordinate_y_calc -= __COORDINATE_Y_SHIFT_INDEX
+
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    LOCATION (TABLE) HOVER COORDINATES 
+
+"""
+        
+
+# Generating coordinates dictionary index:
+LOCATION_TABLE_HOVER_COORDINATES_INDEX: dict[int, context.Coordinates] = {
+    location_index: None for location_index in range(0, 12)
+    }
+
+# Getting location index and coordinates position from other dictionary index:
+for location_index in LOCATION_TABLE_HOVER_COORDINATES_INDEX:
+    coordinates_position: context.Coordinates = LOCATION_TABLE_COORDINATES_INDEX[location_index]
+    
+    # Calculating and adjusting lower stack positions:
+    if location_index == 0 or location_index % 2 == 0:
+        coordinates_hover: context.Coordinates = coordinates_position
+        
+    # Calculating and adjusting upper stack positions:
+    else:
+        coordinate_x_position, coordinate_y_position = coordinates_position
+        coordinate_x_hover_shift: int = SETTINGS.LOCATION_TABLE_HOVER_SHIFT_COORDINATE_X
+        coordinate_y_hover_shift: int = SETTINGS.LOCATION_TABLE_HOVER_SHIFT_COORDINATE_Y
+        coordinate_x_hover: int = coordinate_x_position + coordinate_x_hover_shift
+        coordinate_y_hover: int = coordinate_y_position + coordinate_y_hover_shift
+        coordinates_hover: context.Coordinates = (
+            coordinate_x_hover,
+            coordinate_y_hover,
+            )
+
+    # Adding coordinates to position index:
+    LOCATION_TABLE_HOVER_COORDINATES_INDEX[location_index] = coordinates_position
         
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
