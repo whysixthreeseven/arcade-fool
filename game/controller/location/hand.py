@@ -324,6 +324,11 @@ class HandController:
         # Removing card from the list:
         self.__cards_list.remove(card_object)
         
+        # Updating location index for remaining cards:
+        self.update_location_index(
+            clear_cache = True,
+            )
+        
         # Clearing cache:
         if clear_cache:
             self.clear_cached_cards_attributes()
@@ -485,9 +490,8 @@ class HandController:
         
         # Locating coordinates:
         coordinates_index: dict[int, dict[int, context.Coordinates]] = self.precalc_coordinates
-        card_count: int = len(self.__cards_list)
-        calculated_cordinates: context.Coordinates = coordinates_index[card_count][card_object.location_index]
-        
+        calculated_cordinates: context.Coordinates = coordinates_index[self.cards_count][card_object.location_index]
+    
         # Returning:
         return calculated_cordinates
 
