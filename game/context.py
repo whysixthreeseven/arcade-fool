@@ -423,10 +423,12 @@ class EVENT_NAME:
     PLAYER_REFILL: str = "Player refill"
     PLAYER_SORT: str = "Player sort"
     PLAYER_DRAW: str = "Player draw"
+    PLAYER_PLAY: str = "Player play"
     PLAYER_ANALYZE_HAND: str = "Player analyze hand"
     OPPONENT_REFILL: str = "Opponent refill"
     OPPONENT_SORT: str = "Opponent sort"
     OPPONENT_DRAW: str = "Opponent draw"
+    OPPONENT_PLAY: str = "Opponent play"
     OPPONENT_ANALYZE_HAND: str = "Opponent analyze hand"
     TRUMP_COMPARE: str = "Trump cards compare sequence"
     TRUMP_COMPARE_IN: str = "Slide trump in"
@@ -457,10 +459,12 @@ EVENT_TYPE_INDEX: dict[str, str] = {
     EVENT_NAME.PLAYER_REFILL: EVENT_TYPE.GAME,
     EVENT_NAME.PLAYER_SORT: EVENT_TYPE.GAME,
     EVENT_NAME.PLAYER_DRAW: EVENT_TYPE.GAME,
+    EVENT_NAME.PLAYER_PLAY: EVENT_TYPE.GAME,
     EVENT_NAME.PLAYER_ANALYZE_HAND: EVENT_TYPE.GAME,
     EVENT_NAME.OPPONENT_REFILL: EVENT_TYPE.GAME,
     EVENT_NAME.OPPONENT_SORT: EVENT_TYPE.GAME,
     EVENT_NAME.OPPONENT_DRAW: EVENT_TYPE.GAME,
+    EVENT_NAME.OPPONENT_PLAY: EVENT_TYPE.GAME,
     EVENT_NAME.OPPONENT_ANALYZE_HAND: EVENT_TYPE.GAME,
     EVENT_NAME.TRUMP_COMPARE: EVENT_TYPE.GAME,
     EVENT_NAME.TRUMP_COMPARE_IN: EVENT_TYPE.GAME,
@@ -486,10 +490,12 @@ EVENT_DESCRIPTION_INDEX: dict[str, str] = {
     EVENT_NAME.PLAYER_REFILL: "There is nothing here yet.",
     EVENT_NAME.PLAYER_SORT: "There is nothing here yet.",
     EVENT_NAME.PLAYER_DRAW: "There is nothing here yet.",
+    EVENT_NAME.PLAYER_PLAY: "There is nothing here yet.",
     EVENT_NAME.PLAYER_ANALYZE_HAND: "There is nothing here yet.",
     EVENT_NAME.OPPONENT_REFILL: "There is nothing here yet.",
     EVENT_NAME.OPPONENT_SORT: "There is nothing here yet.",
     EVENT_NAME.OPPONENT_DRAW: "There is nothing here yet.",
+    EVENT_NAME.OPPONENT_PLAY: "There is nothing here yet.",
     EVENT_NAME.OPPONENT_ANALYZE_HAND: "There is nothing here yet.",
     EVENT_NAME.TRUMP_COMPARE: "There is nothing here yet.",
     EVENT_NAME.TRUMP_COMPARE_IN: "There is nothing here yet.",
@@ -515,10 +521,12 @@ EVENT_CONDITION_INDEX: dict[str, str] ={
     EVENT_NAME.PLAYER_REFILL: "Player's HandController card count is equal or greater than six cards",
     EVENT_NAME.PLAYER_SORT: "Player's HandController sorted cards with SESSION selected sort sequence",
     EVENT_NAME.PLAYER_DRAW: "Players's HandController received a new Card object",
+    EVENT_NAME.PLAYER_PLAY: "Player's HandController played a Card object",
     EVENT_NAME.PLAYER_ANALYZE_HAND: "Player's HandController updates cards based on turn and playability",
     EVENT_NAME.OPPONENT_REFILL: "Opponents's HandController card count is equal or greater than six cards",
     EVENT_NAME.OPPONENT_SORT: "Opponent's HandController sorted cards with random sort sequence",
     EVENT_NAME.OPPONENT_DRAW: "Opponent's HandController received a new Card object",
+    EVENT_NAME.OPPONENT_PLAY: "Opponent's HandController played a Card object",
     EVENT_NAME.OPPONENT_ANALYZE_HAND: "Opponent's HandController updates cards based on turn and playability",
     EVENT_NAME.TRUMP_COMPARE: "GameController compares cards in opnening hands",
     EVENT_NAME.TRUMP_COMPARE_IN: "Both players had a trump slide into TableController",
@@ -544,10 +552,12 @@ EVENT_WAIT_INDEX: dict[str, bool] = {
     EVENT_NAME.PLAYER_REFILL: True,
     EVENT_NAME.PLAYER_SORT: True,
     EVENT_NAME.PLAYER_DRAW: True,
+    EVENT_NAME.PLAYER_PLAY: True,
     EVENT_NAME.PLAYER_ANALYZE_HAND: True,
     EVENT_NAME.OPPONENT_REFILL: True,
     EVENT_NAME.OPPONENT_SORT: True,
     EVENT_NAME.OPPONENT_DRAW: True,
+    EVENT_NAME.OPPONENT_PLAY: True,
     EVENT_NAME.OPPONENT_ANALYZE_HAND: True,
     EVENT_NAME.TRUMP_COMPARE: True,
     EVENT_NAME.TRUMP_COMPARE_IN: True,
@@ -566,10 +576,12 @@ EVENT_TIMEOUT_INDEX: dict[str, float] = {
     EVENT_NAME.PLAYER_REFILL: 0.00,
     EVENT_NAME.PLAYER_SORT: 0.00,
     EVENT_NAME.PLAYER_DRAW: 0.00,
+    EVENT_NAME.PLAYER_PLAY: 1.00,
     EVENT_NAME.PLAYER_ANALYZE_HAND: 0.00,
     EVENT_NAME.OPPONENT_REFILL: 0.00,
     EVENT_NAME.OPPONENT_SORT: 0.00,
     EVENT_NAME.OPPONENT_DRAW: 0.00,
+    EVENT_NAME.OPPONENT_PLAY: 1.00,
     EVENT_NAME.OPPONENT_ANALYZE_HAND: 0.00,
     EVENT_NAME.TRUMP_COMPARE: 0.00,
     EVENT_NAME.TRUMP_COMPARE_IN: 0.00,
