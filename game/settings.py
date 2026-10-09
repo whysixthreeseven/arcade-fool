@@ -17,7 +17,7 @@ class __SETTINGS:
     APP_NAME: str = "Arcade Fool"
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
     APP_STARTED: str = "2026.09.02"                                                         # Date of project start (reboot)
-    APP_UPDATED: str = "2026.10.09"                                                         # Date of last edit
+    APP_UPDATED: str = "2026.10.10"                                                         # Date of last edit
     APP_VERSION: str = f"0.0.{APP_UPDATED.replace(".", "")}"                                # Version in A.B.YYYYMMDD format
     APP_AUTHOR: str = "Andrey Vostokov"
 
@@ -157,6 +157,8 @@ class __SETTINGS:
     LOCATION_TABLE_CENTER_COORDINATE_Y: int = AREA_TABLE_CENTER_COORDINATE_Y
     LOCATION_TABLE_INDEX_SHIFT_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.25)
     LOCATION_TABLE_INDEX_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.15)
+    LOCATION_TABLE_HOVER_SHIFT_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.10)
+    LOCATION_TABLE_HOVER_SHIFT_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.10)
     LOCATION_TABLE_MARGIN: int = __AREA_POS_MARGIN
     LOCATION_TABLE_USED_SURFACE: int = int(CARD_TEXTURE_WIDTH * 6 + LOCATION_TABLE_MARGIN * 5)
     
