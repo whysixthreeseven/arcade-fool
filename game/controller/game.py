@@ -1,6 +1,9 @@
 # External libraries:
 import random
 
+# Typing and annotations:
+from typing import Literal
+
 # Controllers:
 from game.controller.location.discard import DiscardController
 from game.controller.location.table import TableController
@@ -34,8 +37,8 @@ class Game:
     def __init__(self) -> None:
         
         # Player controllers:
-        self.__player_one_controller: PlayerController = None
-        self.__player_two_controller: PlayerController = None
+        self.__player_one_controller: PlayerController = None           # Player's controller, hand accessible via .hand
+        self.__player_two_controller: PlayerController = None           # Opponent's controller, hand accessible via .hand
         
         # Location controllers:
         self.__deck_controller: DeckController = None
@@ -44,26 +47,26 @@ class Game:
         
         # Surface and interface controllers:
         self.__surface_controller: surface.Surface = None
-        # self.__ui_controller: UserInterfaceController = None               # TODO: Implement!
+        # self.__ui_controller: UserInterfaceController = None          # TODO: Implement!
         
         # Screen attributes:
-        self.__screen: scene.Scene = None
+        self.__screen: scene.Scene = None                               # Current scene displayed (game surface, menu etc.)
         
         # Event attributes:
         self.__events: list[event.Event] = []
         
         # Game state attributes:
-        self.__state_game_ready: bool = False
+        self.__state_game_ready: bool = False                           # Flag to show if game controller is setup and ready
         self.__state_game_started: bool = False
         self.__state_game_paused: bool = False
         self.__state_game_ended: bool = False
         self.__state_game_phase: str = None
         
         # Round and turn attributes:
-        self.__turn_num: int = 0
-        self.__turn_player: PlayerController = None
-        self.__turn_draw: PlayerController = None
-        self.__round_num: int = 0
+        self.__turn_num: int = 1                                        # Turn num (1 to 12 including)
+        self.__turn_player: PlayerController = None                     # Player controller of the player whose turn it is
+        self.__turn_draw: PlayerController = None                       # Player controller first to draw cards on round end
+        self.__round_num: int = 1                                       # Round num from 1 ascending
         
         # Cursor coordinates attributes:
         self.__cursor_coordinate_x: int = 0
@@ -74,12 +77,12 @@ class Game:
         self.__cursor_release_coordinate_y: int = 0
         
         # Area attributes:
-        self.__area_hover: area.Area | None = None
+        self.__area_hover: area.Area | None = None                      # Area hovered over
         
         # Card hover and select attributes:
-        self.__card_hover: Card | None = None
-        self.__card_hover_list: list[Card] = []
-        self.__card_select: Card | None = None
+        self.__card_hover_list: list[Card] = []                         # All cards hovered over (overlaps)
+        self.__card_hover: Card | None = None                           # Card hovered over (boundary_value calculated)
+        self.__card_select: Card | None = None                          # Card selected on mouse click
         
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -89,6 +92,14 @@ class Game:
     
     
     def __setup_players(self) -> None:
+        """
+        Sets up players for the game.
+        
+        Creates two `PlayerController` class objects, creates and adds `HandController` class objects to them, and updates
+        their attacking and defending states to avoid errors on game updates coming in too soon. Per each class object created, 
+        this method calls its `.setup()` or setup-related method, e.g. `.setup_human()` or `.setup_computer()` for 
+        `PlayerController` class object.
+        """
         
         # Setting up player one (human):
         player_one_controller: PlayerController = PlayerController()
@@ -130,6 +141,12 @@ class Game:
         
     
     def __setup_locations(self) -> None:
+        """
+        Sets up locations for the game.
+
+        Creates three `LocationController` class objects, one for each location type, and updates their attributes. Per each
+        class created, this method calls its `.setup()`.
+        """
         
         # Creating locations controllers:
         deck_controller: DeckController = DeckController()
@@ -147,6 +164,11 @@ class Game:
 
 
     def __setup_surface(self) -> None:
+        """
+        Sets up surface controller for the game. Not implemented yet.
+        
+        TODO: Adjust controller to create areas on call instead of pregenerating them on module load.
+        """
 
         # Creating surface controller:
         surface_controller: surface.Surface = surface.Surface()
@@ -159,6 +181,14 @@ class Game:
         
 
     def setup(self) -> None:
+        """
+        Sets up the controllers and game state.
+        
+        Game controller main setup method. Calls other `.__setup` related methods available to `GameController` class object. 
+        Once done, updates `__state_game_ready` attribute to `True`.
+        
+        Used on controller creation and game start/reset events.
+        """
         
         # Calling setup methods in order:
         self.__setup_players()
@@ -173,6 +203,13 @@ class Game:
         
         
     def __reset_attributes(self) -> None:
+        """
+        Resets all attributes to their default values.
+        
+        Resets all attributes to their default values, including player controllers, turn and round attributes, cursor 
+        coordinates, area, card hover and select attributes. Called by `game_reset()` method on game reset. Does not clear
+        `__events_list` attribute, it is cleared by `game_reset()` method itself to avoid flushing reset-related events.
+        """
         
         # Game state attributes:
         self.__state_game_ready: bool = False
@@ -190,20 +227,32 @@ class Game:
         # Cursor coordinates attributes:
         self.__cursor_coordinate_x: int = 0
         self.__cursor_coordinate_y: int = 0
+        self.__cursor_press_coordinate_x: int = 0
+        self.__cursor_press_coordinate_y: int = 0
+        self.__cursor_release_coordinate_x: int = 0
+        self.__cursor_release_coordinate_y: int = 0
         
-        # Hit attributes:
+        # Area attributes:
         self.__area_hover: area.Area | None = None
-        self.__card_hover_list: list[Card] = []
         
         # Card hover and select attributes:
         self.__card_hover: Card | None = None
+        self.__card_hover_list: list[Card] = []
         self.__card_select: Card | None = None
-        
-        # Trump value:
-        self.__trump_suit: str = None
         
         
     def __reset_player_state(self) -> None:
+        """
+        Resets player controllers' state to default values (player attacking and opponent defending).
+        
+        Used on game reset to avoid errors on player controllers' state. Asserts that player controllers are set before
+        setting their attack/defend states.
+        
+        Raises
+        --------
+        AttributeError
+            If any of the player controllers is not set.
+        """
         
         # Asserting controllers are set:
         for player_controller in self.__player_controllers:
@@ -227,12 +276,27 @@ class Game:
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        GAME CONTROL METHODS
+        GAME & EVENT CONTROL METHODS
     
     """
     
     
-    def __game_prepare_sequence(self) -> None:
+    def __event_prepare_game(self) -> None:
+        """
+        Game preparation event sequence. 
+        
+        Calls to create a new deck of cards, applies reveal "animation" by setting each card's `state_revealed` to `True` one at a 
+        time, and then adds a timeout event to wait for 1 second before next sequence.
+        
+        Runs specific functions and adds events (`event.Event` class objects) in order to the event pipeline. Called by 
+        `game_start()` method. This sequence is used on game start and game reset events. This is the first of of four required 
+        sequences to start the game.
+
+        Sequence order
+        --------
+        `1. Deck hover function;` > `2. Timeout (1 second) event;` > `3. Restock event;` > `4. Timeout (1 second) event;` > 
+        `5. Deal cards event;` > `6. Deck dehover event;`
+        """
         
         # Hovering deck:
         self.set_deck_hover(
@@ -241,40 +305,45 @@ class Game:
             )
             
         # Waiting for objects to load up:
-        self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_1,
-                ignore_assertion = True,
-                ),
+        self.__event_timeout(
+            timeout_seconds = 1,
             autostart = True,
             ignore_assertion = False,
             )
         
         # Adding restock event:
         self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.RESTOCK,
-                ignore_assertion = True,
-                ),
+            event_object = event.EVENT_RESTOCK,
             autostart = True,
             ignore_assertion = False,
             )
             
         # Waiting for objects to load up:
-        self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_1,
-                ignore_assertion = True,
-                ),
+        self.__event_timeout(
+            timeout_seconds = 1,
             autostart = True,
             ignore_assertion = False,
             )
         
     
-    def __game_deal_sequence(self) -> None:
+    def __event_deal_cards_start(self) -> None:
+        """
+        First cards dealing event sequence. 
+        
+        Adds a card to each `PlayerController` in an ordered loop until each player has 6 cards. Dehovers the deck to apply "animation" 
+        and then adds a timeout event to wait for 1 second before next sequence.
+        
+        Runs specific functions and adds events (`event.Event` class objects) in order to the event pipeline. Called by 
+        `game_start()` method. This sequence is used on game start and game reset events. This is the second of of four required 
+        sequences to start the game.
+
+        Sequence order
+        --------
+        `1. (Player draw event, Opponent draw event) loop six times;` > `2. Deck dehover event;` > `3. Timeout (1 second) event;`
+        """
         
         # Starting draw cards loop
-        hand_size_min: int = SETTINGS.HAND_SIZE_REFILL_MIN
+        hand_size_min: int = SETTINGS.HAND_SIZE_REFILL_MIN                  # 6 cards
         for _ in range(hand_size_min):
             
             # Choosing correct player controller and event name:
@@ -302,17 +371,31 @@ class Game:
             )
         
         # Waiting for sort to finish:
-        self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_1,
-                ignore_assertion = False,
-                ),
+        self.__event_timeout(
+            timeout_seconds = 1,
             autostart = True,
             ignore_assertion = False,
             )
         
     
-    def __game_trump_compare_sequence(self) -> None:
+    def __event_compare_trump_cards(self) -> None:
+        """
+        Trump cards compare event sequence. 
+        
+        Internally compares trump cards between players (if available), creates "animation" by sliding trump cards to the table,
+        waits for three seconds, slides cards back to hands, and sorts hand for each player (does not sort opponent's hand, if 
+        no card was shown). Adjusts `turn_player` controller's attribute to determine which player goes first based on trump 
+        cards value comparison results.
+        
+        Runs specific functions and adds events (`event.Event` class objects) in order to the event pipeline. Called by 
+        `game_start()` method. This sequence is used on game start and game reset events. This is the third of of four required 
+        sequences to start the game.
+
+        Sequence order
+        --------
+        `1. Trump compare event;` > `2. Card slide in event;` > `3. Timeout (3 seconds) event;` > `4. Card slide out event;` > 
+        `5. Player sort event;` > (if required) `6. Opponent sort event;`
+        """
         
         # Allowing controller to compare trump cards:
         self.add_event(
@@ -327,11 +410,8 @@ class Game:
             autostart = True,
             ignore_assertion = False,
             )
-        self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_1,
-                ignore_assertion = False,
-                ),
+        self.__event_timeout(
+            timeout_seconds = 1,
             autostart = True,
             ignore_assertion = False,
             )
@@ -348,7 +428,7 @@ class Game:
             ignore_assertion = False,
             )
         
-        # Sorting opponent's hand:
+        # Sorting opponent's hand, if trump card was shown:
         opponent_trump_available: bool = False
         for card_object in self.player_computer.hand.cards:
             if card_object.trump:
@@ -356,15 +436,29 @@ class Game:
                 break
         if opponent_trump_available:
             self.add_event(
-                event_object = event.EVENT_OPPONENT_SORT,
+                event_object = event.EVENT_OPPONENT_SORT,               # Uses HandController's sort_random method!
                 autostart = True,
                 ignore_assertion = False,
                 )
             
     
-    def __game_preset_cards(self) -> None:
+    def __event_analyze_hands(self) -> None:
+        """
+        Players' hand container analyze event sequence. 
         
-        # TODO: Add events!
+        Analyzes both player's hand container to determine card objects' `state_playable` based on each `PlayerController` class'
+        `state_attacking` and `state_defending` (or `state`) properties and turn order.
+        
+        Runs specific functions and adds events (`event.Event` class objects) in order to the event pipeline. Called by 
+        `game_start()` method. This sequence is used on game start and game reset events. This is the fourth and the last of of 
+        four required sequences to start the game.
+
+        Sequence order
+        --------
+        `1. Player analyze hand event;` > `2. Opponent analyze hand event;`
+        """
+        
+        # Adding related events:
         self.add_event(
             event_object = event.EVENT_PLAYER_ANALYZE_HAND,
             autostart = True,
@@ -377,23 +471,22 @@ class Game:
             )
         
     
-    def game_start(self) -> None:
+    def __event_reset_game(self) -> None:
+        """
+        Game reset event sequence. 
         
-        # Running setup, if game is not ready:
-        if not self.state_game_ready:
-            self.setup()
-            
-        # Preparing and dealing cards sequence:
-        self.__game_prepare_sequence()
-        self.__game_deal_sequence()
-        self.__game_trump_compare_sequence()
-        self.__game_preset_cards()
+        Creates "animation" of cards returning to deck container area piling up, makes them invisible one at a time by changing
+        their `state_revealed` to False, starts resetting the game states and attributes internally with `EVENT_RESET` event 
+        added. Calls `DeckController` class `restock()` method to reset deck container and cards state.
         
-    
-    def game_reset(self) -> None:
-            
-        # Removing all other events:
-        self.__events: list[event.Event] = []
+        Runs specific functions and adds events (`event.Event` class objects) in order to the event pipeline. Called by 
+        `game_reset()` method. This sequence is used on game reset event.
+
+        Sequence order
+        --------
+        `1. Cards pile up event` > `2. Timeout (1 second) event;` > `3. Game reset event;` > `4. Timeout (1 second) event;` > 
+        `5. DeckController.restock() method call;`
+        """
         
         # Piling cards up:
         self.add_event(
@@ -403,13 +496,10 @@ class Game:
             )
         
         # Adding short timeout:
-        self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_1,
-                ignore_assertion = True,
-                ),
+        self.__event_timeout(
+            timeout_seconds = 1,
             autostart = True,
-            ignore_assertion = True,
+            ignore_assertion = False,
             )
         
         # Adding reset event:
@@ -420,14 +510,10 @@ class Game:
             )
         
         # Adding short timeout:
-        self.add_event(
-            event_object = event.Event.generate_predefined(
-                event_name = context.EVENT_NAME.TIMEOUT_1,
-                ignore_assertion = True,
-                ),
-            autostart = True,
-            ignore_assertion = True,
-            )
+        self.__event_timeout(
+            timeout_seconds = 1, 
+            autostart = True, 
+            ignore_assertion = True)
         
         # Restocking cards:    
         self.deck.restock(
@@ -435,6 +521,81 @@ class Game:
             ignore_assertion = True,
             clear_cache = True
             )
+        
+        
+    @cached_property
+    def __event_timeout_index(self) -> dict[int, str]:
+        """
+        Timeout event name dictionary index.
+        
+        Generates and returns a dictionary index with timeout in seconds to event name pairs, e.g.: 
+        `{1: context.EVENT_NAME.TIMEOUT_1, ...}`. Cached property, cannot be (and should not be) cleared.
+        """
+        
+        # Generating event name dictionary index:
+        timeout_event_name_index: dict[int, str] = {
+            1: context.EVENT_NAME.TIMEOUT_1,
+            3: context.EVENT_NAME.TIMEOUT_3,
+            5: context.EVENT_NAME.TIMEOUT_5
+            }
+        
+        # Returning:
+        return timeout_event_name_index
+
+        
+    def __event_timeout(self, timeout_seconds: Literal[1, 3, 5] = 1, autostart: bool = True, ignore_assertion: bool = False) -> None:
+        """
+        Creates and adds a timeout event based on `timeout_seconds` parameter.
+        
+        Creates a timeout event (`event.Event` class object) with predefined name based on `timeout_seconds` parameter. Uses 
+        preset default seconds integer values: `1`, `3`, and `5`, and `__event_timeout_index` cached property to select a correct
+        event name for event generation classmethod: `event.Event.generated_predefined()`.
+        
+        Parameters
+        --------
+        timeout_seconds: `Literal[1, 3, 5]` = `1`
+            Timeout event seconds integer value. Can be `1`, `3`, or `5`.
+        autostart: `bool` = `True`
+            If `True`, event will be added to the event pipeline and started immediately.
+        ignore_assertion: `bool` = `False`
+            Flag to ignore assertion on event addition or not.
+        """
+        
+        # Selecting correct timout event:
+        event_name: str = self.__event_timeout_index[timeout_seconds]
+        event_object: event.Event = event.Event.generate_predefined(
+                event_name = event_name,
+                ignore_assertion = True,
+                )
+        
+        # Adding timeout event:
+        self.add_event(
+            event_object = event_object,
+            autostart = autostart,
+            ignore_assertion = ignore_assertion,
+            )
+        
+            
+    def game_start(self) -> None:
+        
+        # Running setup, if game is not ready:
+        if not self.state_game_ready:
+            self.setup()
+            
+        # Adding related events in order:
+        self.__event_prepare_game()
+        self.__event_deal_cards_start()
+        self.__event_compare_trump_cards()
+        self.__event_analyze_hands()
+        
+    
+    def game_reset(self) -> None:
+            
+        # Removing all other events:
+        self.__events: list[event.Event] = []
+        
+        # Adding related events in order:
+        self.__event_reset_game()
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -592,7 +753,7 @@ class Game:
     
     
     @property
-    def cards_area_index(self) -> dict[str, tuple[Card, ...]]:
+    def cards_area_index(self) -> dict[area.Area, tuple[Card, ...]]:
         
         # Constructing card container index:
         card_container_index: dict[str, tuple[Card, ...]] = {
@@ -624,8 +785,8 @@ class Game:
         cards: tuple[Card, ...] = tuple(
             card_object
             for cards_container in cards_container_list
-            for card_object in cards_container 
                 if cards_container is not None
+            for card_object in cards_container 
             )
 
         # Returning:
@@ -2923,13 +3084,41 @@ class Game:
     """
     
     
-    def apply_trump_suit(self) -> None:
+    def apply_trump_suit(self, card_suit: str, ignore_assertion: bool = False) -> None:
+        """
+        Scans all cards in all card containers and updates their `trump` attribute if their suit matches the `card_suit` 
+        parameter.
+        
+        Accespts only default values. Card suit default values can be found in `context.CARD_SUIT` and `context.CARD_SUIT_LIST`.
+        
+        This method may attempt to validate parameters if assertion is enabled with `ignore_assertion` parameter and 
+        `SESSION.ENABLE_ASSERTION` is `True`. On failed validation raises `AssertionError`. Uses `utilities.scripts.validate` and
+        `utilities.scripts.assertion` modules to perform validation.
+        
+        Parameters
+        --------
+        card_suit : `str`
+            Card suit default value to compare card object's `suit` property to. Must be a default value.
+        ignore_assertion : `bool` = `False`
+            Flag to ignore assertion control or not.
+            
+        Raises
+        --------
+        AssertionError
+            Raised if assertion is enabled and validation fails.
+        """
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_card_suit(
+                validate_value = card_suit
+                )
         
         # Looping over all card objects:
         for card_object in self.cards:
             
             # Updating trump state if suits match:
-            if card_object.suit == self.trump_suit:
+            if card_object.suit == card_suit:
                 card_object.set_trump(
                     set_value = True,
                     ignore_assertion = True,
