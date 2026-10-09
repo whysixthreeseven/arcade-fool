@@ -4253,11 +4253,31 @@ class CardController:
         self.__update_tilt(
             clear_cache = clear_cache,
             )
+        
+        
+    def __update_coordinates_hover_location(self, clear_cache: bool = True) -> None:
+        
+        # Retrieving hover coordinates for table location:
+        if self.location == context.CARD_LOCATION.TABLE:
+            coordinates_index: dict[int, context.Coordinates] = coordinates.LOCATION_TABLE_HOVER_COORDINATES_INDEX
+            coordinates_hover: context.Coordinates = coordinates_index[self.location_index]
+        
+        # Retrieving hover coordinates for deck location:
+        elif self.location == context.CARD_LOCATION.DECK:
+            coordinates_index: dict[int, context.Coordinates] = coordinates.LOCATION_DECK_HOVER_COORDINATES_INDEX
+            coordinates_hover: context.Coordinates = coordinates_index[self.location_index]
+            
+        # Updating hover coordinates:
+        self.set_coordinates_hover(
+            set_value = coordinates_hover,
+            ignore_assertion = True,
+            clear_cache = clear_cache
+            )
 
     
     def update_coordinates_location(self, calculated_coordinates: context.Coordinates | None, clear_cache: bool = True) -> None:
         """
-        Updated coordinates based on card's location and `calculated_coordinates` parameter provided.
+        Updates coordinates (position and hover) based on card's location and `calculated_coordinates` parameter provided.
         
         If `calculated_coordinates` parameter is set to None, assumes that card's current location is either "Deck", "Discard", or
         "Table", allowing it to load precaclulcated coordinates values from `self.__location_precalc_coordinates` dictionary index
@@ -4295,17 +4315,16 @@ class CardController:
                     clear_cache = clear_cache
                     )
                 
-                # Updating hover coordinates for deck:
-                if self.location == context.CARD_LOCATION.DECK:
-                    coordinates_index: dict[int, context.Coordinates] = coordinates.LOCATION_DECK_HOVER_COORDINATES_INDEX
-                    coordinates_hover: context.Coordinates = coordinates_index[self.location_index]
-                    self.set_coordinates_hover(
-                        set_value = coordinates_hover,
-                        ignore_assertion = True,
+                # Updating coordinates (hover) to precalculated values:
+                location_hover_list: tuple[str, ...] = (
+                    context.CARD_LOCATION.TABLE,
+                    context.CARD_LOCATION.DECK
+                    )
+                if self.location in location_hover_list:
+                    self.__update_coordinates_hover_location(
                         clear_cache = clear_cache
                         )
                         
-        
         # Updating coordinates based on provided value:
         else:
 
