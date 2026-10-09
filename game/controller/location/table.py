@@ -236,7 +236,7 @@ class TableController:
         
         # Updating card's location:
         location: context.Location = (
-            context.CARD_LOCATION.DISCARD,
+            context.CARD_LOCATION.TABLE,
             location_index
             )
         card_object.set_location(
@@ -247,7 +247,7 @@ class TableController:
         
         # Setting card's owner:
         card_object.set_owner(
-            set_value = self.owner,
+            set_value = None,
             update_previous = True,
             ignore_assertion = True,
             clear_cache = True
@@ -280,7 +280,6 @@ class TableController:
         # Clearing cache:
         if clear_cache:
             self.clear_cached_cards_attributes()
-            self.clear_cached_position_attributes()
             
             
     def remove_card(self, card_object: Card, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -305,7 +304,6 @@ class TableController:
         # Clearing cache, if required:
         if clear_cache:
             self.clear_cached_cards_attributes()
-            self.clear_cached_position_attributes()
             
     
     def sweep(self, clear_cache: bool = True) -> tuple[Card, ...]:
@@ -321,7 +319,6 @@ class TableController:
         # Cleaning cache, if required:
         if clear_cache:
             self.clear_cached_cards_attributes()
-            self.clear_cached_position_attributes()
         
         # Returning:
         return cards_pending_removal
