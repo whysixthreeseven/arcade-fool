@@ -1112,7 +1112,6 @@ class Game:
     def __update_event_sort(self, event_object: event.Event, player_controller: PlayerController, 
                                   delta_time: float = 1 / 60, autoremove: bool = True) -> None:
                 
-
         # Sorting hand:
         if player_controller.type == context.PLAYER_TYPE.HUMAN:
             player_controller.hand.sort_selected(
@@ -1329,7 +1328,20 @@ class Game:
                         
             # Updating card's expected coordinates:
             if card_highest is not None:
-                coordinates_slide: context.Coordinates = coordinates_index[player_controller.type]
+                # coordinates_slide: context.Coordinates = coordinates_index[player_controller.type]
+                
+                # Calculating slide coordinates:
+                coordinate_x_slide: int = card_highest.coordinate_x_position
+                coordinate_y_slide_adjust: int = SETTINGS.LOCATION_HAND_COMPARE_SHIFT_COORDINATE_Y
+                if player_controller.type == context.PLAYER_TYPE.COMPUTER:
+                    coordinate_y_slide_adjust *= -1
+                coordinate_y_slide: int = card_highest.coordinate_y_position + coordinate_y_slide_adjust
+                coordinates_slide: context.Coordinates = (
+                    coordinate_x_slide, 
+                    coordinate_y_slide
+                    )
+                
+                # Comparing and adjusting coordinates expected:
                 if card_highest.coordinates_expected != coordinates_slide:
                     card_highest.set_coordinates_expected(
                         set_value = coordinates_slide,
