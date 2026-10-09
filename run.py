@@ -8,7 +8,7 @@ from game.gameshell import Gameshell
 def run() -> None:
     """
     Runs the game. Main entry point.
-    
+
     Note that game runs with fullscreen and resizable options turned off. Ensure your screen area allows
     for this. Otherwise parts of the game screen may be obscured or invisible.
     """
