@@ -1,5 +1,4 @@
 # External libraries:
-import arcade
 import os
 
 # Context variables:
@@ -17,9 +16,9 @@ class __SETTINGS:
     # Application information:
     APP_NAME: str = "Arcade Fool"
     APP_DESCRIPTION: str = "Card game 'Fool' created with Python and Arcade library"
-    APP_STARTED: str = "2026.09.02"                                     # Date of project start (reboot)
-    APP_UPDATED: str = "2026.10.09"                                     # Date of last edit
-    APP_VERSION: str = f"0.0.{APP_UPDATED.replace(".", "")}"            # Version in A.B.YYYYMMDD format
+    APP_STARTED: str = "2026.09.02"                                                         # Date of project start (reboot)
+    APP_UPDATED: str = "2026.10.09"                                                         # Date of last edit
+    APP_VERSION: str = f"0.0.{APP_UPDATED.replace(".", "")}"                                # Version in A.B.YYYYMMDD format
     APP_AUTHOR: str = "Andrey Vostokov"
 
     # Root directory settings:    
@@ -45,7 +44,7 @@ class __SETTINGS:
     CARD_RENDER_TILT_RANDOM_MAX: int = 12
     CARD_RENDER_TILT_ARCH_MIN: int = 0
     CARD_RENDER_TILT_ARCH_MAX: int = 15
-    CARD_RENDER_TILT_ARCH_THRESHOLD: int = int(CARD_RENDER_TILT_ARCH_MAX * 0.10)        # 10% of max
+    CARD_RENDER_TILT_ARCH_THRESHOLD: int = int(CARD_RENDER_TILT_ARCH_MAX * 0.10)            # 10% of max
     CARD_RENDER_TILT_AXIS_LIST: tuple[int, int] = (-1, 1)
     CARD_RENDER_TILT_ADJUST_MIN: float = 3.00
     CARD_RENDER_TILT_ADJUST_MAX: float = 15.00
@@ -57,7 +56,7 @@ class __SETTINGS:
     CARD_RENDER_ALPHA_FADE: int = int(CARD_RENDER_ALPHA_DEFAULT * CARD_RENDER_ALPHA_FADE_MOD)
     CARD_RENDER_ALPHA_STEP_MOD_DEFAULT: float = 0.015
     CARD_RENDER_ALPHA_STEP_MOD_FADED: float = 0.045
-    CARD_RENDER_BG_COLOR: context.context.RGB_Color = (215, 0, 0)                                           # Red
+    CARD_RENDER_BG_COLOR: context.context.RGB_Color = (215, 0, 0)
     
     # Card texture settings:
     CARD_TEXTURE_SCALE_DEFAULT: float = 0.20
@@ -131,10 +130,10 @@ class __SETTINGS:
     LOCATION_DECK_SHIFT_COORDINATE_X: int = 2
     LOCATION_DECK_SHIFT_COORDINATE_Y: int = 1
     LOCATION_DECK_SHIFT_PER_CARD: int = __SHIFT_PER_CARD
-    LOCATION_DECK_SHIFT_LAST_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.050) * -1               # Shift left
-    LOCATION_DECK_SHIFT_LAST_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025) * -1              # Shift down
-    LOCATION_DECK_SHIFT_SECRET_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.050) * -1             # Shift left
-    LOCATION_DECK_SHIFT_SECRET_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025)                 # Shift up
+    LOCATION_DECK_SHIFT_LAST_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.050) * -1       # Shift left
+    LOCATION_DECK_SHIFT_LAST_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025) * -1      # Shift down
+    LOCATION_DECK_SHIFT_SECRET_COORDINATE_X: int = int(CARD_TEXTURE_WIDTH * 0.050) * -1     # Shift left
+    LOCATION_DECK_SHIFT_SECRET_COORDINATE_Y: int = int(CARD_TEXTURE_HEIGHT * 0.025)         # Shift up
     LOCATION_DECK_SHIFT_GLOBAL: int = int(CARD_TEXTURE_WIDTH / 5)
     LOCATION_DECK_HINT_COORDINATE_X: int = LOCATION_DECK_COORDINATE_X
     LOCATION_DECK_HINT_COORDINATE_Y_UPPER: int = 0 + int(CARD_TEXTURE_HEIGHT * 0.45)
@@ -207,7 +206,8 @@ class __SETTINGS:
     HAND_CARD_OVERLAP_START: float = 0.90
     HAND_CARD_OVERLAP_STOP: float = 0.10
     HAND_CARD_OVERLAP_INCREMENT: float = 0.005
-    HAND_SIZE_REFILL_MIN: int = 6
+    HAND_SIZE_DEFAULT: int = 6
+    HAND_SIZE_REFILL_MIN: int = HAND_SIZE_DEFAULT
     
     # Window settings:
     WINDOW_TITLE: str = f"{APP_NAME} (v{APP_VERSION})"
