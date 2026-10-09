@@ -2514,11 +2514,6 @@ class Game:
                 ignore_assertion = True,
                 clear_cache = True,
                 )
-            self.perform_fade(
-                set_value = True,
-                player_controller = self.player_human,
-                ignore_assertion = ignore_assertion,
-                )
             
                 
     def remove_card_select(self) -> None:
@@ -2736,34 +2731,47 @@ class Game:
                 validate_value = card_object,
                 )
             
-        # Performing action if player is attacking:
-        if player_controller.state_attacking:
-            location_index: int = self.table.get_position_attack(
-                card_object = card_object,
-                ignore_assertion = True,
-                )
-            
-        # Raising error if position is empty or invalid:
-        if location_index is None:
-            error_message: str = f"Unable to find position to play <{card_object}> while player is {player_controller.state.lower()}!"
-            raise IndexError(error_message)
+        # Asserting card object is playable:
+        if card_object.state_playable:
+                
+            # Preparing variables:
+            location_index_selected: int | None = None
+                
+            # Performing action if player is attacking:
+            if player_controller.state_attacking:
+                for location_index, card_table in self.table.cards_index.items():
+                    if location_index == 0 or location_index % 2 == 0:
+                        if card_table is None:
+                            location_index_selected: int = location_index
+                            break
+            elif player_controller.state_defending:
+                for location_index, card_table in self.table.cards_index.items():
+                    if location_index >= 1 and location_index % 2 != 0:
+                        if card_table is None:
+                            location_index_selected: int = location_index
+                            break
+                
+            # Raising error if position is empty or invalid:
+            if location_index_selected is None:
+                error_message: str = f"Unable to find position to play <{card_object}> while player is {player_controller.state.lower()}!"
+                raise IndexError(error_message)
 
-        # Removing card from player's hand and adding it to the table:
-        else:
-            player_controller.hand.remove_card(
-                card_object = card_object,
-                ignore_assertion = False,
-                clear_cache = True,
-                )
-            player_controller.hand.update_coordinates(
-                clear_cache = True
-                )
-            self.table.add_card(
-                card_object = card_object,
-                location_index = location_index,
-                ignore_assertion = False,
-                clear_cache = True,
-                )
+            # Removing card from player's hand and adding it to the table:
+            else:
+                player_controller.hand.remove_card(
+                    card_object = card_object,
+                    ignore_assertion = False,
+                    clear_cache = True,
+                    )
+                player_controller.hand.update_coordinates(
+                    clear_cache = True
+                    )
+                self.table.add_card(
+                    card_object = card_object,
+                    location_index = location_index_selected,
+                    ignore_assertion = False,
+                    clear_cache = True,
+                    )
     
     
     def perform_fade(self, set_value: bool, player_controller: PlayerController, ignore_assertion: bool = False) -> None:
@@ -2831,6 +2839,7 @@ class Game:
         # Checking if hovered card was clicked:
         card_target_legal: bool = bool(
             self.area_hover == area.AREA_PLAYER and
+            self.card_hover.state_playable and 
             self.card_hover is not None and 
             self.card_hover.hit_boundary(
                 hit_coordinates = cursor_coordinates,
@@ -2854,25 +2863,20 @@ class Game:
             else:
                 if self.card_select == self.card_hover:
                     
-                    # Choosing location index for card played:
-                    if self.player_human.state_attacking:
-                        location_index = self.table.get_position_attack(
-                            card_object = self.card_select,
-                            ignore_assertion = ignore_assertion,
-                            )
-                    else:
-                        location_index = self.table.get_position_defence(
-                            card_object = self.card_select,
-                            ignore_assertion = ignore_assertion,
-                            )
-                        
                     # Calling play method:
                     self.perform_player_play(
                         player_controller = self.player_human,
                         card_object = self.card_select,
-                        location_index = location_index,
                         ignore_assertion = ignore_assertion,
                         )
+                    
+                    # Switching turns:
+                    self.switch_turn_player()
+                    for player_controller in self.__player_controllers:
+                        self.perform_player_analyze_hand(
+                            player_controller = player_controller,
+                            ignore_assertion = False,
+                            )
     
     
     def handle_mouse_release(self, cursor_coordinates: context.Coordinates, ignore_assertion: bool = False) -> None:
