@@ -194,7 +194,7 @@ class __SETTINGS:
     # Debug rect settings:
     RECT_COMMON_COLOR_CARD_BOUNDARY: context.RGBA_Color = (255, 165, 0, 255)
     RECT_TABLE_COLOR_POSITION: context.RGBA_Color = (125, 125, 125, 255)
-    RECT_DISCARD_COLOR_POSITION: context.RGBA_Color = (0, 0, 0, 255)
+    RECT_DISCARD_COLOR_POSITION: context.RGBA_Color = (55, 55, 55, 255)
     
     # Debug color settings:
     DEBUG_COLOR_PLAYER_TURN: context.RGBA_Color = (25, 255, 25, 255)

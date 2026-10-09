@@ -2590,13 +2590,13 @@ class Game:
         self.table.display_debug()
         self.discard.display_debug()
         
-        # Player hand debug render:
-        if self.area_hover == area.AREA_PLAYER:
-            self.player_human.hand.display_debug()
+        # # Player hand debug render:
+        # if self.area_hover == area.AREA_PLAYER:
+        #     self.player_human.hand.display_debug()
             
-        # Opponent hand debug render:
-        elif self.area_hover == area.AREA_OPPONENT:
-            self.player_computer.hand.display_debug()
+        # # Opponent hand debug render:
+        # elif self.area_hover == area.AREA_OPPONENT:
+        #     self.player_computer.hand.display_debug()
     
     
     def display_hints(self) -> None:
