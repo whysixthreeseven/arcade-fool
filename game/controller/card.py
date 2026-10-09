@@ -4140,9 +4140,6 @@ class CardController:
         # Adjusting coordinate y:
         if self.coordinate_y != self.coordinate_y_expected:
             
-            if self.owner == context.PLAYER_TYPE.HUMAN:
-                print(self, self.coordinate_y, self.coordinate_y_expected, self.coordinate_y_unplayable, self.state_playable, )
-            
             # Calculating distance and speed:
             difference_coordinate_y = abs(self.coordinate_y - self.coordinate_y_expected)
             if difference_coordinate_y != 0:
