@@ -205,16 +205,28 @@ class AREA_TYPE:
     SURFACE: str = "Surface"
     INTERFACE: str = "Interface"
     PLAYER: str = "Player"
+    PLAYER_INFO: str = "Player info"
     OPPONENT: str = "Opponent"
+    OPPONENT_INFO: str = "Opponent info"
     TABLE: str = "Table"
     DECK: str = "Deck"
     DECK_CONTAINER: str = "Deck container"
+    DECK_INFO: str = "Deck info"
     DISCARD: str = "Discard"
+    DISCARD_INFO: str = "Discard info"
     
     
 AREA_TYPE_LIST: tuple[str, ...] = tuple(
     attribute_value for attribute_name, attribute_value in AREA_TYPE.__dict__.items()
         if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
+    )
+
+
+AREA_TYPE_INFO_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in AREA_TYPE.__dict__.items()
+        if not attribute_name.startswith("__") 
+        and attribute_name.endswith("_INFO") 
         and isinstance(attribute_value, str)
     )
     
@@ -568,7 +580,7 @@ EVENT_WAIT_INDEX: dict[str, bool] = {
     EVENT_NAME.PILE: True,
     EVENT_NAME.RESET: True,
     EVENT_NAME.RESTOCK: True,
-    EVENT_NAME.DECK_DEHOVER: False,               # Only visual effect
+    EVENT_NAME.DECK_DEHOVER: False,                 # Only visual effect
     }
 
 
