@@ -2670,6 +2670,12 @@ class Game:
         self.surface_controller.display_debug()
         self.table.display_debug()
         self.discard.display_debug()
+
+
+    def display_info(self) -> None:
+
+        # Calling display info method:
+        self.surface_controller.display_info()
         
     
     def display_hints(self) -> None:
