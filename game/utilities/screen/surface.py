@@ -50,7 +50,6 @@ class Surface:
             A list of all `area.Area` objects stored in the `Surface` class instance.
         """
         
-        
         # Collecting areas:
         area_list: tuple[area.Area, ...] = (
             self.__area_player,
@@ -67,7 +66,22 @@ class Surface:
         
         # Returning:
         return area_list
-    
+
+
+    @cached_property
+    def __area_ino_list(self) -> tuple[area.Area, ...]:
+
+        # Collecting area objects:
+        area_info_list: tuple[area.Area, ...] = (
+            self.__area_player_info,
+            self.__area_opponent_info,
+            self.__area_deck_info,
+            self.__area_discard_info,
+            )
+
+        # Returning:
+        return area_info_list
+        
     
     @cached_property
     def __area_render_order(self) -> tuple[area.Area, ...]:
@@ -227,7 +241,7 @@ class Surface:
     
     
     @cached_property
-    def area_discards_info(self) -> area.Area:
+    def area_discard_info(self) -> area.Area:
         """
         Discard info `area.Area` object. Used to determine area boundaries for cursor on render surface.
         
@@ -310,4 +324,9 @@ class Surface:
         # Calling display method for all areas:
         for area_object in self.__area_render_order:
             area_object.display()
+
+
+    def display_info(self) -> None:
+
+        
 
