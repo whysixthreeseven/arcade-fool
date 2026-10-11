@@ -41,7 +41,7 @@ class Area:
         
         # Text attributes:
         self.__text_player: str | None = None
-        self.__text_cards: int | None = None 
+        self.__text_cards: int = 0 
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -782,7 +782,7 @@ class Area:
     
     
     @cached_property
-    def text_cards(self) -> int | None:
+    def text_cards(self) -> int:
 
         # Returning:
         return self.__text_cards
@@ -879,15 +879,15 @@ class Area:
     
     @cached_property
     def render_text(self) -> arcade.Text | None:
-        
+
+        # Preparing variables:
+        render_text: None = None
+    
         # Selecting correct text object:
         if self.type in context.AREA_TYPE_INFO_LIST:
-            render_text: arcade.Text = self.__render_text_cards_index[self.text_cards]
+            if self.text_cards is not None:
+                render_text: arcade.Text = self.__render_text_cards_index[self.text_cards]
             
-        # Selecting None:
-        else:
-            render_text: None = None
-        
         # Returning:
         return render_text
     
