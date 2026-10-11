@@ -50,6 +50,7 @@ class Gameshell(arcade.Window):
         
         # Rendering surface and card containers in order:
         self.__gc.display_surface()
+        self.__gc.display_info()
         
         # Cards main display and debug display in order:
         if SESSION.ENABLE_DEBUG:
