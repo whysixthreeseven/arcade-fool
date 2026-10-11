@@ -3152,8 +3152,8 @@ class Game:
         pairs_index: tuple[tuple[int, Callable[..., None]], ...] = (
             (self.deck.cards_count, self.surface_controller.area_deck_info.set_text_cards),
             (self.discard.cards_count, self.surface_controller.area_discard_info.set_text_cards),
-            (self.player_human.cards_count, self.surface_controller.area_player_info.set_text_cards),
-            (self.player_computer.cards_count, self.surface_controller.area_opponent_info.set_text_cards),
+            (self.player_human.hand.cards_count, self.surface_controller.area_player_info.set_text_cards),
+            (self.player_computer.hand.cards_count, self.surface_controller.area_opponent_info.set_text_cards),
             )
 
         for cards_count, set_text_cards in pairs_index:
