@@ -3,6 +3,7 @@ import random
 
 # Typing and annotations:
 from typing import Literal
+from collections.abc import Callable
 
 # Controllers:
 from game.controller.location.discard import DiscardController
@@ -21,7 +22,7 @@ from game import context
 from functools import cached_property
 
 # Various utilities:
-from game.utilities import coordinates, event, keymap, texturepack
+from game.utilities import event, keymap, texturepack
 from game.utilities.screen import area, scene, surface
 from game.utilities.scripts import assertion, validate
 
@@ -2429,7 +2430,7 @@ class Game:
         if self.area_hover is not None:
             
             # Preparing variables:
-            area_hover_selected: tuple[Card, ...] = self.cards_area_index.get(self.area_hover, None)
+            area_hover_selected: tuple[Card, ...] = self.cards_area_index.get(self.area_hover, ())
             
             # Running loop:
             card_hover_list_temp: list[Card] = []
@@ -2650,7 +2651,7 @@ class Game:
             self.surface_controller.area_opponent.display(
                 custom_color = SETTINGS.DEBUG_COLOR_COMPUTER_TURN,
                 )
-        
+            
     
     def display_cards(self) -> None:        
         
@@ -2666,17 +2667,10 @@ class Game:
     def display_debug(self) -> None:
         
         # Location debug render method calls:
+        self.surface_controller.display_debug()
         self.table.display_debug()
         self.discard.display_debug()
         
-        # # Player hand debug render:
-        # if self.area_hover == area.AREA_PLAYER:
-        #     self.player_human.hand.display_debug()
-            
-        # # Opponent hand debug render:
-        # elif self.area_hover == area.AREA_OPPONENT:
-        #     self.player_computer.hand.display_debug()
-    
     
     def display_hints(self) -> None:
         
@@ -2729,6 +2723,9 @@ class Game:
         player_controller.hand.update_coordinates(
             clear_cache = True
             )
+        
+        # Updating area info:
+        self.__handle_update_area_info()
         
         
     def perform_player_analyze_hand(self, player_controller: PlayerController, ignore_assertion: bool = False) -> None:
@@ -2867,6 +2864,9 @@ class Game:
                 autostart = True,
                 ignore_assertion = False,
                 )
+            
+            # Updating area info:
+            self.__handle_update_area_info()
     
     
     def perform_fade(self, set_value: bool, player_controller: PlayerController, ignore_assertion: bool = False) -> None:
@@ -3144,6 +3144,21 @@ class Game:
             self.__handle_update_card(
                 card_object = card_object,
                 force_instant = force_instant
+                )
+            
+            
+    def __handle_update_area_info(self) -> None:
+        
+        pairs_index: tuple[tuple[int, Callable[..., None]], ...] = (
+            (self.deck.cards_count, self.surface_controller.area_deck_info.set_text_cards),
+            (self.discard.cards_count, self.surface_controller.area_discard_info.set_text_cards),
+            (self.player_human.cards_count, self.surface_controller.area_player_info.set_text_cards),
+            (self.player_computer.cards_count, self.surface_controller.area_opponent_info.set_text_cards),
+            )
+
+        for cards_count, set_text_cards in pairs_index:
+            set_text_cards(
+                set_value = cards_count
                 )
     
     
