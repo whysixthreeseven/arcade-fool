@@ -25,7 +25,7 @@ class __SESSION:
         
         # Developer options:
         self.__enable_assertion: bool = True
-        self.__enable_debug: bool = True
+        self.__enable_debug: bool = False
         self.__enable_hint: bool = True
         self.__enable_reveal: bool = False
         
