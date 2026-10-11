@@ -69,7 +69,7 @@ class Surface:
 
 
     @cached_property
-    def __area_ino_list(self) -> tuple[area.Area, ...]:
+    def __area_info_list(self) -> tuple[area.Area, ...]:
 
         # Collecting area objects:
         area_info_list: tuple[area.Area, ...] = (
@@ -328,5 +328,6 @@ class Surface:
 
     def display_info(self) -> None:
 
-        
-
+        # Calling display method for info areas:
+        for area_object in self.__area_info_list:
+            area_object.display_info()
