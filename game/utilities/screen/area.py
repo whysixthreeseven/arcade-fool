@@ -39,6 +39,10 @@ class Area:
         self.__coordinate_x: int = None
         self.__coordinate_y: int = None
         
+        # Text attributes:
+        self.__text_player: str | None = None
+        self.__text_cards_count: int | None = None 
+        
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         NATIVE METHODS
@@ -765,9 +769,127 @@ class Area:
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        TEXT INJECT PROPERTIES AND METHODS
+    
+    """
+    
+    
+    @cached_property
+    def text_player(self) -> str | None:
+        
+        # Returning:
+        return self.__text_player
+    
+    
+    @cached_property
+    def text_cards(self) -> int | None:
+
+        # Returning:
+        return self.__text_cards
+    
+    
+    def set_text_player(self, set_value: str | None, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            if set_value is not None:
+                assertion.assert_value_type(
+                    check_value = set_value,
+                    check_type = str,
+                    raise_error = True,
+                    )
+                assertion.assert_value_not_empty(
+                    check_value = str,
+                    raise_error = True
+                    )
+            
+        # Updating attribute:
+        if self.text_player != set_value:
+            self.__text_player = set_value
+
+            # Clearing cache:
+            if clear_cache:
+                cached_property_list: tuple[str, ...] = (
+                    "text_player",
+                    "text_display"
+                    )
+                cache.clear_cached_property_list(
+                    target_object = self,
+                    target_attribute_list = cached_property_list
+                    )
+                
+                
+    def set_text_cards(self, set_value: int | None, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+        
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value,
+                check_type = int,
+                raise_error = True,
+                )
+            assertion.assert_value_ge_zero(
+                check_value = set_value,
+                raise_error = True,
+                )
+
+        # Updating attribute:
+        if self.text_cards != set_value:
+            self.__text_cards = set_value
+
+            # Clearing cache:
+            if clear_cache:
+                cached_property_list: tuple[str, ...] = (
+                    "text_cards",
+                    "render_text"
+                    )
+                cache.clear_cached_property_list(
+                    target_object = self,
+                    target_attribute_list = cached_property_list
+                    )
+    
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         RENDER CACHED PROPERTIES AND METHODS
         
     """
+    
+    
+    @cached_property
+    def __render_text_cards_index(self) -> dict[int, arcade.Text]:
+        
+        # Generating arcade.Text dictionary index based on all possible cards counts:
+        text_index: dict[int, str] = {
+            count: arcade.Text(
+                text = f"{str(count)} {"card" if count == 1 else "cards"}",
+                x = self.coordinate_x,
+                y = self.coordinate_y,
+                font_size = SETTINGS.AREA_TEXT_FONT_SIZE,
+                font_name = SETTINGS.AREA_TEXT_FONT_FAMILY,
+                anchor_x = "center",
+                anchor_y = "center",
+                color = self.color_text
+                )
+            for count in range(0, SETTINGS.DECK_SIZE_MAX)
+            }
+        
+        # Returning:
+        return text_index
+    
+    
+    @cached_property
+    def render_text(self) -> arcade.Text | None:
+        
+        # Selecting correct text object:
+        if self.type in context.AREA_TYPE_INFO_LIST:
+            render_text: arcade.Text = self.__render_text_cards_index[self.text_cards]
+            
+        # Selecting None:
+        else:
+            render_text: None = None
+        
+        # Returning:
+        return render_text
     
     
     @cached_property
@@ -792,12 +914,19 @@ class Area:
     
     def display(self, custom_color: context.RGBA_Color | None = None) -> None:
         
-        # Rendering:
+        # Rendering main surface:
         arcade.draw_rect_filled(
             rect = self.render_rect,
             color = custom_color or self.color_background,
             tilt_angle = 0
             )
+        
+    
+    def display_info(self) -> None:
+        
+        # Rendering text:
+        if self.render_text is not None:
+            self.render_text.draw()
     
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -899,6 +1028,74 @@ AREA_DISCARD: Area = Area.build(
     init_coordinates = (
         SETTINGS.AREA_DISCARD_CENTER_COORDINATE_X,
         SETTINGS.AREA_DISCARD_CENTER_COORDINATE_Y,
+        ),
+    ignore_assertion = True
+    )
+
+
+# Player info area instance initialization:
+AREA_PLAYER_INFO: Area = Area.build(
+    init_type = context.AREA_TYPE.PLAYER_INFO,
+    init_size = (
+        SETTINGS.AREA_PLAYER_INFO_WIDTH,
+        SETTINGS.AREA_PLAYER_INFO_HEIGHT,
+        ),
+    init_color_background = SETTINGS.AREA_PLAYER_INFO_COLOR_BACKGROUND,
+    init_color_text = SETTINGS.AREA_TEXT_COLOR,
+    init_coordinates = (
+        SETTINGS.AREA_PLAYER_INFO_CENTER_COORDINATE_X,
+        SETTINGS.AREA_PLAYER_INFO_CENTER_COORDINATE_Y,
+        ),
+    ignore_assertion = True
+    )
+
+
+# Player info area instance initialization:
+AREA_OPPONENT_INFO: Area = Area.build(
+    init_type = context.AREA_TYPE.PLAYER_INFO,
+    init_size = (
+        SETTINGS.AREA_OPPONENT_INFO_WIDTH,
+        SETTINGS.AREA_OPPONENT_INFO_HEIGHT,
+        ),
+    init_color_background = SETTINGS.AREA_OPPONENT_INFO_COLOR_BACKGROUND,
+    init_color_text = SETTINGS.AREA_TEXT_COLOR,
+    init_coordinates = (
+        SETTINGS.AREA_OPPONENT_INFO_CENTER_COORDINATE_X,
+        SETTINGS.AREA_OPPONENT_INFO_CENTER_COORDINATE_Y,
+        ),
+    ignore_assertion = True
+    )
+
+
+# Deck info area instance initialization:
+AREA_DECK_INFO: Area = Area.build(
+    init_type = context.AREA_TYPE.DECK_INFO,
+    init_size = (
+        SETTINGS.AREA_DECK_INFO_WIDTH,
+        SETTINGS.AREA_DECK_INFO_HEIGHT,
+        ),
+    init_color_background = SETTINGS.AREA_DECK_INFO_COLOR_BACKGROUND,
+    init_color_text = SETTINGS.AREA_TEXT_COLOR,
+    init_coordinates = (
+        SETTINGS.AREA_DECK_INFO_CENTER_COORDINATE_X,
+        SETTINGS.AREA_DECK_INFO_CENTER_COORDINATE_Y,
+        ),
+    ignore_assertion = True
+    )
+
+
+# Discard info area instance initialization:
+AREA_DISCARD_INFO: Area = Area.build(
+    init_type = context.AREA_TYPE.DISCARD_INFO,
+    init_size = (
+        SETTINGS.AREA_DISCARD_INFO_WIDTH,
+        SETTINGS.AREA_DISCARD_INFO_HEIGHT,
+        ),
+    init_color_background = SETTINGS.AREA_DISCARD_INFO_COLOR_BACKGROUND,
+    init_color_text = SETTINGS.AREA_TEXT_COLOR,
+    init_coordinates = (
+        SETTINGS.AREA_DISCARD_INFO_CENTER_COORDINATE_X,
+        SETTINGS.AREA_DISCARD_INFO_CENTER_COORDINATE_Y,
         ),
     ignore_assertion = True
     )
