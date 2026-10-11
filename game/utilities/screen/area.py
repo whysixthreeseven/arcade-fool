@@ -41,7 +41,7 @@ class Area:
         
         # Text attributes:
         self.__text_player: str | None = None
-        self.__text_cards_count: int | None = None 
+        self.__text_cards: int | None = None 
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
