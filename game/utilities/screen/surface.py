@@ -328,7 +328,6 @@ class Surface:
 
     def display_info(self) -> None:
 
-        # Calling display method for info areas:
-        for area_object in self.__area_info_list:
-            area_object.display_info()
+        # TODO: Implement
+        ...
 
