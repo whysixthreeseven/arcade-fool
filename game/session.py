@@ -274,7 +274,7 @@ class __SESSION:
             )
         
         
-    def set_enable_hint(self, set_value, ignore_assertion: bool = False) -> None:
+    def set_enable_hint(self, set_value: bool, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
         if not ignore_assertion:
@@ -328,7 +328,7 @@ class __SESSION:
     def switch_enable_reveal(self) -> None:
                 
         # Switching:
-        self.__enable_assertion = not self.__enable_reveal
+        self.__enable_reveal = not self.__enable_reveal
 
         # Clearing cache:
         cached_property: str = "ENABLE_REVEAL"
@@ -345,14 +345,14 @@ class __SESSION:
     
     
     @cached_property
-    def TEXTUREPACK_FRONT_DEFAULT(self) -> object:
+    def TEXTUREPACK_FRONT_DEFAULT(self) -> tp.TexturePack:
 
         # Returning:
         return self.__texturepack_front_default
     
     
     @cached_property
-    def TEXTUREPACK_FRONT_SELECTED(self) -> object:
+    def TEXTUREPACK_FRONT_SELECTED(self) -> tp.TexturePack:
         
         # Returning:
         return self.__texturepack_front_selected
@@ -371,14 +371,14 @@ class __SESSION:
     
     
     @cached_property
-    def TEXTUREPACK_BACK_DEFAULT(self) -> object:
+    def TEXTUREPACK_BACK_DEFAULT(self) -> tp.TexturePack:
 
         # Returning:
         return self.__texturepack_back_default
     
 
     @cached_property
-    def TEXTUREPACK_BACK_SELECTED(self) -> object:
+    def TEXTUREPACK_BACK_SELECTED(self) -> tp.TexturePack:
 
         # Returning:
         return self.__texturepack_back_selected
@@ -396,7 +396,7 @@ class __SESSION:
         return texturepack_index
     
     
-    def set_texturepack_front(self, set_value: object, ignore_assertion: bool = False) -> None:
+    def set_texturepack_front(self, set_value: tp.TexturePack, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if not ignore_assertion:
@@ -418,10 +418,7 @@ class __SESSION:
     def set_texturepack_front_next(self) -> None:
         
         # Retrieving next index:
-        texturepack_next: int = self.TEXTUREPACK_FRONT_SELECTED_INDEX + 1
-        texturepack_count: int = len(tp.TEXTUREPACK_FRONT_LIST)
-        if texturepack_next >= texturepack_count:
-            texturepack_next = 0
+        texturepack_next: int = (self.TEXTUREPACK_FRONT_SELECTED_INDEX + 1) % len(tp.TEXTUREPACK_FRONT_LIST)
             
         # Updating attribute:
         self.set_texturepack_front(
@@ -433,10 +430,7 @@ class __SESSION:
     def set_texturepack_front_previous(self) -> None:
             
         # Retrieving next index:
-        texturepack_previous: int = self.TEXTUREPACK_FRONT_SELECTED_INDEX - 1
-        texturepack_count: int = len(tp.TEXTUREPACK_FRONT_LIST)
-        if texturepack_previous < 0:
-            texturepack_previous = texturepack_count - 1
+        texturepack_previous: int = (self.TEXTUREPACK_FRONT_SELECTED_INDEX - 1) % len(tp.TEXTUREPACK_FRONT_LIST)
             
         # Updating attribute:
         self.set_texturepack_front(
@@ -445,7 +439,7 @@ class __SESSION:
             )
         
         
-    def set_texturepack_front_random(self, clear_cache: bool = True) -> None:
+    def set_texturepack_front_random(self) -> None:
         
         # Selecting random texture pack:
         texture_pack_random: tp.TexturePack = random.choice(tp.TEXTUREPACK_FRONT_LIST)
@@ -454,11 +448,10 @@ class __SESSION:
         self.set_texturepack_front(
             set_value = texture_pack_random,
             ignore_assertion = True,
-            clear_cache = clear_cache,
             )
         
 
-    def set_texturepack_back(self, set_value: object, ignore_assertion: bool = False) -> None:
+    def set_texturepack_back(self, set_value: tp.TexturePack, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if not ignore_assertion:
@@ -507,7 +500,7 @@ class __SESSION:
             )
             
     
-    def set_texturepack_back_random(self, clear_cache: bool = True) -> None:
+    def set_texturepack_back_random(self) -> None:
 
         # Selecting random texture pack:
         texturepack_random: tp.TexturePack = random.choice(tp.TEXTUREPACK_BACK_LIST)
@@ -516,7 +509,6 @@ class __SESSION:
         self.set_texturepack_back(
             set_value = texturepack_random,
             ignore_assertion = True,
-            clear_cache = clear_cache,
             )
         
     
