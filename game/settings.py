@@ -1,5 +1,7 @@
 # External libraries:
 import os
+from dataclasses import dataclass
+from pathlib import Path
 
 # Context variables:
 from game import context
@@ -11,6 +13,7 @@ from game import context
 """
 
 
+@dataclass(frozen = True, slots = True)
 class __SETTINGS:
     
     # Application information:
@@ -22,13 +25,13 @@ class __SETTINGS:
     APP_AUTHOR: str = "Andrey Vostokov"
 
     # Root directory settings:    
-    DIR_APP: str = os.path.dirname(__file__)
+    DIR_APP: str = Path(__file__).resolve().parent
     
     # Directory settings:
     DIR_ASSETS_NAME: str = "assets"
-    DIR_ASSETS_PATH: str = os.path.join(DIR_APP, DIR_ASSETS_NAME)
+    DIR_ASSETS_PATH: str = DIR_APP / DIR_ASSETS_NAME
     DIR_TEXTURES_NAME: str = "textures"
-    DIR_TEXTURES_PATH: str = os.path.join(DIR_ASSETS_PATH, DIR_TEXTURES_NAME)
+    DIR_TEXTURES_PATH: str = DIR_ASSETS_PATH / DIR_TEXTURES_NAME
     
     # Card render settings:
     CARD_RENDER_SCALE_DEFAULT: float = 1.00
