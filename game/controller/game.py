@@ -2730,9 +2730,6 @@ class Game:
             clear_cache = True
             )
         
-        # Updating area info:
-        self.__handle_update_area_info()
-        
         
     def perform_player_analyze_hand(self, player_controller: PlayerController, ignore_assertion: bool = False) -> None:
         
@@ -2871,9 +2868,6 @@ class Game:
                 ignore_assertion = False,
                 )
             
-            # Updating area info:
-            self.__handle_update_area_info()
-    
     
     def perform_fade(self, set_value: bool, player_controller: PlayerController, ignore_assertion: bool = False) -> None:
 
@@ -3153,21 +3147,6 @@ class Game:
                 )
             
             
-    def __handle_update_area_info(self) -> None:
-        
-        pairs_index: tuple[tuple[int, Callable[..., None]], ...] = (
-            (self.deck.cards_count, self.surface_controller.area_deck_info.set_text_cards),
-            (self.discard.cards_count, self.surface_controller.area_discard_info.set_text_cards),
-            (self.player_human.hand.cards_count, self.surface_controller.area_player_info.set_text_cards),
-            (self.player_computer.hand.cards_count, self.surface_controller.area_opponent_info.set_text_cards),
-            )
-
-        for cards_count, set_text_cards in pairs_index:
-            set_text_cards(
-                set_value = cards_count
-                )
-    
-    
     def handle_card_update(self, force_instant: bool = False) -> None:
         
         # Looping over location controllers and calling method:
