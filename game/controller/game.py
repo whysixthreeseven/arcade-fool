@@ -3,7 +3,6 @@ import random
 
 # Typing and annotations:
 from typing import Literal
-from collections.abc import Callable
 
 # Controllers:
 from game.controller.location.discard import DiscardController
@@ -1727,19 +1726,20 @@ class Game:
                 # Switching players:
                 self.switch_turn_player()
                 
-                # Adding event to analyze hand for other player controller:
-                event_name: str = str(
-                    context.EVENT_NAME.PLAYER_ANALYZE_HAND if player_controller == self.player_human
-                        else context.EVENT_NAME.OPPONENT_ANALYZE_HAND
-                    )
-                self.add_event(
-                    event_object = event.Event.generate_predefined(
-                        event_name = event_name,
+                # Adding event to analyze hand for both player controllers:
+                for _player_controller in self.__player_controllers:
+                    event_name: str = str(
+                        context.EVENT_NAME.PLAYER_ANALYZE_HAND if _player_controller == self.player_human
+                            else context.EVENT_NAME.OPPONENT_ANALYZE_HAND
+                        )
+                    self.add_event(
+                        event_object = event.Event.generate_predefined(
+                            event_name = event_name,
+                            ignore_assertion = False,
+                            ),
+                        autostart = True,
                         ignore_assertion = False,
-                        ),
-                    autostart = True,
-                    ignore_assertion = False,
-                    )
+                        )
                 
                 # Updating event:
                 self.update_event(
@@ -2495,7 +2495,8 @@ class Game:
                         set_value = True,
                         ignore_assertion = False,
                         clear_cache = True
-                        )                
+                        )  
+                    set_value: Card
                             
     
     def set_deck_hover(self, set_value: bool, ignore_assertion: bool = False) -> None:
@@ -2739,69 +2740,77 @@ class Game:
                 validate_value = player_controller,
                 )
             
+        # Choosing default state:
+        if player_controller == self.player_human:
+            state_playable: bool = False
+        else:
+            state_playable: bool = self.turn_player == self.player_computer
+            
         # Resetting playable state for all cards:
         for card_object in player_controller.hand.cards:
             card_object.set_state_playable(
-                set_value = False,
+                set_value = state_playable,
                 ignore_assertion = True,
                 clear_cache = True,
                 )
             
         # Analyzing attacking player's hand:
-        if player_controller.state_attacking:
-            
-            # Setting all cards as playable, if not card has been played yet:
-            if self.table.cards_count == 0:
-                for card_object in player_controller.hand.cards:
-                    card_object.set_state_playable(
-                        set_value = True,
-                        ignore_assertion = True,
-                        clear_cache = True,
-                        )
-            
-            # Checking what cards have been played so far:
-            else:
+        if not state_playable:
+            if player_controller.state_attacking:
                 
-                # Collecting names and scanning hand:
-                name_list: tuple[str, ...] = tuple(set(card_object.name for card_object in self.table.cards))
-                for card_object in player_controller.hand.cards:
-                    
-                    # Setting card with the same name as playable:
-                    if card_object.name in name_list:
+                # Setting all cards as playable, if not card has been played yet:
+                if self.table.cards_count == 0:
+                    for card_object in player_controller.hand.cards:
                         card_object.set_state_playable(
                             set_value = True,
                             ignore_assertion = True,
                             clear_cache = True,
                             )
-
-        # Analyzing defending player's hand:
-        else:
-            for location_index, card_object in self.table.cards_index.items():
-                if location_index % 2 == 0:
+                
+                # Checking what cards have been played so far:
+                else:
                     
-                    # Acquiring cards per each stack position:
-                    card_attack: Card | None = card_object
-                    card_defend: Card | None = self.table.cards_index[location_index + 1]
-                    if card_attack is None:
-                        break
-                    else:
-                        if card_defend is not None:
+                    # Collecting names and scanning hand:
+                    name_list: tuple[str, ...] = tuple(set(card_object.name for card_object in self.table.cards))
+                    for card_object in player_controller.hand.cards:
+                        
+                        # Setting card with the same name as playable:
+                        if card_object.name in name_list:
+                            card_object.set_state_playable(
+                                set_value = True,
+                                ignore_assertion = True,
+                                clear_cache = True,
+                                )
+
+            # Analyzing defending player's hand:
+            else:
+                for location_index, card_object in self.table.cards_index.items():
+                    if location_index % 2 == 0:
+                        
+                        # Acquiring cards per each stack position:
+                        card_attack: Card | None = card_object
+                        card_defend: Card | None = self.table.cards_index[location_index + 1]
+                        if card_attack is None:
                             break
                         else:
-                            
-                            # Comparing cards available to card attacking value:
-                            for card_object in player_controller.hand.cards:
-                                if card_object > card_attack:
-                                    card_object.set_state_playable(
-                                        set_value = True,
-                                        ignore_assertion = True,
-                                        clear_cache = True,
-                                        )
+                            if card_defend is not None:
+                                break
+                            else:
+                                
+                                # Comparing cards available to card attacking value:
+                                for card_object in player_controller.hand.cards:
+                                    if card_object > card_attack:
+                                        card_object.set_state_playable(
+                                            set_value = True,
+                                            ignore_assertion = True,
+                                            clear_cache = True,
+                                            )
                                     
         # Updating hand controller:
-        player_controller.hand.update_coordinates(
-            clear_cache = True
-            )
+        for _player_controller in self.__player_controllers:
+            _player_controller.hand.update_coordinates(
+                clear_cache = True
+                )
                                     
     
     def perform_player_play(self, player_controller: PlayerController, card_object: Card, ignore_assertion: bool = False) -> None:
