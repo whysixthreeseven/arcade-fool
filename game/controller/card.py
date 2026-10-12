@@ -3037,8 +3037,13 @@ class CardController:
     @cached_property
     def state_revealed(self) -> bool:
         
+        # Forcing reveal if session enabled:
+        state_revealed: bool = self.__state_revealed
+        if SESSION.ENABLE_REVEAL:
+            state_revealed: bool = True
+        
         # Returning:
-        return self.__state_revealed
+        return state_revealed
     
     
     @cached_property
@@ -4376,6 +4381,7 @@ class CardController:
             )
         location_playable: tuple[str, ...] = (
             context.CARD_LOCATION.PLAYER, 
+            context.CARD_LOCATION.OPPONENT,
             )
         
         # Selected state:
