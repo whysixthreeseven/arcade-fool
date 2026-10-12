@@ -303,6 +303,20 @@ COMPUTER_NAME_COLLECTION: tuple[str, ...] = (
     )
 
 
+class COMPUTER_ACTION:
+    ATTACK: str = "Attack"
+    DEFEND: str = "Defend"
+    PASS: str = "Pass"
+    FOLD: str = "Fold"
+    
+
+COMPUTER_ACTION_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in COMPUTER_ACTION.__dict__.items()
+        if not attribute_name.startswith("__") 
+        and isinstance(attribute_value, str)
+    )
+
+
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     HAND-RELATED CONTEXT VARIABLES
 
