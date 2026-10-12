@@ -834,19 +834,18 @@ class Area:
                 )
 
         # Updating attribute:
-        if self.text_cards != set_value:
-            self.__text_cards = set_value
+        self.__text_cards = set_value
 
-            # Clearing cache:
-            if clear_cache:
-                cached_property_list: tuple[str, ...] = (
-                    "text_cards",
-                    "render_text"
-                    )
-                cache.clear_cached_property_list(
-                    target_object = self,
-                    target_attribute_list = cached_property_list
-                    )
+        # Clearing cache:
+        if clear_cache:
+            cached_property_list: tuple[str, ...] = (
+                "text_cards",
+                "render_text"
+                )
+            cache.clear_cached_property_list(
+                target_object = self,
+                target_attribute_list = cached_property_list
+                )
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
