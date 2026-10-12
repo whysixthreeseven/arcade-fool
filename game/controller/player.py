@@ -1023,3 +1023,13 @@ class PlayerController:
         if clear_cache:
             self.clear_cached_state_attributes()
 
+
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        ANALYZE (COMPUTER) METHODS
+
+    """
+    
+    
+    ...
+    
+    
