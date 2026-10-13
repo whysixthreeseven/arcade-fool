@@ -66,169 +66,7 @@ class Area:
 
         # Returning string:
         return string
-    
-    
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        CACHED PROPETIES AND CLEAN METHODS
-    
-    """
-    
-    
-    @cached_property
-    def __cached_core_attributes(self) -> tuple[str, ...]:
         
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "type"
-            )
-        
-        # Returning:
-        return cached_property_list
-
-
-    @cached_property
-    def __cached_color_attributes(self) -> tuple[str, ...]:
-        
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "color_background",
-            "color_text",
-            )
-        
-        # Returning:
-        return cached_property_list
-    
-    
-    @cached_property
-    def __cached_size_attributes(self) -> tuple[str, ...]:
-
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "width",
-            "height",
-            )
-
-        # Returning:
-        return cached_property_list
-
-
-    @cached_property
-    def __cached_coordinate_attributes(self) -> tuple[str, ...]:
-
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "coordinate_x",
-            "coordinate_y",
-            "coordinates"
-            )
-
-        # Returning:
-        return cached_property_list
-    
-    
-    @cached_property
-    def __cached_boundary_attributes(self) -> tuple[str, ...]:
-        
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "boundary_horizontal_left",
-            "boundary_horizontal_right",
-            "boundary_horizontal",
-            "boundary_vertical_top",
-            "boundary_vertical_bottom",
-            "boundary_vertical",
-            "boundary"
-            )
-
-        # Returning:
-        return cached_property_list
-    
-    
-    @cached_property
-    def __cached_render_attributes(self) -> tuple[str, ...]:
-        
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "render_rect"
-            )
-
-        # Returning:
-        return cached_property_list
-    
-    
-    def clear_cached_core_attributes(self) -> None:
-    
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_core_attributes
-            )
-
-
-    def clear_cached_color_attributes(self) -> None:
-        
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_color_attributes
-            )
-
-
-    def clear_cached_size_attributes(self) -> None:
-            
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_size_attributes
-            )
-        
-
-    def clear_cached_coordinate_attributes(self) -> None:
-
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_coordinate_attributes
-            )
-
-
-    def clear_cached_boundary_attributes(self) -> None:
-
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_boundary_attributes
-            )
-        
-    
-    def clear_cached_render_attributes(self) -> None:
-        
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_render_attributes
-            )
-        
-    
-    def clear_cached_attributes(self) -> None:
-        
-        # Collecting cached properties:
-        cached_property_list_collection: tuple[tuple[str, ...], ...] = (
-            self.__cached_core_attributes,
-            self.__cached_color_attributes,
-            self.__cached_size_attributes,
-            self.__cached_coordinate_attributes,
-            self.__cached_boundary_attributes,
-            self.__cached_render_attributes,
-            )
-        
-        # Looping throught the list and clearing cache:
-        for cached_property_list in cached_property_list_collection:
-            cache.clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
-    
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         BUILD METHODS
@@ -237,9 +75,12 @@ class Area:
     
     
     @classmethod
-    def build(cls, init_type: str, init_size: tuple[int, int], 
-                   init_color_background: context.RGB_Color, init_color_text: context.RGB_Color,
-                   init_coordinates: tuple[int, int], ignore_assertion: bool = False) -> None:
+    def build(cls, init_type: str, 
+                   init_size: tuple[int, int], 
+                   init_color_background: context.RGBA_Color, 
+                   init_color_text: context.RGBA_Color,
+                   init_coordinates: tuple[int, int], 
+                   ignore_assertion: bool = False) -> None:
         
         # Creating area object:
         area_object: Area = Area()
@@ -250,34 +91,27 @@ class Area:
             ignore_assertion = ignore_assertion,
             clear_cache = False
             )
-        area_object.clear_cached_core_attributes()
         
         # Unpacking and setting size:
         width, height = init_size
         area_object.set_width(
             set_value = width,
             ignore_assertion = ignore_assertion,
-            clear_cache = False
             )
         area_object.set_height(
             set_value = height,
             ignore_assertion = ignore_assertion,
-            clear_cache = False
             )
-        area_object.clear_cached_size_attributes()
 
         # Setting color:
         area_object.set_color_background(
             set_value = init_color_background,
             ignore_assertion = ignore_assertion,
-            clear_cache = False
             )
         area_object.set_color_text(
             set_value = init_color_text,
             ignore_assertion = ignore_assertion,
-            clear_cache = False
             )
-        area_object.clear_cached_color_attributes()
 
         # Unpacking and setting coordinates:
         area_object.set_coordinates(
@@ -300,14 +134,14 @@ class Area:
     """
     
     
-    @cached_property
+    @property
     def type(self) -> str:
 
         # Returning:
         return self.__type
     
     
-    def set_type(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_type(self, set_value: str, ignore_assertion: bool = False) -> None:
 
         # Validating value:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -327,14 +161,6 @@ class Area:
         # Setting value:
         self.__type = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property: str = "type"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
-    
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         COLOR CACHED PROPETIES AND METHODS
@@ -342,21 +168,21 @@ class Area:
     """
     
     
-    @cached_property
+    @property
     def color_background(self) -> context.RGB_Color:
         
         # Returning:
         return self.__color_background
     
     
-    @cached_property
+    @property
     def color_text(self) -> context.RGB_Color:
         
         # Returning:
         return self.__color_text
 
 
-    def set_color_background(self, set_value: context.RGB_Color, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_color_background(self, set_value: context.RGB_Color, ignore_assertion: bool = False) -> None:
 
         # Validating value:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -367,16 +193,8 @@ class Area:
         # Setting value:
         self.__color_background = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property: str = "color_background"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
-            
     
-    def set_color_text(self, set_value: context.RGB_Color, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_color_text(self, set_value: context.RGB_Color, ignore_assertion: bool = False) -> None:
 
         # Validating value:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -387,13 +205,6 @@ class Area:
         # Setting value:
         self.__color_text = set_value
         
-        # Clearing cache:
-        cached_property: str = "color_text"
-        cache.clear_cached_property(
-            target_object = self,
-            target_attribute = cached_property
-            )
-        
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         SIZE CACHED PROPETIES AND METHODS
@@ -401,21 +212,21 @@ class Area:
     """
     
     
-    @cached_property
+    @property
     def width(self) -> int:
         
         # Returning:
         return self.__width
 
 
-    @cached_property
+    @property
     def height(self) -> int:
 
         # Returning:
         return self.__height
     
     
-    def set_width(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_width(self, set_value: int, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -435,16 +246,8 @@ class Area:
         # Updating attribute:
         self.__width = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property: str = "width"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
-            
     
-    def set_height(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_height(self, set_value: int, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -464,14 +267,6 @@ class Area:
         # Updating attribute:
         self.__height = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property: str = "height"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
-    
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         COORDINATES CACHED PROPETIES AND METHODS
@@ -479,14 +274,14 @@ class Area:
     """
     
     
-    @cached_property
+    @property
     def coordinate_x(self) -> int:
 
         # Returning:
         return self.__coordinate_x
 
 
-    @cached_property
+    @property
     def coordinate_y(self) -> int:
         
         # Returning:
@@ -506,8 +301,7 @@ class Area:
         return coordinates
 
 
-    def set_coordinate_x(self, set_value: int, update_boundary: bool = False, 
-                               ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_coordinate_x(self, set_value: int, update_boundary: bool = False, ignore_assertion: bool = False) -> None:
 
         # Validating value:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -525,22 +319,20 @@ class Area:
                 )
             
         # Updating attribute:
-        self.__coordinate_x = set_value
+        if self.coordinate_x != set_value:
+            self.__coordinate_x = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property_list: tuple[str, ...] = (
-                "coordinate_x",
-                "coordinates"
-                )
-            cache.clear_cached_property_list(
+            # Clearing cache:
+            cached_property: str = "coordinates"
+            cache.clear_cached_property(
                 target_object = self,
-                target_attribute_list = cached_property_list
+                target_attribute = cached_property
                 )
+                
+            # Updating boundaries:
+            if update_boundary:
+                self.update_boundary()
             
-        # Updating boundaries:
-        if update_boundary:
-            self.update_boundary()
             
     def set_coordinate_y(self, set_value: int, update_boundary: bool = False, 
                                ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -561,26 +353,23 @@ class Area:
                 )
 
         # Updating attribute:
-        self.__coordinate_y = set_value
+        if self.coordinate_y != set_value:
+            self.__coordinate_y = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property_list: tuple[str, ...] = (
-                "coordinate_y",
-                "coordinates"
-                )
-            cache.clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
+            # Clearing cache:
+            if clear_cache:
+                cached_property: str = "coordinates"
+                cache.clear_cached_property(
+                    target_object = self,
+                    target_attribute = cached_property
+                    )
 
-        # Updating boundaries:
-        if update_boundary:
-            self.update_boundary()
+            # Updating boundaries:
+            if update_boundary:
+                self.update_boundary()
             
             
-    def set_coordinates(self, set_value: tuple[int, int], update_boundary: bool = False, 
-                        ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_coordinates(self, set_value: context.Coordinates, update_boundary: bool = False, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -596,19 +385,13 @@ class Area:
             set_value = coordinate_x,
             update_boundary = False,
             ignore_assertion = ignore_assertion,
-            clear_cache = False
             )
         self.set_coordinate_y(
             set_value = coordinate_y,
             update_boundary = False,
             ignore_assertion = ignore_assertion,
-            clear_cache = False
             )
         
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_coordinate_attributes()
-            
         # Updating boundaries:
         if update_boundary:
             self.update_boundary()
@@ -737,7 +520,19 @@ class Area:
                 )
     
         # Clearing cache:
-        self.clear_cached_boundary_attributes()
+        cached_property_list: tuple[str, ...] = (
+            "boundary_horizontal_left",
+            "boundary_horizontal_right",
+            "boundary_horizontal",
+            "boundary_vertical_top",
+            "boundary_vertical_bottom",
+            "boundary_vertical",
+            "boundary"
+            )
+        cache.clear_cached_property_list(
+            target_object = self,
+            target_attribute_list = cached_property_list
+            )
         
 
     def hit_boundary(self, hit_coordinates: context.Coordinates, ignore_assertion: bool = False) -> bool:
@@ -759,13 +554,13 @@ class Area:
         check_coordinate_x, check_coordinate_y = hit_coordinates
             
         # Evaluating:
-        hit: bool = bool(
+        hit_state: bool = bool(
             check_coordinate_x in self.boundary_horizontal and
             check_coordinate_y in self.boundary_vertical
             )
         
         # Returning:
-        return hit
+        return hit_state
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -774,14 +569,14 @@ class Area:
     """
     
     
-    @cached_property
+    @property
     def text_player(self) -> str | None:
         
         # Returning:
         return self.__text_player
     
     
-    @cached_property
+    @property
     def text_cards(self) -> int:
 
         # Returning:
@@ -809,13 +604,10 @@ class Area:
 
             # Clearing cache:
             if clear_cache:
-                cached_property_list: tuple[str, ...] = (
-                    "text_player",
-                    "text_display"
-                    )
-                cache.clear_cached_property_list(
+                cached_property: str = "render_text"
+                cache.clear_cached_property(
                     target_object = self,
-                    target_attribute_list = cached_property_list
+                    target_attribute = cached_property
                     )
                 
                 
@@ -838,13 +630,10 @@ class Area:
 
         # Clearing cache:
         if clear_cache:
-            cached_property_list: tuple[str, ...] = (
-                "text_cards",
-                "render_text"
-                )
-            cache.clear_cached_property_list(
+            cached_property: str = "render_text"
+            cache.clear_cached_property(
                 target_object = self,
-                target_attribute_list = cached_property_list
+                target_attribute = cached_property
                 )
     
     
