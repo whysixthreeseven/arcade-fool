@@ -1389,15 +1389,10 @@ class Game:
             # Updating card's expected coordinates:
             if card_highest is not None:
                 
-                # Choosing coordinates to return to:
-                coordinates_slide: context.Coordinates = card_highest.coordinates_unplayable
-                if player_controller == self.player_computer:
-                    coordinates_slide = card_highest.coordinates_position 
-                    
                 # Comparing coordinates and updating:
-                if card_highest.coordinates_expected != coordinates_slide:
+                if card_highest.coordinates_expected != card_highest.coordinates_position:
                     card_highest.set_coordinates_expected(
-                        set_value = coordinates_slide,
+                        set_value = card_highest.coordinates_position,
                         ignore_assertion = True,
                         clear_cache = True
                         )
@@ -2728,6 +2723,12 @@ class Game:
             )
         player_controller.hand.update_coordinates(
             clear_cache = True
+            )
+
+        # Analyzing player's hand (DEBUG, TODO: REMOVE LATER):
+        self.perform_player_analyze_hand(
+            player_controller = player_controller,
+            ignore_assertion = True,
             )
         
         
