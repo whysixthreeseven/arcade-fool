@@ -61,7 +61,7 @@ class __SETTINGS:
     CARD_RENDER_BG_COLOR: context.context.RGB_Color = (215, 0, 0)
     
     # Card texture settings:
-    CARD_TEXTURE_SCALE_DEFAULT: float = 0.20
+    CARD_TEXTURE_SCALE_DEFAULT: float = 0.30
     CARD_TEXTURE_WIDTH_FILE: int = 320
     CARD_TEXTURE_WIDTH: int = int(CARD_TEXTURE_WIDTH_FILE * CARD_TEXTURE_SCALE_DEFAULT)
     CARD_TEXTURE_HEIGHT_FILE: int = 480
