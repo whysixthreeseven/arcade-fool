@@ -265,6 +265,10 @@ class CardController:
         
         # Waking up all other attributes:
         card_object.clear_cached_attributes()
+
+        # Working on sprite creation:
+        card_object.init_sprite()
+        card_object.update_sprite()
         
         # Returning:
         return card_object
@@ -394,35 +398,6 @@ class CardController:
             "render_scale",
             "render_alpha",
             "render_tilt"
-            )
-        
-        # Returning:
-        return cached_property_list
-    
-    
-    @cached_property
-    def __cached_render_rect_attributes(self) -> tuple[str, ...]:
-        """
-        Render rect attributes-related cached properties list.
-        
-        Collects and returns all properties of this card object decorated with `functools` library's `cached_property` wrapper.
-        Used to clear all related properties at once on certain events and when certain attributes change with their dedicated
-        setter.
-        
-        Cached with `functools` library's `cached_property` decorator. Static, cannot be cleared.
-        
-        Returns
-        -------
-        cached_property_list : `tuple[str, ...]`
-            A tuple collection of related cached properties.
-        """
-
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "render_rect",
-            "render_rect_boundary",
-            "render_width",
-            "render_height",
             )
         
         # Returning:
@@ -699,36 +674,6 @@ class CardController:
             )
         
     
-    def clear_cached_render_attributes(self) -> None:
-        """
-        Clears all public cached render properties of this card object.
-        
-        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
-        clear all cached properties of this card object.
-        """
-    
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_render_attributes
-            )
-        
-        
-    def clear_cached_render_rect_attributes(self) -> None:
-        """
-        Clears all public cached render rect properties of this card object.
-        
-        Uses `utilities.scripts.cache` module's `clear_cached_property_list` function and related property list available to
-        clear texturepack properties of this card object.
-        """
-        
-        # Clearing cache:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_render_rect_attributes
-            )
-        
-
     def clear_cached_coordinates_attributes(self) -> None:
         """
         Clears all public cached coordinates properties of this card object.
@@ -847,8 +792,6 @@ class CardController:
             self.__cached_core_attributes,
             self.__cached_texture_attributes,
             self.__cached_boundary_attributes,
-            self.__cached_render_attributes,
-            self.__cached_render_rect_attributes,
             self.__cached_coordinates_attributes,
             self.__cached_state_attributes,
             self.__cached_location_attributes,
@@ -1301,28 +1244,28 @@ class CardController:
                 validate_value = set_value
                 )
 
-        # Updating attribute:
-        self.__coordinate_x = set_value
+        # Updating attributes:
+        if self.coordinate_x != set_value:
+            self.__coordinate_x = set_value
+            self.__sprite.center_x = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            
-            # Clearing target cached properties:
-            cached_property_list: tuple[str, ...] = (
-                "coordinate_x",
-                "coordinates",
-                "render_rect",
-                "render_rect_boundary",
-                "render_tilt_arch",
-                "state_idle",
-                )
-            cache.clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
-            
-            # Clearing related cached properties:
-            self.clear_cached_boundary_attributes() 
+            # Clearing cache:
+            if clear_cache:
+                
+                # Clearing target cached properties:
+                cached_property_list: tuple[str, ...] = (
+                    "coordinate_x",
+                    "coordinates",
+                    "render_tilt_arch",
+                    "state_idle",
+                    )
+                cache.clear_cached_property_list(
+                    target_object = self,
+                    target_attribute_list = cached_property_list
+                    )
+                
+                # Clearing related cached properties:
+                self.clear_cached_boundary_attributes() 
             
             
     def adjust_coordinate_x(self, adjust_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -1403,28 +1346,28 @@ class CardController:
                 validate_value = set_value
                 )
 
-        # Updating attribute:
-        self.__coordinate_y = set_value
-        
-        # Clearing cache:
-        if clear_cache:
+        # Updating attributes:
+        if self.coordinate_y != set_value:
+            self.__coordinate_y = set_value
+            self.__sprite.center_y = set_value
             
-            # Clearing target cached properties:
-            cached_property_list: tuple[str, ...] = (
-                "coordinate_y",
-                "coordinates",
-                "render_rect",
-                "render_rect_boundary",                 
-                "render_tilt_arch",
-                "state_idle",
-                )
-            cache.clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
+            # Clearing cache:
+            if clear_cache:
+                
+                # Clearing target cached properties:
+                cached_property_list: tuple[str, ...] = (
+                    "coordinate_y",
+                    "coordinates",
+                    "render_tilt_arch",
+                    "state_idle",
+                    )
+                cache.clear_cached_property_list(
+                    target_object = self,
+                    target_attribute_list = cached_property_list
+                    )
 
-            # Clearing related cached properties:
-            self.clear_cached_boundary_attributes()
+                # Clearing related cached properties:
+                self.clear_cached_boundary_attributes()
             
             
     def adjust_coordinate_y(self, adjust_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
@@ -1506,8 +1449,6 @@ class CardController:
                 "coordinate_x",
                 "coordinate_y",
                 "coordinates",
-                "render_rect",
-                "render_rect_boundary",
                 "render_tilt_arch",
                 "state_idle",
                 )
@@ -2191,10 +2132,6 @@ class CardController:
             cached_property_list: tuple[str, ...] = (
                 "texture_object_front",
                 "texture_object_selected",
-                "render_rect",
-                "render_rect_boundary",
-                "render_width",
-                "render_height",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
@@ -2217,15 +2154,70 @@ class CardController:
             cached_property_list: tuple[str, ...] = (
                 "texture_object_back",
                 "texture_object_selected",
-                "render_rect",
-                "render_rect_boundary",
-                "render_width",
-                "render_height",
                 )
             cache.clear_cached_property_list(
                 target_object = self,
                 target_attribute_list = cached_property_list
                 )
+
+
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        SPRITE PROPETIES AND METHODS
+    
+    """
+
+
+    @property
+    def sprite(self) -> arcade.Sprite:
+
+        # Returning:
+        return self.__sprite
+
+
+    def init_sprite(self) -> None:
+
+        # Checking if sprite has been created prior:
+        if self.sprite is None:
+
+            # Creating a new sprite object:
+            arcade_sprite: arcade.Sprite = arcade.Sprite(
+                path_or_texture = self.texture_object_selected,
+                scale = 1.00,
+                center_x = self.coordinate_x,
+                center_y = self.coordinate_y,
+                angle = self.render_tilt_current,
+                )
+
+            # Updating attribute:
+            self.__sprite: arcade.Sprite = arcade_sprite
+
+
+    def __update_sprite_coordinates(self) -> None:
+
+        # Updating sprite attributes:
+        self.__sprite.center_x = self.coordinate_x
+        self.__sprite.center_y = self.coordinate_y
+
+
+    def __update_sprite_tilt(self) -> None:
+
+        # Updating sprite attribute:
+        self.__sprite.angle = self.render_tilt_current
+
+
+    def __update_sprite_scale(self) -> None:
+
+        # Updating sprite scale:
+        self.__sprite.scale = self.render_scale_current
+
+
+    def update_sprite(self) -> None:
+
+        # Updating all sprite-related attributes:
+        self.__update_sprite_coordinates()
+        self.__update_sprite_tilt()
+        self.__update_sprite_scale()
+    
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -2234,112 +2226,48 @@ class CardController:
     """
     
     
-    @property
-    def boundary_showcase(self) -> bool:
-        
-        # Checking if card is showcased:
-        boundary_showcase: bool = False
-        if self.location == context.CARD_LOCATION.DECK:
-            if self.location_index == 0:
-                boundary_showcase = True
-            elif SESSION.GAME_MODE_SECRET and self.location_index == 1:
-                boundary_showcase = True
-        
-        # Returning:
-        return boundary_showcase
-    
-    
     @cached_property
     def boundary_left(self) -> int:
         
-        # Calculating showcase boundary:
-        if self.boundary_showcase:
-            boundary: int = int(
-                self.coordinate_x - 
-                self.render_height / 2
-                )
-            
-        # Calculating default boundary:
-        else:
-            boundary: int = int(
-                self.coordinate_x - 
-                self.render_width / 2
-                )
+        # Acquiring boundary and converting to integer:
+        boundary: float = self.sprite.left
+        boundary_conv: int = int(boundary)
         
         # Returning:
-        return boundary
+        return boundary_conv
 
 
     @cached_property
     def boundary_right(self) -> int:
         
-        # Calculating showcase boundary:
-        if self.boundary_showcase:
-            boundary: int = int(
-                self.coordinate_x + 
-                self.render_height / 2
-                )
-
-        # Calculating default boundary:
-        else:
-            boundary: int = int(
-                self.coordinate_x + 
-                self.render_width / 2
-                )
-
+        # Acquiring boundary and converting to integer:
+        boundary: float = self.sprite.right
+        boundary_conv: int = int(boundary)
+        
         # Returning:
-        return boundary
+        return boundary_conv
 
 
     @cached_property
     def boundary_top(self) -> int:
         
-        # Calculating showcase boundary:
-        if self.boundary_showcase:
-            boundary: int = int(
-                self.coordinate_y + 
-                self.render_width / 2
-                )
-
-        # Calculating default boundary:
-        else:
-            coordinate_y_selected: int = self.coordinate_y
-            if self.location == context.CARD_LOCATION.OPPONENT:
-                coordinate_y_selected = self.coordinate_y_position
-            boundary: int = int(
-                coordinate_y_selected + 
-                self.render_height / 2
-                )
-
+        # Acquiring boundary and converting to integer:
+        boundary: float = self.sprite.top
+        boundary_conv: int = int(boundary)
+        
         # Returning:
-        return boundary
+        return boundary_conv
 
 
     @cached_property
     def boundary_bottom(self) -> int:
 
-        # Calculating showcase boundary:
-        if self.boundary_showcase:
-            boundary: int = int(
-                self.coordinate_y - 
-                self.render_width / 2
-                )
-
-        # Calculating default boundary:
-        else:
-            coordinate_y_selected: int = self.coordinate_y
-            if self.location == context.CARD_LOCATION.PLAYER:
-                if not self.state_playable:
-                    coordinate_y_selected = self.coordinate_y_unplayable
-                else:
-                    coordinate_y_selected = self.coordinate_y_position
-            boundary: int = int(
-                coordinate_y_selected -
-                self.render_height / 2
-                )
-
+        # Acquiring boundary and converting to integer:
+        boundary: float = self.sprite.bottom
+        boundary_conv: int = int(boundary)
+        
         # Returning:
-        return boundary
+        return boundary_conv
     
     
     @cached_property
@@ -2433,7 +2361,7 @@ class CardController:
     
     
     @cached_property
-    def render_scale(self) -> float:
+    def render_scale_current(self) -> float:
         
         # Returning:
         return self.__render_scale
@@ -2476,20 +2404,22 @@ class CardController:
                 )
             
         # Updating attribute:
-        self.__render_scale = set_value
+        if self.render_scale_current != set_value:
+            self.__render_scale = set_value
+            self.__sprite.scale = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            
-            # Clearing target cached property:
-            cached_property: str = "render_scale"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
-            
-            # Clearing related cached properties:
-            self.clear_cached_boundary_attributes()
+            # Clearing cache:
+            if clear_cache:
+                
+                # Clearing target cached property:
+                cached_property: str = "render_scale"
+                cache.clear_cached_property(
+                    target_object = self,
+                    target_attribute = cached_property
+                    )
+                
+                # Clearing related cached properties:
+                self.clear_cached_boundary_attributes()
             
     
     def set_render_scale_default(self, clear_cache: bool = True) -> None:
@@ -2522,36 +2452,36 @@ class CardController:
             
         # Updating to selected state:
         if target_value == self.render_scale_selected:
-            if self.render_scale != self.render_scale_step_mod_selected:
+            if self.render_scale_current != self.render_scale_step_mod_selected:
                 step_amount: float = self.__render_scale * self.render_scale_step_mod_selected
                 self.adjust_render_scale(
                     adjust_value = step_amount,
                     ignore_assertion = False,
-                    clear_cache = False,
+                    clear_cache = clear_cache,
                     )
                 if self.__render_scale > self.render_scale_selected:
-                    self.__render_scale = self.render_scale_selected
+                    self.set_render_scale(
+                        set_value = self.render_scale_selected,
+                        ignore_assertion = False,
+                        clear_cache = clear_cache,
+                        )
                 
         # Updating to default state:
         elif target_value == self.render_scale_default:
-            if self.render_scale != self.render_scale_default:
+            if self.render_scale_current != self.render_scale_default:
                 step_amount: float = self.__render_scale * self.render_scale_step_mod_default
                 self.adjust_render_scale(
                     adjust_value = step_amount,
                     ignore_assertion = False,
-                    clear_cache = False,
+                    clear_cache = clear_cache,
                     )
                 if self.__render_scale < self.render_scale_default:
-                    self.__render_scale = self.render_scale_default
+                    self.set_render_scale(
+                        set_value = self.render_scale_default,
+                        ignore_assertion = False,
+                        clear_cache = clear_cache,
+                        )
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property: str = "render_scale"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
-            
     
     def adjust_render_scale(self, adjust_value: float, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
 
@@ -2562,17 +2492,13 @@ class CardController:
                 )
 
         # Updating attribute:
-        render_scale_adjusted: float = self.render_scale + adjust_value
-        self.__render_scale = render_scale_adjusted
+        render_scale_adjusted: float = self.render_scale_current + adjust_value
+        self.set_render_scale(
+            set_value = render_scale_adjusted,
+            ignore_assertion = ignore_assertion,
+            clear_cache = clear_cache,
+            )
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property: str = "render_scale"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
-            
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         RENDER (ALPHA) CACHED PROPERTIES AND METHODS
@@ -2581,7 +2507,7 @@ class CardController:
     
     
     @cached_property
-    def render_alpha(self) -> int:
+    def render_alpha_current(self) -> int:
         
         # Choosing based on state:
         if self.state_faded:
@@ -2657,7 +2583,7 @@ class CardController:
 
         # Updating to faded state:
         if target_value == self.render_alpha_faded:
-            if self.render_alpha != self.render_alpha_step_mod_faded:
+            if self.render_alpha_current != self.render_alpha_step_mod_faded:
                 step_amount: int = self.__render_alpha * self.render_alpha_step_mod_faded
                 self.adjust_render_alpha(
                     adjust_value = step_amount,
@@ -2665,11 +2591,15 @@ class CardController:
                     clear_cache = False,
                     )
                 if self.__render_alpha < self.render_alpha_faded:
-                    self.__render_alpha = self.render_alpha_faded
+                    self.set_render_alpha(
+                        set_value = self.render_alpha_faded,
+                        ignore_assertion = True,
+                        clear_cache = False
+                        )
 
         # Updating to default state:
         elif target_value == self.render_alpha_default:
-            if self.render_alpha != self.render_alpha_step_mod_default:
+            if self.render_alpha_current != self.render_alpha_step_mod_default:
                 step_amount: int = self.__render_alpha * self.render_alpha_step_mod_default
                 self.adjust_render_alpha(
                     adjust_value = step_amount,
@@ -2677,7 +2607,11 @@ class CardController:
                     clear_cache = False,
                     )
                 if self.__render_alpha > self.render_alpha_default:
-                    self.__render_alpha = self.render_alpha_default
+                    self.set_render_alpha(
+                        set_value = self.render_alpha_default,
+                        ignore_assertion = True,
+                        clear_cache = False
+                        )
                     
         # Clearing cache:
         if clear_cache:
@@ -2699,16 +2633,12 @@ class CardController:
                 )
         
         # Updating attribute:
-        render_alpha_adjusted: int = self.render_alpha + adjust_value
-        self.__render_alpha = render_alpha_adjusted
-        
-        # Clearing cache:
-        if clear_cache:
-            cached_property: str = "render_alpha"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
+        render_alpha_adjusted: int = self.render_alpha_current + adjust_value
+        self.set_render_alpha(
+            set_value = render_alpha_adjusted,
+            ignore_assertion = ignore_assertion,
+            clear_cache = clear_cache,
+            )
         
             
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -2718,7 +2648,7 @@ class CardController:
 
     
     @cached_property
-    def render_tilt(self) -> int:
+    def render_tilt_current(self) -> int:
         
         # Returning:
         return self.__render_tilt
@@ -2844,15 +2774,17 @@ class CardController:
                 conv_value = (360 - set_value) * -1
             
         # Updating attribute:
-        self.__render_tilt = conv_value
+        if self.render_tilt_current != conv_value:
+            self.__render_tilt = conv_value
+            self.__sprite.angle = conv_value
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property: str = "render_tilt"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
+            # Clearing cache:
+            if clear_cache:
+                cached_property: str = "render_tilt"
+                cache.clear_cached_property(
+                    target_object = self,
+                    target_attribute = cached_property
+                    )
             
 
     def set_render_tilt_default(self, clear_cache: bool = True) -> None:
@@ -2893,13 +2825,13 @@ class CardController:
                 )
         
         # Preparing variables:    
-        adjust_axis: int = 1 if self.render_tilt < target_value else -1
-        tilt_difference: int = abs(target_value - self.render_tilt)
+        adjust_axis: int = 1 if self.render_tilt_current < target_value else -1
+        tilt_difference: int = abs(target_value - self.render_tilt_current)
         
         # Setting minimum adjust amount for smaller value:
         if target_value == self.render_tilt_random:
             adjust_value = SETTINGS.CARD_RENDER_TILT_ADJUST_SET * adjust_axis
-            adjust_over: bool = abs(self.render_tilt + adjust_value) > abs(self.render_tilt_random)
+            adjust_over: bool = abs(self.render_tilt_current + adjust_value) > abs(self.render_tilt_random)
             if adjust_over:
                 adjust_value = tilt_difference * adjust_axis
             
@@ -2941,86 +2873,12 @@ class CardController:
                 )
 
         # Updating attribute:
-        render_tilt_adjusted: int = self.render_tilt + adjust_value
-        self.__render_tilt = render_tilt_adjusted
-
-        # Clearing cache:
-        if clear_cache:
-            cached_property: str = "render_tilt"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
-            
-    
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        OTHER RENDER CACHED PROPERTIES AND METHODS
-    
-    """
-
-
-    @cached_property
-    def render_rect(self) -> arcade.Rect:
-        
-        # Creating a rectnagle object:
-        rect_object: arcade.Rect = arcade.XYWH(
-            x = self.coordinate_x,
-            y = self.coordinate_y,
-            width = self.render_width,
-            height = self.render_height
+        render_tilt_adjusted: int = self.render_tilt_current + adjust_value
+        self.set_render_tilt(
+            set_value = render_tilt_adjusted,
+            ignore_assertion = True,
+            clear_cache = clear_cache,
             )
-        
-        # Returning:
-        return rect_object
-    
-    
-    @cached_property
-    def render_rect_boundary(self) -> arcade.Rect:
-        
-        # Creating a rectangle object:
-        rect_object: arcade.Rect = arcade.rect.LRBT(
-            left = self.boundary_left,
-            right = self.boundary_right,
-            bottom = self.boundary_bottom,
-            top = self.boundary_top
-            )
-        
-        # Returning:
-        return rect_object
-    
-    
-    @cached_property
-    def render_rect_color(self) -> context.RGB_Color:
-        
-        # Returning:
-        return SETTINGS.CARD_RENDER_BG_COLOR
-    
-    
-    @cached_property
-    def render_rect_color_boundary(self) -> context.RGB_Color:
-        
-        # Returning:
-        return SETTINGS.CARD_RENDER_BG_COLOR
-    
-    
-    @cached_property
-    def render_width(self) -> int:
-        
-        # Calculating:
-        render_width: int = int(SETTINGS.CARD_TEXTURE_WIDTH * self.render_scale)
-        
-        # Returning:
-        return render_width
-    
-    
-    @cached_property
-    def render_height(self) -> int:
-        
-        # Calculating:
-        render_height: int = int(SETTINGS.CARD_TEXTURE_HEIGHT * self.render_scale)
-
-        # Returning:
-        return render_height
     
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -3940,44 +3798,6 @@ class CardController:
         
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        DISPLAY METHODS
-        
-    """
-    
-    
-    def display(self) -> None:
-        """
-        Renders the card object's texture on screen. Used by `Gameshell` object's `on_draw` method within loop logic. 
-        
-        Uses predefined `arcade.Rect` object, card object's `self.texture_object_selected` texture based on its state and other
-        render properties.
-        """
-        
-        # Rendering:
-        if self.state_visible:
-            arcade.draw_texture_rect(
-                texture = self.texture_object_selected,
-                rect = self.render_rect,
-                angle = self.render_tilt,
-                alpha = self.render_alpha
-                )
-        
-    
-    def display_debug(self) -> None:
-        """
-        TODO: Add documentation!
-        """
-        
-        # Rendering:
-        if self.state_visible:
-            arcade.draw_rect_filled(
-                rect = self.render_rect_boundary,
-                color = SETTINGS.RECT_COMMON_COLOR_CARD_BOUNDARY,
-                tilt_angle = 0
-                )
-        
-    
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         UPDATE METHODS
         
     """
@@ -4033,7 +3853,7 @@ class CardController:
             
             # Hovered state:
             if self.state_hovered:
-                if self.render_tilt != self.render_tilt_arch:
+                if self.render_tilt_current != self.render_tilt_arch:
                     self.transition_render_tilt(
                         target_value = self.render_tilt_arch,
                         ignore_assertion = False,
@@ -4042,7 +3862,7 @@ class CardController:
                     
             # Default state:
             else:
-                if self.render_tilt != self.render_tilt_opp:
+                if self.render_tilt_current != self.render_tilt_opp:
                     self.transition_render_tilt(
                         target_value = self.render_tilt_opp,
                         ignore_assertion = False,
@@ -4051,7 +3871,7 @@ class CardController:
                 
         # Adjusting tilt (Table):
         elif self.location == context.CARD_LOCATION.TABLE:
-            if self.render_tilt != self.render_tilt_default:
+            if self.render_tilt_current != self.render_tilt_default:
                 self.transition_render_tilt(
                     target_value = self.render_tilt_default,
                     ignore_assertion = False,
@@ -4066,14 +3886,14 @@ class CardController:
                 
                 # Hovered state:
                 if self.state_hovered:
-                    if self.render_tilt != self.render_tilt_arch:
+                    if self.render_tilt_current != self.render_tilt_arch:
                         self.transition_render_tilt(
                             target_value = self.render_tilt_arch,
                             ignore_assertion = False,
                             clear_cache = True
                             )
                 else:
-                    if self.render_tilt != self.render_tilt_default:
+                    if self.render_tilt_current != self.render_tilt_default:
                         self.transition_render_tilt(
                             target_value = self.render_tilt_default,
                             ignore_assertion = False,
@@ -4082,7 +3902,7 @@ class CardController:
                     
             # Default state:
             else:
-                if self.render_tilt != self.render_tilt_default:
+                if self.render_tilt_current != self.render_tilt_default:
                     self.transition_render_tilt(
                         target_value = self.render_tilt_default,
                         ignore_assertion = False,
@@ -4102,7 +3922,7 @@ class CardController:
                     tilt_value: int = self.render_tilt_random
                     
                 # Transitioning render tilt value:
-                if self.render_tilt != tilt_value:
+                if self.render_tilt_current != tilt_value:
                     self.transition_render_tilt(
                         target_value = tilt_value,
                         ignore_assertion = False,
