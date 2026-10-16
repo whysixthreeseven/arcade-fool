@@ -31,6 +31,9 @@ class Gameshell(arcade.Window):
             antialiasing = SETTINGS.WINDOW_ANTIALIASING,
             draw_rate = SETTINGS.WINDOW_UPDATE_RATE,
             )
+
+        # Centering the window:
+        self.center_window()
         
         # Game controller:
         self.__game_controller: Game = Game()
