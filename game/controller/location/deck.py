@@ -221,7 +221,7 @@ class DeckController:
         return cards_value
 
             
-    def restock(self, cards_list: tuple[Card, ...] | list[Card], ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def restock(self, cards_list: tuple[Card, ...] | list[Card], ignore_assertion: bool = False) -> None:
         
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
             assertion.assert_value_type(

@@ -518,7 +518,6 @@ class Game:
         self.deck.restock(
             cards_list = self.cards,
             ignore_assertion = True,
-            clear_cache = True
             )
         
         
