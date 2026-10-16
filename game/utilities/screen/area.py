@@ -89,7 +89,6 @@ class Area:
         area_object.set_type(
             set_value = init_type,
             ignore_assertion = ignore_assertion,
-            clear_cache = False
             )
         
         # Unpacking and setting size:
@@ -118,7 +117,6 @@ class Area:
             set_value = init_coordinates,
             update_boundary = False,
             ignore_assertion = ignore_assertion,
-            clear_cache = True
             )
         
         # Clearing cache:
