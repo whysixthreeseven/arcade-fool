@@ -2942,8 +2942,8 @@ class Game:
         # Checking if hovered card was clicked:
         card_target_legal: bool = bool(
             self.area_hover == area.AREA_PLAYER and
-            self.card_hover.state_playable and 
             self.card_hover is not None and 
+            self.card_hover.state_playable and 
             self.card_hover.hit_boundary(
                 hit_coordinates = cursor_coordinates,
                 ignore_assertion = False,
