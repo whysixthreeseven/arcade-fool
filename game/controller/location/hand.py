@@ -28,9 +28,6 @@ class HandController:
     
     def __init__(self) -> None:
         
-        # Owner attributes:
-        self.__owner: str = context.PLAYER_TYPE.HUMAN       # TODO: TEST CODE, REMOVE!
-        
         # Container attributes:
         self.__cards_list: list[Card] = []
     

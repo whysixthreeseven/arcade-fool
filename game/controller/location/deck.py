@@ -271,7 +271,6 @@ class DeckController:
                 card_object
                 )
 
-
         # Adding the rest of the cards:
         for card_remaining in card_list_gen:
             card_list_adjusted.append(
