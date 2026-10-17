@@ -9,10 +9,6 @@ from game.settings import SETTINGS
 from game.session import SESSION
 from game import context
 
-# Cache management:
-from functools import cached_property
-from game.utilities.scripts import cache
-
 # Various utilities:
 from game.utilities.scripts import assertion, validate
 
@@ -47,6 +43,7 @@ class PlayerController:
         # State attributes:
         self.__state_attacking: bool = False
         self.__state_defending: bool = False
+        self.__state_analyzing: bool = False
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -94,12 +91,10 @@ class PlayerController:
         self.set_type(
             set_value = context.PLAYER_TYPE.HUMAN,
             ignore_assertion = True,
-            clear_cache = True,
             )
         self.set_name(
             set_value = "Player",
             ignore_assertion = True,
-            clear_cache = True,
             )
         
         # Common setup method:
@@ -112,7 +107,6 @@ class PlayerController:
         self.set_type(
             set_value = context.PLAYER_TYPE.COMPUTER,
             ignore_assertion = True,
-            clear_cache = True,
             )
         self.set_name_random(
             clear_cache = True
@@ -122,175 +116,16 @@ class PlayerController:
         self.set_play_style(
             set_value = context.COMPUTER_STYLE.RANDOM,          # TODO: Add to SESSION variables!
             ignore_assertion = True,
-            clear_cache = True,
             )
         self.set_difficulty(
             set_value = context.COMPUTER_DIFFICULTY.MEDIUM,     # TODO: Add to SESSION variables!
             ignore_assertion = True,
-            clear_cache = True,
             )
         
         # Common setup method:
         self.__setup()
 
         
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        CACHED PROPETIES AND CLEAN METHODS
-    
-    """
-    
-    
-    @cached_property
-    def __cached_core_attributes(self) -> tuple[str, ...]:
-        
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "name",
-            "name_repr",
-            "type",
-            "type_repr",
-            )
-        
-        # Returning:
-        return cached_property_list
-    
-    
-    @cached_property
-    def __cached_game_attributes(self) -> tuple[str, ...]:
-
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "game_count",
-            )
-        
-        # Returning:
-        return cached_property_list
-    
-    
-    @cached_property
-    def __cached_score_attributes(self) -> tuple[str, ...]:
-        
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "score_win",
-            "score_win_ratio",
-            "score_win_ratio_repr",
-            "score_loss",
-            "score_loss_ratio",
-            "score_loss_ratio_repr",
-            "score_draw",
-            "score_draw_ratio",
-            "score_draw_ratio_repr",
-            "score",
-            "score_repr",
-            )
-
-        # Returning:
-        return cached_property_list
-    
-    
-    def __cached_ai_attributes(self) -> tuple[str, ...]:
-            
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "play_style",
-            "difficulty"
-            )
-        
-        # Returning:
-        return cached_property_list
-    
-    
-    @cached_property
-    def __cached_state_attributes(self) -> tuple[str, ...]:
-        
-        # Collecting related cached properties:
-        cached_property_list: tuple[str, ...] = (
-            "state_attacking",
-            "state_defending",
-            "state",
-            )
-        
-        # Returning:
-        return cached_property_list
-
-
-    def clear_cached_core_attributes(self) -> None:
-    
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_core_attributes
-            )
-        
-    
-    def clear_cached_game_attributes(self) -> None:
-        
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_game_attributes
-            )
-        
-        
-    def clear_cached_score_attributes(self) -> None:
-    
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_score_attributes
-            )
-        
-    
-    def clear_cached_ai_attributes(self) -> None:
-        
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_ai_attributes
-            )
-        
-    
-    def clear_cached_state_attributes(self) -> None:
-        
-        # Clearing cached properties:
-        cache.clear_cached_property_list(
-            target_object = self,
-            target_attribute_list = self.__cached_state_attributes
-            )
-
-        
-    def clear_cached_attributes(self) -> None:
-            
-        # Collecting cached properties:
-        cached_property_list_collection: tuple[tuple[str, ...], ...] = (
-            self.__cached_core_attributes,
-            self.__cached_game_attributes,
-            self.__cached_score_attributes,
-            self.__cached_state_attributes,
-            )
-        
-        # Looping throught the list and clearing cache:
-        for cached_property_list in cached_property_list_collection:
-            cache.clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
-            
-        # Cleaning up computer-related cached properties:
-        if self.__type == context.PLAYER_TYPE.COMPUTER:
-            cached_property_list_collection: tuple[tuple[str, ...], ...] = (
-                self.__cached_ai_attributes,
-                )
-
-            # Looping throught the list and clearing cache:
-            for cached_property_list in cached_property_list_collection:
-                cache.clear_cached_property_list(
-                    target_object = self,
-                    target_attribute_list = cached_property_list
-                    )
-    
-    
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         RATIO CALC AND FORMAT METHODS
     
@@ -328,14 +163,14 @@ class PlayerController:
     """
     
     
-    @cached_property
+    @property
     def name(self) -> str:
 
         # Returning:
         return self.__name
     
     
-    @cached_property
+    @property
     def name_repr(self) -> str:
         
         # Formatting string:
@@ -345,7 +180,7 @@ class PlayerController:
         return name_repr
 
 
-    def set_name(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_name(self, set_value: str, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -356,19 +191,8 @@ class PlayerController:
         # Setting value:
         self.__name = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property_list: tuple[str, ...] = (
-                "name",
-                "name_repr",
-                )
-            cache.clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
-            
     
-    def set_name_random(self, clear_cache: bool = True) -> None:
+    def set_name_random(self) -> None:
         
         # Checking type:
         if self.__type == context.PLAYER_TYPE.HUMAN:
@@ -380,7 +204,6 @@ class PlayerController:
         self.set_name(
             set_value = name_random,
             ignore_assertion = True,
-            clear_cache = clear_cache
             )
             
     
@@ -390,14 +213,14 @@ class PlayerController:
     """
     
 
-    @cached_property
+    @property
     def type(self) -> str:
 
         # Returning:
         return self.__type
 
 
-    def set_type(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_type(self, set_value: str, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -417,14 +240,6 @@ class PlayerController:
         # Setting value:
         self.__type = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property: str = "type"
-            cache.clear_cached_property(
-                target_object = self,
-                target_attribute = cached_property
-                )
-            
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         COMPUTER (!) PLAY STYLE CACHED PROPERTIES AND METHODS
@@ -432,14 +247,14 @@ class PlayerController:
     """
     
     
-    @cached_property
+    @property
     def play_style(self) -> str:
 
         # Returning:
         return self.__play_style
 
 
-    def set_play_style(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_play_style(self, set_value: str, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -450,16 +265,6 @@ class PlayerController:
         # Updating attribute:
         self.__play_style = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property_list: tuple[str, ...] = (
-                "play_style",
-                )
-            cache.clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
-            
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         COMPUTER (!) DIFFICULTY CACHED PROPERTIES AND METHODS
@@ -467,14 +272,14 @@ class PlayerController:
     """
     
     
-    @cached_property
+    @property
     def difficulty(self) -> str | None:
 
         # Returning:
         return self.__difficulty
 
 
-    def set_difficulty(self, set_value: str, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_difficulty(self, set_value: str, ignore_assertion: bool = False) -> None:
         
         # Checking player type:
         if self.__type == context.PLAYER_TYPE.HUMAN:
@@ -490,18 +295,8 @@ class PlayerController:
         # Updating attribute:
         self.__difficulty = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            cached_property_list: tuple[str, ...] = (
-                "difficulty",
-                )
-            cache.clear_cached_property_list(
-                target_object = self,
-                target_attribute_list = cached_property_list
-                )
     
-    
-    def set_difficulty_random(self, clear_cache: bool = True) -> None:
+    def set_difficulty_random(self) -> None:
         
         # Selecting difficulty:
         difficulty_random: str = random.choice(context.COMPUTER_DIFFICULTY_LIST)
@@ -510,11 +305,10 @@ class PlayerController:
         self.set_difficulty(
             set_value = difficulty_random,
             ignore_assertion = True,
-            clear_cache = clear_cache
             )        
     
             
-    def increase_difficulty(self, clear_cache: bool = True) -> None:
+    def increase_difficulty(self) -> None:
         
         # Selecting difficulty:
         difficulty_index: int = context.COMPUTER_DIFFICULTY_LIST.index(self.difficulty)
@@ -528,11 +322,10 @@ class PlayerController:
         self.set_difficulty(
             set_value = difficulty,
             ignore_assertion = True,
-            clear_cache = clear_cache
             )
         
     
-    def decrease_difficulty(self, clear_cache: bool = True) -> None:
+    def decrease_difficulty(self) -> None:
 
         # Selecting difficulty:
         difficulty_index: int = context.COMPUTER_DIFFICULTY_LIST.index(self.difficulty)
@@ -546,9 +339,8 @@ class PlayerController:
         self.set_difficulty(
             set_value = difficulty,
             ignore_assertion = True,
-            clear_cache = clear_cache
             )
-    
+            
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         HAND CACHED PROPERTIES AND METHODS
@@ -575,14 +367,13 @@ class PlayerController:
         self.__hand = set_value
 
 
-    def create_hand(self, clear_cache: bool = True) -> None:
+    def create_hand(self) -> None:
         
         # Creating new hand:
         hand_object: HandController = HandController()
         hand_object.set_owner(
             set_value = self.type,
             ignore_assertion = True,
-            clear_cache = True,
             )
         
         # Updating attribute:
@@ -592,7 +383,7 @@ class PlayerController:
             )
         
     
-    def clear_hand(self, clear_cache: bool = True) -> None:
+    def clear_hand(self) -> None:
         
         # Updating attribute:
         if self.hand.cards_count > 0:
@@ -604,25 +395,21 @@ class PlayerController:
                     )
                 self.hand.clear_cached_cards_attributes()
         
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_hand_attributes()
-    
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         GAME CACHED PROPERTIES AND METHODS
 
     """
     
-    
-    @cached_property
+
+    @property    
     def game_count(self) -> int:
         
         # Returning:
         return self.__game_count
     
     
-    def set_game_count(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_game_count(self, set_value: int, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -633,12 +420,8 @@ class PlayerController:
         # Updating attribute:
         self.__game_count = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_game_attributes()
 
-
-    def increase_game_count(self, clear_cache: bool = True) -> None:
+    def increase_game_count(self) -> None:
         
         # Calculating:
         game_count: int = self.game_count + 1
@@ -647,7 +430,6 @@ class PlayerController:
         self.set_game_count(
             set_value = game_count,
             ignore_assertion = True,
-            clear_cache = clear_cache
             )
     
     
@@ -657,14 +439,14 @@ class PlayerController:
     """
     
     
-    @cached_property
+    @property
     def score_win(self) -> int:
         
         # Returning:
         return self.__score_win
 
 
-    @cached_property
+    @property
     def score_win_ratio(self) -> float:
 
         # Calculating:
@@ -680,7 +462,7 @@ class PlayerController:
         return stat_ratio
     
     
-    @cached_property
+    @property
     def score_win_ratio_repr(self) -> str:
         
         # Formatting:
@@ -692,7 +474,7 @@ class PlayerController:
         return stat_ratio_repr
 
 
-    def set_score_win(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_score_win(self, set_value: int, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -703,12 +485,8 @@ class PlayerController:
         # Updating attribute:
         self.__score_win = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_score_attributes()
 
-
-    def increase_score_win(self, clear_cache: bool = True) -> None:
+    def increase_score_win(self) -> None:
 
         # Calculating:
         score_win: int = self.score_win + 1
@@ -717,7 +495,6 @@ class PlayerController:
         self.set_score_win(
             set_value = score_win,
             ignore_assertion = True,
-            clear_cache = clear_cache
             )
         
     
@@ -727,14 +504,14 @@ class PlayerController:
     """
     
     
-    @cached_property
+    @property
     def score_loss(self) -> int:
 
         # Returning:
         return self.__score_loss
     
     
-    @cached_property
+    @property
     def score_loss_ratio(self) -> float:
 
         # Calculating:
@@ -750,7 +527,7 @@ class PlayerController:
         return stat_ratio
 
 
-    @cached_property
+    @property
     def score_loss_ratio_repr(self) -> str:
         
         # Formatting:
@@ -762,7 +539,7 @@ class PlayerController:
         return stat_ratio_repr
 
 
-    def set_score_loss(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_score_loss(self, set_value: int, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -773,12 +550,8 @@ class PlayerController:
         # Updating attribute:
         self.__score_loss = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_score_attributes()
-            
     
-    def increase_score_loss(self, clear_cache: bool = True) -> None:
+    def increase_score_loss(self) -> None:
 
         # Calculating:
         score_loss: int = self.score_loss + 1
@@ -787,7 +560,6 @@ class PlayerController:
         self.set_score_loss(
             set_value = score_loss,
             ignore_assertion = True,
-            clear_cache = clear_cache
             )
         
     
@@ -797,14 +569,14 @@ class PlayerController:
     """
     
 
-    @cached_property
+    @property
     def score_draw(self) -> int:
 
         # Returning:
         return self.__score_draw
     
     
-    @cached_property
+    @property
     def score_draw_ratio(self) -> float:
 
         # Calculating:
@@ -820,7 +592,7 @@ class PlayerController:
         return stat_ratio
     
     
-    @cached_property
+    @property
     def score_draw_ratio_repr(self) -> str:
 
         # Formatting:
@@ -832,7 +604,7 @@ class PlayerController:
         return stat_ratio_repr
 
 
-    def set_score_draw(self, set_value: int, ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_score_draw(self, set_value: int, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -843,12 +615,8 @@ class PlayerController:
         # Updating attribute:
         self.__score_draw = set_value
 
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_score_attributes()
 
-
-    def increase_score_draw(self, clear_cache: bool = True) -> None:
+    def increase_score_draw(self) -> None:
 
         # Calculating:
         score_draw: int = self.score_draw + 1
@@ -857,10 +625,8 @@ class PlayerController:
         self.set_score_draw(
             set_value = score_draw,
             ignore_assertion = True,
-            clear_cache = clear_cache
             )
 
-    
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         SCORE (GLOBAL) CACHED PROPERTIES AND METHODS
@@ -868,7 +634,7 @@ class PlayerController:
     """
     
     
-    @cached_property
+    @property
     def score(self) -> tuple[int, int, int]:
         
         # Packing up:
@@ -882,7 +648,7 @@ class PlayerController:
         return score
     
     
-    @cached_property
+    @property
     def score_repr(self) -> str:
         
         # Generating string:
@@ -898,21 +664,21 @@ class PlayerController:
     """
     
     
-    @cached_property
+    @property
     def state_attacking(self) -> bool:
         
         # Returning
         return self.__state_attacking
     
     
-    @cached_property
+    @property
     def state_defending(self) -> bool:
         
         # Returning:
         return self.__state_defending
-    
-    
-    @cached_property
+
+
+    @property
     def state(self) -> str:
         
         # Validating state attributes:
@@ -933,8 +699,7 @@ class PlayerController:
             raise AttributeError(error_message)
         
     
-    def set_state_attacking(self, set_value: bool, update_related: bool = True, 
-                                  ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_state_attacking(self, set_value: bool, update_related: bool = True, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -947,13 +712,8 @@ class PlayerController:
         if update_related:
             self.__state_defending = not set_value
             
-        # Clearing cache, if required:
-        if clear_cache:
-            self.clear_cached_state_attributes()
-        
     
-    def set_state_defending(self, set_value: bool, update_related: bool = True, 
-                                  ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_state_defending(self, set_value: bool, update_related: bool = True, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -966,13 +726,8 @@ class PlayerController:
         if update_related:
             self.__state_attacking = not set_value
             
-        # Clearing cache, if required:
-        if clear_cache:
-            self.clear_cached_state_attributes()
-        
     
-    def set_state(self, set_value: str, update_related: bool = True,
-                        ignore_assertion: bool = False, clear_cache: bool = True) -> None:
+    def set_state(self, set_value: str, update_related: bool = True, ignore_assertion: bool = False) -> None:
         
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -986,22 +741,16 @@ class PlayerController:
                 set_value = True,
                 update_related = update_related,
                 ignore_assertion = True,
-                clear_cache = False,
                 )
         else:
             self.set_state_defending(
                 set_value = True,
                 update_related = update_related,
                 ignore_assertion = True,
-                clear_cache = False,
                 )
         
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_state_attributes()
 
-
-    def switch_state(self, update_related: bool = True, clear_cache: bool = True) -> None:
+    def switch_state(self, update_related: bool = True) -> None:
         
         # Switching state based on current state:
         if self.state == context.PLAYER_STATE.ATTACKING:
@@ -1009,19 +758,26 @@ class PlayerController:
                 set_value = True,
                 update_related = update_related,
                 ignore_assertion = True,
-                clear_cache = False,
                 )
         else:
             self.set_state_attacking(
                 set_value = True,
                 update_related = update_related,
                 ignore_assertion = True,
-                clear_cache = False,
                 )
+
+    
+    def set_state_analyzing(self, set_value: bool, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            validate.validate_flag(
+                validate_value = set_value,
+                )
+
+        # Updating attribute:
+        self.__state_analyzing = set_value
         
-        # Clearing cache:
-        if clear_cache:
-            self.clear_cached_state_attributes()
 
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
