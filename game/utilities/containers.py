@@ -4,31 +4,46 @@ from dataclasses import dataclass
 # Relevant controllers
 from game.controller.card import CardController as Card
 
-# Settings, session and context:
-from game import context
-
 
 @dataclass(frozen = True)
 class GameSnapshot:
 
+    # Importing controllers to avoid circular imports:
+    from game.controller.player import PlayerController
+    from game.controller.card import CardController as Card
+
+    # Turn and round information:
+    turn_num: int
+    turn_player: PlayerController
+    round_num: int
+
+    # Attack and defence information:
+    player_attacking: PlayerController
+    player_defending: PlayerController
+
+    # Player cards:
+    player_cards: tuple[Card, ...]
+    player_cards_count: int
+    player_cards_value: int
+
     # Opponent cards:
-    opponent_cards: context.CardContainer
+    opponent_cards: tuple[Card, ...]
     opponent_cards_count: int
     opponent_cards_value: int
 
     # Deck cards
-    deck_cards: context.CardContainer
+    deck_cards: tuple[Card, ...]
     deck_cards_count: int
     deck_cards_value: int
 
     # Discard cards
-    discard_cards: context.CardContainer
+    discard_cards: tuple[Card, ...]
     discard_cards_count: int
     discard_cards_value: int
 
     # Table cards:
-    table_index: context.CardIndex
-    table_cards: context.CardContainer
+    table_index: dict[int, Card]
+    table_cards: tuple[Card, ...]
     table_cards_count: int
     table_cards_value: int
 
