@@ -12,8 +12,6 @@ RGB_Color = tuple[int, int, int]
 RGBA_Color = tuple[int, int, int, int]
 Coordinates = tuple[int, int]
 Location = tuple[str, int]
-CardContainer = tuple[object, ...]
-CardIndex = dict[int, object]
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
