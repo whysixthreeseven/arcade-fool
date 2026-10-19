@@ -1,9 +1,6 @@
 # External libraries:
 from dataclasses import dataclass
 
-# Relevant controllers
-from game.controller.card import CardController as Card
-
 
 @dataclass(frozen = True)
 class GameSnapshot:
@@ -11,6 +8,13 @@ class GameSnapshot:
     # Importing controllers to avoid circular imports:
     from game.controller.player import PlayerController
     from game.controller.card import CardController as Card
+
+    # Timestamp function:
+    from game.utilities.scripts.timestamp import timestamp
+
+
+    # Timestamp:
+    __timestamp: str = timestamp()
 
     # Turn and round information:
     turn_num: int
