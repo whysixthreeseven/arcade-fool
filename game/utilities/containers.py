@@ -1,6 +1,9 @@
 # External libraries:
 from dataclasses import dataclass
 
+# Timestamp function:
+from game.utilities.scripts.timestamp import timestamp
+
 
 @dataclass(frozen = True)
 class GameSnapshot:
@@ -9,12 +12,9 @@ class GameSnapshot:
     from game.controller.player import PlayerController
     from game.controller.card import CardController as Card
 
-    # Timestamp function:
-    from game.utilities.scripts.timestamp import timestamp
-
 
     # Timestamp:
-    __timestamp: str = timestamp()
+    __timestamp: str = timestamp()              # 2026-10-19 14:41:00
 
     # Turn and round information:
     turn_num: int
