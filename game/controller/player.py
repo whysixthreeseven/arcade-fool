@@ -81,9 +81,7 @@ class PlayerController:
     def __setup(self) -> None:
         
         # Creating hand:
-        self.create_hand(
-            clear_cache = True,
-            )
+        self.create_hand()
         
     def setup_human(self) -> None:
             
@@ -108,9 +106,7 @@ class PlayerController:
             set_value = context.PLAYER_TYPE.COMPUTER,
             ignore_assertion = True,
             )
-        self.set_name_random(
-            clear_cache = True
-            )
+        self.set_name_random()
         
         # Setting up related attributes to default values:
         self.set_play_style(

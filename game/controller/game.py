@@ -126,13 +126,11 @@ class Game:
             set_value = True,
             update_related = True,
             ignore_assertion = True,
-            clear_cache = True
             )
         player_two_controller.set_state_defending(
             set_value = True,
             update_related = True,
             ignore_assertion = True,
-            clear_cache = True
             )
             
         # Updating attributes:
@@ -1556,13 +1554,11 @@ class Game:
             set_value = True,
             update_related = True,
             ignore_assertion = False,
-            clear_cache = True,
             )
         player_defending.set_state_defending(
             set_value = True,
             update_related = True,
             ignore_assertion = False,
-            clear_cache = True,
             )
         
         # Updating turns:
