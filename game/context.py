@@ -280,15 +280,15 @@ COMPUTER_DIFFICULTY_LIST: tuple[str, ...] = tuple(
     )
 
 
-class COMPUTER_STYLE:
+class COMPUTER_PLAYSTYLE:
     RECKLESS: str = "Reckless"
     DEFENSIVE: str = "Defensive"
     HOARDING: str = "Hoarding"
     RANDOM: str = "Random"
 
 
-COMPUTER_STYLE_LIST: tuple[str, ...] = tuple(
-    attribute_value for attribute_name, attribute_value in COMPUTER_STYLE.__dict__.items()
+COMPUTER_PLAYSTYLE_LIST: tuple[str, ...] = tuple(
+    attribute_value for attribute_name, attribute_value in COMPUTER_PLAYSTYLE.__dict__.items()
         if not attribute_name.startswith("__") 
         and isinstance(attribute_value, str)
     )
