@@ -1,8 +1,14 @@
+# Typing and annotations:
+from typing import Literal
+
 # External libraries:
 from dataclasses import dataclass
 
 # Timestamp function:
 from game.utilities.scripts.timestamp import timestamp
+
+# Context and namespaces:
+from game import context
 
 
 @dataclass(frozen = True)
@@ -19,6 +25,7 @@ class GameSnapshot:
     # Turn and round information:
     turn_num: int
     turn_player: PlayerController
+    turn_draw: PlayerController
     round_num: int
 
     # Attack and defence information:
@@ -35,12 +42,12 @@ class GameSnapshot:
     opponent_cards_count: int
     opponent_cards_value: int
 
-    # Deck cards
+    # Deck cards:
     deck_cards: tuple[Card, ...]
     deck_cards_count: int
     deck_cards_value: int
 
-    # Discard cards
+    # Discard cards:
     discard_cards: tuple[Card, ...]
     discard_cards_count: int
     discard_cards_value: int
@@ -50,4 +57,15 @@ class GameSnapshot:
     table_cards: tuple[Card, ...]
     table_cards_count: int
     table_cards_value: int
+
+
+@dataclass(frozen = True)
+class ComputerAction:
+
+    # Importing controllers to avoid circular imports:
+    from game.controller.card import CardController as Card
+
+    # Action type and card object involved:
+    action_type: Literal["Attack", "Defend", "Fold", "Pass"]        # Default values found in game.context.COMPUTER_ACTION
+    card_object: Card | None = None                                 # Card object, if Attack or Defend, otherwise None
 
