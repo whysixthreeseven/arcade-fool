@@ -21,7 +21,7 @@ from game import context
 from functools import cached_property
 
 # Various utilities:
-from game.utilities import event, keymap, texturepack
+from game.utilities import container, event, keymap, texturepack
 from game.utilities.screen import area, scene, surface
 from game.utilities.scripts import assertion, validate
 
@@ -592,6 +592,52 @@ class Game:
         
         # Adding related events in order:
         self.__event_reset_game()
+
+
+    def game_snapshot(self) -> container.GameSnapshot:
+
+        # Creating a dataclass container snapshot:
+        game_snapshot: container.GameSnapshot = container.GameSnapshot(
+
+            # Turn and round values:
+            turn_num = self.turn_num,
+            turn_player = self.turn_player,
+            turn_draw = self.turn_draw,
+            round_num = self.round_num,
+
+            # Player state values:
+            player_attacking = self.player_attacking,
+            player_defending = self.player_defending,
+
+            # Player values:
+            player_cards = self.player_human.hand.cards,
+            player_cards_count = self.player_human.hand.cards_count,
+            player_cards_value = self.player_human.hand.cards_value,
+
+            # Computer values:
+            computer_cards = self.player_computer.hand.cards,
+            computer_cards_count = self.player_computer.hand.cards_count,
+            computer_cards_value = self.player_computer.hand.cards_value,
+
+            # Deck values:
+            deck_cards = self.deck.cards,
+            deck_cards_count = self.deck.cards_count,
+            deck_cards_value = self.deck.cards_value,
+
+            # Discard values:
+            discard_cards = self.discard.cards,
+            discard_cards_count = self.discard.cards_count,
+            discard_cards_value = self.discard.cards_value,
+
+            # Table values:
+            table_cards_index = self.table.cards_index,
+            table_cards = self.table.cards,
+            table_cards_count = self.table.cards_count,
+            table_cards_value = self.table.cards_value,
+            )
+
+        # Returning:
+        return game_snapshot
             
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
