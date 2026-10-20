@@ -680,7 +680,7 @@ def validate_computer_style(validate_value: int) -> None:
     # Asserting value is default:
     assertion.assert_value_default(
         check_value = validate_value,
-        check_list = context.COMPUTER_STYLE_LIST,
+        check_list = context.COMPUTER_PLAYSTYLE_LIST,
         raise_error = True
         )
         
