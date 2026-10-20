@@ -6,7 +6,7 @@ from game import context
 
 # Various utilities:
 from game.utilities import texturepack as tp
-from game.utilities.scripts import validate
+from game.utilities.scripts import assertion, validate
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -43,6 +43,12 @@ class __SESSION:
         self.__hand_sort_seq_default: str = context.HAND_SORT_SEQ.SUIT
         self.__hand_sort_seq_selected: str = context.HAND_SORT_SEQ.SUIT
         self.__hand_sort_seq_reverse: bool = False
+
+        # Computer playstyle and difficulty:
+        self.__computer_playstyle_default: str = context.COMPUTER_PLAYSTYLE.RANDOM
+        self.__computer_playstyle_selected: str = context.COMPUTER_PLAYSTYLE.RANDOM
+        self.__computer_difficulty_default: str = context.COMPUTER_DIFFICULTY.EASY      # Not implemented
+        self.__computer_difficulty_selected: str = context.COMPUTER_DIFFICULTY.EASY     # Not implemented
 
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -152,7 +158,7 @@ class __SESSION:
 
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        TEXTURE PACK CACHED PROPERTIES AND METHODS
+        TEXTURE PACK PROPERTIES AND METHODS
     
     """
     
@@ -312,7 +318,7 @@ class __SESSION:
         
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        GAME MODE CACHED PROPERTIES AND METHODS
+        GAME MODE PROPERTIES AND METHODS
     
     """
     
@@ -394,7 +400,7 @@ class __SESSION:
 
         
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        DECK CACHED PROPERTIES AND METHODS
+        DECK PROPERTIES AND METHODS
     
     """
     
@@ -473,7 +479,7 @@ class __SESSION:
 
 
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        HAND SORT CACHED PROPERTIES AND METHODS
+        HAND SORT PROPERTIES AND METHODS
     
     """
     
@@ -522,9 +528,161 @@ class __SESSION:
         
         # Updating attribute:
         self.set_hand_sort_seq(
-            set_value = context.HAND_SORT_SEQ.SUIT,
+            set_value = self.HAND_SORT_SEQ_DEFAULT,
             set_reverse_value = False,
             ignore_assertion = True
+            )
+
+
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        COMPUTER PLAYSTYLE PROPERTIES AND METHODS
+    
+    """
+
+
+    @property
+    def COMPUTER_PLAYSTYLE_DEFAULT(self) -> str:
+
+        # Returning:
+        return self.__computer_playstyle_default
+
+
+    @property
+    def COMPUTER_PLAYSTYLE_SELECTED(self) -> str:
+
+        # Returning:
+        return self.__computer_playstyle_selected
+
+
+    def set_computer_playstyle(self, set_value: str, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value, 
+                check_type = str,
+                raise_error = True,
+                )
+            assertion.assert_value_default(
+                check_value = set_value,
+                check_list = context.COMPUTER_PLAYSTYLE_LIST,
+                raise_error = True,
+                )
+        
+        # Updating attribute:
+        self.__computer_playstyle_selected = set_value
+
+
+    def set_computer_playstyle_default(self) -> None:
+
+        # Updating attribute:
+        self.set_computer_playstyle(
+            set_value = self.COMPUTER_PLAYSTYLE_DEFAULT,
+            ignore_assertion = True
+            )
+        
+    
+    def set_computer_playstyle_next(self) -> None:
+
+        # Acquiring current and required value index:
+        playstyle_index: int = context.COMPUTER_PLAYSTYLE_LIST.index(self.COMPUTER_PLAYSTYLE_SELECTED)
+        playstyle_index_selected: int = (playstyle_index + 1) % len(context.COMPUTER_PLAYSTYLE_LIST)
+        playstyle_value: str = context.COMPUTER_PLAYSTYLE_LIST[playstyle_index_selected]
+
+        # Updating attribute:
+        self.set_computer_playstyle(
+            set_value = playstyle_value,
+            ignore_assertion = True,
+            )
+
+
+    def set_computer_playstyle_previous(self) -> None:
+
+        # Acquiring current and required value index:
+        playstyle_index: int = context.COMPUTER_PLAYSTYLE_LIST.index(self.COMPUTER_PLAYSTYLE_SELECTED)
+        playstyle_index_selected: int = (playstyle_index - 1) % len(context.COMPUTER_PLAYSTYLE_LIST)
+        playstyle_value: str = context.COMPUTER_PLAYSTYLE_LIST[playstyle_index_selected]
+
+        # Updating attribute:
+        self.set_computer_playstyle(
+            set_value = playstyle_value,
+            ignore_assertion = True,
+            )
+
+    
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        COMPUTER DIFFICULTY PROPERTIES AND METHODS
+    
+    """
+
+
+    @property
+    def COMPUTER_DIFFICULTY_DEFAULT(self) -> str:
+
+        # Returning:
+        return self.__computer_difficulty_default
+
+
+    @property
+    def COMPUTER_DIFFICULTY_SELECTED(self) -> str:
+
+        # Returning:
+        return self.__computer_difficulty_selected
+
+    
+    def set_computer_difficulty(self, set_value: str, ignore_assertion: bool = False) -> None:
+
+        # Assertion control:
+        if not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = set_value, 
+                check_type = str,
+                raise_error = True,
+                )
+            assertion.assert_value_default(
+                check_value = set_value,
+                check_list = context.COMPUTER_DIFFICULTY_LIST,
+                raise_error = True,
+                )
+
+        # Updating attribute:
+        self.__computer_difficulty_selected = set_value
+
+
+    def set_computer_difficulty_default(self) -> None:
+
+        # Updating attribute:
+        self.set_computer_difficulty(
+            set_value = self.COMPUTER_DIFFICULTY_DEFAULT,
+            ignore_assertion = True
+            )
+
+
+    def set_computer_difficulty_next(self) -> None:
+
+        # Acquiring current and required value index:
+        difficulty_index: int = context.COMPUTER_DIFFICULTY_LIST.index(self.COMPUTER_DIFFICULTY_SELECTED)
+        difficulty_index_selected = (difficulty_index + 1) % len(context.COMPUTER_DIFFICULTY_LIST)
+        difficulty_value: str = context.COMPUTER_DIFFICULTY_LIST[difficulty_index_selected]
+
+        # Updating attribute:
+        self.set_computer_difficulty(
+            set_value = difficulty_value,
+            ignore_assertion = True,
+            )
+
+
+    def set_computer_difficulty_previous(self) -> None:
+
+        # Acquiring current and required value index:
+        difficulty_index: int = context.COMPUTER_DIFFICULTY_LIST.index(self.COMPUTER_DIFFICULTY_SELECTED)
+        difficulty_index_selected: int = (difficulty_index - 1) % len(context.COMPUTER_DIFFICULTY_LIST)
+        difficulty_value: str = context.COMPUTER_DIFFICULTY_LIST[difficulty_index_selected]
+
+        # Updating attribute:
+        self.set_computer_difficulty(
+            set_value = difficulty_value,
+            ignore_assertion = True,
             )
 
 
