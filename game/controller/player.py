@@ -10,6 +10,7 @@ from game.session import SESSION
 from game import context
 
 # Various utilities:
+from game.utilities import container
 from game.utilities.scripts import assertion, validate
 
 
@@ -38,13 +39,14 @@ class PlayerController:
         
         # Computer (!) attributes:
         self.__difficulty: str = None
-        self.__play_style: str = None
+        self.__playstyle: str = None
+        self.__game_snapshot: container.Container = None
         
         # State attributes:
         self.__state_attacking: bool = False
         self.__state_defending: bool = False
         self.__state_analyzing: bool = False
-        
+
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         NATIVE METHODS
@@ -247,7 +249,7 @@ class PlayerController:
     def play_style(self) -> str:
 
         # Returning:
-        return self.__play_style
+        return self.__playstyle
 
 
     def set_play_style(self, set_value: str, ignore_assertion: bool = False) -> None:
@@ -259,7 +261,7 @@ class PlayerController:
                 )
             
         # Updating attribute:
-        self.__play_style = set_value
+        self.__playstyle = set_value
 
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -761,10 +763,23 @@ class PlayerController:
                 update_related = update_related,
                 ignore_assertion = True,
                 )
+        
 
+    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        ANALYZE (COMPUTER) PROPERTIES AND METHODS
+
+    """
     
-    def set_state_analyzing(self, set_value: bool, ignore_assertion: bool = False) -> None:
 
+    @property
+    def state_analyzing(self) -> bool:
+
+        # Returning:
+        return self.__state_analyzing
+
+
+    def set_state_analyzing(self, set_value: bool, ignore_assertion: bool = False) -> None:
+    
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
             validate.validate_flag(
@@ -775,13 +790,19 @@ class PlayerController:
         self.__state_analyzing = set_value
         
 
+    @property
+    def feed_game_snapshot(self, game_snapshot: container.GameSnapshot, ignore_assertion: bool = False) -> None:
 
-    """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        ANALYZE (COMPUTER) METHODS
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
+            assertion.assert_value_type(
+                check_value = game_snapshot,
+                check_type = container.GameSnapshot,
+                raise_error = True,
+                )
 
-    """
-    
+        # Updating attribute:
+        self.__feed_game_snapshot = game_snapshot
 
-    ...
 
     
