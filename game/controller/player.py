@@ -40,12 +40,11 @@ class PlayerController:
         # Computer (!) attributes:
         self.__difficulty: str = None
         self.__playstyle: str = None
-        self.__game_snapshot: container.Container = None
+        self.__game_snapshot: container.GameSnapshot | None = None
         
         # State attributes:
         self.__state_attacking: bool = False
         self.__state_defending: bool = False
-        self.__state_analyzing: bool = False
 
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -111,12 +110,12 @@ class PlayerController:
         self.set_name_random()
         
         # Setting up related attributes to default values:
-        self.set_play_style(
-            set_value = context.COMPUTER_STYLE.RANDOM,          # TODO: Add to SESSION variables!
+        self.set_playstyle(
+            set_value = context.COMPUTER_PLAYSTYLE.RANDOM,              # TODO: Add to SESSION variables!
             ignore_assertion = True,
             )
         self.set_difficulty(
-            set_value = context.COMPUTER_DIFFICULTY.MEDIUM,     # TODO: Add to SESSION variables!
+            set_value = context.COMPUTER_DIFFICULTY.MEDIUM,             # TODO: Add to SESSION variables!
             ignore_assertion = True,
             )
         
@@ -246,13 +245,13 @@ class PlayerController:
     
     
     @property
-    def play_style(self) -> str:
+    def playstyle(self) -> str:
 
         # Returning:
         return self.__playstyle
 
 
-    def set_play_style(self, set_value: str, ignore_assertion: bool = False) -> None:
+    def set_playstyle(self, set_value: str, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
         if SESSION.ENABLE_ASSERTION and not ignore_assertion:
@@ -769,40 +768,109 @@ class PlayerController:
         ANALYZE (COMPUTER) PROPERTIES AND METHODS
 
     """
-    
+
 
     @property
-    def state_analyzing(self) -> bool:
+    def game_snapshot(self) -> container.GameSnapshot:
 
         # Returning:
-        return self.__state_analyzing
-
-
-    def set_state_analyzing(self, set_value: bool, ignore_assertion: bool = False) -> None:
+        return self.__game_snapshot
     
-        # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            validate.validate_flag(
-                validate_value = set_value,
-                )
 
-        # Updating attribute:
-        self.__state_analyzing = set_value
-        
-
-    @property
     def feed_game_snapshot(self, game_snapshot: container.GameSnapshot, ignore_assertion: bool = False) -> None:
 
         # Assertion control:
-        if SESSION.ENABLE_ASSERTION and not ignore_assertion:
-            assertion.assert_value_type(
-                check_value = game_snapshot,
-                check_type = container.GameSnapshot,
-                raise_error = True,
-                )
+        if SESSION.ENABLE_ASSERTION:
+
+            # Checking if player is human-type:
+            if self.type == context.PLAYER_TYPE.HUMAN:
+                error_message: str = f"Calling Human-type PlayerController, which cannot call feed_game_snapshot() method!"
+                raise TypeError(error_message)
+
+            # Parameter assertion:
+            if not ignore_assertion:
+                assertion.assert_value_type(
+                    check_value = game_snapshot,
+                    check_type = container.GameSnapshot,
+                    raise_error = True,
+                    )
 
         # Updating attribute:
-        self.__feed_game_snapshot = game_snapshot
+        self.__game_snapshot = game_snapshot
 
 
-    
+    def remove_game_snapshot(self) -> None:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION:
+
+            # Checking if player is human-type:
+            if self.type == context.PLAYER_TYPE.HUMAN:
+                error_message: str = f"Calling Human-type PlayerController, which cannot call remove_game_snapshot() method!"
+                raise TypeError(error_message)
+
+            # Checking if game snapshot is available:
+            if self.__game_snapshot is None:
+                error_message: str = f"Calling remove_game_snapshot() method without calling feed_game_snapshot() method first!"
+                raise AttributeError(error_message)
+
+        # Removing attribute:
+        self.__game_snapshot = None
+
+
+    def __get_action_playstyle_reckless(self) -> container.ComputerAction:
+        ...
+
+
+    def __get_action_playstyle_defensive(self) -> container.ComputerAction:
+        ...
+
+
+    def __get_action_playstyle_hoarding(self) -> container.ComputerAction:
+        ...
+
+
+    def __get_action_playstyle_random(self) -> container.ComputerAction:
+        ...
+
+
+    def get_action(self) -> container.ComputerAction:
+
+        # Assertion control:
+        if SESSION.ENABLE_ASSERTION:
+
+            # Checking if player is human-type:
+            if self.type == context.PLAYER_TYPE.HUMAN:
+                error_message: str = f"Calling Human-type PlayerController, which cannot call get_action() method!"
+                raise TypeError(error_message)
+
+            # Checking if game snapshot is available:
+            else:
+                if self.__game_snapshot is None:
+                    error_message: str = f"Calling get_action() method without calling feed_game_snapshot() method first!"
+                    raise AttributeError(error_message)
+
+        # Passing turn if no cards avaiable:
+        if self.hand.cards_count == 0:
+            computer_action: container.ComputerAction = container.ComputerAction(
+                action = context.COMPUTER_ACTION.PASS,
+                card_object = None
+                )
+
+        # Else, analyzing:
+        else:
+
+            # Selecting correct method to get action:
+            computer_action_index = {
+                context.COMPUTER_PLAYSTYLE.RECKLESS: self.__get_action_playstyle_reckless,
+                context.COMPUTER_PLAYSTYLE.DEFENSIVE: self.__get_action_playstyle_defensive,
+                context.COMPUTER_PLAYSTYLE.HOARDING: self.__get_action_playstyle_hoarding,
+                context.COMPUTER_PLAYSTYLE.RANDOM: self.__get_action_playstyle_random,
+                }
+            get_action_method = computer_action_index.get(self.playstyle, None)
+            if get_action_method is not None:
+                computer_action = get_action_method()
+
+        # Returning:
+        return computer_action
+
