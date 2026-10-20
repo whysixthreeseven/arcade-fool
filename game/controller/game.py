@@ -263,13 +263,11 @@ class Game:
             set_value = True,
             update_related = True,
             ignore_assertion = True,
-            clear_cache = True
             )
         self.player_computer.set_state_defending(
             set_value = True,
             update_related = True,
             ignore_assertion = True,
-            clear_cache = True
             )
             
     
