@@ -831,7 +831,102 @@ class PlayerController:
 
 
     def __get_action_playstyle_random(self) -> container.ComputerAction:
-        ...
+
+        # Choosing a card to attack with:
+        if self.state_attacking:
+
+            # Choosing a card to start attack with:
+            if self.game_snapshot.table_cards_count == 0:
+
+                # Calculating reserved cards count:
+                reserved_cards_count: int = min(4, max(0, self.hand.cards_count // 2 - 1))      # 1->3==0, 4->5==1, 6->7==2, 8->9==3...
+
+                # Getting reserved and available cards:
+                reserved_cards: list[object] = sorted(self.hand.cards, key = lambda card: card.value, reverse = True)[:reserved_cards_count]
+                available_cards: list[object] = [card_object for card_object in self.hand.cards if card_object not in reserved_cards]
+
+                # Choosing a card to play:
+                card_object: object = random.choice(available_cards)
+
+                # Creating computer action:
+                computer_action: container.ComputerAction = container.ComputerAction(
+                    action_type = context.COMPUTER_ACTION.ATTACK,
+                    card_object = card_object,
+                    )
+
+            # Choosing a card to attack with:
+            else:
+
+                # Scanning card names:
+                card_name_list: tuple[str, ...] = tuple(
+                    card_object.name for card_object in self.game_snapshot.table_cards
+                    )
+                available_cards: tuple[object, ...] = tuple(
+                    card_object for card_object in self.hand.cards 
+                        if card_object.name in card_name_list
+                    )
+                available_cards_count: int = len(available_cards)
+
+                # Choosing a card to play and attacking:
+                if available_cards_count > 0:
+                    card_object: object = random.choice(available_cards)
+                    computer_action: container.ComputerAction = container.ComputerAction(
+                        action_type = context.COMPUTER_ACTION.ATTACK,
+                        card_object = card_object,
+                        )
+                
+                # Passing turn, if no card is available for play:
+                else:
+                    computer_action: container.ComputerAction = container.ComputerAction(
+                        action_type = context.COMPUTER_ACTION.PASS,
+                        card_object = None,
+                        )
+
+        # Choosing a card to defend with:
+        elif self.state_defending:
+
+            # Scanning attacking cards:
+            card_attacking: object | None = None
+            for location_index, card_object in self.game_snapshot.table_index:
+
+                # Scanning lower stack position:
+                if location_index == 0 or location_index % 2 == 0:
+                    card_object: object | None = self.game_snapshot.table_cards[location_index]
+
+                    # If card is present, scanning upper stack position:
+                    if card_object is not None:
+                        location_index_upper: int = location_index + 1
+                        card_object_upper: object | None = self.game_snapshot.table_cards[location_index_upper]
+
+                        # If no card defending, adding card on the lower stack to the list:
+                        if card_object_upper is None:
+                            card_attacking: object = card_object
+                            break
+
+                    # Stopping scan, no attacking card found:
+                    else:
+                        break
+
+            # If no cards are attacking, raising error:
+            if card_attacking is None:
+                error_message: str = f"Calling get_action() while defending, when no card is attacking!"
+                raise AssertionError(error_message)
+
+            # Getting all cards with greater value than card attacking:
+            available_cards: tuple[object, ...] = tuple(
+                card_object for card_object in self.hand.cards
+                    if card_object > card_attacking
+                )
+
+            # Choosing card at random and creating computer action:
+            card_object: object = random.choice(available_cards)
+            computer_action: container.ComputerAction = container.ComputerAction(
+                action_type = context.COMPUTER_ACTION.DEFEND,
+                card_object = card_object,
+                )
+
+        # Returning:
+        return computer_action
 
 
     def get_action(self) -> container.ComputerAction:
