@@ -661,7 +661,7 @@ class CardController:
 
         # Clearing cached properties:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_core_attributes
             )
     
@@ -676,7 +676,7 @@ class CardController:
     
         # Clearing cached properties:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_texture_attributes
             )
         
@@ -691,7 +691,7 @@ class CardController:
         
         # Clearing cached properties:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_boundary_attributes
             )
         
@@ -706,7 +706,7 @@ class CardController:
     
         # Clearing cached properties:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_render_attributes
             )
         
@@ -721,7 +721,7 @@ class CardController:
         
         # Clearing cache:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_render_rect_attributes
             )
         
@@ -736,7 +736,7 @@ class CardController:
         
         # Clearing cached properties:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_coordinates_attributes
             )
     
@@ -751,7 +751,7 @@ class CardController:
         
         # Clearing cached properties:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_state_attributes
             )
         
@@ -766,7 +766,7 @@ class CardController:
             
         # Clearing cached properties:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_location_attributes
             )
         
@@ -781,7 +781,7 @@ class CardController:
     
         # Clearing cached properties:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_id_attributes
             )
     
@@ -796,7 +796,7 @@ class CardController:
     
         # Clearing cached properties:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_added_index_attributes
             )
         
@@ -811,7 +811,7 @@ class CardController:
 
         # Clearing cached properties:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_update_attributes
             )
         
@@ -826,7 +826,7 @@ class CardController:
 
         # Clearing cached properties:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_added_owner_attributes
             )
         
@@ -857,7 +857,7 @@ class CardController:
         # Looping throught the list and clearing cache:
         for cached_property_list in cached_property_list_collection:
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -983,7 +983,7 @@ class CardController:
                 "value",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
     
@@ -1080,7 +1080,7 @@ class CardController:
                 
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
     
@@ -1165,7 +1165,7 @@ class CardController:
                 "value",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1182,7 +1182,7 @@ class CardController:
                 "value"
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
     
@@ -1314,7 +1314,7 @@ class CardController:
                 "state_idle",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1416,7 +1416,7 @@ class CardController:
                 "state_idle",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
 
@@ -1509,7 +1509,7 @@ class CardController:
                 "state_idle",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1571,7 +1571,7 @@ class CardController:
                 "render_tilt_arch",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute = cached_property_list
                 )
             
@@ -1597,7 +1597,7 @@ class CardController:
                 "render_tilt_arch",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute = cached_property_list
                 )
         
@@ -1637,7 +1637,7 @@ class CardController:
                 "render_tilt_arch",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
 
@@ -1694,7 +1694,7 @@ class CardController:
                 "state_idle",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1718,7 +1718,7 @@ class CardController:
                 "state_idle",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1755,7 +1755,7 @@ class CardController:
                 "state_idle",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1811,7 +1811,7 @@ class CardController:
                 "coordinates_hover"
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1834,7 +1834,7 @@ class CardController:
                 "coordinates_hover"
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1870,7 +1870,7 @@ class CardController:
                 "coordinates_hover"
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1926,7 +1926,7 @@ class CardController:
                 "coordinates_select"
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1949,7 +1949,7 @@ class CardController:
                 "coordinates_select"
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -1985,7 +1985,7 @@ class CardController:
                 "coordinates_select"
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -2138,7 +2138,7 @@ class CardController:
                 "texture_filepath_front",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -2168,7 +2168,7 @@ class CardController:
                 "texture_filepath_back",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
     
@@ -2194,7 +2194,7 @@ class CardController:
                 "render_height",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -2220,7 +2220,7 @@ class CardController:
                 "render_height",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -3171,7 +3171,7 @@ class CardController:
                 "texture_object_selected"
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
 
@@ -3211,7 +3211,7 @@ class CardController:
                     "state_idle"
                     )
                 cache.clear_cached_property_list(
-                    target_object = self,
+                    target_obj = self,
                     target_attribute_list = cached_property_list
                     )
                 
@@ -3255,7 +3255,7 @@ class CardController:
                 "render_tilt_random",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
@@ -3296,7 +3296,7 @@ class CardController:
                 "render_alpha",
                 )
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             

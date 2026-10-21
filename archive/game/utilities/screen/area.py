@@ -528,7 +528,7 @@ class Area:
             "boundary"
             )
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = cached_property_list
             )
         

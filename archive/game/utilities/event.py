@@ -227,7 +227,7 @@ class Event:
 
         # Clearing cached properties:
         cache.clear_cached_property_list(
-            target_object = self,
+            target_obj = self,
             target_attribute_list = self.__cached_status_attributes
             )
     
@@ -249,7 +249,7 @@ class Event:
         # Looping throught the list and clearing cache:
         for cached_property_list in cached_property_list_collection:
             cache.clear_cached_property_list(
-                target_object = self,
+                target_obj = self,
                 target_attribute_list = cached_property_list
                 )
             
