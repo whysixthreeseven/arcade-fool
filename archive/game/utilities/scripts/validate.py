@@ -506,7 +506,7 @@ def validate_card_object(validate_value: object) -> None:
     """
     
     # Card class object:
-    from game.controller.card import CardController as Card
+    from game.controller.card import _Controller as Card
     
     # Asserting value type:
     assertion.assert_value_type(

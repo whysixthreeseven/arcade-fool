@@ -15,7 +15,7 @@ from game import context
 class GameSnapshot:
 
     # Importing controllers to avoid circular imports:
-    from game.controller.card import CardController as Card
+    from game.controller.card import _Controller as Card
 
     # Turn and round information:
     turn_num: int
@@ -61,7 +61,7 @@ class GameSnapshot:
 class ComputerAction:
 
     # Importing controllers to avoid circular imports:
-    from game.controller.card import CardController as Card
+    from game.controller.card import _Controller as Card
 
     # Action type and card object involved:
     action_type: Literal["Attack", "Defend", "Fold", "Pass"]        # Default values found in game.context.COMPUTER_ACTION

@@ -10,7 +10,7 @@ from game.controller.location.table import TableController
 from game.controller.location.deck import DeckController
 from game.controller.location.hand import HandController
 from game.controller.player import PlayerController
-from game.controller.card import CardController as Card
+from game.controller.card import _Controller as Card
 
 # Settings, session and context:
 from game.settings import SETTINGS

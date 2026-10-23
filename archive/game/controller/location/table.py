@@ -1,5 +1,5 @@
 # Card class object:
-from game.controller.card import CardController as Card
+from game.controller.card import _Controller as Card
 
 # External libraries:
 import arcade

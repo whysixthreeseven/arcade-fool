@@ -4,7 +4,7 @@ from game.controller.location.discard import DiscardController
 from game.controller.location.table import TableController
 from game.controller.location.deck import DeckController
 from game.controller.location.hand import HandController
-from game.controller.card import CardController as Card
+from game.controller.card import _Controller as Card
 from game.utilities.screen import area
 from game.utilities.screen.surface import Surface
 
