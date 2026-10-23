@@ -5,3 +5,4 @@ venv
 # Test files:
 **/test.py
 
+/archive
