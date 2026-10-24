@@ -3,10 +3,11 @@ from typing import Literal
 
 
 # RGB color variables:
-RGB_Color = tuple[int, int, int]
-RGBA_Color = tuple[int, int, int, int]
+RGB = tuple[int, int, int]
+RGBA = tuple[int, int, int, int]
 Location = tuple[str, int]
 Coordinates = tuple[float, float]
-Coordinates_Type = Literal["current", "position", "expected", "hover", "select"]
+CoordinatesType = Literal["current", "position", "expected", "hover", "select"]
+StateType = Literal["hovered", "selected", "playable", "controlled", "ready", "showcase"]
 
 
