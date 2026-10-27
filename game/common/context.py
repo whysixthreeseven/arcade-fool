@@ -191,6 +191,53 @@ class _PlayerContext:
 
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    TEXTURE PACK CONTEXT MODULES AND CLASS COLLECTION
+
+"""
+
+
+class _TexturePackFrontContext:
+
+    # Context attributes:
+    TYPE: str = "Back"
+    DARK: str = "Dark"
+    LIGHT: str = "Light"
+    SEPIA: str = "Sepia"
+
+    # List and index:
+    LIST: tuple[str, ...] = (DARK, LIGHT, SEPIA)
+    INDEX: dict[str, tuple[str, ...]] = {
+        DARK: ("1_1", "2_1"),
+        LIGHT: ("1_1", "2_1", "2_2", "4_1", "4_2", "4_3"),
+        SEPIA: ("1_1", "2_1")
+        }
+
+
+class _TexturePackBackContext:
+
+    # Context attributes:
+    TYPE: str = "Back"
+    CROSS: str = "Cross"
+    MOUNTAIN: str = "Mountain"
+    PLAIN: str = "Plain"
+    SUN: str = "Sun"
+
+    # List and index:
+    LIST: tuple[str, ...] = (CROSS, MOUNTAIN, PLAIN, SUN)
+    INDEX: dict[str, tuple[str, ...]] = {
+        style: ("Blue", "Green", "Navy", "Orange", "Purple", "Red", "White") 
+        for style in LIST
+        }
+
+
+class _TexturePackContext:
+
+    # Related modules:
+    FRONT = _TexturePackFrontContext()
+    BACK = _TexturePackBackContext()
+
+
+""" '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     COMPUTER CONTEXT MODULES AND CLASS COLLECTION
 
 """
@@ -265,6 +312,7 @@ class _Context:
     CARD = _CardContext()
     PLAYER = _PlayerContext()
     COMPUTER = _ComputerContext()
+    TEXTUREPACK = _TexturePackContext()
 
 
 # Initializing context class instance:
