@@ -1,3 +1,6 @@
+# Typing and annotations:
+from typing import Literal
+
 # Assertion script:
 from game.utilities.scripts import assertion
 
