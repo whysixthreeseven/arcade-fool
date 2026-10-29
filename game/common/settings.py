@@ -15,7 +15,7 @@ class _AppSettings:
     NAME: str = "Arcade Fool"
     DESCRIPTION: str = "Fool game created with Python and arcade library"
     DATE_CREATED: str = "2026.09.01"
-    DATE_UPDATED: str = "2026.10.22"
+    DATE_UPDATED: str = "2026.10.25"
     VERSION: str = f"0.0.1.{DATE_UPDATED.replace(".", "")}"
     AUTHOR: str = "Andrey Vostokov"
 
@@ -55,8 +55,8 @@ class _CardAlphaModule:
 
 
 class _CardDebugModule:
-    COLOR_BG: namespace.RGBA_Color = (225, 225, 225, 255)
-    COLOR_TEXT: namespace.RGBA_Color = (0, 0, 0, 255)
+    COLOR_BG: namespace.RGBA = (225, 225, 225, 255)
+    COLOR_TEXT: namespace.RGBA = (0, 0, 0, 255)
     FONT_SIZE: int = 14
     FONT_FAMILY: str = "FiraCodeNerdFont-Medium.ttf"
 
@@ -89,7 +89,6 @@ class _CardSettings:
 
 
 class _DirectorySettings:
-
     APP: str = Path(__file__).resolve().parent.parent
     ASSETS: str = APP / "assets"
     SPRITES: str = ASSETS / "sprites"
