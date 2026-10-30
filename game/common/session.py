@@ -5,9 +5,7 @@ class _ModeModule:
 
 
 class _RulesModule:
-    __DECK_SIZE_MAX: int = 52               # Max deck size, 2 through Ace
-    __DECK_SIZE_MIN: int = 36               # Min (default) size, 6 through Ace
-    DECK_SIZE: int = __DECK_SIZE_MIN        # Deck size selected for the game
+    DECK_SIZE: int = 36                     # Deck size selected for the game
     HAND_SIZE_MIN: int = 6                  # Min hand size on refill event
     HAND_SIZE_MAX: int = DECK_SIZE          # Max hand size on sweep
     PLAY_COUNT_MIN: int = 1                 # Min number of cards to play per round on attack
