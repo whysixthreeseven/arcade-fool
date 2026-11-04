@@ -200,6 +200,9 @@ class _TexturePack:
                 custom_error = None,
                 )
 
+        # Updating attribute:
+        self.__color = set_value
+
     
     """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         TYPE ATTRIBUTE PROPERTIES AND METHODS
@@ -212,13 +215,41 @@ class _TexturePack:
         # Returning:
         return self.__type
 
-
     
     @property
     def type_repr(self) -> str:
 
-        
+        # Raising error, if attribute is not set before call:
+        if self.type is None:
+            error_message: str = f"Calling type_repr property on texture pack object with no type attribute set!"
+            raise AttributeError(error_message)
 
+        # Formatting:
+        type_repr: str = self.type.capitalize()
+
+        # Returning:
+        return type_repr
+
+
+    def set_type(
+            self,
+            set_value: str,
+            ignore_assertion: bool = False,
+            ) -> None:
+
+        # Assertion control:
+        if SESSION.DEBUG.ENABLE_ASSERTION and not ignore_assertion:
+            check_list: tuple[str, ...] = (
+                VAR.TEXTUREPACK.FRONT.TYPE,
+                VAR.TEXTUREPACK.BACK.TYPE,
+                )
+            assertion.assert_value_is_default(
+                check_value = set_value,
+                check_list = check_list,
+                raise_error = True,
+                custom_error = None,
+                )
+    
 
 """ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     TEXTURE PACK (FRONT) CLASS CONSTRUCTOR
