@@ -7,4 +7,3 @@ pyglet==2.1.16
 pymunk==6.9.0
 pytiled_parser==2.2.9
 typing_extensions==4.16.0
-
